@@ -13,7 +13,7 @@
     Master为主线程,有且只有一个\
     Worker线程唯一对应上下文实例,防止线程安全问题\
     Worker线程数默认为cpu核心数的2倍\
-    Worker可被安全的注销和重新生成,由Master管理\
+    Worker可被安全的注销和重新生成,由Master管理
 
 4. ##### PING的扩展性
     ping是高度可扩展的.
