@@ -21,7 +21,7 @@
     <modules>
         <module>ping-core</module>
         <module>ping-plugin</module>
-        <module>ping-common</module>
+        <module>ping-web</module>
         <module>ping-demo</module>
         <module>ping-api</module>
     </modules>
