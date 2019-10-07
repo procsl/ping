@@ -24,8 +24,6 @@
         <module>ping-web</module>
         <module>ping-demo</module>
         <module>ping-api</module>
-        <module>ping-util</module>
-        <module>ping-gen</module>
     </modules>
     <name>ping</name>
 
