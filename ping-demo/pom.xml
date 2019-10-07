@@ -11,5 +11,12 @@
 
     <artifactId>ping-demo</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>cn.procsl</groupId>
+            <artifactId>ping-web</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 
 </project>
