@@ -14,11 +14,6 @@ public class RouterTemplate extends HttpVerticle {
         router.route("").method(HttpMethod.GET).handler(requestHandler -> {
             // 路径参数
             String productType = requestHandler.request().getParam("producttype");
-
-            // 查询参数
-            String params = requestHandler.request().getParam("");
-
-
         });
     }
 }
