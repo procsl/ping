@@ -15,6 +15,7 @@
         <vertx.version>3.8.1</vertx.version>
         <spring.version>5.1.9.RELEASE</spring.version>
         <compiler.version>1.8</compiler.version>
+        <jackson.version>2.10.0</jackson.version>
         <main.class>io.vertx.core.Launcher</main.class>
         <main.verticle>cn.procsl.ping.demo.Application</main.verticle>
     </properties>
@@ -101,26 +102,26 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.9.9</version>
+            <version>${jackson.version}</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.9.9</version>
+            <version>${jackson.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-yaml</artifactId>
-            <version>2.9.9</version>
+            <version>${jackson.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.9.9</version>
+            <version>${jackson.version}</version>
         </dependency>
 
         <dependency>
