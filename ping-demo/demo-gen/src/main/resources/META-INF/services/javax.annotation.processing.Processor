@@ -1,1 +1,2 @@
-cn.procsl.ping.web.gen.AnnotationProcessor
+cn.procsl.ping.web.gen.process.GetProcessor
+cn.procsl.ping.web.gen.process.PostProcessor

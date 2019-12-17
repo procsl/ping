@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!--配置支持yaml-->
+    <bean class="org.springframework.beans.factory.config.YamlPropertiesFactoryBean" id="yamlPropertiesFactory"
+          primary="true">
+        <property name="singleton" value="true"/>
+        <property name="matchDefault" value="true"/>
+        <property name="resources" value="classpath*:*.yaml"/>
+    </bean>
+
+    <bean class="org.springframework.orm.hibernate5.HibernateTemplate">
+        <property name="sessionFactory" ref="sessionFactory"/>
+        <property name="cacheQueries" value="${ping.business.hibernate.cacheQueries:true}"/>
+        <property name="fetchSize" value="${ping.business.hibernate.fetchSize:50}"/>
+        <property name="checkWriteOperations" value="false"/>
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="sessionFactory" ref="sessionFactory"/>
+        <property name="validateExistingTransaction" value="true"/>
+    </bean>
+
+    <bean name="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean"
+          destroy-method="destroy">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="current_session_context_class">thread</prop>
+            </props>
+        </property>
+        <property name="packagesToScan" value="cn.procsl.business.user.entity"/>
+    </bean>
+
+    <bean class="com.zaxxer.hikari.HikariDataSource" name="dataSource" destroy-method="close"
+          lazy-init="true">
+        <property name="username" value="${ping.business.database.username}"/>
+        <property name="password" value="${ping.business.database.password}"/>
+        <property name="jdbcUrl" value="${ping.business.database.url}"/>
+        <property name="driverClassName" value="${ping.business.database.driver}"/>
+        <property name="maximumPoolSize" value="${ping.business.dataSource.poolSize:10}"></property>
+        <property name="poolName" value="${ping.business.dataSource.name:HikariDataSource}"></property>
+    </bean>
+
+    <context:component-scan base-package="cn.procsl.business"/>
+
+    <context:spring-configured/>
+
+    <context:load-time-weaver/>
+
+    <context:property-placeholder location="classpath:*.properties" file-encoding="UTF-8"
+                                  properties-ref="yamlPropertiesFactory"/>
+    <tx:annotation-driven transaction-manager="transactionManager" mode="aspectj"/>
+    <context:annotation-config/>
+</beans>

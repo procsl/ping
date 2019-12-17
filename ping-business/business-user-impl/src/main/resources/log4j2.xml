@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="off">
+    <appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="[%-d{HH:mm:ss}-%highlight{%-5level}]-%T: %l:%highlight{%m%n}"/>
+        </Console>
+    </appenders>
+    <loggers>
+        <!--        <logger name="io.netty" level="info"/>-->
+        <root level="debug">
+            <appender-ref ref="Console"/>
+        </root>
+    </loggers>
+</configuration>
