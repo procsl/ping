@@ -26,6 +26,7 @@ public class User implements EntityObject<String> {
     @Column(nullable = false, length = 20)
     protected String name;
 
+    @Enumerated
     protected UserDTO.Gender gender;
 
     @Column(nullable = false, unique = true, length = 20)
@@ -41,6 +42,7 @@ public class User implements EntityObject<String> {
     private String password;
 
     @Column(nullable = false, updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     protected Date createDate;
 
     @Version

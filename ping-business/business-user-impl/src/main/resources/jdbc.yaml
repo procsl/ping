@@ -1,9 +1,0 @@
-ping:
-  business:
-    dataSource:
-      poolSize: 4
-    database:
-      driver: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://${ping.business.database.host}:${ping.business.database.port}/ping?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&zeroDateTimeBehavior=CONVERT_TO_NULL&allowPublicKeyRetrieval=true
-      host: 127.0.0.1
-      port: 3306

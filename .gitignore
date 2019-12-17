@@ -1,4 +1,5 @@
 **/target
+**/jdbc.*
 
 ### STS ###
 .apt_generated
