@@ -17,7 +17,7 @@
         <compiler.version>1.8</compiler.version>
         <hibernate.version>5.4.10.Final</hibernate.version>
         <aspectj.version>1.9.4</aspectj.version>
-        <jackson.version>2.9.9</jackson.version>
+        <jackson.version>2.10.1</jackson.version>
     </properties>
 
     <dependencies>
