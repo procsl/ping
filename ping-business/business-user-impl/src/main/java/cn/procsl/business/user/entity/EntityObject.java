@@ -8,11 +8,16 @@ import java.io.Serializable;
  * @author procsl
  * @date 2019/12/13
  */
-public interface EntityObject<T extends Serializable> {
+public abstract class EntityObject<T extends Serializable> {
+
+    T id;
+
     /**
      * 获取实体ID
      *
      * @return 实体
      */
-    T getId();
+    public T getId() {
+        return id;
+    }
 }

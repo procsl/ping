@@ -28,11 +28,6 @@
     <bean name="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean"
           destroy-method="destroy">
         <property name="dataSource" ref="dataSource"/>
-        <property name="hibernateProperties">
-            <props>
-                <prop key="current_session_context_class">thread</prop>
-            </props>
-        </property>
         <property name="packagesToScan" value="cn.procsl.business.user.entity"/>
     </bean>
 
@@ -50,10 +45,11 @@
 
     <context:spring-configured/>
 
-    <context:load-time-weaver/>
+    <context:load-time-weaver aspectj-weaving="on"/>
 
     <context:property-placeholder location="classpath:*.properties" file-encoding="UTF-8"
                                   properties-ref="yamlPropertiesFactory"/>
-    <tx:annotation-driven transaction-manager="transactionManager" mode="aspectj"/>
+    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
+
     <context:annotation-config/>
 </beans>

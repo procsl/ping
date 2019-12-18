@@ -15,10 +15,10 @@ import java.util.Date;
  * @date 2019/12/17
  */
 @Service
-public class UserServiceImpl implements IUserService {
+public class TestUserServiceImpl implements IUserService {
 
-//    @Autowired
-//    HibernateDaoTemplate<String, User> hibernateDaoTemplate;
+    @Autowired
+    HibernateDaoTemplate<String, User> hibernateDaoTemplate;
 
     @Autowired
     HibernateTemplate template;
@@ -27,14 +27,14 @@ public class UserServiceImpl implements IUserService {
     @Transactional
     public void create() {
         User user = new User();
-        user.setGender(UserDTO.Gender.男)
-                .setVersion(1L)
-                .setAccount("12312312")
-                .setEmail("program_chen@foxmail.com")
-                .setPhone("hhhhe")
-                .setName("朝闻道")
-                .setCreateDate(new Date());
+        user.setGender(UserDTO.Gender.男);
+        user.setVersion(1L);
+        user.setAccount("12312312");
+        user.setEmail("program_chen@foxmail.com");
+        user.setPhone("hhhhe");
+        user.setName("朝闻道");
+        user.setCreateDate(new Date());
         template.save(user);
-//        hibernateDaoTemplate.save(user);
+        hibernateDaoTemplate.save(user);
     }
 }

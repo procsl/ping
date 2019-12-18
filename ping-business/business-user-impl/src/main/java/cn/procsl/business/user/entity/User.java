@@ -18,9 +18,12 @@ import java.util.Date;
 @Table
 @Getter
 @Setter
-public class User implements EntityObject<String> {
+public class User extends EntityObject<String> {
 
-    @Transient
+    @Id
+    @Column(length = 32)
+    @GenericGenerator(name = "idGenerator", strategy = "uuid")
+    @GeneratedValue(generator = "idGenerator")
     protected String id;
 
     @Column(nullable = false, length = 20)
@@ -48,12 +51,4 @@ public class User implements EntityObject<String> {
     @Version
     protected Long version;
 
-    @Override
-    @Id
-    @Column(length = 32)
-    @GenericGenerator(name = "idGenerator", strategy = "uuid")
-    @GeneratedValue(generator = "idGenerator")
-    public String getId() {
-        return id;
-    }
 }

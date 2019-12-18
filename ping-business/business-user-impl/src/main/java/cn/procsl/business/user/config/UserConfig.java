@@ -31,5 +31,4 @@ public class UserConfig {
      */
     @Value("${ping.business.config.user.systemAccountPassword:123456}")
     private String systemAccountPassword;
-
 }

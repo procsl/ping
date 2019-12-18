@@ -32,15 +32,15 @@ public class HibernateTest {
     public void save() {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
-        User user = new User()
-                .setName("朝闻道")
-                .setCreateDate(new Date())
-                .setPassword("1234567890")
-                .setGender(UserDTO.Gender.未知)
-                .setPhone("15197456789")
-                .setEmail("program_chen@foxmal.com")
-                .setAccount("123123098093")
-                .setVersion(1L);
+        User user = new User();
+        user.setName("朝闻道");
+        user.setCreateDate(new Date());
+        user.setPassword("1234567890");
+        user.setGender(UserDTO.Gender.未知);
+        user.setPhone("15197456789");
+        user.setEmail("program_chen@foxmal.com");
+        user.setAccount("123123098093");
+        user.setVersion(1L);
         session.save(user);
         transaction.commit();
         session.close();
@@ -51,15 +51,16 @@ public class HibernateTest {
     public void update() {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
-        User user = new User()
-                .setName("朝闻道")
-                .setCreateDate(new Date())
-                .setPassword("1234567890")
-                .setGender(UserDTO.Gender.未知)
-                .setPhone("15197456789")
-                .setEmail("program_chen@foxmal.com")
-                .setAccount("123123098093")
-                .setVersion(1L);
+        User user = new User();
+        user.setName("朝闻道");
+        user.setCreateDate(new Date());
+        user.setPassword("1234567890");
+        user.setGender(UserDTO.Gender.未知);
+        user.setPhone("15197456789");
+        user.setEmail("program_chen@foxmal.com");
+        user.setAccount("123123098093");
+        user.setVersion(1L);
+        ;
         transaction.commit();
         session.save(user);
         Assert.assertNotNull(user.getId());
@@ -79,15 +80,15 @@ public class HibernateTest {
     public void query() {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
-        User user = new User()
-                .setName("朝闻道")
-                .setCreateDate(new Date())
-                .setPassword("1234567890")
-                .setGender(UserDTO.Gender.未知)
-                .setPhone("15197456789")
-                .setEmail("program_chen@foxmal.com")
-                .setAccount("123123098093")
-                .setVersion(1L);
+        User user = new User();
+        user.setName("朝闻道");
+        user.setCreateDate(new Date());
+        user.setPassword("1234567890");
+        user.setGender(UserDTO.Gender.未知);
+        user.setPhone("15197456789");
+        user.setEmail("program_chen@foxmal.com");
+        user.setAccount("123123098093");
+        user.setVersion(1L);
         transaction.commit();
         session.save(user);
         Assert.assertNotNull(user.getId());
@@ -107,15 +108,15 @@ public class HibernateTest {
     public void delete() {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
-        User user = new User()
-                .setName("朝闻道")
-                .setCreateDate(new Date())
-                .setPassword("1234567890")
-                .setGender(UserDTO.Gender.未知)
-                .setPhone("15197456789")
-                .setEmail("program_chen@foxmal.com")
-                .setAccount("123123098093")
-                .setVersion(1L);
+        User user = new User();
+        user.setName("朝闻道");
+        user.setCreateDate(new Date());
+        user.setPassword("1234567890");
+        user.setGender(UserDTO.Gender.未知);
+        user.setPhone("15197456789");
+        user.setEmail("program_chen@foxmal.com");
+        user.setAccount("123123098093");
+        user.setVersion(1L);
         transaction.commit();
         session.save(user);
         Assert.assertNotNull(user.getId());
