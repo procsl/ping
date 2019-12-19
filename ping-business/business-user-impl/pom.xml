@@ -105,6 +105,7 @@
             <version>3.4.1</version>
         </dependency>
 
+        <!--抽个时间换掉 用google的-->
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
@@ -144,6 +145,26 @@
             <version>28.1-jre</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>6.1.0.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.el</groupId>
+            <artifactId>javax.el-api</artifactId>
+            <version>3.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.el</artifactId>
+            <version>3.0.1-b08</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -152,6 +173,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
+                    <!--保留参数名称-->
+                    <compilerArgument>-parameters</compilerArgument>
                     <compilerVersion>${compiler.version}</compilerVersion>
                 </configuration>
             </plugin>

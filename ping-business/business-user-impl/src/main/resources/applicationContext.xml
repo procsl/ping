@@ -47,6 +47,14 @@
         <property name="poolName" value="${ping.business.dataSource.name:HikariDataSource}"></property>
     </bean>
 
+    <!--参数校验-->
+    <bean class="org.springframework.validation.beanvalidation.MethodValidationPostProcessor">
+        <property name="validatedAnnotationType" value="javax.validation.Valid"/>
+    </bean>
+
+    <bean class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+    </bean>
+
     <context:component-scan base-package="cn.procsl.business"/>
 
     <context:spring-configured/>

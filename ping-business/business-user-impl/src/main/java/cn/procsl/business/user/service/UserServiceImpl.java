@@ -13,9 +13,11 @@ import org.springframework.validation.annotation.Validated;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 /**
  * 用户服务实现类
+ * 参数校验, 仅支持放在类上 且只能为 @Validated
  *
  * @author procsl
  * @date 2019/12/12
@@ -26,19 +28,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Integer create(@NotNull @NotEmpty @Size(min = 1) UserDTO... users) throws EntityExistException, BusinessException {
+    public Integer create(@NotNull @NotEmpty @Size(min = 1) List<UserDTO> users) throws EntityExistException, BusinessException {
         for (UserDTO dto : users) {
             new UserDO(dto).save();
         }
-        return users.length;
+        return users.size();
     }
 
     @Override
-    public Integer update(@NotNull @NotEmpty @Size(min = 1) UserDTO... users) throws EntityNotFoundException, BusinessException {
+    public Integer update(@NotNull @NotEmpty @Size(min = 1) List<UserDTO> users) throws EntityNotFoundException, BusinessException {
         for (UserDTO dto : users) {
             new UserDO(dto).update();
         }
-        return users.length;
+        return users.size();
     }
 
     @Override
@@ -47,10 +49,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Integer delete(@NotNull @NotEmpty @Size(min = 1) String... ids) throws BusinessException {
+    public Integer delete(@NotNull @NotEmpty @Size(min = 1) List<String> ids) throws BusinessException {
         for (String id : ids) {
             new UserDO(id).delete();
         }
-        return ids.length;
+        return ids.size();
     }
 }
