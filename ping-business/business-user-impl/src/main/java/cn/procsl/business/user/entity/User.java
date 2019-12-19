@@ -15,7 +15,12 @@ import java.util.Date;
  * @date 2019/12/14
  */
 @Entity
-@Table
+@Table(uniqueConstraints = {
+        // 以下列建索引
+        @UniqueConstraint(columnNames = {"account"}),
+        @UniqueConstraint(columnNames = {"phone"}),
+        @UniqueConstraint(columnNames = {"email"}),
+})
 @Getter
 @Setter
 public class User extends EntityObject<String> {
@@ -32,13 +37,13 @@ public class User extends EntityObject<String> {
     @Enumerated
     protected UserDTO.Gender gender;
 
-    @Column(nullable = false, unique = true, length = 20)
+    @Column(nullable = false, length = 20)
     private String account;
 
-    @Column(unique = true, length = 20)
+    @Column(length = 50)
     private String email;
 
-    @Column(unique = true, length = 20)
+    @Column(length = 20)
     private String phone;
 
     @Column(nullable = false, length = 32)
@@ -49,6 +54,7 @@ public class User extends EntityObject<String> {
     protected Date createDate;
 
     @Version
+    @Column(nullable = false)
     protected Long version;
 
 }

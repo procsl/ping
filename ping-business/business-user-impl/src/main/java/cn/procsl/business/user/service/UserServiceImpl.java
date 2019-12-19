@@ -8,6 +8,7 @@ import cn.procsl.business.user.dto.UserDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -25,7 +26,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Integer create(@NotNull @NotEmpty @Size(min = 1) UserDTO... users) throws IllegalArgsException, EntityExistException, BusinessException {
+    public Integer create(@NotNull @NotEmpty @Size(min = 1) UserDTO... users) throws EntityExistException, BusinessException {
         for (UserDTO dto : users) {
             new UserDO(dto).save();
         }
@@ -33,7 +34,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Integer update(@NotNull @NotEmpty @Size(min = 1) UserDTO... users) throws IllegalArgsException, EntityNotFoundException, BusinessException {
+    public Integer update(@NotNull @NotEmpty @Size(min = 1) UserDTO... users) throws EntityNotFoundException, BusinessException {
         for (UserDTO dto : users) {
             new UserDO(dto).update();
         }

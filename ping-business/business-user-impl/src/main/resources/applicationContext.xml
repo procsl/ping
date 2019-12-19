@@ -29,6 +29,12 @@
           destroy-method="destroy">
         <property name="dataSource" ref="dataSource"/>
         <property name="packagesToScan" value="cn.procsl.business.user.entity"/>
+        <property name="implicitNamingStrategy">
+            <bean class="cn.procsl.business.user.config.NameImplicitNamingStrategy"/>
+        </property>
+        <property name="physicalNamingStrategy">
+            <bean class="cn.procsl.business.user.config.LowCasePhysicalNamingStrategy"/>
+        </property>
     </bean>
 
     <bean class="com.zaxxer.hikari.HikariDataSource" name="dataSource" destroy-method="close"
@@ -49,7 +55,8 @@
 
     <context:property-placeholder location="classpath:*.properties" file-encoding="UTF-8"
                                   properties-ref="yamlPropertiesFactory"/>
-    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
+
+    <tx:annotation-driven proxy-target-class="true"/>
 
     <context:annotation-config/>
 </beans>

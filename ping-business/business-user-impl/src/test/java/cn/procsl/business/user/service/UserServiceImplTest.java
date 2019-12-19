@@ -38,7 +38,7 @@ public class UserServiceImplTest {
                         .build())
                 .name("朝闻道")
                 .build();
-        this.userService.create(user, user, user, user, user, user);
+        this.userService.create(null);
     }
 
     @Test
