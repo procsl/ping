@@ -33,6 +33,7 @@ public class TestUserServiceImpl implements IUserService {
         user.setEmail("program_chen@foxmail.com");
         user.setPhone("hhhhe");
         user.setName("朝闻道");
+        user.setPassword("用户密码吗");
         user.setCreateDate(new Date());
         template.save(user);
         hibernateDaoTemplate.save(user);

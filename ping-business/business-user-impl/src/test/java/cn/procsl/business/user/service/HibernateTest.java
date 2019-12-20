@@ -21,7 +21,7 @@ import java.util.Date;
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:applicationContext.xml"})
+@ContextConfiguration(locations = {"classpath*:spring/application.xml"})
 @Rollback
 public class HibernateTest {
 
@@ -35,11 +35,11 @@ public class HibernateTest {
         User user = new User();
         user.setName("朝闻道");
         user.setCreateDate(new Date());
-        user.setPassword("1234567890");
+        user.setPassword("123456ss7890");
         user.setGender(UserDTO.Gender.未知);
-        user.setPhone("15197456789");
-        user.setEmail("program_chen@foxmal.com");
-        user.setAccount("123123098093");
+        user.setPhone("151974ss56789");
+        user.setEmail("progssram_chen@foxmal.com");
+        user.setAccount("12312309ss8093");
         user.setVersion(1L);
         session.save(user);
         transaction.commit();
@@ -54,11 +54,11 @@ public class HibernateTest {
         User user = new User();
         user.setName("朝闻道");
         user.setCreateDate(new Date());
-        user.setPassword("1234567890");
+        user.setPassword("123456s7890");
         user.setGender(UserDTO.Gender.未知);
-        user.setPhone("15197456789");
-        user.setEmail("program_chen@foxmal.com");
-        user.setAccount("123123098093");
+        user.setPhone("1519745s6789");
+        user.setEmail("prograam_chen@foxmal.com");
+        user.setAccount("1231a23098093");
         user.setVersion(1L);
         ;
         transaction.commit();
@@ -85,9 +85,9 @@ public class HibernateTest {
         user.setCreateDate(new Date());
         user.setPassword("1234567890");
         user.setGender(UserDTO.Gender.未知);
-        user.setPhone("15197456789");
-        user.setEmail("program_chen@foxmal.com");
-        user.setAccount("123123098093");
+        user.setPhone("1519a7456789");
+        user.setEmail("proagram_chen@foxmal.com");
+        user.setAccount("12312a3098093");
         user.setVersion(1L);
         transaction.commit();
         session.save(user);
@@ -111,11 +111,11 @@ public class HibernateTest {
         User user = new User();
         user.setName("朝闻道");
         user.setCreateDate(new Date());
-        user.setPassword("1234567890");
+        user.setPassword("12345a67890");
         user.setGender(UserDTO.Gender.未知);
-        user.setPhone("15197456789");
-        user.setEmail("program_chen@foxmal.com");
-        user.setAccount("123123098093");
+        user.setPhone("151974a56789");
+        user.setEmail("prograam_chen@foxmal.com");
+        user.setAccount("1231a23098093");
         user.setVersion(1L);
         transaction.commit();
         session.save(user);

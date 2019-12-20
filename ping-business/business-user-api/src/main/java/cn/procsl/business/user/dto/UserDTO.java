@@ -2,8 +2,10 @@ package cn.procsl.business.user.dto;
 
 import lombok.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 /**
@@ -24,6 +26,7 @@ public class UserDTO implements Serializable {
      * 账户姓名
      */
     @NotEmpty
+    @Size(max = 20)
     protected String name;
 
     /**
@@ -36,6 +39,7 @@ public class UserDTO implements Serializable {
      * 用户账户
      */
     @NotNull
+    @Valid
     protected Account account;
 
     /**
@@ -65,6 +69,7 @@ public class UserDTO implements Serializable {
          */
         @NotNull
         @NotEmpty
+        @Size(max = 50)
         String credential;
 
         /**
@@ -72,6 +77,7 @@ public class UserDTO implements Serializable {
          */
         @NotNull
         @NotEmpty
+        @Size(min = 8, max = 16)
         String password;
 
         /**

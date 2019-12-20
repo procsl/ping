@@ -9,8 +9,6 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import javax.validation.ConstraintViolationException;
-
 import static cn.procsl.business.user.dto.UserDTO.Account.Type.email;
 import static cn.procsl.business.user.dto.UserDTO.Setting.Theme.black;
 import static cn.procsl.business.user.dto.UserDTO.Status.enable;
@@ -20,7 +18,7 @@ import static cn.procsl.business.user.dto.UserDTO.Status.enable;
  * @date 2019/12/14
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:applicationContext.xml"})
+@ContextConfiguration(locations = {"classpath:spring/application.xml"})
 @Rollback
 public class UserServiceImplTest {
 
@@ -32,7 +30,7 @@ public class UserServiceImplTest {
         UserDTO user = UserDTO.builder()
                 .account(UserDTO.Account.builder()
                         .credential("zhaowendao@procsl.cn")
-                        .password("chenshanlu")
+                        .password("chens11111anlu")
                         .type(email).build())
                 .gender(UserDTO.Gender.未知)
                 .status(enable)
@@ -43,11 +41,6 @@ public class UserServiceImplTest {
                 .build();
         this.userService.create(ImmutableList.of(user));
 
-    }
-
-    @Test(expected = ConstraintViolationException.class)
-    public void validate() {
-        this.userService.create(null);
     }
 
     @Test

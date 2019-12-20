@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -24,11 +25,12 @@ import java.util.List;
  */
 @Slf4j
 @Service
+@Validated
 public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Integer create(@NotNull @NotEmpty @Size(min = 1) List<UserDTO> users) throws EntityExistException, BusinessException {
+    public Integer create(List<UserDTO> users) throws EntityExistException, BusinessException {
         for (UserDTO dto : users) {
             new UserDO(dto).save();
         }
@@ -36,7 +38,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Integer update(@NotNull @NotEmpty @Size(min = 1) List<UserDTO> users) throws EntityNotFoundException, BusinessException {
+    @Transactional(rollbackFor = Exception.class)
+    public Integer update(List<UserDTO> users) throws EntityNotFoundException, BusinessException {
         for (UserDTO dto : users) {
             new UserDO(dto).update();
         }
@@ -44,12 +47,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserDTO> query(@NotNull QueryContext<UserDTO> queryContext) throws UnSupportQueryException {
+    public Page<UserDTO> query(QueryContext<UserDTO> queryContext) throws UnSupportQueryException {
         return null;
     }
 
     @Override
-    public Integer delete(@NotNull @NotEmpty @Size(min = 1) List<String> ids) throws BusinessException {
+    @Transactional(rollbackFor = Exception.class)
+    public Integer delete(List<String> ids) throws BusinessException {
         for (String id : ids) {
             new UserDO(id).delete();
         }

@@ -18,7 +18,6 @@ import java.util.List;
  * @author procsl
  * @date 2019/12/11
  */
-@Valid
 public interface UserService {
 
     /**
@@ -32,7 +31,7 @@ public interface UserService {
      * @throws EntityExistException 若用户账户/邮箱/手机号已存在则抛出此异常
      * @throws BusinessException    通用的业务异常
      */
-    Integer create(@NotNull @NotEmpty @Size(min = 1) List<UserDTO> user) throws IllegalArgsException, EntityExistException, BusinessException;
+    Integer create(@NotNull @NotEmpty @Size(min = 1, max = 10) @Valid List<@NotNull UserDTO> user) throws IllegalArgsException, EntityExistException, BusinessException;
 
     /**
      * 更新用户信息
@@ -43,7 +42,7 @@ public interface UserService {
      * @throws EntityNotFoundException 实体未找到异常
      * @throws BusinessException       通用的业务异常
      */
-    Integer update(@NotNull @NotEmpty @Size(min = 1) List<UserDTO> user) throws IllegalArgsException, EntityNotFoundException, BusinessException;
+    Integer update(@NotNull @NotEmpty @Size(min = 1, max = 10) List<@NotNull @NotEmpty @Valid UserDTO> user) throws IllegalArgsException, EntityNotFoundException, BusinessException;
 
     /**
      * 账户查询方法
@@ -61,5 +60,5 @@ public interface UserService {
      * @return 返回成功删除的用户信息条数
      * @throws BusinessException 如果删除出现问题则抛出异常
      */
-    Integer delete(@NotNull @NotEmpty @Size(min = 1) List<String> id) throws BusinessException;
+    Integer delete(@NotNull @NotEmpty @Size(min = 1, max = 10) List<@NotNull @NotEmpty @Size(min = 32, max = 32) String> id) throws BusinessException;
 }

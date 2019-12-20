@@ -1,16 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
-
-    <!--配置支持yaml-->
-    <bean class="org.springframework.beans.factory.config.YamlPropertiesFactoryBean" id="yamlPropertiesFactory"
-          primary="true">
-        <property name="singleton" value="true"/>
-        <property name="matchDefault" value="true"/>
-        <property name="resources" value="classpath*:*.yaml"/>
-    </bean>
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean class="org.springframework.orm.hibernate5.HibernateTemplate">
         <property name="sessionFactory" ref="sessionFactory"/>
@@ -37,8 +28,7 @@
         </property>
     </bean>
 
-    <bean class="com.zaxxer.hikari.HikariDataSource" name="dataSource" destroy-method="close"
-          lazy-init="true">
+    <bean class="com.zaxxer.hikari.HikariDataSource" name="dataSource" destroy-method="close">
         <property name="username" value="${ping.business.database.username}"/>
         <property name="password" value="${ping.business.database.password}"/>
         <property name="jdbcUrl" value="${ping.business.database.url}"/>
@@ -47,24 +37,4 @@
         <property name="poolName" value="${ping.business.dataSource.name:HikariDataSource}"></property>
     </bean>
 
-    <!--参数校验-->
-    <bean class="org.springframework.validation.beanvalidation.MethodValidationPostProcessor">
-        <property name="validatedAnnotationType" value="javax.validation.Valid"/>
-    </bean>
-
-    <bean class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
-    </bean>
-
-    <context:component-scan base-package="cn.procsl.business"/>
-
-    <context:spring-configured/>
-
-    <context:load-time-weaver aspectj-weaving="on"/>
-
-    <context:property-placeholder location="classpath:*.properties" file-encoding="UTF-8"
-                                  properties-ref="yamlPropertiesFactory"/>
-
-    <tx:annotation-driven proxy-target-class="true"/>
-
-    <context:annotation-config/>
 </beans>

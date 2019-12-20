@@ -3,7 +3,6 @@ package cn.procsl.business.user.config;
 import org.hibernate.boot.model.naming.*;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.util.Comparator;
 import java.util.List;
 
 /**
