@@ -19,12 +19,12 @@
     <bean name="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean"
           destroy-method="destroy">
         <property name="dataSource" ref="dataSource"/>
-        <property name="packagesToScan" value="cn.procsl.business.user.entity"/>
+        <property name="packagesToScan" value="cn.procsl.business.impl.user.entity"/>
         <property name="implicitNamingStrategy">
-            <bean class="cn.procsl.business.user.config.NameImplicitNamingStrategy"/>
+            <bean class="cn.procsl.business.impl.user.config.NameImplicitNamingStrategy"/>
         </property>
         <property name="physicalNamingStrategy">
-            <bean class="cn.procsl.business.user.config.LowCasePhysicalNamingStrategy"/>
+            <bean class="cn.procsl.business.impl.user.config.LowCasePhysicalNamingStrategy"/>
         </property>
     </bean>
 

@@ -15,7 +15,7 @@
         <property name="resources" value="classpath*:jdbc.yaml"/>
     </bean>
 
-    <context:component-scan base-package="cn.procsl.business"/>
+    <context:component-scan base-package="cn.procsl.business.impl.user"/>
 
     <context:spring-configured/>
 

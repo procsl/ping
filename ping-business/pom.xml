@@ -15,6 +15,7 @@
         <module>business-user-api</module>
         <module>business-core</module>
         <module>business-user-impl</module>
+        <module>business-user-web</module>
     </modules>
 
     <dependencies>
