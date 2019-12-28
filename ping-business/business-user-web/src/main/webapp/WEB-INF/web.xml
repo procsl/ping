@@ -6,13 +6,12 @@
          xmlns="http://java.sun.com/xml/ns/javaee"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
          version="2.5">
-
-    <display-name>Web Application</display-name>
+    <display-name>Archetype Created Web Application</display-name>
 
     <servlet>
         <description>请求入口</description>
         <servlet-name>MainServlet</servlet-name>
-        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <servlet-class>cn.procsl.business.user.web.components.DispatcherServlet</servlet-class>
         <init-param>
             <param-name>contextConfigLocation</param-name>
             <param-value>classpath:spring/user-web.xml</param-value>
@@ -28,4 +27,5 @@
     <session-config>
         <session-timeout>10</session-timeout>
     </session-config>
+
 </web-app>

@@ -44,15 +44,15 @@ public class BusinessException extends RuntimeException implements Serializable 
     }
 
     public BusinessException() {
-        super(null, null);
+        super(null, null, log.isDebugEnabled(), log.isDebugEnabled());
     }
 
     public BusinessException(String message) {
-        super(message, null);
+        super(message, null, log.isDebugEnabled(), log.isDebugEnabled());
     }
 
     public BusinessException(String message, String code) {
-        super(message, null);
+        super(message, null, log.isDebugEnabled(), log.isDebugEnabled());
         this.code = code;
     }
 

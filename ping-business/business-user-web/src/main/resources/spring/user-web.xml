@@ -2,9 +2,65 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
     <context:component-scan base-package="cn.procsl.business.user.web"/>
 
-    <import resource="user-business.xml"/>
+    <!--    <import resource="user-business.xml"/>-->
+
+    <!--全局异常处理-->
+    <bean id="handlerExceptionResolver" primary="true"
+          class="cn.procsl.business.user.web.error.RestHandlerExceptionResolver"/>
+
+    <!--配置类容协商处理器-->
+    <bean class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean"
+          id="mvcContentNegotiationManager">
+        <property name="favorPathExtension" value="true"/>
+        <property name="favorParameter" value="true"/>
+        <property name="parameterName" value="$format"/>
+        <property name="defaultContentType" value="application/json"/>
+        <property name="mediaTypes">
+            <map>
+                <entry key="json" value="application/json"/>
+                <entry key="xml" value="application/xml"/>
+            </map>
+        </property>
+        <property name="ignoreUnknownPathExtensions" value="true"/>
+    </bean>
+
+    <!--    会自动注册一些组件-->
+    <mvc:annotation-driven content-negotiation-manager="mvcContentNegotiationManager"
+                           enable-matrix-variables="true">
+    </mvc:annotation-driven>
+
+    <mvc:redirect-view-controller path="/" redirect-url="/apis.json"/>
+
+    <!--    内容协商处理器-->
+    <bean class="cn.procsl.business.user.web.components.resolver.CustomerContentNegotiatingViewResolver">
+        <property name="contentNegotiationManager" ref="mvcContentNegotiationManager"/>
+        <property name="useNotAcceptableStatusCode" value="true"/>
+        <property name="defaultViews" ref="jsonView"/>
+        <property name="viewResolvers">
+            <list>
+                <bean class="cn.procsl.business.user.web.components.resolver.JsonResolver"></bean>
+                <bean class="cn.procsl.business.user.web.components.resolver.XmlResolver"></bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="jsonView" class="org.springframework.web.servlet.view.json.MappingJackson2JsonView">
+        <property name="extractValueFromSingleKeyModel" value="true"/>
+        <property name="contentType" value="application/json"/>
+        <property name="disableCaching" value="false"/>
+        <property name="updateContentLength" value="true"/>
+    </bean>
+
+    <bean name="xmlView" class="org.springframework.web.servlet.view.xml.MappingJackson2XmlView">
+        <property name="updateContentLength" value="true"/>
+        <property name="disableCaching" value="false"/>
+        <property name="contentType" value="application/xml"/>
+    </bean>
+
+
 </beans>

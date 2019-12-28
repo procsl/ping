@@ -15,6 +15,7 @@
         <module>demo-gen</module>
         <module>demo-web</module>
         <module>dome-jooq</module>
+        <module>demo-webapp</module>
     </modules>
 
 </project>
