@@ -15,7 +15,7 @@ public class NotFoundException extends BusinessException {
     public NotFoundException(String httpMethod, String requestURL) {
         this.httpMethod = httpMethod;
         this.requestURL = requestURL;
-        this.code = "404";
+        this.code = "001";
     }
 
     @Override

@@ -1,5 +1,6 @@
 package cn.procsl.business.user.web.router;
 
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -11,11 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("users")
 public class UserController {
 
-//    @Autowired
-//    private UserService userService;
+    @PostMapping
+    public void create() {
+    }
 
-//    @PostMapping
-//    public void create(UserDTO user) {
-//        this.userService.create(ImmutableList.of(user));
-//    }
+    public String test() {
+        return "test";
+    }
 }
