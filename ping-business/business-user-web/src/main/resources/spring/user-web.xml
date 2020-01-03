@@ -24,6 +24,10 @@
             <map>
                 <entry key="json" value="application/json"/>
                 <entry key="xml" value="application/xml"/>
+                <entry key="html" value="application/xml"/>
+                <entry key="jsp" value="application/xml"/>
+                <entry key="php" value="application/xml"/>
+                <entry key="asp" value="application/xml"/>
             </map>
         </property>
         <property name="ignoreUnknownPathExtensions" value="true"/>
@@ -36,7 +40,7 @@
         <property name="order" value="-1"/>
         <property name="returnValueHandlers">
             <list>
-                <bean class="cn.procsl.business.user.web.components.SimpleTypeValueHandler">
+                <bean class="cn.procsl.business.user.web.components.SimpleTypeValueHandler" init-method="init">
                     <property name="order" value="1"/>
                 </bean>
                 <bean class="cn.procsl.business.user.web.components.ReturnValueHandlerHook">
@@ -61,15 +65,12 @@
         <property name="contentType" value="application/json"/>
         <property name="disableCaching" value="false"/>
         <property name="updateContentLength" value="true"/>
-        <property name="beanName" value="object"/>
     </bean>
 
     <bean name="xmlView" class="org.springframework.web.servlet.view.xml.MappingJackson2XmlView">
         <property name="updateContentLength" value="true"/>
         <property name="disableCaching" value="false"/>
         <property name="contentType" value="application/xml"/>
-        <property name="beanName" value="object"/>
-        <property name="modelKey" value="__return_key__"/>
     </bean>
 
 
