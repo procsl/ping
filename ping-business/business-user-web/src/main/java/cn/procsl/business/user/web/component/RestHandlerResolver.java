@@ -1,4 +1,4 @@
-package cn.procsl.business.user.web.components;
+package cn.procsl.business.user.web.component;
 
 import cn.procsl.business.user.web.annotation.Accepted;
 import cn.procsl.business.user.web.annotation.Created;
@@ -14,7 +14,6 @@ import org.springframework.core.Ordered;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.method.support.ModelAndViewContainer;
@@ -24,7 +23,6 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestResponseBody
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * @author procsl
@@ -72,7 +70,6 @@ public class RestHandlerResolver implements HandlerMethodReturnValueHandler, Ord
             mavContainer.addAttribute(this.returnKey, returnValue);
         }
 
-        response.setHeader("Content-type", MediaType.TEXT_HTML_VALUE);
         do {
 
             HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
@@ -80,6 +77,7 @@ public class RestHandlerResolver implements HandlerMethodReturnValueHandler, Ord
                 break;
             }
 
+//            response.setHeader("Content-type", MediaType.TEXT_HTML_VALUE);
             // 如果存在此注解或者为Void类型, 直接返回
             if (returnType.getParameterType() == Void.class || returnType.hasMethodAnnotation(NoContent.class)) {
                 this.requestResponseBodyMethodProcessor.handleReturnValue(null, returnType, mavContainer, webRequest);

@@ -1,4 +1,4 @@
-package cn.procsl.business.user.web.components.exception;
+package cn.procsl.business.user.web.component.exception;
 
 
 import cn.procsl.business.exception.BusinessException;

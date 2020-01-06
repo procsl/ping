@@ -1,4 +1,4 @@
-package cn.procsl.business.user.web.components.resolver;
+package cn.procsl.business.user.web.component.resolver;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

@@ -11,7 +11,7 @@
     <servlet>
         <description>请求入口</description>
         <servlet-name>MainServlet</servlet-name>
-        <servlet-class>cn.procsl.business.user.web.components.DispatcherServlet</servlet-class>
+        <servlet-class>cn.procsl.business.user.web.component.DispatcherServlet</servlet-class>
         <init-param>
             <param-name>contextConfigLocation</param-name>
             <param-value>classpath:spring/user-web.xml</param-value>

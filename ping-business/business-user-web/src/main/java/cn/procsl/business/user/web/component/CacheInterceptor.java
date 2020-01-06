@@ -1,4 +1,4 @@
-package cn.procsl.business.user.web.components;
+package cn.procsl.business.user.web.component;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.HandlerInterceptor;

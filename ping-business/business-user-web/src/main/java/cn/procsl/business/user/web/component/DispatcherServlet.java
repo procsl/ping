@@ -1,9 +1,8 @@
-package cn.procsl.business.user.web.components;
+package cn.procsl.business.user.web.component;
 
-import cn.procsl.business.user.web.components.exception.NotFoundException;
+import cn.procsl.business.user.web.component.exception.NotFoundException;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.HttpServletRequest;

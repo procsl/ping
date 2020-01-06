@@ -12,7 +12,7 @@
           class="cn.procsl.business.user.web.error.RestHandlerExceptionResolver"/>
 
     <mvc:interceptors>
-        <bean class="cn.procsl.business.user.web.components.CacheInterceptor"/>
+        <bean class="cn.procsl.business.user.web.component.CacheInterceptor"/>
     </mvc:interceptors>
 
     <bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
@@ -39,20 +39,20 @@
         <property name="order" value="-1"/>
         <property name="returnValueHandlers">
             <list>
-                <bean class="cn.procsl.business.user.web.components.RestHandlerResolver">
+                <bean class="cn.procsl.business.user.web.component.RestHandlerResolver">
                     <property name="order" value="2"/>
                 </bean>
             </list>
         </property>
     </bean>
 
-    <bean class="cn.procsl.business.user.web.components.resolver.RestViewResolver">
+    <bean class="cn.procsl.business.user.web.component.resolver.RestViewResolver">
         <property name="contentNegotiationManager" ref="contentNegotiationManager"/>
         <property name="defaultView" ref="jsonView"/>
         <property name="order" value="100"/>
     </bean>
 
-    <bean name="jsonView" class="cn.procsl.business.user.web.components.view.JsonView">
+    <bean name="jsonView" class="cn.procsl.business.user.web.component.view.JsonView">
         <property name="extractValueFromSingleKeyModel" value="true"/>
         <property name="contentType" value="application/json"/>
         <property name="disableCaching" value="false"/>

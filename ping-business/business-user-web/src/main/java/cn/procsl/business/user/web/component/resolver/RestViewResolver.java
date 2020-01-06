@@ -1,20 +1,16 @@
-package cn.procsl.business.user.web.components.resolver;
+package cn.procsl.business.user.web.component.resolver;
 
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
-import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**

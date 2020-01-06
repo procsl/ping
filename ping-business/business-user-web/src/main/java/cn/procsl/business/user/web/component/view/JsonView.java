@@ -1,8 +1,8 @@
-package cn.procsl.business.user.web.components.view;
+package cn.procsl.business.user.web.component.view;
 
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.servlet.view.xml.MappingJackson2XmlView;
+import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 import java.util.Map;
 
@@ -10,8 +10,7 @@ import java.util.Map;
  * @author procsl
  * @date 2020/01/01
  */
-public class XmlView extends MappingJackson2XmlView {
-
+public class JsonView extends MappingJackson2JsonView {
 
     @Setter
     @Value("${ping.business.web.errorKey:__error_key__}")
@@ -32,4 +31,5 @@ public class XmlView extends MappingJackson2XmlView {
         }
         return super.filterModel(model);
     }
+
 }
