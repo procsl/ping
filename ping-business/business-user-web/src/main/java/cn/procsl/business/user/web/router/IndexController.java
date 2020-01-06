@@ -28,7 +28,7 @@ public class IndexController {
 
     @Data
     public static class TestObject {
-        private String field;
-        private String name;
+        private String field = "123";
+        private String name = "朝闻道";
     }
 }

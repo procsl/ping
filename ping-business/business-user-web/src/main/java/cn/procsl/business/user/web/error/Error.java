@@ -7,7 +7,7 @@ import lombok.Data;
  * @date 2019/12/25
  */
 @Data
-public class ErrorEntity {
+public class Error {
 
     private String code;
 

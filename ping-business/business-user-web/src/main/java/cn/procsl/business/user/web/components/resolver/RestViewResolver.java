@@ -70,28 +70,4 @@ public class RestViewResolver extends ContentNegotiatingViewResolver {
         return null;
     }
 
-//    protected List<MediaType> getMediaTypes(HttpServletRequest request) {
-//        try {
-//            ServletWebRequest webRequest = new ServletWebRequest(request);
-//            List<MediaType> acceptableMediaTypes = this.contentNegotiationManager.resolveMediaTypes(webRequest);
-//            List<MediaType> producibleMediaTypes = getProducibleMediaTypes(request);
-//            Set<MediaType> compatibleMediaTypes = new LinkedHashSet<>();
-//            for (MediaType acceptable : acceptableMediaTypes) {
-//                for (MediaType producible : producibleMediaTypes) {
-//                    if (acceptable.isCompatibleWith(producible)) {
-//                        compatibleMediaTypes.add(getMostSpecificMediaType(acceptable, producible));
-//                    }
-//                }
-//            }
-//            List<MediaType> selectedMediaTypes = new ArrayList<>(compatibleMediaTypes);
-//            MediaType.sortBySpecificityAndQuality(selectedMediaTypes);
-//            return selectedMediaTypes;
-//        } catch (HttpMediaTypeNotAcceptableException ex) {
-//            if (logger.isDebugEnabled()) {
-//                logger.debug(ex.getMessage());
-//            }
-//            return null;
-//        }
-//    }
-
 }

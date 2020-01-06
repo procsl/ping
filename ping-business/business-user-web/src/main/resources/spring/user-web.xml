@@ -25,7 +25,6 @@
                 <entry key="json" value="application/json"/>
                 <entry key="xml" value="application/xml"/>
                 <entry key="html" value="application/xml"/>
-                <entry key="jsp" value="application/xml"/>
                 <entry key="php" value="application/xml"/>
                 <entry key="asp" value="application/xml"/>
             </map>
@@ -40,10 +39,7 @@
         <property name="order" value="-1"/>
         <property name="returnValueHandlers">
             <list>
-                <bean class="cn.procsl.business.user.web.components.SimpleTypeValueHandler" init-method="init">
-                    <property name="order" value="1"/>
-                </bean>
-                <bean class="cn.procsl.business.user.web.components.ReturnValueHandlerHook">
+                <bean class="cn.procsl.business.user.web.components.RestHandlerResolver">
                     <property name="order" value="2"/>
                 </bean>
             </list>
@@ -52,11 +48,7 @@
 
     <bean class="cn.procsl.business.user.web.components.resolver.RestViewResolver">
         <property name="contentNegotiationManager" ref="contentNegotiationManager"/>
-        <property name="defaultViews">
-            <list>
-                <ref bean="jsonView"/>
-            </list>
-        </property>
+        <property name="defaultView" ref="jsonView"/>
         <property name="order" value="100"/>
     </bean>
 
