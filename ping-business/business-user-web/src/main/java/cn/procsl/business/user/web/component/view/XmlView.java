@@ -1,7 +1,6 @@
 package cn.procsl.business.user.web.component.view;
 
-import lombok.Setter;
-import org.springframework.beans.factory.annotation.Value;
+import cn.procsl.business.user.web.component.Constant;
 import org.springframework.web.servlet.view.xml.MappingJackson2XmlView;
 
 import java.util.Map;
@@ -12,24 +11,8 @@ import java.util.Map;
  */
 public class XmlView extends MappingJackson2XmlView {
 
-
-    @Setter
-    @Value("${ping.business.web.errorKey:__error_key__}")
-    protected String errorKey;
-
-    @Setter
-    @Value("${ping.business.web.returnKey:__return_key__}")
-    protected String returnKey;
-
     @Override
     protected Object filterModel(Map<String, Object> model) {
-        if (model.containsKey(this.returnKey)) {
-            return model.get(this.returnKey);
-        }
-
-        if (model.containsKey(errorKey)) {
-            return model.get(this.errorKey);
-        }
-        return super.filterModel(model);
+        return Constant.filter(model);
     }
 }

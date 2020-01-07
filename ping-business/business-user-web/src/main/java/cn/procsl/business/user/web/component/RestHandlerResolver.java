@@ -3,26 +3,27 @@ package cn.procsl.business.user.web.component;
 import cn.procsl.business.user.web.annotation.Accepted;
 import cn.procsl.business.user.web.annotation.Created;
 import cn.procsl.business.user.web.annotation.NoContent;
+import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.method.support.ModelAndViewContainer;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author procsl
@@ -36,16 +37,10 @@ public class RestHandlerResolver implements HandlerMethodReturnValueHandler, Ord
     int order;
 
     @Setter
-    @Value("${ping.business.web.returnKey:__return_key__}")
-    private String returnKey;
+    private RequestResponseBodyMethodProcessor process;
 
-    @Autowired
-    @Setter
-    private RequestMappingHandlerAdapter requestMappingHandlerAdapter;
-
-    @Setter
-    private RequestResponseBodyMethodProcessor requestResponseBodyMethodProcessor;
-
+    @Autowired(required = false)
+    private List<HttpMessageConverter<?>> httpMessageConverters;
 
     /**
      * 拦截所有的类型
@@ -67,7 +62,7 @@ public class RestHandlerResolver implements HandlerMethodReturnValueHandler, Ord
         HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);
         // 判断是否为简单类型,如果是则直接根据相关的注解返回
         if (!isSimpleType(returnValue, returnType)) {
-            mavContainer.addAttribute(this.returnKey, returnValue);
+            mavContainer.addAttribute(Constant.RETURN_VALUE.getValue(), returnValue);
         }
 
         do {
@@ -77,11 +72,10 @@ public class RestHandlerResolver implements HandlerMethodReturnValueHandler, Ord
                 break;
             }
 
-//            response.setHeader("Content-type", MediaType.TEXT_HTML_VALUE);
             // 如果存在此注解或者为Void类型, 直接返回
             if (returnType.getParameterType() == Void.class || returnType.hasMethodAnnotation(NoContent.class)) {
-                this.requestResponseBodyMethodProcessor.handleReturnValue(null, returnType, mavContainer, webRequest);
                 response.setStatus(HttpStatus.NO_CONTENT.value());
+                this.process.handleReturnValue(null, returnType, mavContainer, webRequest);
                 return;
             }
 
@@ -112,24 +106,14 @@ public class RestHandlerResolver implements HandlerMethodReturnValueHandler, Ord
             String link = replace(create.name(), location, id);
             response.setHeader("Location", link);
         } while (false);
-        this.requestResponseBodyMethodProcessor.handleReturnValue(returnValue, returnType, mavContainer, webRequest);
+        this.process.handleReturnValue(returnValue, returnType, mavContainer, webRequest);
     }
 
-
     private boolean isSimpleType(Object returnValue, MethodParameter returnType) throws IOException {
-        if (returnValue == null) {
-            return true;
-        }
-        if (returnType.getParameterType() == Void.class) {
-            return true;
-        }
-        if (returnType.getParameterType() == String.class) {
-            return true;
-        }
-        if (returnType.getParameterType().isInstance(Number.class)) {
-            return true;
-        }
-        return false;
+        return returnValue == null ||
+                Void.class.isAssignableFrom(returnType.getParameterType()) ||
+                String.class.isAssignableFrom(returnType.getParameterType()) ||
+                Number.class.isAssignableFrom(returnType.getParameterType());
     }
 
     protected String convert(Object returnValue, MethodParameter returnType) {
@@ -160,8 +144,15 @@ public class RestHandlerResolver implements HandlerMethodReturnValueHandler, Ord
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        if (this.requestResponseBodyMethodProcessor == null) {
-            this.requestResponseBodyMethodProcessor = new RequestResponseBodyMethodProcessor(this.requestMappingHandlerAdapter.getMessageConverters());
+        if (this.process == null) {
+            final List<HttpMessageConverter<?>> list;
+            if (this.httpMessageConverters == null) {
+                list = ImmutableList.of(new StringHttpMessageConverter(), new NumberHttpMessageConverter(), new DateConverter());
+            } else {
+                list = this.httpMessageConverters;
+            }
+            this.process = new RequestResponseBodyMethodProcessor(list);
         }
     }
+
 }

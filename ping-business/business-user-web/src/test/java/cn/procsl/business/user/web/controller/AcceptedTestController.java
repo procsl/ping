@@ -31,7 +31,7 @@ public class AcceptedTestController {
         return 200D;
     }
 
-    @PostMapping("double")
+    @PostMapping("long")
     @Accepted
     public long postLong() {
         return 3000L;

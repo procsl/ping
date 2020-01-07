@@ -40,7 +40,6 @@ public class RestViewResolver extends ContentNegotiatingViewResolver {
             return bestView;
         }
 
-        // TODO
         return defaultView;
     }
 

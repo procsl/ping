@@ -54,16 +54,17 @@
 
     <bean name="jsonView" class="cn.procsl.business.user.web.component.view.JsonView">
         <property name="extractValueFromSingleKeyModel" value="true"/>
-        <property name="contentType" value="application/json"/>
         <property name="disableCaching" value="false"/>
         <property name="updateContentLength" value="true"/>
     </bean>
 
-    <bean name="xmlView" class="org.springframework.web.servlet.view.xml.MappingJackson2XmlView">
+    <bean name="xmlView" class="cn.procsl.business.user.web.component.view.XmlView">
         <property name="updateContentLength" value="true"/>
         <property name="disableCaching" value="false"/>
-        <property name="contentType" value="application/xml"/>
     </bean>
 
+    <bean class="cn.procsl.business.user.web.component.NumberHttpMessageConverter"/>
+    <bean class="cn.procsl.business.user.web.component.DateConverter"/>
+    <bean class="org.springframework.http.converter.StringHttpMessageConverter"/>
 
 </beans>
