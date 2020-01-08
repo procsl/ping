@@ -73,7 +73,7 @@ public class RestHandlerResolver implements HandlerMethodReturnValueHandler, Ord
             }
 
             // 如果存在此注解或者为Void类型, 直接返回
-            if (returnType.getParameterType() == Void.class || returnType.hasMethodAnnotation(NoContent.class)) {
+            if (returnType.getParameterType().getName().equals("void") || Void.class.isAssignableFrom(returnType.getParameterType())|| returnType.hasMethodAnnotation(NoContent.class)) {
                 response.setStatus(HttpStatus.NO_CONTENT.value());
                 this.process.handleReturnValue(null, returnType, mavContainer, webRequest);
                 return;

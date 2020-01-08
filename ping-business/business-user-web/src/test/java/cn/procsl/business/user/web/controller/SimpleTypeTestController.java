@@ -12,35 +12,30 @@ import java.util.Date;
  * @date 2020/01/06
  */
 @Controller
-@RequestMapping("accepted")
-public class AcceptedTestController {
+@RequestMapping("simple")
+public class SimpleTypeTestController {
 
     @PostMapping("string")
-    @Accepted
     public String postString() {
         return "string";
     }
 
     @PostMapping("integer")
-    @Accepted
     public int postVoid() {
         return 100;
     }
 
     @PostMapping("double")
-    @Accepted
     public double postDouble() {
         return 200D;
     }
 
     @PostMapping("long")
-    @Accepted
     public long postLong() {
         return 3000L;
     }
 
     @PostMapping("date")
-    @Accepted
     public Date postDate() {
         return new Date();
     }
