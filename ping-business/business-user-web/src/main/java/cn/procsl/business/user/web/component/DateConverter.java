@@ -55,6 +55,10 @@ public class DateConverter extends AbstractHttpMessageConverter<Date> implements
 
     @Override
     protected void writeInternal(Date date, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
+        MediaType content = outputMessage.getHeaders().getContentType();
+        if (content == null) {
+            outputMessage.getHeaders().setContentType(MediaType.TEXT_PLAIN);
+        }
         String str = format.format(date);
         if (this.getDefaultCharset() == null) {
             outputMessage.getBody().write(str.getBytes());

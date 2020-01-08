@@ -21,6 +21,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.regex.Matcher;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -62,8 +64,7 @@ public class AcceptedTest {
         mockMvc.perform(post)
                 // 必须是Accepted的状态码
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN_VALUE))
-                .andExpect(status().isAccepted())
-                .andExpect(content().string("200"));
+                .andExpect(status().isAccepted());
     }
 
     @Test
@@ -85,4 +86,14 @@ public class AcceptedTest {
                 .andExpect(status().isAccepted())
                 .andExpect(content().string("100"));
     }
+
+    @Test
+    public void testDate() throws Exception {
+        MockHttpServletRequestBuilder post = post("/accepted/date");
+        mockMvc.perform(post)
+                // 必须是Accepted的状态码
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN_VALUE))
+                .andExpect(status().isAccepted());
+    }
+
 }

@@ -67,7 +67,7 @@ public class RestHandlerExceptionResolver extends AbstractHandlerExceptionResolv
         Error error = new Error();
         error.setMessage(log.isDebugEnabled() ? ex.getMessage() : this.defaultMessage);
         error.setCode("500000");
-        log.error("全局异常:{}, {}", ex.getMessage(), ex.getStackTrace());
+        log.error("全局异常", ex);
         return mv.addObject(this.errorKey, error);
     }
 

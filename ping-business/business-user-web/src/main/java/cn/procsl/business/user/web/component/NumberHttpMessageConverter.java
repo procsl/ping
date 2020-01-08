@@ -82,7 +82,15 @@ public class NumberHttpMessageConverter extends AbstractHttpMessageConverter<Num
 
     @Override
     protected void writeInternal(Number number, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
-        outputMessage.getBody().write(number.byteValue());
+        MediaType content = outputMessage.getHeaders().getContentType();
+        if (content == null) {
+            outputMessage.getHeaders().setContentType(MediaType.TEXT_PLAIN);
+        }
+        if (this.getDefaultCharset() != null) {
+            outputMessage.getBody().write(number.toString().getBytes(this.getDefaultCharset()));
+        } else {
+            outputMessage.getBody().write(number.toString().getBytes());
+        }
     }
 
     @Override

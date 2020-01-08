@@ -5,6 +5,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.Date;
+
 /**
  * @author procsl
  * @date 2020/01/06
@@ -36,4 +38,11 @@ public class AcceptedTestController {
     public long postLong() {
         return 3000L;
     }
+
+    @PostMapping("date")
+    @Accepted
+    public Date postDate() {
+        return new Date();
+    }
+
 }
