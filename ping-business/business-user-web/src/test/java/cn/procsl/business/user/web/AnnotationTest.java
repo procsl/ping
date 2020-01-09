@@ -1,5 +1,6 @@
 package cn.procsl.business.user.web;
 
+import cn.procsl.business.user.web.component.filter.LogTraceFilter;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +35,7 @@ public class AnnotationTest {
 
     @Before
     public void before() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).addFilters(new LogTraceFilter()).build();
         Assert.assertNotNull("mockMvc 初始化失败", mockMvc);
     }
 
