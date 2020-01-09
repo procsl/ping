@@ -61,8 +61,9 @@ public class RestHandlerResolver implements HandlerMethodReturnValueHandler, Ord
 
         HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);
         // 判断是否为简单类型,如果是则直接根据相关的注解返回
-        if (!isSimpleType(returnValue, returnType)) {
+        if (!isSimpleType(returnType)) {
             mavContainer.addAttribute(Constant.RETURN_VALUE.getValue(), returnValue);
+            return;
         }
 
         do {
@@ -109,9 +110,8 @@ public class RestHandlerResolver implements HandlerMethodReturnValueHandler, Ord
         this.process.handleReturnValue(returnValue, returnType, mavContainer, webRequest);
     }
 
-    private boolean isSimpleType(Object returnValue, MethodParameter returnType) throws IOException {
-        return returnValue == null ||
-                Void.class.isAssignableFrom(returnType.getParameterType()) ||
+    private boolean isSimpleType(MethodParameter returnType) throws IOException {
+        return Void.class.isAssignableFrom(returnType.getParameterType()) ||
                 String.class.isAssignableFrom(returnType.getParameterType()) ||
                 Number.class.isAssignableFrom(returnType.getParameterType());
     }

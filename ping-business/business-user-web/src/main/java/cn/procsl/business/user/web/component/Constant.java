@@ -1,7 +1,6 @@
 package cn.procsl.business.user.web.component;
 
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.Map;
 
@@ -27,6 +26,6 @@ public enum Constant {
         if (model.containsKey(Constant.ERROR_VALUE.value)) {
             return model.get(Constant.ERROR_VALUE.value);
         }
-        return null;
+        return "";
     }
 }

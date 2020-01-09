@@ -1,7 +1,7 @@
 package cn.procsl.business.user.web.error;
 
 import cn.procsl.business.exception.BusinessException;
-import lombok.Setter;
+import cn.procsl.business.user.web.component.Constant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,10 +26,6 @@ public class RestHandlerExceptionResolver extends AbstractHandlerExceptionResolv
     @Value("ping.business.user.web.defaultMessage:系统错误")
     private String defaultMessage;
 
-    @Setter
-    @Value("ping.business.web.errorKey:__error_key__")
-    protected String errorKey;
-
     @Autowired
     private ApplicationContext applicationContext;
 
@@ -45,7 +41,7 @@ public class RestHandlerExceptionResolver extends AbstractHandlerExceptionResolv
             Error error = new Error();
             error.setMessage(ex.getMessage());
             error.setCode(((BusinessException) ex).httpStatus() + ((BusinessException) ex).getCode());
-            return mv.addObject(this.errorKey, error);
+            return mv.addObject(Constant.ERROR_VALUE.getValue(), error);
         }
 
         if (ex instanceof HttpRequestMethodNotSupportedException) {
@@ -53,14 +49,14 @@ public class RestHandlerExceptionResolver extends AbstractHandlerExceptionResolv
             Error error = new Error();
             error.setMessage(log.isDebugEnabled() ? ex.getMessage() : "Not Acceptable");
             error.setCode("4006001");
-            return mv.addObject(this.errorKey, error);
+            return mv.addObject(Constant.ERROR_VALUE.getValue(), error);
         }
 
         if (ex instanceof NoHandlerFoundException) {
             Error error = new Error();
             error.setMessage(log.isDebugEnabled() ? ex.getMessage() : "Not Found");
             error.setCode("4004001");
-            return mv.addObject(this.errorKey, error);
+            return mv.addObject(Constant.ERROR_VALUE.getValue(), error);
         }
 
         response.setStatus(500);
@@ -68,7 +64,7 @@ public class RestHandlerExceptionResolver extends AbstractHandlerExceptionResolv
         error.setMessage(log.isDebugEnabled() ? ex.getMessage() : this.defaultMessage);
         error.setCode("500000");
         log.error("全局异常", ex);
-        return mv.addObject(this.errorKey, error);
+        return mv.addObject(Constant.ERROR_VALUE.getValue(), error);
     }
 
     @Override
