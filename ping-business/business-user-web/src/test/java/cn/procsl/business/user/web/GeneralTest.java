@@ -74,8 +74,8 @@ public class GeneralTest {
         mockMvc.perform(get)
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(xpath("//key1").string("value"))
-                .andExpect(xpath("//key2").string("value2"))
+                .andExpect(xpath("/root/key1").string("value"))
+                .andExpect(xpath("/root/key2").string("value2"))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_XML));
     }
 
@@ -85,10 +85,18 @@ public class GeneralTest {
         mockMvc.perform(get)
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(xpath("/RegularImmutableList/item[1]").string("hello"))
-                .andExpect(xpath("/RegularImmutableList/item[2]").string("world"))
-                .andExpect(xpath("/RegularImmutableList/item[3]").string("list"))
+                .andExpect(xpath("/root/item[1]").string("hello"))
+                .andExpect(xpath("/root/item[2]").string("world"))
+                .andExpect(xpath("/root/item[3]").string("list"))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_XML));
     }
 
+    @Test
+    public void formatXmlObject() throws Exception {
+        MockHttpServletRequestBuilder get = MockMvcRequestBuilders.get("/format/object.xml");
+        mockMvc.perform(get)
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_XML));
+    }
 }

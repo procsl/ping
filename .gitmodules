@@ -1,0 +1,3 @@
+[submodule "ping-third/squiggly"]
+	path = ping-third/squiggly
+	url = https://github.com/procsl/squiggly.git

@@ -1,10 +1,12 @@
 package cn.procsl.business.user.web.controller;
 
+import cn.procsl.business.user.web.error.RestError;
 import com.google.common.collect.ImmutableList;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +17,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("format")
-public class GeneralController {
+public class GeneralController implements Serializable {
 
     @GetMapping("map")
     public Map<String, String> map() {
@@ -28,6 +30,19 @@ public class GeneralController {
     @GetMapping("list")
     public List<String> list() {
         return ImmutableList.of("hello", "world", "list");
+    }
+
+    @GetMapping("object")
+    public Object object() {
+        return new Serializable() {
+            public String helloWorld;
+            public RestError restError;
+
+            {
+                restError = new RestError().setCode("123").setMessage("哈哈哈哈哈哈哈哈");
+                helloWorld = "你好呀";
+            }
+        };
     }
 
 }

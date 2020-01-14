@@ -24,7 +24,9 @@
             <map>
                 <entry key="json" value="application/json"/>
                 <entry key="xml" value="application/xml"/>
-                <entry key="html" value="application/xml"/>
+                <entry key="html" value="application/json"/>
+                <entry key="yaml" value="application/yaml"/>
+                <entry key="yml" value="application/yaml"/>
                 <entry key="php" value="application/xml"/>
                 <entry key="asp" value="application/xml"/>
             </map>
@@ -63,8 +65,21 @@
         <property name="disableCaching" value="false"/>
     </bean>
 
+    <bean name="yaml" class="cn.procsl.business.user.web.component.view.YamlView">
+        <constructor-arg value="application/yaml"/>
+        <property name="updateContentLength" value="true"/>
+    </bean>
+
     <bean class="cn.procsl.business.user.web.component.NumberHttpMessageConverter"/>
     <bean class="cn.procsl.business.user.web.component.DateConverter"/>
     <bean class="org.springframework.http.converter.StringHttpMessageConverter"/>
+
+    <bean id="fieldFilterProvider" class="cn.procsl.business.user.web.component.FieldFilterProvider">
+        <constructor-arg index="0" value="filter"/>
+        <constructor-arg index="1" value="**"/>
+    </bean>
+    <bean id="propertyFilter" class="com.github.bohnman.squiggly.filter.SquigglyPropertyFilter">
+        <constructor-arg ref="fieldFilterProvider"/>
+    </bean>
 
 </beans>

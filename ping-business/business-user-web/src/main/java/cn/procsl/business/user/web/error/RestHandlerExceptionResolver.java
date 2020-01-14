@@ -38,7 +38,7 @@ public class RestHandlerExceptionResolver extends AbstractHandlerExceptionResolv
         // 业务异常依据抛出的业务的异常的指示返回状态码
         if (ex instanceof BusinessException) {
             response.setStatus(((BusinessException) ex).httpStatus());
-            Error error = new Error();
+            RestError error = new RestError();
             error.setMessage(ex.getMessage());
             error.setCode(((BusinessException) ex).httpStatus() + ((BusinessException) ex).getCode());
             return mv.addObject(Constant.ERROR_VALUE.getValue(), error);
@@ -46,21 +46,21 @@ public class RestHandlerExceptionResolver extends AbstractHandlerExceptionResolv
 
         if (ex instanceof HttpRequestMethodNotSupportedException) {
             response.setStatus(406);
-            Error error = new Error();
+            RestError error = new RestError();
             error.setMessage(log.isDebugEnabled() ? ex.getMessage() : "Not Acceptable");
             error.setCode("4006001");
             return mv.addObject(Constant.ERROR_VALUE.getValue(), error);
         }
 
         if (ex instanceof NoHandlerFoundException) {
-            Error error = new Error();
+            RestError error = new RestError();
             error.setMessage(log.isDebugEnabled() ? ex.getMessage() : "Not Found");
             error.setCode("4004001");
             return mv.addObject(Constant.ERROR_VALUE.getValue(), error);
         }
 
         response.setStatus(500);
-        Error error = new Error();
+        RestError error = new RestError();
         error.setMessage(log.isDebugEnabled() ? ex.getMessage() : this.defaultMessage);
         error.setCode("500000");
         log.error("全局异常", ex);
