@@ -61,6 +61,7 @@
     </bean>
 
     <bean name="xmlView" class="cn.procsl.business.user.web.component.view.XmlView">
+        <constructor-arg value="root"/>
         <property name="updateContentLength" value="true"/>
         <property name="disableCaching" value="false"/>
     </bean>
