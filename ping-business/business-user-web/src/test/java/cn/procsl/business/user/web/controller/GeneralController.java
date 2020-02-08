@@ -35,12 +35,12 @@ public class GeneralController implements Serializable {
     @GetMapping("object")
     public Object object() {
         return new Serializable() {
-            public String helloWorld;
-            public RestError restError;
+            public String echo;
+            public RestError error;
 
             {
-                restError = new RestError().setCode("123").setMessage("哈哈哈哈哈哈哈哈");
-                helloWorld = "你好呀";
+                error = new RestError().setCode("123").setMessage("哈哈哈哈哈哈哈哈");
+                echo = "你好呀";
             }
         };
     }

@@ -1,4 +1,4 @@
-package cn.procsl.business.user.web.router;
+package cn.procsl.business.user.web.controller;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
@@ -8,20 +8,20 @@ import lombok.Data;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
 
 /**
  * @author procsl
- * @date 2019/12/25
+ * @date 2020/02/07
  */
-@RequestMapping
-@RestController
-public class IndexController {
+@Controller
+@RequestMapping("filter")
+public class FilterController {
 
     @Autowired
     ApplicationContext context;
@@ -39,18 +39,18 @@ public class IndexController {
 
         String two = "朝闻道";
 
-        Test three = new Test();
+        TestObject.Test three = new TestObject.Test();
 
-        Stack stack = new Stack();
+        TestObject.Stack stack = new TestObject.Stack();
 
-        Stack[] stacks = {stack, stack, stack, stack};
+        TestObject.Stack[] stacks = {stack, stack, stack, stack};
 
         public static class Stack {
             @Getter
             String name = "name";
             @Getter
             String echo = "echo hello";
-            
+
             @Getter
             String fuck = "fuck";
         }
@@ -59,7 +59,7 @@ public class IndexController {
         public static class Test {
             @JacksonXmlProperty(localName = "item")
             @JacksonXmlElementWrapper(localName = "items")
-            List list = ImmutableList.of(new Stack(), new Stack());
+            List list = ImmutableList.of(new TestObject.Stack(), new TestObject.Stack());
 
             Map<String, String> map = ImmutableMap.of("key", "value");
 
@@ -69,4 +69,5 @@ public class IndexController {
 
         }
     }
+
 }

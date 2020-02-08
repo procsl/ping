@@ -1,12 +1,12 @@
 package cn.procsl.business.user.web.component.view;
 
 import cn.procsl.business.user.web.component.Constant;
+import cn.procsl.business.user.web.component.FieldsPropertyFilter;
+import cn.procsl.business.user.web.component.PropertyFilterMixin;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
-import com.github.bohnman.squiggly.filter.SquigglyPropertyFilter;
-import com.github.bohnman.squiggly.filter.SquigglyPropertyFilterMixin;
 import lombok.Setter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,8 +54,8 @@ public class YamlView extends AbstractJackson2View implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
         ObjectMapper mapper = this.getObjectMapper();
         mapper.configure(INDENT_OUTPUT, this.format);
-        SimpleFilterProvider filterProvider = new SimpleFilterProvider().addFilter(SquigglyPropertyFilter.FILTER_ID, propertyFilter);
+        SimpleFilterProvider filterProvider = new SimpleFilterProvider().addFilter(FieldsPropertyFilter.FILTER_ID, propertyFilter);
         mapper.setFilterProvider(filterProvider);
-        mapper.addMixIn(Object.class, SquigglyPropertyFilterMixin.class);
+        mapper.addMixIn(Object.class, PropertyFilterMixin.class);
     }
 }

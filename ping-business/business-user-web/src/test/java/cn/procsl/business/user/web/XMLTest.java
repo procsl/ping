@@ -2,7 +2,7 @@ package cn.procsl.business.user.web;
 
 import cn.procsl.business.user.web.router.IndexController;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonStreamContext;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.cfg.MapperConfig;
@@ -15,7 +15,6 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.github.bohnman.squiggly.filter.SquigglyPropertyFilter;
-import com.github.bohnman.squiggly.filter.SquigglyPropertyFilterMixin;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
@@ -81,12 +80,11 @@ public class XMLTest {
             }
 
             @Override
-            public void serializeAsField(Object pojo, JsonGenerator jgen, SerializerProvider provider, PropertyWriter writer) throws Exception {
-                log.debug("current node name:{}", jgen.getOutputContext().getCurrentName());
-                JsonStreamContext oc = jgen.getOutputContext();
-                String root = null;
-                log.error("root node name:{}", root);
-                super.serializeAsField(pojo, jgen, provider, writer);
+            public void serializeAsField(Object pojo, JsonGenerator general, SerializerProvider provider, PropertyWriter writer) throws Exception {
+                log.debug("s-当前节点的path:{}", general.getOutputContext().pathAsPointer().toString());
+                log.debug("name:{}", writer.getName());
+                super.serializeAsField(pojo, general, provider, writer);
+                log.debug("e-当前节点的path:{}\n\n\n", general.getOutputContext().pathAsPointer().toString());
             }
 
             @Override
@@ -102,15 +100,14 @@ public class XMLTest {
 
     @Test
     public void run() throws IOException {
-        XmlMapper mapper = new XmlMapper();
+        ObjectMapper mapper = new XmlMapper();
         mapper.setPropertyNamingStrategy(strategy);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         mapper.configure(INDENT_OUTPUT, true);
 
         mapper.setFilterProvider(filterProvider);
-        mapper.addMixIn(Object.class, SquigglyPropertyFilterMixin.class);
 
-        mapper.writer().withRootName("root").writeValue(out, index.api());
+        mapper.writer().writeValue(out, index.api());
 
         log.debug("\n--------------xml-----------\n{}\n-----------------xml------------", out.toString());
     }

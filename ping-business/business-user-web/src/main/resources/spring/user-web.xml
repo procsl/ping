@@ -75,12 +75,10 @@
     <bean class="cn.procsl.business.user.web.component.DateConverter"/>
     <bean class="org.springframework.http.converter.StringHttpMessageConverter"/>
 
-    <bean id="fieldFilterProvider" class="cn.procsl.business.user.web.component.FieldFilterProvider">
-        <constructor-arg index="0" value="filter"/>
-        <constructor-arg index="1" value="**"/>
-    </bean>
-    <bean id="propertyFilter" class="com.github.bohnman.squiggly.filter.SquigglyPropertyFilter">
-        <constructor-arg ref="fieldFilterProvider"/>
-    </bean>
+<!--    <bean id="fieldFilterProvider" class="cn.procsl.business.user.web.component.FieldFilterProvider">-->
+<!--        <constructor-arg index="0" value="filter"/>-->
+<!--        <constructor-arg index="1" value="**"/>-->
+<!--    </bean>-->
+    <bean id="propertyFilter" class="cn.procsl.business.user.web.component.FieldsPropertyFilter"/>
 
 </beans>
