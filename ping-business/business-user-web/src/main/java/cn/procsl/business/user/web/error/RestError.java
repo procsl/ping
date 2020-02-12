@@ -1,5 +1,6 @@
 package cn.procsl.business.user.web.error;
 
+import cn.procsl.business.user.web.component.SkipFilter;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -9,6 +10,7 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
+@SkipFilter
 public class RestError {
 
     private String code;

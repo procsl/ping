@@ -1,6 +1,5 @@
 package cn.procsl.business.user.web.router;
 
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -57,8 +56,7 @@ public class IndexController {
 
         @Data
         public static class Test {
-            @JacksonXmlProperty(localName = "item")
-            @JacksonXmlElementWrapper(localName = "items")
+
             List list = ImmutableList.of(new Stack(), new Stack());
 
             Map<String, String> map = ImmutableMap.of("key", "value");

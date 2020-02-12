@@ -29,7 +29,7 @@ import static com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT;
  * @date 2020/01/15
  */
 @Slf4j
-public class XMLTest {
+public class XmlTest {
 
     private PropertyNamingStrategy strategy;
 

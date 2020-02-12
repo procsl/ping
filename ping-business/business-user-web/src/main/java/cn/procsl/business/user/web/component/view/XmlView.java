@@ -36,7 +36,10 @@ public class XmlView extends MappingJackson2XmlView implements InitializingBean 
     }
 
     public XmlView(String rootName) {
-        super(new XmlMapper() {
+        super(new XmlMapper(){
+            {
+                this.setDefaultUseWrapper(false);
+            }
             @Override
             public ObjectWriter writer() {
                 return super.writer().withRootName(rootName);
@@ -52,4 +55,6 @@ public class XmlView extends MappingJackson2XmlView implements InitializingBean 
         mapper.setFilterProvider(filterProvider);
         mapper.addMixIn(Object.class, PropertyFilterMixin.class);
     }
+
+
 }

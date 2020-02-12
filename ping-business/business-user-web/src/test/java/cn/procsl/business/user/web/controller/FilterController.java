@@ -1,6 +1,6 @@
 package cn.procsl.business.user.web.controller;
 
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import cn.procsl.business.user.web.error.RestError;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -31,6 +31,12 @@ public class FilterController {
         return new TestObject();
     }
 
+
+    @GetMapping("skip-filter")
+    public Object skipFilter() {
+        return new RestError().setMessage("test").setCode("121212");
+    }
+
     @Data
     public static class TestObject {
 
@@ -57,8 +63,7 @@ public class FilterController {
 
         @Data
         public static class Test {
-            @JacksonXmlProperty(localName = "item")
-            @JacksonXmlElementWrapper(localName = "items")
+
             List list = ImmutableList.of(new TestObject.Stack(), new TestObject.Stack());
 
             Map<String, String> map = ImmutableMap.of("key", "value");

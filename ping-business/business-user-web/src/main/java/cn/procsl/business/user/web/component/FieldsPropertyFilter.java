@@ -1,11 +1,12 @@
 package cn.procsl.business.user.web.component;
 
-import cn.procsl.business.user.web.FilterProperties;
+import cn.procsl.business.user.web.FilterPattern;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonStreamContext;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.PropertyWriter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableList;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
@@ -13,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author procsl
@@ -40,23 +44,20 @@ public class FieldsPropertyFilter extends SimpleBeanPropertyFilter implements In
 
     @Override
     public void serializeAsField(Object pojo, JsonGenerator jgen, SerializerProvider provider, PropertyWriter writer) throws Exception {
-
         // 如果该类存在过指定的注解, 则直接跳过
         if (pojo.getClass().isAnnotationPresent(SkipFilter.class)) {
             super.serializeAsField(pojo, jgen, provider, writer);
             return;
         }
 
-        FilterProperties properties = this.process(this.request);
+        // 未解析到参数也跳过
+        FilterPattern properties = this.once(this.request);
         if (properties == null) {
             super.serializeAsField(pojo, jgen, provider, writer);
             return;
         }
 
-        // 构建路径
-        String path = jgen.getOutputContext().pathAsPointer().toString() + "/" + writer.getName();
-        path = path.substring(1).replace("/", ".");
-
+        List path = this.buildPath(jgen, writer);
         log.debug("path:{}", path);
         if (properties.matches(path)) {
             super.serializeAsField(pojo, jgen, provider, writer);
@@ -64,15 +65,39 @@ public class FieldsPropertyFilter extends SimpleBeanPropertyFilter implements In
         }
     }
 
+    protected List<String> buildPath(JsonGenerator jgen, PropertyWriter writer) {
+        JsonStreamContext start;
+        if (jgen.getOutputContext().hasCurrentIndex()) {
+            start = jgen.getOutputContext().getParent();
+        } else {
+            start = jgen.getOutputContext();
+        }
+
+        if (start != null) {
+            LinkedList<String> builder = new LinkedList<>();
+            if (start.getCurrentName() != null) {
+                builder.add(start.getCurrentName());
+            }
+            while (!start.inRoot() && (start = start.getParent()) != null) {
+                if (start.inObject()) {
+                    builder.add(start.getCurrentName());
+                }
+            }
+            builder.add(0, writer.getName());
+            Collections.reverse(builder);
+            return builder;
+        }
+        return ImmutableList.of(writer.getName());
+    }
 
 
     /**
      * 每个请求处理一次
      */
-    protected FilterProperties process(HttpServletRequest request) {
+    protected FilterPattern once(HttpServletRequest request) {
         Object params = request.getAttribute(this.getClass().getName());
         if (params != null) {
-            return (FilterProperties) params;
+            return (FilterPattern) params;
         }
 
         // 如果指定的参数不存在则跳过
@@ -81,24 +106,21 @@ public class FieldsPropertyFilter extends SimpleBeanPropertyFilter implements In
             return null;
         }
 
-        FilterProperties properties = new FilterProperties();
-
         // 如果指定的类型为null, 则默认使用 include
         String type = this.request.getParameter(this.filterType);
+        FilterPattern.PatternType filterType;
         if (StringUtils.isEmpty(type)) {
-            properties.setType(FilterProperties.FilterType.INCLUDE);
+            filterType = FilterPattern.PatternType.include;
         } else {
             try {
-                properties.setType(FilterProperties.FilterType.valueOf(type));
+                filterType = FilterPattern.PatternType.valueOf(type);
             } catch (Exception e) {
-                properties.setType(FilterProperties.FilterType.INCLUDE);
+                filterType = FilterPattern.PatternType.include;
             }
         }
 
         // 解析参数
-        ImmutableSet<String> set = ImmutableSet.copyOf(filterParam.split(","));
-        properties.setFields(set);
-
+        FilterPattern properties = new FilterPattern(filterType, filterParam);
         this.request.setAttribute(this.getClass().getName(), properties);
         return properties;
     }
@@ -110,7 +132,7 @@ public class FieldsPropertyFilter extends SimpleBeanPropertyFilter implements In
         }
 
         if (this.filterType == null) {
-            this.filterType = "filter";
+            this.filterType = "pattern";
         }
     }
 }

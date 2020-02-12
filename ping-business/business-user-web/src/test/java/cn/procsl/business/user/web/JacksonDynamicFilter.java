@@ -3,9 +3,9 @@ package cn.procsl.business.user.web;
 import cn.procsl.business.user.web.controller.FilterController;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.ser.PropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.github.shihyuho.jackson.databind.DynamicFilterMixIn;
 import com.github.shihyuho.jackson.databind.DynamicFilterProvider;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,7 @@ public class JacksonDynamicFilter {
     @Test
     public void test() throws JsonProcessingException {
 
-        ObjectMapper mapper = new XmlMapper();
+        ObjectMapper mapper = new JsonMapper();
         mapper.addMixIn(Object.class, DynamicFilterMixIn.class);
         mapper.setFilterProvider(new DynamicFilterProvider());
 
