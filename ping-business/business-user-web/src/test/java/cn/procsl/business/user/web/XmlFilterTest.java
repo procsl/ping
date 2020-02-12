@@ -89,8 +89,22 @@ public class XmlFilterTest {
                 .andExpect(xpath("/root/@one").exists())
                 .andExpect(xpath("/root/three").exists())
                 .andExpect(xpath("/root/stack").exists())
-                .andExpect(xpath("/root/stacks").exists())
                 .andExpect(xpath("/root/stacks/name").doesNotExist())
+                .andExpect(xpath("/root/stacks/echo").exists())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_XML));
+    }
+
+    @Test
+    public void skipFilter() throws Exception {
+        MockHttpServletRequestBuilder get = MockMvcRequestBuilders.get("/filter/skip-filter.xml?field=message&pattern=exclude");
+        mockMvc.perform(get)
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(xpath("/root/two").exists())
+                .andExpect(xpath("/root/@one").exists())
+                .andExpect(xpath("/root/three").exists())
+                .andExpect(xpath("/root/stack").exists())
+                .andExpect(xpath("/root/stacks/name").exists())
                 .andExpect(xpath("/root/stacks/echo").exists())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_XML));
     }

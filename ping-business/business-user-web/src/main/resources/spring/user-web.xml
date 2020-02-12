@@ -66,19 +66,10 @@
         <property name="disableCaching" value="false"/>
     </bean>
 
-    <bean name="yaml" class="cn.procsl.business.user.web.component.view.YamlView">
-        <constructor-arg value="application/yaml"/>
-        <property name="updateContentLength" value="true"/>
-    </bean>
-
     <bean class="cn.procsl.business.user.web.component.NumberHttpMessageConverter"/>
     <bean class="cn.procsl.business.user.web.component.DateConverter"/>
     <bean class="org.springframework.http.converter.StringHttpMessageConverter"/>
 
-<!--    <bean id="fieldFilterProvider" class="cn.procsl.business.user.web.component.FieldFilterProvider">-->
-<!--        <constructor-arg index="0" value="filter"/>-->
-<!--        <constructor-arg index="1" value="**"/>-->
-<!--    </bean>-->
     <bean id="propertyFilter" class="cn.procsl.business.user.web.component.FieldsPropertyFilter"/>
 
 </beans>

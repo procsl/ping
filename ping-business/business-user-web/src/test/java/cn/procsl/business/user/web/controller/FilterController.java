@@ -1,6 +1,6 @@
 package cn.procsl.business.user.web.controller;
 
-import cn.procsl.business.user.web.error.RestError;
+import cn.procsl.business.user.web.component.SkipFilter;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -34,7 +34,7 @@ public class FilterController {
 
     @GetMapping("skip-filter")
     public Object skipFilter() {
-        return new RestError().setMessage("test").setCode("121212");
+        return new TestObject2();
     }
 
     @Data
@@ -73,6 +73,10 @@ public class FilterController {
             String[] array = {"array1", "array2", "array3", "array4"};
 
         }
+    }
+
+    @SkipFilter
+    public static class TestObject2 extends TestObject {
     }
 
 }

@@ -1,11 +1,13 @@
 package cn.procsl.business.user.web;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonStreamContext;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.ser.PropertyWriter;
+import com.google.common.collect.ImmutableList;
 import org.springframework.util.StringUtils;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author procsl
@@ -13,28 +15,51 @@ import java.util.Map;
  */
 public class FilterPattern {
 
-    protected PatternType pattern;
+    protected PatternType patternType;
 
     protected Map<String, Object> fields;
 
+    protected static final FilterPattern TRUE = new InnerFilter(true);
+
+    protected static final FilterPattern FALSE = new InnerFilter(false);
+
     public enum PatternType {
-        include, exclude
+        include, exclude, skip
     }
 
-    public FilterPattern(PatternType pattern, String params) {
+    public static FilterPattern compile() {
+        return TRUE;
+    }
 
-        this.pattern = pattern;
+    public static FilterPattern compile(PatternType patternType, String params) {
+        if (patternType == PatternType.skip) {
+            return TRUE;
+        }
+
+        boolean bool = patternType == PatternType.include && (params == null || params.isEmpty());
+        if (bool) {
+            return FALSE;
+        }
+
+        bool = patternType == PatternType.exclude && (params == null || params.isEmpty());
+        if (bool) {
+            return TRUE;
+        }
+
+        FilterPattern pattern = new FilterPattern();
+        pattern.patternType = patternType;
         String[] tmp = params.split(",");
-        fields = new HashMap<>(tmp.length);
+        pattern.fields = new HashMap<>(tmp.length);
         for (String param : tmp) {
             if (!StringUtils.isEmpty(param)) {
-                this.resolve(fields, param.split("\\."));
+                resolve(pattern.fields, param.split("\\."));
             }
         }
 
+        return pattern;
     }
 
-    private void resolve(Map<String, Object> map, String... param) {
+    private static void resolve(Map<String, Object> map, String... param) {
         if (param.length == 0) {
             return;
         }
@@ -52,19 +77,17 @@ public class FilterPattern {
         for (int i = 0; i < param.length - 1; i++) {
             tmp[i] = param[i + 1];
         }
-        this.resolve(tmpMap, tmp);
+        resolve(tmpMap, tmp);
     }
 
-    /**
-     * @param path three.list.test
-     * @return
-     */
-    public boolean matches(List<String> path) {
-        switch (pattern) {
+    public boolean skip(Object pojo, JsonGenerator jgen, SerializerProvider provider, PropertyWriter writer) {
+        switch (patternType) {
+            case skip:
+                return true;
             case include:
-                return include(this.fields, path);
+                return include(this.fields, buildPath(jgen, writer));
             case exclude:
-                return exclude(this.fields, path);
+                return exclude(this.fields, buildPath(jgen, writer));
         }
         return true;
     }
@@ -143,5 +166,44 @@ public class FilterPattern {
             return true;
         }
         return include((Map<String, Object>) tmpMap, path.subList(1, path.size()));
+    }
+
+    protected List<String> buildPath(JsonGenerator jgen, PropertyWriter writer) {
+        JsonStreamContext start;
+        if (jgen.getOutputContext().hasCurrentIndex()) {
+            start = jgen.getOutputContext().getParent();
+        } else {
+            start = jgen.getOutputContext();
+        }
+
+        if (start != null) {
+            LinkedList<String> builder = new LinkedList<>();
+            if (start.getCurrentName() != null) {
+                builder.add(start.getCurrentName());
+            }
+            while (!start.inRoot() && (start = start.getParent()) != null) {
+                if (start.inObject()) {
+                    builder.add(start.getCurrentName());
+                }
+            }
+            builder.add(0, writer.getName());
+            Collections.reverse(builder);
+            return builder;
+        }
+        return ImmutableList.of(writer.getName());
+    }
+
+    private static class InnerFilter extends FilterPattern {
+
+        private boolean bool;
+
+        public InnerFilter(boolean bool) {
+            this.bool = bool;
+        }
+
+        @Override
+        public final boolean skip(Object pojo, JsonGenerator jgen, SerializerProvider provider, PropertyWriter writer) {
+            return bool;
+        }
     }
 }
