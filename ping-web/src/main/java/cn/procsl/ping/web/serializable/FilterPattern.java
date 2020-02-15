@@ -182,8 +182,6 @@ public class FilterPattern {
     }
 
     /**
-     * TODO
-     *
      * @param map
      * @param path
      * @return
@@ -218,7 +216,7 @@ public class FilterPattern {
         if (builder != null) {
             builder.add(0, writer.getName());
             Collections.reverse(builder);
-            return builder;
+           return builder;
         }
 
         return writer.getName();
