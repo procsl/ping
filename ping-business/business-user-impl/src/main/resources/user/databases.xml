@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean class="org.springframework.orm.hibernate5.HibernateTemplate">
+        <property name="sessionFactory" ref="sessionFactory"/>
+        <property name="cacheQueries" value="${ping.business.hibernate.cacheQueries:true}"/>
+        <property name="fetchSize" value="${ping.business.hibernate.fetchSize:50}"/>
+        <property name="checkWriteOperations" value="false"/>
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="sessionFactory" ref="sessionFactory"/>
+        <property name="validateExistingTransaction" value="true"/>
+    </bean>
+
+    <bean name="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean"
+          destroy-method="destroy">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="packagesToScan" value="cn.procsl.business.impl.user.entity"/>
+        <property name="implicitNamingStrategy">
+            <bean class="cn.procsl.ping.business.user.impl.config.NameImplicitNamingStrategy"/>
+        </property>
+        <property name="physicalNamingStrategy">
+            <bean class="cn.procsl.ping.business.user.impl.config.LowCasePhysicalNamingStrategy"/>
+        </property>
+    </bean>
+
+    <bean class="com.zaxxer.hikari.HikariDataSource" name="dataSource" destroy-method="close">
+        <property name="username" value="${ping.business.database.username}"/>
+        <property name="password" value="${ping.business.database.password}"/>
+        <property name="jdbcUrl" value="${ping.business.database.url}"/>
+        <property name="driverClassName" value="${ping.business.database.driver}"/>
+        <property name="maximumPoolSize" value="${ping.business.dataSource.poolSize:10}"></property>
+        <property name="poolName" value="${ping.business.dataSource.name:HikariDataSource}"></property>
+    </bean>
+
+</beans>

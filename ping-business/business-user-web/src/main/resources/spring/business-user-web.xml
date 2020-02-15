@@ -5,17 +5,22 @@
        xmlns:mvc="http://www.springframework.org/schema/mvc"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
-    <context:component-scan base-package="cn.procsl.business.user.web"/>
+    <context:component-scan base-package="cn.procsl.ping.web"/>
+    <context:component-scan base-package="cn.procsl.ping.api"/>
 
     <!--全局异常处理-->
     <bean id="handlerExceptionResolver" primary="true"
-          class="cn.procsl.business.user.web.resolver.HandlerExceptionResolver"/>
+          class="cn.procsl.ping.business.user.web.resolver.HandlerExceptionResolver"/>
 
+    <context:annotation-config/>
+
+    <mvc:resources mapping="swagger-ui.html" location="classpath:/META-INF/resources/"/>
+    <mvc:resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/"/>
 
     <mvc:interceptors>
         <bean class="cn.procsl.ping.web.component.resolver.CacheInterceptor"/>
     </mvc:interceptors>
 
+    <import resource="web.xml"/>
 
-    <import resource="web.xml"></import>
 </beans>
