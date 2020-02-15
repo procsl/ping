@@ -1,7 +1,7 @@
 package cn.procsl.business.impl.user;
 
-import cn.procsl.business.user.dto.UserDTO;
 import cn.procsl.business.impl.user.entity.User;
+import cn.procsl.business.user.dto.UserDTO;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -21,7 +21,7 @@ import java.util.Date;
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath*:spring/user-business.xml"})
+@ContextConfiguration(locations = {"classpath*:business/user.xml"})
 @Rollback
 public class HibernateTest {
 

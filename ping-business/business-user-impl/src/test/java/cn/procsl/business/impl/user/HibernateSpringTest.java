@@ -13,7 +13,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @date 2019/12/17
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:spring/user-business.xml"})
+@ContextConfiguration(locations = {"classpath:business/user.xml"})
 @Rollback
 public class HibernateSpringTest {
 

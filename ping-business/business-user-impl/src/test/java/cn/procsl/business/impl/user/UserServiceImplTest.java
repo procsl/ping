@@ -19,7 +19,7 @@ import static cn.procsl.business.user.dto.UserDTO.Status.enable;
  * @date 2019/12/14
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:spring/user-business.xml"})
+@ContextConfiguration(locations = {"classpath:business/user.xml"})
 @Rollback
 public class UserServiceImplTest {
 

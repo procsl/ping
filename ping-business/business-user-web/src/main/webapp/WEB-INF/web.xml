@@ -14,7 +14,7 @@
         <servlet-class>cn.procsl.ping.web.component.DispatcherServlet</servlet-class>
         <init-param>
             <param-name>contextConfigLocation</param-name>
-            <param-value>classpath:spring/web.xml</param-value>
+            <param-value>classpath:spring/business-user-web.xml</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>

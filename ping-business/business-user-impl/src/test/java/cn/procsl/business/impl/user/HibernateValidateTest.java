@@ -15,7 +15,7 @@ import javax.validation.ConstraintViolationException;
  * @date 2019/12/20
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:spring/user-business.xml"})
+@ContextConfiguration(locations = {"classpath:business/user.xml"})
 public class HibernateValidateTest {
 
     @Autowired
