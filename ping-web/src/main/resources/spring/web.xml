@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+        <property name="favorPathExtension" value="true"/>
+        <property name="favorParameter" value="true"/>
+        <property name="parameterName" value="$format"/>
+        <property name="defaultContentType" value="application/json"/>
+        <property name="mediaTypes">
+            <map>
+                <entry key="json" value="application/json"/>
+                <entry key="xml" value="application/xml"/>
+                <entry key="html" value="application/json"/>
+                <entry key="yaml" value="application/yaml"/>
+                <entry key="yml" value="application/yaml"/>
+                <entry key="php" value="application/xml"/>
+                <entry key="asp" value="application/xml"/>
+            </map>
+        </property>
+        <property name="ignoreUnknownPathExtensions" value="true"/>
+    </bean>
+
+    <bean id="requestMappingHandlerAdapter"
+          primary="true"
+          class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+        <property name="contentNegotiationManager" ref="contentNegotiationManager"/>
+        <property name="order" value="-1"/>
+        <property name="returnValueHandlers">
+            <list>
+                <bean class="cn.procsl.ping.web.component.resolver.RestHandlerResolver">
+                    <property name="order" value="2"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean class="cn.procsl.ping.web.component.resolver.RestViewResolver">
+        <property name="contentNegotiationManager" ref="contentNegotiationManager"/>
+        <property name="defaultView" ref="jsonView"/>
+        <property name="order" value="100"/>
+    </bean>
+
+    <bean name="jsonView" class="cn.procsl.ping.web.component.view.JsonView">
+        <property name="extractValueFromSingleKeyModel" value="true"/>
+        <property name="disableCaching" value="false"/>
+        <property name="updateContentLength" value="true"/>
+    </bean>
+
+    <bean name="xmlView" class="cn.procsl.ping.web.component.view.XmlView">
+        <constructor-arg value="root"/>
+        <property name="updateContentLength" value="true"/>
+        <property name="disableCaching" value="false"/>
+    </bean>
+
+    <bean class="cn.procsl.ping.web.component.converter.NumberHttpMessageConverter"/>
+    <bean class="cn.procsl.ping.web.component.converter.DateHttpMessageConverter"/>
+    <bean class="org.springframework.http.converter.StringHttpMessageConverter"/>
+
+    <bean id="propertyFilter" class="cn.procsl.ping.web.serializable.SerializableFilter"/>
+
+</beans>
