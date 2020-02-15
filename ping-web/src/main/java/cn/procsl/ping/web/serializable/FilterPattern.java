@@ -31,6 +31,13 @@ public class FilterPattern {
         return TRUE;
     }
 
+    /**
+     * 根据相关条件创建FilterPattern实例
+     *
+     * @param patternType
+     * @param params
+     * @return
+     */
     public static FilterPattern compile(PatternType patternType, String params) {
         if (patternType == PatternType.skip) {
             return TRUE;
@@ -81,25 +88,35 @@ public class FilterPattern {
         resolve(tmpMap, tmp);
     }
 
+    /**
+     * 是否跳过当前的节点的序列化
+     *
+     * @param pojo
+     * @param jgen
+     * @param provider
+     * @param writer
+     * @return true 序列化当前节点 false 忽略当前节点的序列化
+     */
     public boolean skip(Object pojo, JsonGenerator jgen, SerializerProvider provider, PropertyWriter writer) {
         switch (patternType) {
             case include:
                 Object object = buildPath(jgen, writer);
                 if (object instanceof String) {
-                    return include(this.fields, (String) object);
+                    return includeOne(this.fields, (String) object);
                 }
-                return include(this.fields, (List<String>) object);
+                return includeMore(this.fields, (List<String>) object);
             case exclude:
                 object = buildPath(jgen, writer);
                 if (object instanceof String) {
-                    return exclude(this.fields, (String) object);
+                    return excludeOne(this.fields, (String) object);
                 }
-                return exclude(this.fields, (List<String>) object);
-            default: return true;
+                return excludeMore(this.fields, (List<String>) object);
+            default:
+                return true;
         }
     }
 
-    protected static boolean exclude(Map<String, Object> map, String key) {
+    protected static boolean excludeOne(Map<String, Object> map, String key) {
         boolean bool = map.containsKey(key);
         // map中存在该节点
         if (bool) {
@@ -122,11 +139,11 @@ public class FilterPattern {
      * @param path
      * @return
      */
-    protected static boolean exclude(Map<String, Object> map, List<String> path) {
+    protected static boolean excludeMore(Map<String, Object> map, List<String> path) {
 
         String key = path.get(0);
         if (path.size() == 1) {
-            return exclude(map, path.get(0));
+            return excludeOne(map, path.get(0));
         }
 
         // 如果不是最后一个, 首先判断是否存在在map中
@@ -141,7 +158,7 @@ public class FilterPattern {
             return false;
         }
 
-        return exclude((Map<String, Object>) tmpMap, path.subList(1, path.size()));
+        return excludeMore((Map<String, Object>) tmpMap, path.subList(1, path.size()));
     }
 
     /**
@@ -159,7 +176,7 @@ public class FilterPattern {
      *             如果path 未匹配完成 map为空 则返回false
      * @return
      */
-    protected static boolean include(Map<String, Object> map, List<String> path) {
+    protected static boolean includeMore(Map<String, Object> map, List<String> path) {
         if (path.isEmpty()) {
             return false;
         }
@@ -176,7 +193,7 @@ public class FilterPattern {
         if ((tmpMap = map.get(tmp)) == null) {
             return true;
         }
-        return include((Map<String, Object>) tmpMap, path.subList(1, path.size()));
+        return includeMore((Map<String, Object>) tmpMap, path.subList(1, path.size()));
     }
 
     /**
@@ -184,7 +201,7 @@ public class FilterPattern {
      * @param path
      * @return
      */
-    protected boolean include(Map<String, Object> map, String path) {
+    protected boolean includeOne(Map<String, Object> map, String path) {
         return map.containsKey(path);
     }
 
