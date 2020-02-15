@@ -8,6 +8,6 @@ package cn.procsl.ping.web.component.exception;
 public class NotFoundException extends RuntimeException{
 
     public NotFoundException(String method, String uri) {
-        super();
+        super(method+uri, null, false,false);
     }
 }

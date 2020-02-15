@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonStreamContext;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.PropertyWriter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 
@@ -11,6 +12,7 @@ import java.util.*;
  * @author procsl
  * @date 2020/02/07
  */
+@Slf4j
 public class FilterPattern {
 
     protected PatternType patternType;
@@ -84,10 +86,34 @@ public class FilterPattern {
             case skip:
                 return true;
             case include:
-                return include(this.fields, buildPath(jgen, writer));
+                Object object = buildPath(jgen, writer);
+                if (object instanceof String) {
+                    return include(this.fields, (String) object);
+                }
+                return include(this.fields, (List<String>) object);
             case exclude:
-                return exclude(this.fields, buildPath(jgen, writer));
+                object = buildPath(jgen, writer);
+                if (object instanceof String) {
+                    return exclude(this.fields, (String) object);
+                }
+                return exclude(this.fields, (List<String>) object);
         }
+        return true;
+    }
+
+    protected static boolean exclude(Map<String, Object> map, String key) {
+        boolean bool = map.containsKey(key);
+        // map中存在该节点
+        if (bool) {
+            // 最后的节点
+            if (map.get(key) == null) {
+                return false;
+            }
+            // 非最后的节点, 说明map还有子节点
+            return true;
+        }
+
+        // map中不存在该节点
         return true;
     }
 
@@ -102,19 +128,7 @@ public class FilterPattern {
 
         String key = path.get(0);
         if (path.size() == 1) {
-            boolean bool = map.containsKey(key);
-            // map中存在该节点
-            if (bool) {
-                // 最后的节点
-                if (map.get(key) == null) {
-                    return false;
-                }
-                // 非最后的节点, 说明map还有子节点
-                return true;
-            }
-
-            // map中不存在该节点
-            return true;
+            return exclude(map, path.get(0));
         }
 
         // 如果不是最后一个, 首先判断是否存在在map中
@@ -169,15 +183,16 @@ public class FilterPattern {
 
     /**
      * TODO
+     *
      * @param map
      * @param path
      * @return
      */
-    protected boolean include(Map<String, Object> map, String path){
+    protected boolean include(Map<String, Object> map, String path) {
         return map.containsKey(path);
     }
 
-    protected List<String> buildPath(JsonGenerator jgen, PropertyWriter writer) {
+    protected Object buildPath(JsonGenerator jgen, PropertyWriter writer) {
         JsonStreamContext start;
         if (jgen.getOutputContext().hasCurrentIndex()) {
             start = jgen.getOutputContext().getParent();
@@ -185,23 +200,36 @@ public class FilterPattern {
             start = jgen.getOutputContext();
         }
 
-        if (start != null) {
-            LinkedList<String> builder = new LinkedList<>();
-            if (start.getCurrentName() != null) {
-                builder.add(start.getCurrentName());
+        if (start == null) {
+            return writer.getName();
+        }
+
+        LinkedList<String> builder = null;
+        if (start.getCurrentName() != null) {
+            builder = this.createAndPush(null, start.getCurrentName());
+        }
+
+        while (!start.inRoot() && (start = start.getParent()) != null) {
+            if (start.inObject()) {
+                builder = this.createAndPush(builder, start.getCurrentName());
             }
-            while (!start.inRoot() && (start = start.getParent()) != null) {
-                if (start.inObject()) {
-                    builder.add(start.getCurrentName());
-                }
-            }
+        }
+
+        if (builder != null) {
             builder.add(0, writer.getName());
             Collections.reverse(builder);
             return builder;
         }
-        LinkedList list = new LinkedList();
-        list.add(writer.getName());
-        return list;
+
+        return writer.getName();
+    }
+
+    private LinkedList<String> createAndPush(LinkedList<String> defaultList, String item) {
+        if (defaultList == null) {
+            defaultList = new LinkedList<>();
+        }
+        defaultList.add(item);
+        return defaultList;
     }
 
     private static class InnerFilter extends FilterPattern {
