@@ -83,8 +83,6 @@ public class FilterPattern {
 
     public boolean skip(Object pojo, JsonGenerator jgen, SerializerProvider provider, PropertyWriter writer) {
         switch (patternType) {
-            case skip:
-                return true;
             case include:
                 Object object = buildPath(jgen, writer);
                 if (object instanceof String) {
@@ -97,8 +95,8 @@ public class FilterPattern {
                     return exclude(this.fields, (String) object);
                 }
                 return exclude(this.fields, (List<String>) object);
+            default: return true;
         }
-        return true;
     }
 
     protected static boolean exclude(Map<String, Object> map, String key) {
@@ -216,7 +214,7 @@ public class FilterPattern {
         if (builder != null) {
             builder.add(0, writer.getName());
             Collections.reverse(builder);
-           return builder;
+            return builder;
         }
 
         return writer.getName();
