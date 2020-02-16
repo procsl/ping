@@ -3,6 +3,7 @@ package cn.procsl.ping.web.component;
 import cn.procsl.ping.web.serializable.PropertyFilterMixin;
 import cn.procsl.ping.web.serializable.SerializableFilter;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
@@ -24,6 +25,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     @Bean
     public XmlMapper xmlMapper(@Value("${ping.xmlMapper.rootName:root}") String rootName,
                                @Value("${ping.xmlMapper.defaultUseWrapper:true}") boolean defaultUseWrapper,
+                               @Autowired PropertyNamingStrategy propertyNamingStrategy,
                                @Autowired SimpleBeanPropertyFilter propertyFilter) {
 
         XmlMapper mapper = new XmlMapper() {
@@ -37,6 +39,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
             }
         };
         mapper.configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, true);
+        mapper.setPropertyNamingStrategy(propertyNamingStrategy);
         SimpleFilterProvider filterProvider = new SimpleFilterProvider().addFilter(SerializableFilter.FILTER_ID, propertyFilter);
         mapper.setFilterProvider(filterProvider);
         mapper.addMixIn(Object.class, PropertyFilterMixin.class);
@@ -45,10 +48,12 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     }
 
     @Bean
-    public JsonMapper jsonMapper(@Autowired SimpleBeanPropertyFilter propertyFilter) {
+    public JsonMapper jsonMapper(@Autowired SimpleBeanPropertyFilter propertyFilter,
+                                 @Autowired PropertyNamingStrategy propertyNamingStrategy) {
         JsonMapper mapper = JsonMapper.builder().build();
         SimpleFilterProvider filterProvider = new SimpleFilterProvider().addFilter(SerializableFilter.FILTER_ID, propertyFilter);
         mapper.setFilterProvider(filterProvider);
+        mapper.setPropertyNamingStrategy(propertyNamingStrategy);
         mapper.addMixIn(Object.class, PropertyFilterMixin.class);
         return mapper;
     }

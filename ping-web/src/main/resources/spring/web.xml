@@ -146,10 +146,5 @@
 
     <bean id="propertyFilter" class="cn.procsl.ping.web.serializable.SerializableFilter"/>
 
-    <!--    <bean class=" org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping">-->
-    <!--        <property name="contentNegotiationManager" ref="contentNegotiationManager"/>-->
-    <!--        <property name="removeSemicolonContent" value="false"/>-->
-    <!--        <property name="order" value="0"/>-->
-    <!--    </bean>-->
-
+    <bean id="namingStrategy" class="cn.procsl.ping.web.serializable.NamingStrategy"/>
 </beans>
