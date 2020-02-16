@@ -1,3 +1,6 @@
 [submodule "ping-third/squiggly"]
 	path = ping-third/squiggly
 	url = https://github.com/procsl/squiggly.git
+[submodule ".\\ping-third\\swagger-ui"]
+	path = .\\ping-third\\swagger-ui
+	url = https://github.com/swagger-api/swagger-ui.git

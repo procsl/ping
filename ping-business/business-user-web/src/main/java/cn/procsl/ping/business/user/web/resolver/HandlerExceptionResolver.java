@@ -2,6 +2,7 @@ package cn.procsl.ping.business.user.web.resolver;
 
 import cn.procsl.ping.business.exception.BusinessException;
 import cn.procsl.ping.web.component.error.RestError;
+import cn.procsl.ping.web.component.exception.NotFoundException;
 import cn.procsl.ping.web.component.view.Constant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,14 +50,23 @@ public class HandlerExceptionResolver extends AbstractHandlerExceptionResolver {
             response.setStatus(406);
             RestError error = new RestError();
             error.setMessage(log.isDebugEnabled() ? ex.getMessage() : "Not Acceptable");
-            error.setCode("4006001");
+            error.setCode("406001");
             return mv.addObject(Constant.ERROR_VALUE.getValue(), error);
         }
 
         if (ex instanceof NoHandlerFoundException) {
             RestError error = new RestError();
+            response.setStatus(500);
             error.setMessage(log.isDebugEnabled() ? ex.getMessage() : "Not Found");
-            error.setCode("4004001");
+            error.setCode("404002");
+            return mv.addObject(Constant.ERROR_VALUE.getValue(), error);
+        }
+
+        if (ex instanceof NotFoundException) {
+            response.setStatus(404);
+            RestError error = new RestError();
+            error.setMessage(ex.getMessage());
+            error.setCode("404001");
             return mv.addObject(Constant.ERROR_VALUE.getValue(), error);
         }
 

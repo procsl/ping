@@ -13,8 +13,10 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.Ordered;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -54,7 +56,7 @@ public class RestHandlerResolver implements HandlerMethodReturnValueHandler, Ord
      */
     @Override
     public boolean supportsReturnType(MethodParameter returnType) {
-        return true;
+        return !(HttpEntity.class.isAssignableFrom(returnType.getParameterType()) && !RequestEntity.class.isAssignableFrom(returnType.getParameterType()));
     }
 
     @Override

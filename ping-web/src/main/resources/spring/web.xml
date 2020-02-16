@@ -27,14 +27,42 @@
           class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
         <property name="contentNegotiationManager" ref="contentNegotiationManager"/>
         <property name="order" value="-1"/>
+        <property name="requestBodyAdvice" ref="jsonViewRequestBodyAdvice"/>
+        <property name="responseBodyAdvice" ref="jsonViewResponseBodyAdvice"/>
         <property name="returnValueHandlers">
             <list>
-                <bean class="cn.procsl.ping.web.component.resolver.RestHandlerResolver">
-                    <property name="order" value="2"/>
-                </bean>
+                <ref bean="restHandlerResolver"/>
+                <ref bean="httpEntityMethodProcessor"/>
             </list>
         </property>
     </bean>
+
+    <bean id="restHandlerResolver" class="cn.procsl.ping.web.component.resolver.RestHandlerResolver">
+        <property name="order" value="2"/>
+    </bean>
+
+    <bean id="httpEntityMethodProcessor"
+          class="org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor">
+        <constructor-arg index="0">
+            <list>
+                <ref bean="stringHttpMessageConverter"/>
+                <ref bean="jackson2HttpMessageConverter"/>
+            </list>
+        </constructor-arg>
+        <constructor-arg index="1" ref="contentNegotiationManager"/>
+        <constructor-arg index="2">
+            <list>
+                <ref bean="jsonViewResponseBodyAdvice"/>
+                <ref bean="jsonViewRequestBodyAdvice"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="jsonViewRequestBodyAdvice"
+          class="org.springframework.web.servlet.mvc.method.annotation.JsonViewRequestBodyAdvice"/>
+
+    <bean id="jsonViewResponseBodyAdvice"
+          class="org.springframework.web.servlet.mvc.method.annotation.JsonViewResponseBodyAdvice"/>
 
     <bean class="cn.procsl.ping.web.component.resolver.RestViewResolver">
         <property name="contentNegotiationManager" ref="contentNegotiationManager"/>
@@ -54,9 +82,11 @@
         <property name="disableCaching" value="false"/>
     </bean>
 
-    <bean class="cn.procsl.ping.web.component.converter.NumberHttpMessageConverter"/>
-    <bean class="cn.procsl.ping.web.component.converter.DateHttpMessageConverter"/>
-    <bean class="org.springframework.http.converter.StringHttpMessageConverter"/>
+    <bean id="numberHttpMessageConverter" class="cn.procsl.ping.web.component.converter.NumberHttpMessageConverter"/>
+    <bean id="dateHttpMessageConverter" class="cn.procsl.ping.web.component.converter.DateHttpMessageConverter"/>
+    <bean id="stringHttpMessageConverter" class="org.springframework.http.converter.StringHttpMessageConverter"/>
+    <bean id="jackson2HttpMessageConverter"
+          class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"/>
 
     <bean id="propertyFilter" class="cn.procsl.ping.web.serializable.SerializableFilter"/>
 
