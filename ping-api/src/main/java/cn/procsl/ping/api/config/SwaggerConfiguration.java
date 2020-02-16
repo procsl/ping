@@ -18,13 +18,14 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  */
 @EnableSwagger2
 @Configuration
-public class ApiConfiguration {
+public class SwaggerConfiguration {
 
     @Bean
     public Docket docket(ApiInfo apiInfo) {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo)
-                .produces(ImmutableSet.of("application/xml", "application/json", "text/plain"))
+                .produces(ImmutableSet.of("application/xml", "application/json", "text/plain", "*/*"))
+                .consumes(ImmutableSet.of("application/xml", "application/json", "text/plain", "string"))
                 .select()
                 //controller匹配规则
                 .apis(RequestHandlerSelectors.any())

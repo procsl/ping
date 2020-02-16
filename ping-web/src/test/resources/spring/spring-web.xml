@@ -9,7 +9,7 @@
 
 
     <mvc:interceptors>
-        <bean class="cn.procsl.ping.web.component.resolver.CacheInterceptor"/>
+        <bean class="cn.procsl.ping.web.component.filter.RequestInterceptor"/>
     </mvc:interceptors>
 
 

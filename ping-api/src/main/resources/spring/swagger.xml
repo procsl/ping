@@ -10,5 +10,4 @@
 
     <context:component-scan base-package="cn.procsl.ping.api"/>
 
-    <mvc:annotation-driven/>
 </beans>

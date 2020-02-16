@@ -13,14 +13,12 @@
                 <entry key="json" value="application/json"/>
                 <entry key="xml" value="application/xml"/>
                 <entry key="html" value="application/json"/>
-                <entry key="yaml" value="application/yaml"/>
-                <entry key="yml" value="application/yaml"/>
-                <entry key="php" value="application/xml"/>
-                <entry key="asp" value="application/xml"/>
             </map>
         </property>
         <property name="ignoreUnknownPathExtensions" value="true"/>
     </bean>
+
+    <bean class="cn.procsl.ping.web.component.WebMvcConfiguration"/>
 
     <bean id="requestMappingHandlerAdapter"
           primary="true"
@@ -29,16 +27,58 @@
         <property name="order" value="-1"/>
         <property name="requestBodyAdvice" ref="jsonViewRequestBodyAdvice"/>
         <property name="responseBodyAdvice" ref="jsonViewResponseBodyAdvice"/>
+        <property name="messageConverters">
+            <list>
+                <ref bean="stringHttpMessageConverter"/>
+                <ref bean="jackson2JsonHttpMessageConverter"/>
+                <ref bean="jackson2XmlHttpMessageConverter"/>
+                <ref bean="byteArrayHttpMessageConverter"/>
+                <ref bean="sourceHttpMessageConverter"/>
+                <ref bean="allEncompassingFormHttpMessageConverter"/>
+                <ref bean="numberHttpMessageConverter"/>
+                <ref bean="dateHttpMessageConverter"/>
+            </list>
+        </property>
         <property name="returnValueHandlers">
             <list>
-                <ref bean="restHandlerResolver"/>
                 <ref bean="httpEntityMethodProcessor"/>
+                <ref bean="requestResponseBodyMethodProcessor"/>
+                <ref bean="simpleTypeHandlerResolver"/>
+                <ref bean="restHandlerResolver"/>
             </list>
         </property>
     </bean>
 
+    <bean id="requestResponseBodyMethodProcessor"
+          class="org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor">
+        <constructor-arg index="0">
+            <list>
+                <ref bean="stringHttpMessageConverter"/>
+                <ref bean="jackson2JsonHttpMessageConverter"/>
+                <ref bean="jackson2XmlHttpMessageConverter"/>
+                <ref bean="byteArrayHttpMessageConverter"/>
+                <ref bean="sourceHttpMessageConverter"/>
+                <ref bean="allEncompassingFormHttpMessageConverter"/>
+                <ref bean="numberHttpMessageConverter"/>
+                <ref bean="dateHttpMessageConverter"/>
+            </list>
+        </constructor-arg>
+        <constructor-arg index="1" ref="contentNegotiationManager"/>
+        <constructor-arg index="2">
+            <list>
+                <ref bean="jsonViewRequestBodyAdvice"/>
+                <ref bean="jsonViewResponseBodyAdvice"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
     <bean id="restHandlerResolver" class="cn.procsl.ping.web.component.resolver.RestHandlerResolver">
-        <property name="order" value="2"/>
+        <property name="order" value="10"/>
+    </bean>
+
+    <bean id="simpleTypeHandlerResolver" class="cn.procsl.ping.web.component.resolver.SimpleTypeHandlerResolver">
+        <property name="order" value="1"/>
+        <property name="process" ref="requestResponseBodyMethodProcessor"/>
     </bean>
 
     <bean id="httpEntityMethodProcessor"
@@ -46,7 +86,8 @@
         <constructor-arg index="0">
             <list>
                 <ref bean="stringHttpMessageConverter"/>
-                <ref bean="jackson2HttpMessageConverter"/>
+                <ref bean="jackson2JsonHttpMessageConverter"/>
+                <ref bean="jackson2XmlHttpMessageConverter"/>
             </list>
         </constructor-arg>
         <constructor-arg index="1" ref="contentNegotiationManager"/>
@@ -70,14 +111,15 @@
         <property name="order" value="100"/>
     </bean>
 
-    <bean name="jsonView" class="cn.procsl.ping.web.component.view.JsonView">
+    <bean id="jsonView" class="cn.procsl.ping.web.component.view.JsonView">
+        <constructor-arg ref="jsonMapper"/>
         <property name="extractValueFromSingleKeyModel" value="true"/>
         <property name="disableCaching" value="false"/>
         <property name="updateContentLength" value="true"/>
     </bean>
 
-    <bean name="xmlView" class="cn.procsl.ping.web.component.view.XmlView">
-        <constructor-arg value="root"/>
+    <bean id="xmlView" class="cn.procsl.ping.web.component.view.XmlView">
+        <constructor-arg ref="xmlMapper"/>
         <property name="updateContentLength" value="true"/>
         <property name="disableCaching" value="false"/>
     </bean>
@@ -85,9 +127,29 @@
     <bean id="numberHttpMessageConverter" class="cn.procsl.ping.web.component.converter.NumberHttpMessageConverter"/>
     <bean id="dateHttpMessageConverter" class="cn.procsl.ping.web.component.converter.DateHttpMessageConverter"/>
     <bean id="stringHttpMessageConverter" class="org.springframework.http.converter.StringHttpMessageConverter"/>
-    <bean id="jackson2HttpMessageConverter"
-          class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"/>
+    <bean id="jackson2JsonHttpMessageConverter"
+          class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+        <constructor-arg ref="jsonMapper"/>
+    </bean>
+
+    <bean id="jackson2XmlHttpMessageConverter"
+          class="org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter">
+        <constructor-arg ref="xmlMapper"/>
+    </bean>
+
+    <bean id="byteArrayHttpMessageConverter" class="org.springframework.http.converter.ByteArrayHttpMessageConverter"/>
+
+    <bean id="sourceHttpMessageConverter" class="org.springframework.http.converter.xml.SourceHttpMessageConverter"/>
+
+    <bean id="allEncompassingFormHttpMessageConverter"
+          class="org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter"/>
 
     <bean id="propertyFilter" class="cn.procsl.ping.web.serializable.SerializableFilter"/>
+
+    <!--    <bean class=" org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping">-->
+    <!--        <property name="contentNegotiationManager" ref="contentNegotiationManager"/>-->
+    <!--        <property name="removeSemicolonContent" value="false"/>-->
+    <!--        <property name="order" value="0"/>-->
+    <!--    </bean>-->
 
 </beans>

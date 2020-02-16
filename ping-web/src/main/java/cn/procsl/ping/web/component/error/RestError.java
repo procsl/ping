@@ -16,4 +16,8 @@ public class RestError {
     private String code;
 
     private String message;
+
+    public static RestError create(String code, String message) {
+        return new RestError().setCode(code).setMessage(message);
+    }
 }

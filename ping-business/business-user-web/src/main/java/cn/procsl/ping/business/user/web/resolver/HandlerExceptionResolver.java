@@ -82,4 +82,5 @@ public class HandlerExceptionResolver extends AbstractHandlerExceptionResolver {
     public int getOrder() {
         return Integer.MIN_VALUE;
     }
+
 }
