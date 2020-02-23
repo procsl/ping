@@ -60,27 +60,28 @@ public class SerializableFilter extends SimpleBeanPropertyFilter implements Init
         // 如果存在该注解 则跳过以下的
         boolean bool = pojo.getClass().isAnnotationPresent(SkipFilter.class);
         if (bool) {
-            return push(key, FilterPattern.compile(), this.request);
+            return push(key, FilterPattern.compiler(), this.request);
         }
 
         // 如果指定的参数不存在则跳过
-        String filterParam = this.request.getParameter(this.field);
-        if (StringUtils.isEmpty(filterParam)) {
-            return push(key, FilterPattern.compile(), this.request);
+
+        String[] filterParams = this.request.getParameterValues(this.field);
+        if (filterParams == null || filterParams.length == 0) {
+            return push(key, FilterPattern.compiler(), this.request);
         }
 
         // 如果指定的类型为null, 则默认使用 include
         String type = this.request.getParameter(this.filterType);
-        FilterPattern pattern = FilterPattern.compile(getType(type), filterParam);
+        FilterPattern pattern = FilterPattern.compiler(getType(type), filterParams);
         return push(key, pattern, this.request);
     }
 
-    private FilterPattern push(String key, FilterPattern pattern, HttpServletRequest request){
+    private FilterPattern push(String key, FilterPattern pattern, HttpServletRequest request) {
         request.setAttribute(key, pattern);
         return pattern;
     }
 
-    private FilterPattern.PatternType getType(String type){
+    private FilterPattern.PatternType getType(String type) {
 
         FilterPattern.PatternType filterType;
         if (StringUtils.isEmpty(type)) {

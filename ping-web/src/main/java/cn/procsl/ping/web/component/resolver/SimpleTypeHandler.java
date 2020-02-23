@@ -15,18 +15,24 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor;
+import org.springframework.web.servlet.mvc.method.annotation.ViewNameMethodReturnValueHandler;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
+import java.util.Locale;
+
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.FORWARD_URL_PREFIX;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 
 /**
  * @author procsl
  * @date 2020/02/16
  */
 @Slf4j
-public class SimpleTypeHandlerResolver implements HandlerMethodReturnValueHandler, Ordered {
+public class SimpleTypeHandler implements HandlerMethodReturnValueHandler, Ordered {
 
+    ViewNameMethodReturnValueHandler nameMethodReturnValueHandler = new ViewNameMethodReturnValueHandler();
 
     @Getter
     @Setter
@@ -38,15 +44,16 @@ public class SimpleTypeHandlerResolver implements HandlerMethodReturnValueHandle
 
     @Override
     public boolean supportsReturnType(MethodParameter returnType) {
-        return "void".equals(returnType.getParameterType().getName()) ||
-                Void.class.isAssignableFrom(returnType.getParameterType()) ||
-                String.class.isAssignableFrom(returnType.getParameterType()) ||
-                Date.class.isAssignableFrom(returnType.getParameterType()) ||
-                Number.class.isAssignableFrom(returnType.getParameterType());
+        return this.nameMethodReturnValueHandler.supportsReturnType(returnType) ||
+                returnType.getParameterType().isEnum() ||
+                Number.class.isAssignableFrom(returnType.getParameterType()) ||
+                Date.class.isAssignableFrom(returnType.getParameterType());
     }
 
     @Override
     public void handleReturnValue(Object returnValue, MethodParameter returnType, ModelAndViewContainer mavContainer, NativeWebRequest webRequest) throws Exception {
+
+
         do {
 
             HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);
@@ -54,6 +61,11 @@ public class SimpleTypeHandlerResolver implements HandlerMethodReturnValueHandle
             if ("void".equals(returnType.getParameterType().getName()) || Void.class.isAssignableFrom(returnType.getParameterType()) || returnType.hasMethodAnnotation(NoContent.class)) {
                 response.setStatus(HttpStatus.NO_CONTENT.value());
                 this.process.handleReturnValue(null, returnType, mavContainer, webRequest);
+                return;
+            }
+
+            if (isQuick(returnValue, webRequest.getLocale())) {
+                nameMethodReturnValueHandler.handleReturnValue(returnValue, returnType, mavContainer, webRequest);
                 return;
             }
 
@@ -118,4 +130,18 @@ public class SimpleTypeHandlerResolver implements HandlerMethodReturnValueHandle
         return old.replace("{" + name + "}", newStr);
     }
 
+
+    protected boolean isQuick(Object object, Locale locale) {
+        String link;
+        if (!(object instanceof String)) {
+            return false;
+        }
+        link = (String) object;
+        try {
+            boolean bool = link.startsWith(FORWARD_URL_PREFIX) || link.startsWith(REDIRECT_URL_PREFIX);
+            return bool;
+        } catch (Exception e) {
+        }
+        return false;
+    }
 }

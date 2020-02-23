@@ -10,10 +10,14 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.FORWARD_URL_PREFIX;
+import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
 
 /**
  * @author procsl
@@ -27,8 +31,16 @@ public class RestViewResolver extends ContentNegotiatingViewResolver {
     @Setter
     protected View defaultView;
 
+    @Autowired
+    InternalResourceViewResolver internalResourceViewResolver;
+
     @Override
     public View resolveViewName(String viewName, Locale locale) throws Exception {
+
+        boolean bool = viewName.startsWith(FORWARD_URL_PREFIX) || viewName.startsWith(REDIRECT_URL_PREFIX);
+        if (bool) {
+            return internalResourceViewResolver.resolveViewName(viewName, locale);
+        }
 
         RequestAttributes attrs = RequestContextHolder.getRequestAttributes();
         List<MediaType> requestedMediaTypes = this.getMediaTypes(((ServletRequestAttributes) attrs).getRequest());

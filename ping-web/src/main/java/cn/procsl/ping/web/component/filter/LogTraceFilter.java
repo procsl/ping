@@ -24,7 +24,7 @@ public class LogTraceFilter extends HttpFilter {
         MDC.put("trace_id", tmp);
         boolean bool = log.isDebugEnabled();
         if (bool) {
-            res.setHeader("X-trace-id", tmp);
+            res.setHeader("X-Trace-Id", tmp);
         }
         chain.doFilter(req, res);
     }

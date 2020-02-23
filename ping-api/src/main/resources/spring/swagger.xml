@@ -10,4 +10,10 @@
 
     <context:component-scan base-package="cn.procsl.ping.api"/>
 
+    <mvc:cors>
+        <mvc:mapping path="/csrf" allow-credentials="true" allowed-methods="*" allowed-headers="*"
+                     allowed-origins="procsl.cn"/>
+    </mvc:cors>
+
+
 </beans>

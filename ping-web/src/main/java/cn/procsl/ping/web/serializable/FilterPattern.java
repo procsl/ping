@@ -27,7 +27,7 @@ public class FilterPattern {
         include, exclude, skip
     }
 
-    public static FilterPattern compile() {
+    public static FilterPattern compiler() {
         return TRUE;
     }
 
@@ -38,31 +38,35 @@ public class FilterPattern {
      * @param params
      * @return
      */
-    public static FilterPattern compile(PatternType patternType, String params) {
+    public static FilterPattern compiler(PatternType patternType, String... params) {
         if (patternType == PatternType.skip) {
             return TRUE;
         }
 
-        boolean bool = patternType == PatternType.include && (params == null || params.isEmpty());
+        boolean bool = patternType == PatternType.include && (params == null || params.length == 0);
         if (bool) {
             return FALSE;
         }
 
-        bool = patternType == PatternType.exclude && (params == null || params.isEmpty());
+        bool = patternType == PatternType.exclude && (params == null || params.length == 0);
         if (bool) {
             return TRUE;
         }
 
         FilterPattern pattern = new FilterPattern();
         pattern.patternType = patternType;
-        String[] tmp = params.split(",");
-        pattern.fields = new HashMap<>(tmp.length);
-        for (String param : tmp) {
-            if (param.isEmpty()) {
-                continue;
+        pattern.fields = new HashMap<>(params.length + 1);
+
+        for (String param : params) {
+            String[] tmp = param.split(",");
+            for (String t : tmp) {
+                if (t.isEmpty()) {
+                    continue;
+                }
+                resolve(pattern.fields, t.split("\\."));
             }
-            resolve(pattern.fields, param.split("\\."));
         }
+
 
         return pattern;
     }
@@ -77,7 +81,7 @@ public class FilterPattern {
         }
         Object object = map.get(param[0]);
         if (object == null) {
-            object = new LinkedHashMap<>(1);
+            object = new HashMap<>(1);
         }
         Map<String, Object> tmpMap = (Map<String, Object>) object;
         map.put(param[0], tmpMap);

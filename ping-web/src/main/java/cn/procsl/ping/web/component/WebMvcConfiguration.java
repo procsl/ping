@@ -13,14 +13,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import org.springframework.context.annotation.Primary;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * @author procsl
  * @date 2020/02/16
  */
 @Configuration
-public class WebMvcConfiguration extends WebMvcConfigurationSupport {
+public class WebMvcConfiguration implements WebMvcConfigurer {
 
     @Bean
     public XmlMapper xmlMapper(@Value("${ping.xmlMapper.rootName:root}") String rootName,
@@ -48,6 +49,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     }
 
     @Bean
+    @Primary
     public JsonMapper jsonMapper(@Autowired SimpleBeanPropertyFilter propertyFilter,
                                  @Autowired PropertyNamingStrategy propertyNamingStrategy) {
         JsonMapper mapper = JsonMapper.builder().build();
@@ -57,6 +59,5 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
         mapper.addMixIn(Object.class, PropertyFilterMixin.class);
         return mapper;
     }
-
 
 }

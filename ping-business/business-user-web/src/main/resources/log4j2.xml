@@ -9,6 +9,7 @@
         <logger name="org.springframework.test" level="info"/>
         <logger name="org.hibernate" level="info"/>
         <logger name="org.junit" level="info"/>
+        <logger name="org.springframework.web" level="trace"/>
         <root level="debug">
             <appender-ref ref="Console"/>
         </root>

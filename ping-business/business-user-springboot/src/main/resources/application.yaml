@@ -1,0 +1,31 @@
+server:
+  port: 8081
+
+#openapi 3
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    config-url: /v3/api-docs/swagger-config
+    displayRequestDuration: true
+    layout: BaseLayout
+    path: /api-docs.html
+    show-extensions: true
+    url: /v3/api-docs
+
+
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
+      - org.springframework.boot.autoconfigure.web.servlet.MultipartAutoConfiguration
+      - org.springframework.boot.autoconfigure.websocket.servlet.WebSocketMessagingAutoConfiguration
+      - org.springframework.boot.autoconfigure.websocket.servlet.WebSocketServletAutoConfiguration
+      - org.springframework.boot.autoconfigure.websocket.reactive.WebSocketReactiveAutoConfiguration
+
+ping:
+  rest:
+    web:
+      rest-controller-package-name:
+        - cn.procsl.ping.business

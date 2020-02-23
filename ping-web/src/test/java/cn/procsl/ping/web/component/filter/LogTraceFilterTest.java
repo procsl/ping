@@ -43,7 +43,7 @@ public class LogTraceFilterTest {
         MockHttpServletRequestBuilder get = get("/404");
         mockMvc.perform(get)
                 .andDo(print())
-                .andExpect(header().exists("X-trace-id"));
+                .andExpect(header().exists("X-Trace-Id"));
     }
 
 

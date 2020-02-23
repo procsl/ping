@@ -1,13 +1,12 @@
 package cn.procsl.ping.business.user.web.controller;
 
-import com.google.common.collect.ImmutableList;
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.validation.constraints.NotEmpty;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,7 +16,7 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("users")
-@Api(tags = "用户信息接口")
+@Tag(name = "用户模块", description = "这是用户模块描述")
 public class UserController {
 
     LinkedList<User> userInfo = new LinkedList<>();
@@ -33,8 +32,12 @@ public class UserController {
     }
 
     @DeleteMapping
-    public void delete(User user) {
-        userInfo.remove(user);
+    public void delete(@NotEmpty Integer[] id) {
+        User user = new User();
+        for (Integer s : id) {
+            user.id = s;
+            userInfo.remove(user);
+        }
     }
 
     @GetMapping("{id}")
@@ -47,14 +50,19 @@ public class UserController {
         return null;
     }
 
+    @GetMapping("enum")
+    public PatternEnum testEnum(PatternEnum patternEnum) {
+        return patternEnum;
+    }
+
     @Getter
     @Setter
-    @XmlRootElement(name = "root")
     protected static class User {
         Integer id;
         String name;
         String gender;
-        List<String> list = ImmutableList.of("1", "2", "3", "4");
+        PatternEnum pattern;
+        List<String> list;
 
         @Override
         public boolean equals(Object obj) {
@@ -65,5 +73,9 @@ public class UserController {
         public int hashCode() {
             return id == null ? 0 : id;
         }
+    }
+
+    protected static enum PatternEnum {
+        A, B, C, D
     }
 }

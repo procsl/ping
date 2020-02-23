@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd">
 
-    <bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+    <bean id="mvcContentNegotiationManager" primary="true"
+          class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
         <property name="favorPathExtension" value="true"/>
         <property name="favorParameter" value="true"/>
         <property name="parameterName" value="$format"/>
@@ -12,7 +13,6 @@
             <map>
                 <entry key="json" value="application/json"/>
                 <entry key="xml" value="application/xml"/>
-                <entry key="html" value="application/json"/>
             </map>
         </property>
         <property name="ignoreUnknownPathExtensions" value="true"/>
@@ -23,93 +23,91 @@
     <bean id="requestMappingHandlerAdapter"
           primary="true"
           class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
-        <property name="contentNegotiationManager" ref="contentNegotiationManager"/>
+        <property name="contentNegotiationManager" ref="mvcContentNegotiationManager"/>
         <property name="order" value="-1"/>
         <property name="requestBodyAdvice" ref="jsonViewRequestBodyAdvice"/>
         <property name="responseBodyAdvice" ref="jsonViewResponseBodyAdvice"/>
-        <property name="messageConverters">
-            <list>
-                <ref bean="stringHttpMessageConverter"/>
-                <ref bean="jackson2JsonHttpMessageConverter"/>
-                <ref bean="jackson2XmlHttpMessageConverter"/>
-                <ref bean="byteArrayHttpMessageConverter"/>
-                <ref bean="sourceHttpMessageConverter"/>
-                <ref bean="allEncompassingFormHttpMessageConverter"/>
-                <ref bean="numberHttpMessageConverter"/>
-                <ref bean="dateHttpMessageConverter"/>
-            </list>
-        </property>
-        <property name="returnValueHandlers">
-            <list>
-                <ref bean="httpEntityMethodProcessor"/>
-                <ref bean="requestResponseBodyMethodProcessor"/>
-                <ref bean="simpleTypeHandlerResolver"/>
-                <ref bean="restHandlerResolver"/>
-            </list>
-        </property>
+        <property name="messageConverters" ref="converter"/>
+        <property name="returnValueHandlers" ref="handlerMethodReturnValueHandler"/>
     </bean>
 
     <bean id="requestResponseBodyMethodProcessor"
           class="org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor">
-        <constructor-arg index="0">
-            <list>
-                <ref bean="stringHttpMessageConverter"/>
-                <ref bean="jackson2JsonHttpMessageConverter"/>
-                <ref bean="jackson2XmlHttpMessageConverter"/>
-                <ref bean="byteArrayHttpMessageConverter"/>
-                <ref bean="sourceHttpMessageConverter"/>
-                <ref bean="allEncompassingFormHttpMessageConverter"/>
-                <ref bean="numberHttpMessageConverter"/>
-                <ref bean="dateHttpMessageConverter"/>
-            </list>
-        </constructor-arg>
-        <constructor-arg index="1" ref="contentNegotiationManager"/>
-        <constructor-arg index="2">
-            <list>
-                <ref bean="jsonViewRequestBodyAdvice"/>
-                <ref bean="jsonViewResponseBodyAdvice"/>
-            </list>
-        </constructor-arg>
+        <constructor-arg index="0" ref="converter"/>
+        <constructor-arg index="1" ref="mvcContentNegotiationManager"/>
+        <constructor-arg index="2" ref="advice"/>
     </bean>
 
-    <bean id="restHandlerResolver" class="cn.procsl.ping.web.component.resolver.RestHandlerResolver">
+    <bean id="restHandlerResolver" class="cn.procsl.ping.web.component.resolver.RestHandler">
         <property name="order" value="10"/>
     </bean>
 
-    <bean id="simpleTypeHandlerResolver" class="cn.procsl.ping.web.component.resolver.SimpleTypeHandlerResolver">
+    <bean id="simpleTypeHandlerResolver" class="cn.procsl.ping.web.component.resolver.SimpleTypeHandler">
         <property name="order" value="1"/>
         <property name="process" ref="requestResponseBodyMethodProcessor"/>
     </bean>
 
     <bean id="httpEntityMethodProcessor"
           class="org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor">
-        <constructor-arg index="0">
-            <list>
-                <ref bean="stringHttpMessageConverter"/>
-                <ref bean="jackson2JsonHttpMessageConverter"/>
-                <ref bean="jackson2XmlHttpMessageConverter"/>
-            </list>
-        </constructor-arg>
-        <constructor-arg index="1" ref="contentNegotiationManager"/>
-        <constructor-arg index="2">
-            <list>
-                <ref bean="jsonViewResponseBodyAdvice"/>
-                <ref bean="jsonViewRequestBodyAdvice"/>
-            </list>
-        </constructor-arg>
+        <constructor-arg index="0" ref="converter"/>
+        <constructor-arg index="1" ref="mvcContentNegotiationManager"/>
+        <constructor-arg index="2" ref="advice"/>
     </bean>
 
+    <util:list id="advice">
+        <ref bean="jsonViewResponseBodyAdvice"/>
+        <ref bean="jsonViewRequestBodyAdvice"/>
+    </util:list>
     <bean id="jsonViewRequestBodyAdvice"
           class="org.springframework.web.servlet.mvc.method.annotation.JsonViewRequestBodyAdvice"/>
 
     <bean id="jsonViewResponseBodyAdvice"
           class="org.springframework.web.servlet.mvc.method.annotation.JsonViewResponseBodyAdvice"/>
 
+    <util:list id="converter">
+        <bean id="numberHttpMessageConverter"
+              class="cn.procsl.ping.web.component.converter.NumberHttpMessageConverter"/>
+        <bean id="dateHttpMessageConverter" class="cn.procsl.ping.web.component.converter.DateHttpMessageConverter"/>
+        <bean id="stringHttpMessageConverter" class="org.springframework.http.converter.StringHttpMessageConverter"/>
+        <bean id="jackson2JsonHttpMessageConverter"
+              class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+            <constructor-arg ref="jsonMapper"/>
+        </bean>
+        <bean id="jackson2XmlHttpMessageConverter"
+              class="org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter">
+            <constructor-arg ref="xmlMapper"/>
+        </bean>
+        <bean id="byteArrayHttpMessageConverter"
+              class="org.springframework.http.converter.ByteArrayHttpMessageConverter"/>
+
+        <bean id="sourceHttpMessageConverter"
+              class="org.springframework.http.converter.xml.SourceHttpMessageConverter"/>
+
+        <bean id="allEncompassingFormHttpMessageConverter"
+              class="org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter"/>
+    </util:list>
+
+    <util:list id="handlerMethodReturnValueHandler">
+        <bean class="org.springframework.web.servlet.mvc.method.annotation.ModelAndViewMethodReturnValueHandler"/>
+        <bean class="org.springframework.web.method.annotation.ModelMethodProcessor"/>
+        <ref bean="httpEntityMethodProcessor"/>
+        <ref bean="requestResponseBodyMethodProcessor"/>
+        <ref bean="simpleTypeHandlerResolver"/>
+        <ref bean="restHandlerResolver"/>
+    </util:list>
+
     <bean class="cn.procsl.ping.web.component.resolver.RestViewResolver">
-        <property name="contentNegotiationManager" ref="contentNegotiationManager"/>
+        <property name="contentNegotiationManager" ref="mvcContentNegotiationManager"/>
         <property name="defaultView" ref="jsonView"/>
         <property name="order" value="100"/>
+        <property name="viewResolvers">
+            <list>
+                <ref bean="internalResourceViewResolver"/>
+            </list>
+        </property>
     </bean>
+
+    <bean id="internalResourceViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver"/>
 
     <bean id="jsonView" class="cn.procsl.ping.web.component.view.JsonView">
         <constructor-arg ref="jsonMapper"/>
@@ -124,27 +122,9 @@
         <property name="disableCaching" value="false"/>
     </bean>
 
-    <bean id="numberHttpMessageConverter" class="cn.procsl.ping.web.component.converter.NumberHttpMessageConverter"/>
-    <bean id="dateHttpMessageConverter" class="cn.procsl.ping.web.component.converter.DateHttpMessageConverter"/>
-    <bean id="stringHttpMessageConverter" class="org.springframework.http.converter.StringHttpMessageConverter"/>
-    <bean id="jackson2JsonHttpMessageConverter"
-          class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
-        <constructor-arg ref="jsonMapper"/>
-    </bean>
-
-    <bean id="jackson2XmlHttpMessageConverter"
-          class="org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter">
-        <constructor-arg ref="xmlMapper"/>
-    </bean>
-
-    <bean id="byteArrayHttpMessageConverter" class="org.springframework.http.converter.ByteArrayHttpMessageConverter"/>
-
-    <bean id="sourceHttpMessageConverter" class="org.springframework.http.converter.xml.SourceHttpMessageConverter"/>
-
-    <bean id="allEncompassingFormHttpMessageConverter"
-          class="org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter"/>
-
     <bean id="propertyFilter" class="cn.procsl.ping.web.serializable.SerializableFilter"/>
 
     <bean id="namingStrategy" class="cn.procsl.ping.web.serializable.NamingStrategy"/>
+
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/>
 </beans>

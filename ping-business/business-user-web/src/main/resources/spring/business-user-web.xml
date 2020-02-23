@@ -15,7 +15,9 @@
 
     <import resource="web.xml"/>
 
-    <import resource="swagger.xml"/>
+<!--    <import resource="swagger.xml"/>-->
+
+    <import resource="openapi.xml"/>
 
     <context:component-scan
             base-package="cn.procsl.ping.business.user.web"/>

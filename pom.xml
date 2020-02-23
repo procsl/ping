@@ -25,6 +25,8 @@
         <module>ping-demo</module>
         <module>ping-api</module>
         <module>ping-business</module>
+        <module>ping-rest-spring-boot-starter</module>
+        <module>ping-api-spring-boot-starter</module>
     </modules>
     <name>ping</name>
 
