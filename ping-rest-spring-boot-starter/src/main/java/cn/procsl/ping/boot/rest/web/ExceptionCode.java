@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.rest.web;
 
-import cn.procsl.ping.boot.rest.serial.SkipFilter;
+import cn.procsl.ping.boot.rest.annotation.SkipFilter;
 import lombok.*;
 
 import java.io.Serializable;

@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author procsl
  * @date 2020/02/18
  */
-@SpringBootApplication(scanBasePackages = "cn.procsl.ping")
+@SpringBootApplication(scanBasePackages = "cn.procsl.ping.business")
 public class UserApplication {
 
     public static void main(String[] args) {

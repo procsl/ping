@@ -5,6 +5,7 @@ import cn.procsl.ping.boot.rest.resolver.RestViewResolver;
 import cn.procsl.ping.boot.rest.serial.PropertyFilterMixin;
 import cn.procsl.ping.boot.rest.serial.SerializableFilter;
 import cn.procsl.ping.boot.rest.view.JsonView;
+import cn.procsl.ping.boot.rest.web.NoContentResponseBodyAdvice;
 import cn.procsl.ping.boot.rest.web.RestPathExtensionContentNegotiationStrategy;
 import cn.procsl.ping.boot.rest.web.RestRequestMappingHandlerAdapter;
 import cn.procsl.ping.boot.rest.web.RestRequestMappingHandlerMapping;
@@ -37,7 +38,6 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.accept.ContentNegotiationManager;
@@ -46,7 +46,10 @@ import org.springframework.web.accept.PathExtensionContentNegotiationStrategy;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.View;
-import org.springframework.web.servlet.config.annotation.*;
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
+import org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
@@ -76,28 +79,16 @@ import static org.springframework.http.MediaType.APPLICATION_XML;
 @ConditionalOnClass({Servlet.class, DispatcherServlet.class, WebMvcConfigurer.class})
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE + 2)
 @AutoConfigureAfter({RestDispatcherServletAutoConfiguration.class, TaskExecutionAutoConfiguration.class, ValidationAutoConfiguration.class})
+@ConditionalOnMissingBean(RestWebAutoConfiguration.class)
 public class RestWebAutoConfiguration extends DelegatingWebMvcConfiguration {
 
     final RestWebProperties properties;
-
-    private static final boolean jaxb2Present;
-
-    private static final boolean jackson2SmilePresent;
-
-    private static final boolean jackson2CborPresent;
 
     @Setter
     private MediaType JSON_TYPE;
 
     @Setter
     private MediaType XML_TYPE;
-
-    static {
-        ClassLoader classLoader = WebMvcConfigurationSupport.class.getClassLoader();
-        jaxb2Present = ClassUtils.isPresent("javax.xml.bind.Binder", classLoader);
-        jackson2SmilePresent = ClassUtils.isPresent("com.fasterxml.jackson.dataformat.smile.SmileFactory", classLoader);
-        jackson2CborPresent = ClassUtils.isPresent("com.fasterxml.jackson.dataformat.cbor.CBORFactory", classLoader);
-    }
 
     @Override
     public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
@@ -141,7 +132,6 @@ public class RestWebAutoConfiguration extends DelegatingWebMvcConfiguration {
         MappingJackson2XmlView view = new MappingJackson2XmlView(xmlMapper);
         view.setModelKey(this.properties.getModelKey());
         view.setUpdateContentLength(true);
-//        view.setContentType(XML_TYPE.toString());
         return view;
     }
 
@@ -323,5 +313,11 @@ public class RestWebAutoConfiguration extends DelegatingWebMvcConfiguration {
             }
         }
         return manager;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public NoContentResponseBodyAdvice noContentResponseBodyAdvice() {
+        return new NoContentResponseBodyAdvice(this.properties);
     }
 }

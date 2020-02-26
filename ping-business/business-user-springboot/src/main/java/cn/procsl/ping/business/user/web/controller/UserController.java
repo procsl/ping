@@ -1,56 +1,53 @@
 package cn.procsl.ping.business.user.web.controller;
 
-import cn.procsl.ping.boot.rest.annotation.ApiVersion;
+import cn.procsl.ping.boot.rest.annotation.NoContent;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.Data;
+import org.hibernate.validator.constraints.Length;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.util.LinkedList;
+import java.util.List;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
  * @author procsl
  * @date 2020/02/19
  */
 @RestController
-@RequestMapping("/echo")
+@RequestMapping("users")
 @Tag(name = "用户模块")
 public class UserController {
 
-    @GetMapping("user")
-    @ApiVersion(2)
-    public Map<String, String> getUser() {
-        HashMap<String, String> tmp = new HashMap<>();
-        tmp.put("hello", "xxx");
-        return tmp;
+    private List<User> users = new LinkedList<>();
+
+    @PostMapping
+    @NoContent
+    public void create(@RequestBody User user, @RequestParam Integer index) {
+        users.add(user);
     }
 
-
-    @GetMapping("user")
-    public Map<String, String> current() {
-        HashMap<String, String> tmp = new HashMap<>();
-        tmp.put("hello", "xxx");
-        return tmp;
+    @DeleteMapping(value = "{index}", produces = {APPLICATION_JSON_VALUE})
+    public User deleteUser(@PathVariable Integer index) {
+        return users.remove(0);
     }
 
-
-    @GetMapping("string")
-    public String getString() {
-        throw new RuntimeException("string");
+    @GetMapping
+    public List<User> getUsers() {
+        return users;
     }
 
-
-    @GetMapping("/role")
-    public Map<String, String> getRoles() {
-        HashMap<String, String> tmp = new HashMap<>();
-        tmp.put("hello", "role");
-        return tmp;
+    @PatchMapping
+    public void patch(@RequestBody User user) {
+        users.add(user);
     }
 
-    @GetMapping("role/{test}")
-    private String integer(@PathVariable String test) {
-        return test;
+    @Data
+    protected static class User {
+        @NotNull @Length(max = 32) String name;
+        @NotNull @Size(max = 32, min = 32) String password;
     }
 }

@@ -3,6 +3,8 @@ package cn.procsl.ping.boot.rest.annotation;
 import java.lang.annotation.*;
 
 /**
+ * 移除版本管理
+ *
  * @author procsl
  * @date 2020/02/21
  */
@@ -10,5 +12,4 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface NotApiVersion {
-    int value() default 1;
 }

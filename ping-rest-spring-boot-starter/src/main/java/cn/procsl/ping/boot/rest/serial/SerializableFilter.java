@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.rest.serial;
 
+import cn.procsl.ping.boot.rest.annotation.SkipFilter;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.PropertyWriter;

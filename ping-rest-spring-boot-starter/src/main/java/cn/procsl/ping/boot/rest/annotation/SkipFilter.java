@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.rest.serial;
+package cn.procsl.ping.boot.rest.annotation;
 
 import java.lang.annotation.*;
 
