@@ -11,8 +11,6 @@ import javax.validation.constraints.Size;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-
 /**
  * @author procsl
  * @date 2020/02/19
@@ -30,19 +28,18 @@ public class UserController {
         users.add(user);
     }
 
-    @DeleteMapping(value = "{index}", produces = {APPLICATION_JSON_VALUE})
+    @DeleteMapping(value = "{index}")
     public User deleteUser(@PathVariable Integer index) {
         return users.remove(0);
     }
 
     @GetMapping
-    public List<User> getUsers() {
+    public List<User> getUsers(User user) {
         return users;
     }
 
     @PatchMapping
     public void patch(@RequestBody User user) {
-        users.add(user);
     }
 
     @Data

@@ -52,12 +52,13 @@ public class RestRequestMappingHandlerMapping extends RequestMappingHandlerMappi
     protected RequestMappingInfo createRequestMappingInfo(Method method, Class<?> handlerType) {
         RequestMappingInfo.BuilderConfiguration config = findConfig(this);
 
-        RequestMappingInfo info = createRequestMappingInfo(method, null, config);
+        Integer version = getVersion(method, handlerType);
+        RequestMappingInfo info = createRequestMappingInfo(method, version, config);
         if (info == null) {
             return null;
         }
 
-        RequestMappingInfo typeInfo = createRequestMappingInfo(handlerType, getVersion(method, handlerType), config);
+        RequestMappingInfo typeInfo = createRequestMappingInfo(handlerType, version, config);
         if (typeInfo != null) {
             info = typeInfo.combine(info);
         }
@@ -129,15 +130,18 @@ public class RestRequestMappingHandlerMapping extends RequestMappingHandlerMappi
 
         RequestCondition<?> condition;
         Method method = null;
+        String[] paths;
         if (element instanceof Class) {
             condition = this.getCustomTypeCondition((Class<?>) element);
+            paths = buildPathByVersion(requestMapping, apiVersion);
         } else {
             condition = this.getCustomMethodCondition((Method) element);
             method = (Method) element;
+            paths = buildPathByVersion(requestMapping, null);
         }
 
         RequestMappingInfo.Builder builder = RequestMappingInfo
-                .paths(buildPathByVersion(requestMapping, apiVersion))
+                .paths(paths)
                 .methods(requestMapping.method())
                 .params(requestMapping.params())
                 .headers(requestMapping.headers())
@@ -159,6 +163,11 @@ public class RestRequestMappingHandlerMapping extends RequestMappingHandlerMappi
         }
 
         if (StringUtils.isEmpty(properties.getMimeSubtype())) {
+            return products;
+        }
+
+        // 如果当前不为方法,则直接返回默认的
+        if (method == null) {
             return products;
         }
 
