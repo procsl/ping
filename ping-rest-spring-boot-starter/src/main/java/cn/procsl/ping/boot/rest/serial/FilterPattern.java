@@ -249,9 +249,9 @@ public class FilterPattern {
         return defaultList;
     }
 
-    private static class InnerFilter extends FilterPattern {
+    private static final class InnerFilter extends FilterPattern {
 
-        private boolean bool;
+        private final boolean bool;
 
         public InnerFilter(boolean bool) {
             this.bool = bool;

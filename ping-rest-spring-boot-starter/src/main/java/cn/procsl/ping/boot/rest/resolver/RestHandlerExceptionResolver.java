@@ -1,8 +1,8 @@
 package cn.procsl.ping.boot.rest.resolver;
 
 import cn.procsl.ping.boot.rest.config.RestWebProperties;
-import cn.procsl.ping.boot.rest.web.ExceptionCode;
-import cn.procsl.ping.boot.rest.web.NotFoundException;
+import cn.procsl.ping.boot.rest.exception.ExceptionCode;
+import cn.procsl.ping.boot.rest.exception.NotFoundException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;

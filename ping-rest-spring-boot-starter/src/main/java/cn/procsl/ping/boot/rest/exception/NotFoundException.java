@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.rest.web;
+package cn.procsl.ping.boot.rest.exception;
 
 
 /**

@@ -25,7 +25,7 @@ import static org.springframework.http.MediaType.*;
  * @date 2020/02/26
  */
 @RequiredArgsConstructor
-public class RestResponse implements Function {
+public class RestVisitor implements Visitor {
 
     final String VND_XML;
 
@@ -37,74 +37,75 @@ public class RestResponse implements Function {
 
         //当前的方法
         Set<RequestMethod> methods = requestMappingInfo.getMethodsCondition().getMethods();
-
-        for (RequestMethod method : methods) {
-            if ("GET".equals(method.name())) {
-                Operation get = item.getGet();
-                if (get != null) {
-                    this.push(item, get, method, requestMappingInfo, handlerMethod);
-                    break;
-                }
-            }
-
-            if ("POST".equals(method.name())) {
-                Operation post = item.getPost();
-                if (post != null) {
-                    this.push(item, post, method, requestMappingInfo, handlerMethod);
-                    break;
-                }
-            }
-
-
-            if ("DELETE".equals(method.name())) {
-                Operation delete = item.getDelete();
-                if (delete != null) {
-                    this.push(item, delete, method, requestMappingInfo, handlerMethod);
-                    break;
-                }
-            }
-
-            if ("PATCH".equals(method.name())) {
-                Operation patch = item.getPatch();
-                if (patch != null) {
-                    this.push(item, patch, method, requestMappingInfo, handlerMethod);
-                    break;
-                }
-            }
-
-            if ("PUT".equals(method.name())) {
-                Operation put = item.getPut();
-                if (put != null) {
-                    this.push(item, put, method, requestMappingInfo, handlerMethod);
-                    break;
-                }
-            }
-
-            if ("HEAD".equals(method.name())) {
-                Operation head = item.getHead();
-                if (head != null) {
-                    this.push(item, head, method, requestMappingInfo, handlerMethod);
-                    break;
-                }
-            }
-
-            if ("TRACE".equals(method.name())) {
-                Operation trace = item.getTrace();
-                if (trace != null) {
-                    this.push(item, trace, method, requestMappingInfo, handlerMethod);
-                    break;
-                }
-            }
-
-            if ("OPTIONS".equals(method.name())) {
-                Operation options = item.getOptions();
-                if (options != null) {
-                    this.push(item, options, method, requestMappingInfo, handlerMethod);
-                    break;
-                }
-            }
-
-        }
+        return;
+//
+//        for (RequestMethod method : methods) {
+//            if ("GET".equals(method.name())) {
+//                Operation get = item.getGet();
+//                if (get != null) {
+//                    this.push(item, get, method, requestMappingInfo, handlerMethod);
+//                    break;
+//                }
+//            }
+//
+//            if ("POST".equals(method.name())) {
+//                Operation post = item.getPost();
+//                if (post != null) {
+//                    this.push(item, post, method, requestMappingInfo, handlerMethod);
+//                    break;
+//                }
+//            }
+//
+//
+//            if ("DELETE".equals(method.name())) {
+//                Operation delete = item.getDelete();
+//                if (delete != null) {
+//                    this.push(item, delete, method, requestMappingInfo, handlerMethod);
+//                    break;
+//                }
+//            }
+//
+//            if ("PATCH".equals(method.name())) {
+//                Operation patch = item.getPatch();
+//                if (patch != null) {
+//                    this.push(item, patch, method, requestMappingInfo, handlerMethod);
+//                    break;
+//                }
+//            }
+//
+//            if ("PUT".equals(method.name())) {
+//                Operation put = item.getPut();
+//                if (put != null) {
+//                    this.push(item, put, method, requestMappingInfo, handlerMethod);
+//                    break;
+//                }
+//            }
+//
+//            if ("HEAD".equals(method.name())) {
+//                Operation head = item.getHead();
+//                if (head != null) {
+//                    this.push(item, head, method, requestMappingInfo, handlerMethod);
+//                    break;
+//                }
+//            }
+//
+//            if ("TRACE".equals(method.name())) {
+//                Operation trace = item.getTrace();
+//                if (trace != null) {
+//                    this.push(item, trace, method, requestMappingInfo, handlerMethod);
+//                    break;
+//                }
+//            }
+//
+//            if ("OPTIONS".equals(method.name())) {
+//                Operation options = item.getOptions();
+//                if (options != null) {
+//                    this.push(item, options, method, requestMappingInfo, handlerMethod);
+//                    break;
+//                }
+//            }
+//
+//        }
     }
 
     public void push(PathItem item, Operation operation, RequestMethod method,

@@ -1,12 +1,11 @@
 package cn.procsl.ping.boot.api.config;
 
-import cn.procsl.ping.boot.api.core.Function;
 import cn.procsl.ping.boot.api.core.OpenApiCustom;
 import cn.procsl.ping.boot.api.core.OpenApiRequestBuilder;
-import cn.procsl.ping.boot.api.core.RestResponse;
+import cn.procsl.ping.boot.api.core.RestVisitor;
+import cn.procsl.ping.boot.api.core.Visitor;
 import cn.procsl.ping.boot.rest.config.RestWebAutoConfiguration;
 import cn.procsl.ping.boot.rest.config.RestWebProperties;
-import cn.procsl.ping.boot.rest.web.RestRequestMappingHandlerMapping;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -27,6 +26,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.util.Collections;
 import java.util.List;
@@ -60,17 +60,6 @@ public class OpenApiAutoConfiguration {
         return api;
     }
 
-//    @Bean
-//    @ConditionalOnBean(value = OpenApiResource.class)
-//    @Order
-//    public OpenApiAspect openApiAspectConfiguration(@Autowired HttpServletResponse response,
-//                                                    OpenApiResource resource
-//    ) {
-//        OpenApiAspect tmp = new OpenApiAspect(response, resource);
-//        return tmp;
-//    }
-
-
     /**
      * 替换组件
      *
@@ -96,20 +85,21 @@ public class OpenApiAutoConfiguration {
     }
 
     @Bean
-    public OpenApiCustom apiCustom(@Autowired RestRequestMappingHandlerMapping mpping,
-                                   @Autowired List<Function> functions,
+    public OpenApiCustom apiCustom(@Autowired RequestMappingHandlerMapping mpping,
+                                   @Autowired List<Visitor> functions,
                                    @Autowired RestWebProperties properties) {
         return new OpenApiCustom(properties, mpping, functions);
     }
 
     @Bean
-    public RestResponse restResponse(RestWebProperties properties) {
+    @ConditionalOnMissingBean
+    public RestVisitor restVisitor(RestWebProperties properties) {
         if (ObjectUtils.isEmpty(properties.getMimeSubtype())) {
-            return new RestResponse(null, null);
+            return new RestVisitor(null, null);
         }
         MediaType xml = new MediaType("application", properties.getMimeSubtype() + "+xml");
         MediaType json = new MediaType("application", properties.getMimeSubtype() + "+json");
-        return new RestResponse(xml.toString(), json.toString());
+        return new RestVisitor(xml.toString(), json.toString());
     }
 
 

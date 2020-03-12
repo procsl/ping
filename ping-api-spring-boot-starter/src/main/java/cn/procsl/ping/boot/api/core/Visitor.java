@@ -8,7 +8,7 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
  * @author procsl
  * @date 2020/02/26
  */
-public interface Function {
+public interface Visitor {
     /**
      * 根据相关的上下文创建item信息
      *

@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.rest.web;
 
+import cn.procsl.ping.boot.rest.exception.NotFoundException;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.util.WebUtils;
 

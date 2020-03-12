@@ -29,7 +29,7 @@ public class OpenApiCustom implements OpenApiCustomiser {
 
     private Map<RequestMappingInfo, HandlerMethod> links;
 
-    protected final List<Function> pathFunctionList;
+    protected final List<Visitor> pathFunctionList;
 
     @Override
     public void customise(OpenAPI openApi) {

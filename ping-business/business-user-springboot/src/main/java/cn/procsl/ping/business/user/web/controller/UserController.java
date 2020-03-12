@@ -1,6 +1,7 @@
 package cn.procsl.ping.business.user.web.controller;
 
 import cn.procsl.ping.boot.rest.annotation.NoContent;
+import cn.procsl.ping.boot.rest.annotation.RestEndpoint;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
@@ -15,8 +16,7 @@ import java.util.List;
  * @author procsl
  * @date 2020/02/19
  */
-@RestController
-@RequestMapping("users")
+@RestEndpoint("user")
 @Tag(name = "用户模块")
 public class UserController {
 

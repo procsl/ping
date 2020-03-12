@@ -2,11 +2,12 @@ package cn.procsl.ping.boot.rest.config;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 
-import java.util.List;
-
-import static java.util.Collections.EMPTY_LIST;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * @author procsl
@@ -15,9 +16,7 @@ import static java.util.Collections.EMPTY_LIST;
 @ConfigurationProperties(prefix = "ping.rest.web")
 @Getter
 @Setter
-public class RestWebProperties {
-
-    private String contentNegotiationParameterName = "content";
+public class RestWebProperties implements InitializingBean {
 
     private boolean wrapper = true;
 
@@ -29,13 +28,83 @@ public class RestWebProperties {
 
     private String modelKey = "modelKey";
 
-    private String filterParameterName = "filter";
+    /**
+     * 支持的元媒体类型
+     */
+    private Set<MetaMediaType> metaMediaTypes = Collections.singleton(MetaMediaType.json);
 
-    private String filterTypeParameterName = "pattern";
+    /**
+     * 是否启用自定义媒体类型
+     */
+    private RepresentationStrategy representationStrategy = RepresentationStrategy.system_mime;
 
-    private List<String> restControllerPackageName = EMPTY_LIST;
-
+    /**
+     * 如果不为null 则生成 诸如 application/vnd.api+json 的格式
+     * <p>
+     * 自定义媒体类型
+     */
     private String mimeSubtype = "vnd.api";
 
+    /**
+     * 是否启用版本管理
+     */
     private boolean enableVersion = true;
+
+    /**
+     * 版本策略
+     * <p>
+     * 默认为前缀模
+     * 式
+     */
+    private VersionStrategy versionStrategy = VersionStrategy.path_prefix;
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+
+    }
+
+    /**
+     * 版本策略
+     */
+    public enum VersionStrategy {
+        /**
+         * 基于路径前缀
+         * 比如  https://api.procsl.cn/v1/products
+         */
+        path_prefix,
+
+
+        /**
+         * 基于MIME
+         * application/vnd.api.v1+json
+         */
+        mime_type
+
+    }
+
+    /**
+     * 表征媒体类型
+     */
+    public enum MetaMediaType {
+        json, xml, yaml
+    }
+
+    /**
+     * 表征策略
+     */
+    public enum RepresentationStrategy {
+
+        // application/vnd.api+json
+        custom_mime,
+
+        // application/json
+        system_mime
+    }
+
+    @Bean
+    public VersionStrategyProperties versionStrategyConfiguration() {
+        return new VersionStrategyProperties();
+    }
+
+
 }

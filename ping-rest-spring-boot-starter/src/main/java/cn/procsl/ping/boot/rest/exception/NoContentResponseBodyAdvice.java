@@ -1,6 +1,5 @@
-package cn.procsl.ping.boot.rest.web;
+package cn.procsl.ping.boot.rest.exception;
 
-import cn.procsl.ping.boot.rest.annotation.NoContent;
 import cn.procsl.ping.boot.rest.config.RestWebProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,19 +25,19 @@ public class NoContentResponseBodyAdvice implements ResponseBodyAdvice<Object> {
 
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
-        Class<?> controller = returnType.getMethod().getDeclaringClass();
-        for (String s : this.properties.getRestControllerPackageName()) {
-            boolean bool = controller.getName().startsWith(s);
-            if (bool) {
-                Class<?> returnParameter = returnType.getParameterType();
-                return "void".equals(returnParameter.getName())
-                        ||
-                        returnType.hasMethodAnnotation(NoContent.class)
-                        ||
-                        Void.class.isAssignableFrom(returnType.getParameterType());
-
-            }
-        }
+//        Class<?> controller = returnType.getMethod().getDeclaringClass();
+//        for (String s : this.properties.getRestControllerPackageName()) {
+//            boolean bool = controller.getName().startsWith(s);
+//            if (bool) {
+//                Class<?> returnParameter = returnType.getParameterType();
+//                return "void".equals(returnParameter.getName())
+//                        ||
+//                        returnType.hasMethodAnnotation(NoContent.class)
+//                        ||
+//                        Void.class.isAssignableFrom(returnType.getParameterType());
+//
+//            }
+//        }
         return false;
     }
 
