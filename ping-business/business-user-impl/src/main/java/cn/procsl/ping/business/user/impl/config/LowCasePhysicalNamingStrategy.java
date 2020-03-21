@@ -1,6 +1,5 @@
 package cn.procsl.ping.business.user.impl.config;
 
-import com.google.common.base.CaseFormat;
 import org.hibernate.boot.model.naming.Identifier;
 import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
 import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
@@ -44,13 +43,11 @@ public class LowCasePhysicalNamingStrategy implements PhysicalNamingStrategy {
         if (name == null) {
             return null;
         }
-        String tmp = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, name.getText());
-        return Identifier.toIdentifier(tmp);
+        return Identifier.toIdentifier(name.getText().toLowerCase());
     }
 
     private Identifier castTranslate(String table, Identifier name) {
-        String tmp = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, name.getText());
-        return Identifier.toIdentifier(table.concat(tmp));
+        return Identifier.toIdentifier(table.concat(name.getText().toLowerCase()));
     }
 
 

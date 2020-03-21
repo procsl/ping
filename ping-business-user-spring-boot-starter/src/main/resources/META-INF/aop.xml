@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<aspectj>
+    <weaver options="-Xset:weaveJavaxPackages=true -Xlint:ignore -verbose">
+        <include within="cn.procsl.ping.business.user.impl.domain.*"/>
+    </weaver>
+</aspectj>

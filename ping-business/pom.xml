@@ -15,12 +15,8 @@
         <module>business-user-api</module>
         <module>business-core</module>
         <module>business-user-impl</module>
-        <module>business-user-web</module>
         <module>business-user-springboot</module>
     </modules>
-
-    <dependencies>
-    </dependencies>
 
 
 </project>
