@@ -1,6 +1,5 @@
 package cn.procsl.ping.boot.rest.view;
 
-import cn.procsl.ping.boot.rest.config.RestWebProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
@@ -12,15 +11,15 @@ import java.util.Map;
  */
 public class JsonView extends MappingJackson2JsonView {
 
-    private final RestWebProperties properties;
+    private final String key;
 
-    public JsonView(ObjectMapper objectMapper, RestWebProperties properties) {
+    public JsonView(ObjectMapper objectMapper, String key) {
         super(objectMapper);
-        this.properties = properties;
+        this.key = key;
     }
 
     @Override
     protected Object filterModel(Map<String, Object> model) {
-        return model.get(properties.getModelKey());
+        return model.get(key);
     }
 }

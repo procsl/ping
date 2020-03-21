@@ -1,21 +1,26 @@
 package cn.procsl.ping.boot.rest.resolver;
 
+import cn.procsl.ping.boot.rest.config.RestWebProperties;
+import cn.procsl.ping.boot.rest.view.JsonView;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
-import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
-import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
+import javax.servlet.ServletContext;
+import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import static org.springframework.web.servlet.view.UrlBasedViewResolver.FORWARD_URL_PREFIX;
-import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT_URL_PREFIX;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.parseMediaType;
+import static org.springframework.util.MimeTypeUtils.APPLICATION_XML;
 
 /**
  * @author procsl
@@ -24,19 +29,19 @@ import static org.springframework.web.servlet.view.UrlBasedViewResolver.REDIRECT
 @RequiredArgsConstructor
 public class RestViewResolver extends ContentNegotiatingViewResolver {
 
-    final InternalResourceViewResolver internalResourceViewResolver;
 
-    final List<View> views;
+    final private EnumMap<RestWebProperties.MetaMediaType, List<MediaType>> mediaTypes;
 
-    final View defaultView;
+    private View defaultView;
+
+    private List<View> defaultViews;
+
+    final private RestWebProperties properties;
+
+    HashMap<String, MediaType> cache = new HashMap<>(10);
 
     @Override
     public View resolveViewName(String viewName, Locale locale) throws Exception {
-
-        boolean bool = viewName.startsWith(FORWARD_URL_PREFIX) || viewName.startsWith(REDIRECT_URL_PREFIX);
-        if (bool) {
-            return internalResourceViewResolver.resolveViewName(viewName, locale);
-        }
 
         RequestAttributes attrs = RequestContextHolder.getRequestAttributes();
         List<MediaType> requestedMediaTypes = this.getMediaTypes(((ServletRequestAttributes) attrs).getRequest());
@@ -45,7 +50,7 @@ public class RestViewResolver extends ContentNegotiatingViewResolver {
             return this.defaultView;
         }
 
-        return this.getBestView(this.views, requestedMediaTypes, attrs);
+        return this.getBestView(defaultViews, requestedMediaTypes, attrs);
     }
 
 
@@ -53,11 +58,8 @@ public class RestViewResolver extends ContentNegotiatingViewResolver {
     protected View getBestView(List<View> views, List<MediaType> requestedMediaTypes, RequestAttributes attrs) {
         for (MediaType mediaType : requestedMediaTypes) {
             for (View view : views) {
-                if (!StringUtils.hasText(view.getContentType())) {
-                    continue;
-                }
 
-                MediaType currentContentType = MediaType.parseMediaType(view.getContentType());
+                MediaType currentContentType = getMediaType(view.getContentType());
                 if (!mediaType.isCompatibleWith(currentContentType)) {
                     continue;
                 }
@@ -66,7 +68,56 @@ public class RestViewResolver extends ContentNegotiatingViewResolver {
                 return view;
             }
         }
-        return this.defaultView;
+        return defaultView;
     }
 
+    @Override
+    protected void initServletContext(ServletContext servletContext) {
+        super.initServletContext(servletContext);
+        defaultViews = this.getDefaultViews();
+
+        if (mediaTypes.containsKey(RestWebProperties.MetaMediaType.json)) {
+            for (View view : defaultViews) {
+                if (APPLICATION_JSON.isCompatibleWith(getMediaType(view.getContentType()))) {
+                    this.defaultView = view;
+                    return;
+                }
+            }
+        }
+
+        if (mediaTypes.containsKey(RestWebProperties.MetaMediaType.xml)) {
+            for (View view : defaultViews) {
+                if (APPLICATION_XML.isCompatibleWith(getMediaType(view.getContentType()))) {
+                    this.defaultView = view;
+                    return;
+                }
+            }
+        }
+
+        if (mediaTypes.containsKey(RestWebProperties.MetaMediaType.yaml)) {
+            for (View view : defaultViews) {
+                if (new MediaType("application/yaml").isCompatibleWith(getMediaType(view.getContentType()))) {
+                    this.defaultView = view;
+                    return;
+                }
+            }
+        }
+
+        if (defaultViews.isEmpty()) {
+            this.defaultView = new JsonView(new JsonMapper(), this.properties.getModelKey());
+            return;
+        }
+
+        this.defaultView = defaultViews.get(0);
+    }
+
+    private MediaType getMediaType(String contentType) {
+        if (cache.containsKey(contentType)) {
+            return cache.get(contentType);
+        }
+
+        MediaType mediatype = parseMediaType(contentType);
+        cache.put(contentType, mediatype);
+        return mediatype;
+    }
 }

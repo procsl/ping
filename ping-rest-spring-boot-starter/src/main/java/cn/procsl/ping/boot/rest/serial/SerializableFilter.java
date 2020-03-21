@@ -37,6 +37,10 @@ public class SerializableFilter extends SimpleBeanPropertyFilter {
      * 每个请求处理一次
      */
     protected FilterPattern findPattern(Object pojo) {
+        if (context == null) {
+            return compiler();
+        }
+
         FilterPattern params = context.getFilterPattern();
         if (params != null) {
             return params;

@@ -1,3 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=cn.procsl.ping.boot.rest.config.RestWebAutoConfiguration,\
-  cn.procsl.ping.boot.rest.config.RestDispatcherServletAutoConfiguration,\
-  cn.procsl.ping.boot.rest.config.RestHttpMessageConverterAutoConfiguration
+  cn.procsl.ping.boot.rest.config.RestDispatcherServletAutoConfiguration

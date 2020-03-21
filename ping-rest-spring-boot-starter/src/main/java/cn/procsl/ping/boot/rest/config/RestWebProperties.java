@@ -2,7 +2,6 @@ package cn.procsl.ping.boot.rest.config;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
@@ -16,7 +15,7 @@ import java.util.Set;
 @ConfigurationProperties(prefix = "ping.rest.web")
 @Getter
 @Setter
-public class RestWebProperties implements InitializingBean {
+public class RestWebProperties {
 
     private boolean wrapper = true;
 
@@ -58,10 +57,6 @@ public class RestWebProperties implements InitializingBean {
      */
     private VersionStrategy versionStrategy = VersionStrategy.path_prefix;
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-
-    }
 
     /**
      * 版本策略

@@ -7,6 +7,7 @@ import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.http.MediaType;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.lang.reflect.Method;
@@ -17,6 +18,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static cn.procsl.ping.boot.rest.config.RestWebProperties.MetaMediaType.*;
+import static java.util.Arrays.binarySearch;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 
@@ -89,6 +91,33 @@ public class RequestMappingBuilderHook implements RegisterMappingHook {
         if (!ObjectUtils.isEmpty(consumer)) {
             return consumer;
         }
+
+        boolean isApi = AnnotatedElementUtils.hasAnnotation(method, ResponseBody.class) || AnnotatedElementUtils.hasAnnotation(clazz, ResponseBody.class);
+        if (!isApi) {
+            return consumer;
+        }
+
+        RequestMethod[] methods = requestMapping.method();
+        boolean bool =
+                methods == null
+                        ||
+                        methods.length == 0
+                        ||
+                        binarySearch(methods, RequestMethod.GET) >= 0
+                        ||
+                        binarySearch(methods, RequestMethod.DELETE) >= 0
+                        ||
+                        binarySearch(methods, RequestMethod.OPTIONS) >= 0
+                        ||
+                        binarySearch(methods, RequestMethod.TRACE) >= 0
+                        ||
+                        binarySearch(methods, RequestMethod.HEAD) >= 0;
+
+        // 没有请求体的方法 不设置
+        if (bool) {
+            return consumer;
+        }
+
         return this.consumer;
     }
 
@@ -96,9 +125,10 @@ public class RequestMappingBuilderHook implements RegisterMappingHook {
     public String[] products(RequestMapping requestMapping, Class clazz, Method method, boolean isClass, String[] products) {
         if (!ObjectUtils.isEmpty(products)) {
             return products;
-        }
+        } boolean isApi = AnnotatedElementUtils.hasAnnotation(method, ResponseBody.class) ||
 
-        boolean isApi = AnnotatedElementUtils.hasAnnotation(method, ResponseBody.class);
+
+                AnnotatedElementUtils.hasAnnotation(clazz, ResponseBody.class);
         if (!isApi) {
             return products;
         }

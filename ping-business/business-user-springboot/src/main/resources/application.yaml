@@ -26,8 +26,11 @@ spring:
       - org.springframework.boot.autoconfigure.websocket.servlet.WebSocketServletAutoConfiguration
       - org.springframework.boot.autoconfigure.websocket.reactive.WebSocketReactiveAutoConfiguration
 
+
 ping:
   rest:
     web:
-      rest-controller-package-name:
-        - cn.procsl.ping.business
+      representation-strategy: custom_mime
+      meta-media-types:
+        - json
+        - xml

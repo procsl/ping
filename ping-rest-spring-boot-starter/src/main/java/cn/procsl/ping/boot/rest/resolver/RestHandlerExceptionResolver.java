@@ -4,7 +4,6 @@ import cn.procsl.ping.boot.rest.config.RestWebProperties;
 import cn.procsl.ping.boot.rest.exception.ExceptionCode;
 import cn.procsl.ping.boot.rest.exception.NotFoundException;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -14,6 +13,7 @@ import org.springframework.web.servlet.handler.AbstractHandlerExceptionResolver;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * 基于rest风格的全局异常处理
@@ -22,17 +22,25 @@ import javax.servlet.http.HttpServletResponse;
  * @date 2019/12/25
  */
 @Slf4j
-@RequiredArgsConstructor
 public class RestHandlerExceptionResolver extends AbstractHandlerExceptionResolver {
-
-    private final RestWebProperties properties;
 
     @Setter
     @Getter
     protected int order = 0;
 
+    private final RestWebProperties properties;
+
+    @Setter
+    private List<String> accepts;
+
+    public RestHandlerExceptionResolver(RestWebProperties properties, List<String> accepts) {
+        this.properties = properties;
+        this.accepts = accepts;
+    }
+
     @Override
-    protected final ModelAndView doResolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+    protected ModelAndView doResolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+
         ModelAndView mv = new ModelAndView();
         ExceptionCode code = new ExceptionCode();
         log.warn("请求异常:", ex);
@@ -46,6 +54,8 @@ public class RestHandlerExceptionResolver extends AbstractHandlerExceptionResolv
 
             if (ex instanceof HttpMediaTypeNotAcceptableException) {
                 mv.setStatus(HttpStatus.NOT_ACCEPTABLE);
+                code.setCode(mv.getStatus().toString() + "001");
+                code.setMessage(ex.getMessage());
                 break;
             }
 
