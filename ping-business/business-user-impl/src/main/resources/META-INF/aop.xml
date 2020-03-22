@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<aspectj>
-    <weaver options="-Xset:weaveJavaxPackages=true -Xlint:ignore -verbose">
-    </weaver>
-</aspectj>

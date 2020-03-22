@@ -21,6 +21,7 @@ public class UserServiceImplTest {
 
     @Test
     public void create() {
-        userService.create(UserDTO.builder().name("test").build());
+        UserDTO dto = UserDTO.builder().name("test").build();
+        userService.create(dto);
     }
 }

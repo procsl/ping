@@ -3,6 +3,8 @@ package cn.procsl.ping.business.user.impl.domain;
 import cn.procsl.ping.business.user.dto.UserDTO;
 import cn.procsl.ping.business.user.impl.entity.User;
 import cn.procsl.ping.business.user.impl.repository.UserRepository;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
  * @author procsl
  * @date 2019/12/15
  */
-//@Slf4j
-//@ToString
+@Slf4j
+@ToString
 @Configurable(autowire = Autowire.BY_TYPE, preConstruction = true)
 public class UserDO {
 
