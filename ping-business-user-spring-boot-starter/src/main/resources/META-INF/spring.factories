@@ -1,1 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=cn.procsl.ping.business.user.config.UserAutoConfiguration
