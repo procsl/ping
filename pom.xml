@@ -18,10 +18,10 @@
     </properties>
 
     <modules>
-        <module>ping-rest-spring-boot-starter</module>
-        <module>ping-doc-spring-boot-starter</module>
-        <module>ping-data-spring-boot-starter</module>
-        <module>ping-user-spring-boot-starter</module>
+<!--        <module>ping-rest-spring-boot-starter</module>-->
+<!--        <module>ping-doc-spring-boot-starter</module>-->
+<!--        <module>ping-data-spring-boot-starter</module>-->
+<!--        <module>ping-user-spring-boot-starter</module>-->
     </modules>
     <name>ping</name>
 </project>
