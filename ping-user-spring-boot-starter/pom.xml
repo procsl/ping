@@ -2,6 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <!--    <parent>-->
     <!--        <artifactId>ping</artifactId>-->
     <!--        <groupId>cn.procsl</groupId>-->
@@ -92,24 +93,32 @@
     </dependencyManagement>
 
     <build>
+        <finalName>${artifactId}-${version}.jar</finalName>
 
-        <finalName>procsl</finalName>
-        <!-- 定义了变量配置文件的地址 -->
-        <filters>
-            <filter>src/main/resources/${profile.env}/</filter>
-        </filters>
-        <resources>
-            <resource>
+        <testResources>
+            <testResource>
                 <directory>src/main/resources</directory>
+                <excludes>
+                    <!--先排除application开头的配置文件-->
+                    <exclude>application-*.yml</exclude>
+                </excludes>
+            </testResource>
+
+            <!--测试配置文件-->
+            <testResource>
+                <directory>src/main/resources</directory>
+                <!--filtering 需要设置为 true，这样在include的时候，才会把
+                配置文件中的@profiles.active@ 这个maven`变量`替换成当前环境的对应值  -->
                 <filtering>true</filtering>
-            </resource>
-        </resources>
+                <includes>
+                    <!--引入所需环境的配置文件-->
+                    <include>application.yml</include>
+                    <include>application-${profiles.active}.yml</include>
+                </includes>
+            </testResource>
+        </testResources>
 
         <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -125,27 +134,27 @@
             <plugin>
                 <groupId>com.mysema.maven</groupId>
                 <artifactId>apt-maven-plugin</artifactId>
-                <version>1.1.3</version>
                 <executions>
                     <execution>
                         <goals>
                             <goal>process</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>target/generated-sources/java</outputDirectory>
+                            <outputDirectory>${basedir}/target/generated-sources/java</outputDirectory>
                             <processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+
         </plugins>
     </build>
 
     <profiles>
         <profile>
-            <id>dev</id>
+            <id>h2</id>
             <properties>
-                <profile.env>dev</profile.env>
+                <profiles.active>h2</profiles.active>
             </properties>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -158,12 +167,13 @@
                     <scope>test</scope>
                 </dependency>
             </dependencies>
+
         </profile>
 
         <profile>
-            <id>test</id>
+            <id>mysql8</id>
             <properties>
-                <profile.env>test</profile.env>
+                <profiles.active>mysql8</profiles.active>
             </properties>
             <dependencies>
                 <!--https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
@@ -175,20 +185,5 @@
                 </dependency>
             </dependencies>
         </profile>
-
-        <profile>
-            <id>prod</id>
-            <properties>
-                <profile.env>test</profile.env>
-            </properties>
-            <dependencies>
-                <dependency>
-                    <groupId>com.h2database</groupId>
-                    <artifactId>h2</artifactId>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-        </profile>
     </profiles>
-
 </project>

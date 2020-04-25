@@ -9,6 +9,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 /**
  * @author procsl
  * @date 2020/04/10
@@ -25,11 +28,4 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 public class UserAutoConfiguration {
 
     final UserProperties properties;
-
-    @Bean
-    @ConditionalOnMissingBean
-    public UserRoleService userRoleService() {
-        return new UserRoleService();
-    }
-
 }

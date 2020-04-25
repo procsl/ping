@@ -1,0 +1,20 @@
+#通用配置
+spring:
+  jpa:
+    show-sql: true
+    generate-ddl: true
+
+    #jpa hibernate配置
+    properties:
+      hibernate:
+        format_sql: true
+    hibernate:
+      naming:
+        physical-strategy: cn.procsl.ping.boot.data.naming.LowCasePhysicalNamingStrategy
+        implicit-strategy: cn.procsl.ping.boot.data.naming.NameImplicitNamingStrategy
+      use-new-id-generator-mappings: true
+      ddl-auto: update
+
+
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
