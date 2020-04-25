@@ -1,7 +1,4 @@
 spring:
-  profiles:
-    active: @profiles.active@
-
   #数据源配置
   datasource:
     url: jdbc:mysql://127.0.0.1:3306/ping?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&zeroDateTimeBehavior=CONVERT_TO_NULL&allowPublicKeyRetrieval=true
@@ -9,7 +6,7 @@ spring:
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-  #dev环境使用H2数据库
+  #使用mysql数据库
   jpa:
     database: mysql
     database-platform: org.hibernate.dialect.MySQL8Dialect
