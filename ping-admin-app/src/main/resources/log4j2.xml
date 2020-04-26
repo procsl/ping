@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="off">
+    <appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="[%highlight{%-5level}] %c{1}-%L: %highlight{%m%n}"/>
+        </Console>
+    </appenders>
+    <loggers>
+        <logger name="org.springframework.test" level="info"/>
+        <logger name="org.hibernate" level="info"/>
+        <logger name="org.junit" level="info"/>
+        <logger name="org.springframework.web" level="info"/>
+        <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="trace"/>
+        <root level="info">
+            <appender-ref ref="Console"/>
+        </root>
+    </loggers>
+</configuration>

@@ -6,6 +6,7 @@ import cn.procsl.ping.boot.user.domain.rbac.repository.UserRoleRepository;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.Optional;
 
 /**
  * @author procsl
@@ -16,9 +17,8 @@ import javax.inject.Singleton;
 public class UserRoleService {
 
     @Inject
-    UserRoleRepository userRoleRepository;
+    Optional<RoleRepository> roleRepository;
 
     @Inject
-    RoleRepository roleRepository;
-
+    Optional<UserRoleRepository> userRoleRepository;
 }

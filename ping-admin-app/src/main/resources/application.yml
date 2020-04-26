@@ -1,0 +1,65 @@
+#服务端口
+server:
+  port: 8081
+
+#服务名称
+spring:
+  application:
+    name: @project.artifactId@.@project.version@
+
+  jpa:
+    show-sql: true
+    generate-ddl: true
+
+    #jpa hibernate配置
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+
+      #jpa原生配置
+#      javax:
+#        persistence:
+#          schema-generation:
+#            create-source: metadata
+#
+#            scripts:
+#              action: update
+#              create-target: ./admin-app.sql
+
+    #hibernate配
+    hibernate:
+      naming:
+        physical-strategy: cn.procsl.ping.boot.data.naming.LowCasePhysicalNamingStrategy
+        implicit-strategy: cn.procsl.ping.boot.data.naming.NameImplicitNamingStrategy
+      use-new-id-generator-mappings: true
+      ddl-auto: update
+
+    # 取消视图级别的实体绑定
+    open-in-view: false
+
+
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+
+#  data:
+#    jpa:
+#      repositories:
+#        bootstrap-mode: lazy
+
+
+  profiles:
+    active: @profiles.active@
+
+
+  #    liquibase配置
+  liquibase:
+    change-log: classpath*:/changelog/admin-app-master.yaml
+    database-change-log-lock-table: admin_app_change_log_lock
+    database-change-log-table: admin_app_changeme_log
+    enabled: false
+
+#      开启debug模式
+#debug: true
+
+
