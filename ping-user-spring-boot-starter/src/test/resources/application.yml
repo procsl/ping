@@ -8,6 +8,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        use_sql_comments: true
     hibernate:
       naming:
         physical-strategy: cn.procsl.ping.boot.data.naming.LowCasePhysicalNamingStrategy

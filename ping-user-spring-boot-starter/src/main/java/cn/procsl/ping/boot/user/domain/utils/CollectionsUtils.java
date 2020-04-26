@@ -21,6 +21,7 @@ public class CollectionsUtils {
      * @throws UnsupportedOperationException
      */
     @Nullable
+    @SafeVarargs
     public static <T> Set<T> createAndAppend(@Nullable Set<T> collects, @Nullable T... elements) throws UnsupportedOperationException {
 
         if (elements == null || elements.length == 0) {
@@ -39,7 +40,7 @@ public class CollectionsUtils {
     }
 
     @Nullable
-    public static <T> Set<T> createAndAppend(@Nullable Set<T> collects, @Nullable List<T> elements) throws UnsupportedOperationException {
+    static <T> Set<T> createAndAppend(@Nullable Set<T> collects, @Nullable List<T> elements) throws UnsupportedOperationException {
         if (elements == null || elements.isEmpty()) {
             return null;
         }
