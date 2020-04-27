@@ -1,6 +1,6 @@
 #服务端口
 server:
-  port: 8081
+  port: 8080
 
 #服务名称
 spring:
@@ -17,16 +17,6 @@ spring:
         format_sql: true
         use_sql_comments: true
 
-      #jpa原生配置
-#      javax:
-#        persistence:
-#          schema-generation:
-#            create-source: metadata
-#
-#            scripts:
-#              action: update
-#              create-target: ./admin-app.sql
-
     #hibernate配
     hibernate:
       naming:
@@ -38,14 +28,13 @@ spring:
     # 取消视图级别的实体绑定
     open-in-view: false
 
-
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
 
-#  data:
-#    jpa:
-#      repositories:
-#        bootstrap-mode: lazy
+  data:
+    jpa:
+      repositories:
+        bootstrap-mode: lazy
 
 
   profiles:
