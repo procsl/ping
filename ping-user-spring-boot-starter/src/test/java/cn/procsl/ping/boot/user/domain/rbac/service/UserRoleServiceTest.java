@@ -14,8 +14,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
 
 /**
  * @author procsl
@@ -25,7 +23,6 @@ import javax.inject.Provider;
 @SpringBootTest
 @Transactional
 @Slf4j
-@Named
 public class UserRoleServiceTest {
 
     @Inject

@@ -8,8 +8,7 @@ import org.springframework.context.annotation.ComponentScan;
  * @author procsl
  * @date 2020/04/06
  */
-@SpringBootApplication
-@ComponentScan("cn.procsl.ping.boot.data.domain")
+@SpringBootApplication(scanBasePackages = "cn.procsl.ping.boot.data")
 public class TestDataApplication {
 
     public static void main(String[] args) {
