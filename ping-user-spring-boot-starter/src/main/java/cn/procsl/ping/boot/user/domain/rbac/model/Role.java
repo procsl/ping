@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 /**
+ * 用户角色
  * @author procsl
  * @date 2020/04/06
  */

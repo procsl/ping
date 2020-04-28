@@ -1,7 +1,7 @@
 package cn.procsl.ping.boot.user.domain.rbac.service;
 
 import cn.procsl.ping.boot.user.domain.rbac.repository.RoleRepository;
-import cn.procsl.ping.boot.user.domain.rbac.repository.UserRoleRepository;
+import cn.procsl.ping.boot.user.domain.rbac.repository.IdentityRepository;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -20,5 +20,5 @@ public class UserRoleService {
     Optional<RoleRepository> roleRepository;
 
     @Inject
-    Optional<UserRoleRepository> userRoleRepository;
+    Optional<IdentityRepository> userRoleRepository;
 }
