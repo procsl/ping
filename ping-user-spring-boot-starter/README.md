@@ -14,25 +14,25 @@
 * 创建用户身份信息
 使用身份类型, 身份ID创建一个身份标识对象,如果已经存在该对象, 则抛出异常。
 创建成功则返回唯一的用户身份实体 \
-`Identity IdentityService.create(String type, String ID) throws BusinessException;`\
+`Identity IdentityService.create(String type, String ID) throws BusinessException`\
 创建成功后释出创建用户身份信息事件
 
-* 查找用户身份 通过ID
+* 查找用户身份 通过ID\
 `Identity IdentityService.findById(Long identityId)`
 
 *  删除用户身份
 该操作将会实际删除用户的身份信息, 包括关联的角色信息, 但不包括角色实体等\
-`void IdentityService.delete(Long identityId);`\
+`void IdentityService.delete(Long identityId)`\
 删除成功过后释出删除用户身份信息事件
 
 * 为当前的身份添加角色\
-`void Identity.addRoles(List<Long> roleId);`
+`void Identity.addRoles(List<Long> roleId)`
 
 * 为当前的身份删除角色\
-`void Identity.removeRoles(List<Long> roleId);`
+`void Identity.removeRoles(List<Long> roleId)`
 
 * 刷新事件, 发出当前用户身份实体修改的事件, 用于添加删除角色之后\
-`void IdentityService.refresh(Long id);`
+`void IdentityService.refresh(Long id)`
 
 **其他的所有的业务逻辑都基于此基础接口**
 
@@ -44,21 +44,21 @@
 * 注册角色信息
 该接口用于向系统注册角色相关的信息, 表示创建角色。
 必须提供一个在系统中不存在的角色名称, 如果角色已经存在, 则抛出异常\
-`Role RoleService.create(String roleName) throws BusinessException;`
+`Role RoleService.create(String roleName) throws BusinessException`
 
 * 查找角色信息
     1. 通过Id查找\
-    `Role RoleService.findById(Long roleName);`
+    `Role RoleService.findById(Long roleName)`
 
     2. 通过name查找\
-    `Role RoleService.findByName(String roleName);`
+    `Role RoleService.findByName(String roleName)`
     
 * 删除角色信息\
  如果角色在使用中, 则抛出异常\
- `void RoleService.delete(Long id) throws BusinessException;`
+ `void RoleService.delete(Long id) throws BusinessException`
  
 * 为指定的角色添加权限\
-`void Role.addPerm(Long permId);`
+`void Role.addPerm(Long permId)`
 
 * 为指定的角色移除权限\
 `void Role.removePerm(Long permId)`
