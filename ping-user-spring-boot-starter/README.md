@@ -64,7 +64,7 @@
 `void Role.removePerm(Long permId)`
 
 ## 权限管理
+权限的本质为对资源的操作
 
 ## 资源管理
 
-## 管理操作接口导出

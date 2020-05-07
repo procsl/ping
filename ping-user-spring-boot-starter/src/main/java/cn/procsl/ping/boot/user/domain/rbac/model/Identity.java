@@ -6,8 +6,9 @@ import cn.procsl.ping.boot.user.domain.utils.CollectionsUtils;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.List;
 import java.util.Set;
+
+import static cn.procsl.ping.boot.user.domain.rbac.model.Role.ROLE_ID_NAME;
 
 /**
  * 表示外部实体 机构 用户等需要角色权限管理的实体
@@ -23,16 +24,16 @@ import java.util.Set;
 @ToString
 public class Identity extends GeneralEntity {
 
-    private final static String roleColumnName = "role_id";
+    public final static String IDENTITY_ID_NAME = "identity_id";
 
     @Id
-    @Column(length = 20, updatable = false)
+    @Column(length = GENERAL_ENTITY_ID_LENGTH, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @CollectionTable(uniqueConstraints = @UniqueConstraint(columnNames = {"identity_id", roleColumnName}))
+    @CollectionTable(uniqueConstraints = @UniqueConstraint(columnNames = {IDENTITY_ID_NAME, ROLE_ID_NAME}))
     @ElementCollection
-    @Column(name = roleColumnName, nullable = false, updatable = false, length = 20)
+    @Column(name = IDENTITY_ID_NAME, nullable = false, updatable = false, length = GENERAL_ENTITY_ID_LENGTH)
     @Description(comment = "用户角色IDs")
     private Set<Long> roles;
 

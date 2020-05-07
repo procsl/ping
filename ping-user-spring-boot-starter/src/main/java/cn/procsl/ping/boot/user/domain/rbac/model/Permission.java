@@ -20,12 +20,14 @@ import java.io.Serializable;
 @Description(comment = "用户权限实体")
 public class Permission extends GeneralEntity implements Serializable {
 
+    public final static String PERMISSION_ID_NAME = "permission_id";
+
     @Id
-    @Column(length = 20, updatable = false)
+    @Column(length = GENERAL_ENTITY_ID_LENGTH, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 20, nullable = false)
+    @Column(length = 40, nullable = false)
     @Description(comment = "权限名称")
     private String name;
 

@@ -17,6 +17,7 @@ import java.io.Serializable;
 @MappedSuperclass
 public abstract class GeneralEntity implements Serializable {
 
+    public static final int GENERAL_ENTITY_ID_LENGTH = 20;
 
     /**
      * 版本号
