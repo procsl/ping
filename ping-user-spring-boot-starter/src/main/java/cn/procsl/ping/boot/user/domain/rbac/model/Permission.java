@@ -34,7 +34,7 @@ public class Permission implements Serializable {
 
     @CollectionTable(uniqueConstraints = @UniqueConstraint(columnNames = {PERMISSION_ID_NAME, "operation"}))
     @ElementCollection
-    @Column(name = "operation", updatable = false, length = GENERAL_ENTITY_ID_LENGTH)
+    @Column(name = "operation", updatable = false, length = 20)
     @Description(comment = "支持的操作, 针对当前关联的资源")
     protected Set<String> operations;
 
