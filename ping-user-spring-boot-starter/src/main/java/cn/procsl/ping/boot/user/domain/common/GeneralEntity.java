@@ -33,6 +33,6 @@ public abstract class GeneralEntity implements Serializable {
     @CreatedDate
     @Column(updatable = false, nullable = false)
     @OrderBy
-    private Long createDate;
+    private Long createAt;
 
 }

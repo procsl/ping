@@ -46,7 +46,7 @@ public class Role extends GeneralEntity implements Serializable {
     protected String name;
 
     @Column(length = GENERAL_ENTITY_ID_LENGTH, nullable = false)
-    @Description(comment = "继承的角色ID,不能是互斥的角色ID, 默认-1角色, 即空角色")
+    @Description(comment = "继承的角色ID,当前角色拥有继承角色的所有权限, 与互斥的角色冲突。 默认-1角色, 即空角色")
     @DefaultValue("-1")
     protected Long extendBy;
 

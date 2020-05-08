@@ -6,8 +6,10 @@ import cn.procsl.ping.boot.user.domain.utils.CollectionsUtils;
 import lombok.*;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Set;
 
+import static cn.procsl.ping.boot.user.domain.common.GeneralEntity.GENERAL_ENTITY_ID_LENGTH;
 import static cn.procsl.ping.boot.user.domain.rbac.model.Role.ROLE_ID_NAME;
 
 /**
@@ -22,7 +24,7 @@ import static cn.procsl.ping.boot.user.domain.rbac.model.Role.ROLE_ID_NAME;
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @ToString
-public class Identity extends GeneralEntity {
+public class Identity implements Serializable {
 
     public final static String IDENTITY_ID_NAME = "identity_id";
 
@@ -33,11 +35,11 @@ public class Identity extends GeneralEntity {
 
     @CollectionTable(uniqueConstraints = @UniqueConstraint(columnNames = {IDENTITY_ID_NAME, ROLE_ID_NAME}))
     @ElementCollection
-    @Column(name = IDENTITY_ID_NAME, nullable = false, updatable = false, length = GENERAL_ENTITY_ID_LENGTH)
+    @Column(name = ROLE_ID_NAME, nullable = false, updatable = false, length = GENERAL_ENTITY_ID_LENGTH)
     @Description(comment = "用户角色IDs")
     private Set<Long> roles;
 
-    public void addRole(@NonNull Long roleIds) {
+    void addRole(@NonNull Long roleIds) {
         this.roles = CollectionsUtils.createAndAppend(this.roles, roleIds);
     }
 
