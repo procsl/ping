@@ -8,7 +8,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Set;
 
-import static cn.procsl.ping.boot.user.domain.common.GeneralEntity.GENERAL_ENTITY_ID_LENGTH;
+import static cn.procsl.ping.boot.data.business.entity.GeneralEntity.GENERAL_ENTITY_ID_LENGTH;
 
 /**
  * @author procsl
@@ -28,9 +28,8 @@ public class Permission implements Serializable {
     protected Long id;
 
     @Description(comment = "对应的的资源ID")
-    @Column(name = "resource_id", length = GENERAL_ENTITY_ID_LENGTH, updatable = false)
-    protected Long resource;
-
+    @OneToOne
+    protected Resource resource;
 
     @CollectionTable(uniqueConstraints = @UniqueConstraint(columnNames = {PERMISSION_ID_NAME, "operation"}))
     @ElementCollection

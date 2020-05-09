@@ -3,7 +3,7 @@ package cn.procsl.ping.boot.user.domain.rbac.model;
 import cn.procsl.ping.boot.data.annotation.DefaultValue;
 import cn.procsl.ping.boot.data.annotation.Description;
 import cn.procsl.ping.boot.data.annotation.IfEmptyAutoCreate;
-import cn.procsl.ping.boot.user.domain.common.GeneralEntity;
+import cn.procsl.ping.boot.data.business.entity.GeneralEntity;
 import cn.procsl.ping.boot.user.domain.utils.CollectionsUtils;
 import lombok.*;
 

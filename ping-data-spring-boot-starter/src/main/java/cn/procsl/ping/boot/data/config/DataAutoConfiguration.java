@@ -6,11 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateProperties;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 /**
  * 自动配置 用于注册加载时依赖注入和包扫描
@@ -23,6 +25,8 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties({DataProperties.class, HibernateProperties.class})
 @AutoConfigureBefore(JpaBaseConfiguration.class)
 @Slf4j
+@EnableJpaRepositories(basePackages = "cn.procsl.ping.boot.data.business.repository")
+@EntityScan(basePackages = "cn.procsl.ping.boot.data.business.entity")
 public class DataAutoConfiguration {
 
     final DataProperties dataProperties;

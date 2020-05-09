@@ -1,13 +1,16 @@
 package cn.procsl.ping.boot.user.domain.rbac.model;
 
 import cn.procsl.ping.boot.data.annotation.Description;
-import cn.procsl.ping.boot.user.domain.common.GeneralEntity;
+import cn.procsl.ping.boot.data.business.entity.TreeNode;
+import cn.procsl.ping.boot.data.business.entity.GeneralEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Set;
+
+import static javax.persistence.EnumType.STRING;
 
 /**
  * @author procsl
@@ -21,7 +24,7 @@ import java.util.Set;
 @Description(comment = "资源聚合")
 public class Resource extends GeneralEntity {
 
-    private final static String RESOURCE_ID_NAME = "resource_id";
+    protected final static String RESOURCE_ID_NAME = "resource_id";
 
     @Id
     @Column(length = GENERAL_ENTITY_ID_LENGTH, updatable = false)
@@ -30,15 +33,19 @@ public class Resource extends GeneralEntity {
 
     @Description(comment = "资源名称")
     @Column(length = 20)
-    private String name;
+    protected String name;
 
     @Embedded
     @Basic(fetch = FetchType.LAZY)
-    private PathTree<Long> pathTree;
+    protected TreeNode<Long> node;
 
     @CollectionTable(uniqueConstraints = @UniqueConstraint(columnNames = {RESOURCE_ID_NAME, "operation"}))
     @ElementCollection
     @Column(name = "operation", updatable = false, length = 20)
     @Description(comment = "支持的操作, 针对当前关联的资源")
     protected Set<String> operations;
+
+    @Description(comment = "资源类型")
+    @Enumerated(STRING)
+    protected ResourceType type;
 }

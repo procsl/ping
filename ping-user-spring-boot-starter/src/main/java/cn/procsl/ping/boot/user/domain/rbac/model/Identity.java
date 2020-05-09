@@ -1,7 +1,6 @@
 package cn.procsl.ping.boot.user.domain.rbac.model;
 
 import cn.procsl.ping.boot.data.annotation.Description;
-import cn.procsl.ping.boot.user.domain.common.GeneralEntity;
 import cn.procsl.ping.boot.user.domain.utils.CollectionsUtils;
 import lombok.*;
 
@@ -9,7 +8,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Set;
 
-import static cn.procsl.ping.boot.user.domain.common.GeneralEntity.GENERAL_ENTITY_ID_LENGTH;
+import static cn.procsl.ping.boot.data.business.entity.GeneralEntity.GENERAL_ENTITY_ID_LENGTH;
 import static cn.procsl.ping.boot.user.domain.rbac.model.Role.ROLE_ID_NAME;
 
 /**

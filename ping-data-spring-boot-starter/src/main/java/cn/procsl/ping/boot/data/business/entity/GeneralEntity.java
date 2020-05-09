@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.user.domain.common;
+package cn.procsl.ping.boot.data.business.entity;
 
 import lombok.Data;
 import org.hibernate.annotations.ColumnDefault;
