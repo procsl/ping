@@ -27,3 +27,4 @@
 
 ### VS Code ###
 .vscode/
+/ping-admin-app/data/ping_app.mv.db
