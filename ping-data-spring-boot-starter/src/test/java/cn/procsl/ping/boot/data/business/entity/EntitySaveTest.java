@@ -43,7 +43,8 @@ public class EntitySaveTest {
         entity.setName("名称");
         jpaRepository.save(entity);
         TreeNodeTest newNode = TreeNodeTest.root.create(entity.getId());
-        newNode.setParentId("1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111");
+        newNode.setParentId("11111111111111111111111111111111111111111111111111111111111" +
+                "11111111111111111111111111111111111111111111111111111111111");
         entity.setNodeTest(newNode);
         jpaRepository.save(entity);
         jpaRepository.flush();
