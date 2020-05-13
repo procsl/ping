@@ -18,17 +18,38 @@ import static cn.procsl.ping.boot.data.business.entity.GeneralEntity.GENERAL_ENT
 @Data
 public class ResourceTreeNode extends TreeNode<Long> {
 
+    private final static ResourceTreeNode root = new ResourceTreeNode() {
+        @Override
+        public final String getPath() {
+            return getRootPath();
+        }
+
+        @Override
+        public final Integer getDepth() {
+            return 0;
+        }
+
+        @Override
+        public final Long getParentId() {
+            return -1L;
+        }
+    };
+
     @Column(nullable = false, length = GENERAL_ENTITY_ID_LENGTH)
     protected Long parentId;
 
     @Override
     public ResourceTreeNode create(@NonNull Long id) {
-        return null;
+        ResourceTreeNode tmp = new ResourceTreeNode();
+        tmp.setParentId(id);
+        tmp.setDepth(1);
+        tmp.setPath(this.buildPath(root, id));
+        return tmp;
     }
 
     @Override
     @Transient
     public TreeNode<Long> getRoot() {
-        return null;
+        return root;
     }
 }
