@@ -12,6 +12,7 @@ import org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 /**
@@ -25,6 +26,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableConfigurationProperties({DataProperties.class, HibernateProperties.class})
 @AutoConfigureBefore(JpaBaseConfiguration.class)
 @Slf4j
+@EnableJpaAuditing
 @EnableJpaRepositories(basePackages = "cn.procsl.ping.boot.data.business.repository")
 @EntityScan(basePackages = "cn.procsl.ping.boot.data.business.entity")
 public class DataAutoConfiguration {

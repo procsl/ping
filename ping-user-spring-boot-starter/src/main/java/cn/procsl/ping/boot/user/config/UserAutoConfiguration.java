@@ -17,7 +17,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableConfigurationProperties({UserProperties.class})
 @RequiredArgsConstructor
 @ComponentScan({"cn.procsl.ping.boot.user.domain.rbac.service"})
-@EnableJpaAuditing
 @ConditionalOnMissingBean({UserAutoConfiguration.class, UserAutoConfiguration.class})
 @EnableJpaRepositories(basePackages = "cn.procsl.ping.boot.user.domain.rbac.repository")
 @EntityScan(basePackages = "cn.procsl.ping.boot.user.domain.rbac.model")

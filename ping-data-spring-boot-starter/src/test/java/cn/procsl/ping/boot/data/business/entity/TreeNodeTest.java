@@ -17,26 +17,43 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class TreeNodeTest extends TreeNode<String> {
 
+    public static final TreeNodeTest root = new TreeNodeTest() {
+        @Override
+        public TreeNodeTest getRoot() {
+            return this;
+        }
+
+        @Override
+        public Integer getDepth() {
+            return 0;
+        }
+
+        @Override
+        public String getPath() {
+            return this.getRootPath();
+        }
+
+        @Override
+        public String getParentId() {
+            return "root";
+        }
+    };
 
     @Description(comment = "父节点的ID")
-    @Column(nullable = false, length = 32)
+    @Column(length = 32)
     protected String parentId;
 
     @Override
-    public TreeNode<String> create(@NonNull String s) {
-        TreeNode<String> root = this.getRoot();
-        root.setParentId(s);
-        root.setDepth(0);
-        root.setPath(this.buildPath(this.getRootPath(), s));
+    public TreeNodeTest create(@NonNull String s) {
+        TreeNodeTest tmp = this.getRoot();
+        tmp.setParentId(s);
+        tmp.setDepth(0);
+        tmp.setPath(this.buildPath(this.getRootPath(), s));
         return root;
     }
 
     @Override
-    public TreeNode<String> getRoot() {
-        TreeNodeTest root = new TreeNodeTest();
-        root.setDepth(0);
-        root.setPath(this.getRootPath());
-        root.setParentId("root");
+    public TreeNodeTest getRoot() {
         return root;
     }
 }

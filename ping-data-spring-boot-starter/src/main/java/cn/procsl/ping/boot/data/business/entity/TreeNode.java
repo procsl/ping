@@ -23,17 +23,15 @@ import java.io.Serializable;
 public abstract class TreeNode<ID> implements Serializable {
 
     @Description(comment = "父节点的ID")
-    @Column(nullable = false)
-    protected ID parentId;
+    private ID parentId;
 
     @Description(comment = "ID路径, 以/分割, 默认为/自身ID")
-    @Column(length = 1000, nullable = false)
-    protected String path;
+    @Column(length = 1000)
+    private String path;
 
     @Description(comment = "深度, 默认深度为0")
     @DefaultValue("0")
-    @Column(nullable = false)
-    protected Integer depth;
+    private Integer depth;
 
     /**
      * 创建层级为1的节点, 通过ID
