@@ -1,7 +1,6 @@
 package cn.procsl.ping.boot.user.domain.rbac.model;
 
 import cn.procsl.ping.boot.data.annotation.Description;
-import cn.procsl.ping.boot.data.business.entity.TreeNode;
 import cn.procsl.ping.boot.data.business.entity.GeneralEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,7 +36,7 @@ public class Resource extends GeneralEntity {
 
     @Embedded
     @Basic(fetch = FetchType.LAZY)
-    protected TreeNode<Long> node;
+    protected ResourceTreeNode node;
 
     @CollectionTable(uniqueConstraints = @UniqueConstraint(columnNames = {RESOURCE_ID_NAME, "operation"}))
     @ElementCollection
@@ -47,5 +46,6 @@ public class Resource extends GeneralEntity {
 
     @Description(comment = "资源类型")
     @Enumerated(STRING)
+    @Column(length = 15)
     protected ResourceType type;
 }

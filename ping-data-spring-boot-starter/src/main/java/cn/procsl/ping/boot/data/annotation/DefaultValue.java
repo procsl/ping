@@ -14,5 +14,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({METHOD, FIELD, TYPE})
 @Retention(RUNTIME)
 public @interface DefaultValue {
-    String value();
+    String value() default "";
+
+    String forFiled() default "";
 }

@@ -19,6 +19,7 @@ import static cn.procsl.ping.boot.data.business.entity.GeneralEntity.GENERAL_ENT
 public class ResourceTreeNode extends TreeNode<Long> {
 
     private final static ResourceTreeNode root = new ResourceTreeNode() {
+
         @Override
         public final String getPath() {
             return getRootPath();
@@ -49,7 +50,7 @@ public class ResourceTreeNode extends TreeNode<Long> {
 
     @Override
     @Transient
-    public TreeNode<Long> getRoot() {
+    public ResourceTreeNode getRoot() {
         return root;
     }
 }

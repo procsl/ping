@@ -1,8 +1,8 @@
 package cn.procsl.ping.boot.user.domain.rbac.model;
 
 import cn.procsl.ping.boot.data.annotation.Description;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -17,6 +17,7 @@ import static cn.procsl.ping.boot.data.business.entity.GeneralEntity.GENERAL_ENT
 @Entity
 @Table
 @Getter
+@Setter
 @Description(comment = "用户权限实体")
 public class Permission implements Serializable {
 
@@ -37,7 +38,8 @@ public class Permission implements Serializable {
     @Description(comment = "支持的操作, 针对当前关联的资源")
     protected Set<String> operations;
 
-    @Builder(buildMethodName = "done", builderMethodName = "create")
-    public Permission() {
-    }
+//    @Builder(buildMethodName = "done", builderMethodName = "create")
+//    public Permission() {
+//    }
+
 }

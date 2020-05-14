@@ -4,9 +4,12 @@ import cn.procsl.ping.boot.data.annotation.DefaultValue;
 import cn.procsl.ping.boot.data.annotation.Description;
 import cn.procsl.ping.boot.data.annotation.IfEmptyAutoCreate;
 import cn.procsl.ping.boot.data.business.entity.GeneralEntity;
+import cn.procsl.ping.boot.data.business.utils.BusinessException;
 import cn.procsl.ping.boot.user.domain.utils.CollectionsUtils;
 import lombok.*;
+import org.springframework.util.StringUtils;
 
+import javax.annotation.Nullable;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Set;
@@ -35,25 +38,28 @@ public class Role extends GeneralEntity implements Serializable {
 
     public final static Long EMPTY_ROLE_ID = -1L;
 
+    public final static int NAME_LENGTH = 50;
+
+
     @Id
     @Column(length = GENERAL_ENTITY_ID_LENGTH, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
 
-    @Column(length = 50, nullable = false)
+    @Column(length = NAME_LENGTH, nullable = false)
     @Description(comment = "角色名称")
     @IfEmptyAutoCreate(type = "name")
     protected String name;
 
     @Column(length = GENERAL_ENTITY_ID_LENGTH, nullable = false)
     @Description(comment = "继承的角色ID,当前角色拥有继承角色的所有权限, 与互斥的角色冲突。 默认-1角色, 即空角色")
-    @DefaultValue("-1")
+    @DefaultValue(forFiled = "cn.procsl.ping.boot.user.domain.rbac.model.Role.EMPTY_ROLE_ID")
     protected Long extendBy;
 
     @Column(length = 5, nullable = false)
     @Description(comment = "最大数量约束, 拥有此角色时当前角色的拥有者拥有的角色数量必须少于等于此值, 默认值为0, 表示不限制, 继承角色不计入此限制")
     @DefaultValue("0")
-    private Integer max;
+    protected Integer max;
 
     @CollectionTable(uniqueConstraints = @UniqueConstraint(columnNames = {ROLE_ID_NAME, REQUIRE_ID_NAME}))
     @ElementCollection
@@ -73,6 +79,7 @@ public class Role extends GeneralEntity implements Serializable {
     @Description(comment = "权限IDs")
     protected Set<Long> permissions;
 
+
     @Builder(buildMethodName = "done", builderMethodName = "create")
     public Role(String name) {
         this.name = name;
@@ -82,4 +89,61 @@ public class Role extends GeneralEntity implements Serializable {
         this.permissions = CollectionsUtils.createAndAppend(this.permissions, permissions);
     }
 
+    public void removePermission(@NonNull Long... permissions) {
+        CollectionsUtils.nullSafeRemove(this.permissions, permissions);
+    }
+
+    /**
+     * 设置继承的角色, 可以设置为null
+     *
+     * @param parent
+     */
+    public void doExtendBy(@Nullable Long parent) {
+        // TODO 获取注解的默认值 空角色
+        if (parent == null || EMPTY_ROLE_ID.equals(parent)) {
+            this.extendBy = EMPTY_ROLE_ID;
+        }
+
+        // 继承的角色不能存在于互斥角色中
+        do {
+            if (this.excludes == null) {
+                break;
+            }
+            if (this.excludes.contains(parent)) {
+                throw new BusinessException("扩展角色{}与互斥角色冲突", parent);
+            }
+        } while (false);
+        this.extendBy = parent;
+    }
+
+    /**
+     * 重命名角色名称
+     *
+     * @param name 新的角色名称
+     */
+    public void rename(String name) {
+        if (StringUtils.isEmpty(name)) {
+            throw new IllegalArgumentException("角色名称不可为空");
+        }
+
+        if (name.length() > NAME_LENGTH) {
+            throw new IllegalArgumentException("错误的角色名称");
+        }
+        this.name = name;
+    }
+
+    @Builder(buildMethodName = "done", builderMethodName = "creator")
+    public Role(String name,
+                Long extendBy,
+                Integer max,
+                Set<Long> requires,
+                Set<Long> excludes,
+                Set<Long> permissions) {
+        this.rename(name);
+        this.doExtendBy(extendBy);
+        this.max = max;
+        this.requires = requires;
+        this.excludes = excludes;
+        this.permissions = permissions;
+    }
 }
