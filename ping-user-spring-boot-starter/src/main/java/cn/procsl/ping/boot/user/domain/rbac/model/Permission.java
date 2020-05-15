@@ -1,6 +1,7 @@
 package cn.procsl.ping.boot.user.domain.rbac.model;
 
 import cn.procsl.ping.boot.data.annotation.Description;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +10,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 import static cn.procsl.ping.boot.data.business.entity.GeneralEntity.GENERAL_ENTITY_ID_LENGTH;
+import static lombok.AccessLevel.PRIVATE;
 
 /**
  * @author procsl
@@ -17,7 +19,7 @@ import static cn.procsl.ping.boot.data.business.entity.GeneralEntity.GENERAL_ENT
 @Entity
 @Table
 @Getter
-@Setter
+@Setter(PRIVATE)
 @Description(comment = "用户权限实体")
 public class Permission implements Serializable {
 

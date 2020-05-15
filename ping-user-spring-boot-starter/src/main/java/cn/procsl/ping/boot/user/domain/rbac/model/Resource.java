@@ -2,6 +2,7 @@ package cn.procsl.ping.boot.user.domain.rbac.model;
 
 import cn.procsl.ping.boot.data.annotation.Description;
 import cn.procsl.ping.boot.data.business.entity.GeneralEntity;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,6 +11,7 @@ import javax.persistence.*;
 import java.util.Set;
 
 import static javax.persistence.EnumType.STRING;
+import static lombok.AccessLevel.PRIVATE;
 
 /**
  * @author procsl
@@ -19,7 +21,7 @@ import static javax.persistence.EnumType.STRING;
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = "name")})
 @Getter
 @NoArgsConstructor
-@Setter
+@Setter(PRIVATE)
 @Description(comment = "资源聚合")
 public class Resource extends GeneralEntity {
 

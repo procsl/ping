@@ -15,6 +15,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 import static cn.procsl.ping.boot.user.domain.rbac.model.Permission.PERMISSION_ID_NAME;
+import static lombok.AccessLevel.PRIVATE;
 
 /**
  * 用户角色
@@ -26,7 +27,7 @@ import static cn.procsl.ping.boot.user.domain.rbac.model.Permission.PERMISSION_I
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = "name")})
 @Getter
 @NoArgsConstructor
-@Setter
+@Setter(PRIVATE)
 @Description(comment = "用户角色作为单独的聚合根")
 public class Role extends GeneralEntity implements Serializable {
 

@@ -2,8 +2,7 @@ package cn.procsl.ping.boot.data.business.entity;
 
 import cn.procsl.ping.boot.data.annotation.DefaultValue;
 import cn.procsl.ping.boot.data.annotation.Description;
-import lombok.Data;
-import lombok.NonNull;
+import lombok.*;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -18,20 +17,21 @@ import java.io.Serializable;
  * @author procsl
  * @date 2020/05/09
  */
-@Data
+@Getter
+@Setter(AccessLevel.PROTECTED)
 @MappedSuperclass
 public abstract class TreeNode<ID> implements Serializable {
 
     @Description(comment = "父节点的ID")
-    private ID parentId;
+    protected ID parentId;
 
     @Description(comment = "ID路径, 以/分割, 默认为/自身ID")
     @Column(length = 1000)
-    private String path;
+    protected String path;
 
     @Description(comment = "深度, 默认深度为0")
     @DefaultValue("0")
-    private Integer depth;
+    protected Integer depth;
 
     /**
      * 创建层级为1的节点, 通过ID

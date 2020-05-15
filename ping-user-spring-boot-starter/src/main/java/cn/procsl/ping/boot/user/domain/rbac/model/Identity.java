@@ -10,6 +10,7 @@ import java.util.Set;
 
 import static cn.procsl.ping.boot.data.business.entity.GeneralEntity.GENERAL_ENTITY_ID_LENGTH;
 import static cn.procsl.ping.boot.user.domain.rbac.model.Role.ROLE_ID_NAME;
+import static lombok.AccessLevel.PRIVATE;
 
 /**
  * 表示外部实体 机构 用户等需要角色权限管理的实体
@@ -21,7 +22,7 @@ import static cn.procsl.ping.boot.user.domain.rbac.model.Role.ROLE_ID_NAME;
 @NoArgsConstructor
 @Description(comment = "用户身份聚合根")
 @Getter
-@Setter(AccessLevel.PRIVATE)
+@Setter(PRIVATE)
 @ToString
 public class Identity implements Serializable {
 
