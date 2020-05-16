@@ -1,9 +1,10 @@
 package cn.procsl.ping.meta.annotation;
 
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.*;
 
 /**
  * 扩展标识注解
@@ -11,8 +12,7 @@ import java.lang.annotation.Target;
  * @date 2020/05/16
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
+@Target({FIELD,METHOD,TYPE,})
 public @interface Extends {
 
-    Class<Object> annotations();
 }
