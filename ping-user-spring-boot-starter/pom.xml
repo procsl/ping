@@ -135,12 +135,6 @@
                         <arg>-parameters</arg>
                     </compilerArgs>
                 </configuration>
-<!--                <configuration>-->
-<!--                    <compilerArgs>-->
-<!--                        <arg>-Aquerydsl.entityAccessors=true</arg>-->
-<!--                        <arg>-Aquerydsl.useFields=false</arg>-->
-<!--                    </compilerArgs>-->
-<!--                </configuration>-->
                 <dependencies>
                     <dependency>
                         <groupId>com.querydsl</groupId>
@@ -148,11 +142,6 @@
                         <version>${querydsl.version}</version>
                         <classifier>jpa</classifier>
                     </dependency>
-<!--                    <dependency>-->
-<!--                        <groupId>org.hibernate.javax.persistence</groupId>-->
-<!--                        <artifactId>hibernate-jpa-2.1-api</artifactId>-->
-<!--                        <version>1.0.0.Final</version>-->
-<!--                    </dependency>-->
                 </dependencies>
             </plugin>
         </plugins>

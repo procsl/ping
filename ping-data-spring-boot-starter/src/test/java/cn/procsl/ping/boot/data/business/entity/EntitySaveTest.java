@@ -10,6 +10,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import java.util.UUID;
 
 /**
  * @author procsl
@@ -43,8 +44,10 @@ public class EntitySaveTest {
         entity.setName("名称");
         jpaRepository.save(entity);
         TreeNodeTest newNode = TreeNodeTest.root.create(entity.getId());
-        newNode.setParentId("11111111111111111111111111111111111111111111111111111111111" +
-                "11111111111111111111111111111111111111111111111111111111111");
+
+        String parentId = UUID.randomUUID().toString().replace("-", "").toLowerCase() + "abcd";
+
+        newNode.setParentId(parentId);
         entity.setNodeTest(newNode);
         jpaRepository.save(entity);
         jpaRepository.flush();

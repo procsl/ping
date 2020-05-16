@@ -2,6 +2,7 @@ package cn.procsl.ping.boot.user.domain.utils;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,7 +19,7 @@ public class CollectionsUtils {
      * @param elements 待填充的元素
      * @param <T>      元素类型
      * @return 填充后的元素
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException 对于不支持写的操作抛出此异常
      */
     @Nullable
     @SafeVarargs
@@ -32,9 +33,7 @@ public class CollectionsUtils {
             collects = new HashSet<>();
         }
 
-        for (T element : elements) {
-            collects.add(element);
-        }
+        Collections.addAll(collects, elements);
 
         return collects;
     }
@@ -46,7 +45,7 @@ public class CollectionsUtils {
      * @param elements 元素
      * @param <T>      泛型类型
      * @return 返回旧容器或在容器不存在的情况下创建并添加元素的容器
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException 对于不支持写的操作抛出此异常
      */
     @Nullable
     static <T> Set<T> createAndAppend(@Nullable Set<T> collects, @Nullable Collection<T> elements) throws UnsupportedOperationException {
@@ -58,9 +57,7 @@ public class CollectionsUtils {
             collects = new HashSet<>();
         }
 
-        for (T element : elements) {
-            collects.add(element);
-        }
+        collects.addAll(elements);
 
         return collects;
     }
@@ -71,8 +68,9 @@ public class CollectionsUtils {
      * @param collections 容器,必须支持可写
      * @param elements    待删除的容器
      * @param <T>         泛型类型
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException 对于不支持写的操作抛出此异常
      */
+    @SafeVarargs
     public static <T> void nullSafeRemove(@Nullable Set<T> collections, @Nullable T... elements) throws UnsupportedOperationException {
         if (collections == null || collections.isEmpty()) {
             return;
@@ -92,9 +90,9 @@ public class CollectionsUtils {
      *
      * @param collections 元素容器
      * @param elements    待删除容器
-     * @param <T>
+     * @param <T>         元素的泛型类型
      */
-    public static <T> void nullSafeRemove(@Nullable Set<T> collections, @Nullable Collection<T> elements)  throws UnsupportedOperationException{
+    public static <T> void nullSafeRemove(@Nullable Set<T> collections, @Nullable Collection<T> elements) throws UnsupportedOperationException {
         if (collections == null || collections.isEmpty()) {
             return;
         }
