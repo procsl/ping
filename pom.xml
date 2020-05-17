@@ -22,7 +22,6 @@
         <module>ping-doc-spring-boot-starter</module>
         <module>ping-data-spring-boot-starter</module>
         <module>ping-user-spring-boot-starter</module>
-        <module>ping-admin-app</module>
     </modules>
     <name>ping</name>
     

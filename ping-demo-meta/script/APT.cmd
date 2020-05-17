@@ -1,1 +1,2 @@
+cd ..\
 mvnDebug clean package

@@ -19,17 +19,13 @@ import java.util.Set;
  * @author procsl
  * @date 2020/05/16
  */
+@SupportedAnnotationTypes({"cn.procsl.ping.meta.annotation.Extends"})
+@SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class FunctionAnnotationProcessor extends AbstractProcessor {
 
     private Elements elementUtils;
     private Messager messager;
     private Filer filer;
-
-    @Override
-    public Set<String> getSupportedOptions() {
-        messager.printMessage(Diagnostic.Kind.NOTE, "getSupportedOptions");
-        return super.getSupportedOptions();
-    }
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
@@ -41,12 +37,6 @@ public class FunctionAnnotationProcessor extends AbstractProcessor {
     public SourceVersion getSupportedSourceVersion() {
         messager.printMessage(Diagnostic.Kind.NOTE, "getSupportedSourceVersion");
         return SourceVersion.latestSupported();
-    }
-
-    @Override
-    public Iterable<? extends Completion> getCompletions(Element element, AnnotationMirror annotation, ExecutableElement member, String userText) {
-        messager.printMessage(Diagnostic.Kind.NOTE, "getCompletions");
-        return super.getCompletions(element, annotation, member, userText);
     }
 
     @Override
