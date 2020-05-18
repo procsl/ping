@@ -1,1 +1,2 @@
- cn.procsl.ping.meta.process.FunctionAnnotationProcessor
+cn.procsl.ping.boot.data.processor.RepositoryProcessor
+cn.procsl.ping.meta.process.FunctionAnnotationProcessor

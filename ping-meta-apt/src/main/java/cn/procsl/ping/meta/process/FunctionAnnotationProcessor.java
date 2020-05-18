@@ -4,9 +4,6 @@ import cn.procsl.ping.meta.annotation.Extends;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic;
@@ -19,8 +16,6 @@ import java.util.Set;
  * @author procsl
  * @date 2020/05/16
  */
-@SupportedAnnotationTypes({"cn.procsl.ping.meta.annotation.Extends"})
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class FunctionAnnotationProcessor extends AbstractProcessor {
 
     private Elements elementUtils;
@@ -45,12 +40,10 @@ public class FunctionAnnotationProcessor extends AbstractProcessor {
         this.elementUtils = processingEnv.getElementUtils();
         this.messager = processingEnv.getMessager();
         this.filer = processingEnv.getFiler();
-        messager.printMessage(Diagnostic.Kind.NOTE, "init");
     }
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        messager.printMessage(Diagnostic.Kind.NOTE, "process");
         return true;
     }
 

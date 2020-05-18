@@ -20,6 +20,13 @@
             <artifactId>ping-meta-apt</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
+
+        <dependency>
+            <artifactId>ping-data-spring-boot-starter</artifactId>
+            <groupId>cn.procsl</groupId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -29,11 +36,29 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                    <source>8</source>
-                    <target>8</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <generatedSourcesDirectory>${project.build.directory}/generated-sources/java
+                    </generatedSourcesDirectory>
+                    <!--保留参数名称-->
+                    <compilerVersion>1.8</compilerVersion>
+                    <compilerArgs>
+                        <arg>-g</arg>
+                        <arg>-Xlint</arg>
+                        <arg>-parameters</arg>
+                        <!--是否创建repository-->
+                        <arg>-Acreator.repository=true</arg>
+                        <!--包名-->
+                        <arg>-Acreator.repository.package.name=cn.procsl.ping.demo.repository</arg>
+                        <!--生成的repo列表-->
+                        <arg>-Acreator.repository.includes=org.springframework.data.jpa.repository.JpaRepository</arg>
+                    </compilerArgs>
                     <annotationProcessors>
                         <annotationProcessor>
                             cn.procsl.ping.meta.process.FunctionAnnotationProcessor
+                        </annotationProcessor>
+                        <annotationProcessor>
+                            cn.procsl.ping.boot.data.processor.RepositoryProcessor
                         </annotationProcessor>
                     </annotationProcessors>
                 </configuration>
