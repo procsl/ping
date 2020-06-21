@@ -1,8 +1,8 @@
 package cn.procsl.ping.boot.user.domain.rbac.model;
 
+import cn.procsl.ping.boot.data.annotation.CreateRepository;
 import cn.procsl.ping.boot.data.annotation.Description;
 import cn.procsl.ping.boot.data.business.entity.GeneralEntity;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,6 +23,7 @@ import static lombok.AccessLevel.PRIVATE;
 @NoArgsConstructor
 @Setter(PRIVATE)
 @Description(comment = "资源聚合")
+@CreateRepository
 public class Resource extends GeneralEntity {
 
     protected final static String RESOURCE_ID_NAME = "resource_id";

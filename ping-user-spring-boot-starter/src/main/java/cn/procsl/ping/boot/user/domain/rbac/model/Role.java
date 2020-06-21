@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.user.domain.rbac.model;
 
+import cn.procsl.ping.boot.data.annotation.CreateRepository;
 import cn.procsl.ping.boot.data.annotation.DefaultValue;
 import cn.procsl.ping.boot.data.annotation.Description;
 import cn.procsl.ping.boot.data.annotation.IfEmptyAutoCreate;
@@ -29,6 +30,7 @@ import static lombok.AccessLevel.PRIVATE;
 @NoArgsConstructor
 @Setter(PRIVATE)
 @Description(comment = "用户角色作为单独的聚合根")
+@CreateRepository
 public class Role extends GeneralEntity implements Serializable {
 
     public final static String ROLE_ID_NAME = "role_id";

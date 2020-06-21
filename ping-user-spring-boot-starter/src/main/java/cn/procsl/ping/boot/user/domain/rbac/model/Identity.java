@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.user.domain.rbac.model;
 
+import cn.procsl.ping.boot.data.annotation.CreateRepository;
 import cn.procsl.ping.boot.data.annotation.Description;
 import cn.procsl.ping.boot.user.domain.utils.CollectionsUtils;
 import lombok.*;
@@ -24,6 +25,7 @@ import static lombok.AccessLevel.PRIVATE;
 @Getter
 @Setter(PRIVATE)
 @ToString
+@CreateRepository
 public class Identity implements Serializable {
 
     public final static String IDENTITY_ID_NAME = "identity_id";

@@ -133,7 +133,8 @@
                         <arg>-g</arg>
                         <arg>-Xlint</arg>
                         <arg>-parameters</arg>
-                        <arg>-Acreator.repository.package.name=cn.procsl.ping.boot.user.repository</arg>
+                        <arg>-Acreator.repository.package.name=cn.procsl.ping.boot.user.domain.rbac.repository</arg>
+                        <arg>-Acreate.repository.prefix=P</arg>
                     </compilerArgs>
                 </configuration>
                 <dependencies>

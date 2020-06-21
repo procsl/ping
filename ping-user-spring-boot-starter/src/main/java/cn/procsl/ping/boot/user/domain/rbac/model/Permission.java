@@ -1,7 +1,7 @@
 package cn.procsl.ping.boot.user.domain.rbac.model;
 
+import cn.procsl.ping.boot.data.annotation.CreateRepository;
 import cn.procsl.ping.boot.data.annotation.Description;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,6 +21,7 @@ import static lombok.AccessLevel.PRIVATE;
 @Getter
 @Setter(PRIVATE)
 @Description(comment = "用户权限实体")
+@CreateRepository
 public class Permission implements Serializable {
 
     public final static String PERMISSION_ID_NAME = "permission_id";

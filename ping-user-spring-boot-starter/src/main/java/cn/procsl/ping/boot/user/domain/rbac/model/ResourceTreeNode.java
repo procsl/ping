@@ -1,7 +1,6 @@
 package cn.procsl.ping.boot.user.domain.rbac.model;
 
 import cn.procsl.ping.boot.data.business.entity.TreeNode;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -11,7 +10,6 @@ import javax.persistence.Embeddable;
 import javax.persistence.Transient;
 
 import static cn.procsl.ping.boot.data.business.entity.GeneralEntity.GENERAL_ENTITY_ID_LENGTH;
-import static lombok.AccessLevel.PRIVATE;
 
 /**
  * @author procsl
