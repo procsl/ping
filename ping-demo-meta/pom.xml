@@ -46,21 +46,19 @@
                         <arg>-g</arg>
                         <arg>-Xlint</arg>
                         <arg>-parameters</arg>
-                        <!--是否创建repository-->
-                        <arg>-Acreator.repository=true</arg>
                         <!--包名-->
                         <arg>-Acreator.repository.package.name=cn.procsl.ping.demo.repository</arg>
                         <!--生成的repo列表-->
-                        <arg>-Acreator.repository.includes=org.springframework.data.jpa.repository.JpaRepository</arg>
+                        <!--<arg>-Acreator.repository.includes=org.springframework.data.jpa.repository.JpaRepository</arg>-->
                     </compilerArgs>
-                    <annotationProcessors>
-                        <annotationProcessor>
-                            cn.procsl.ping.meta.process.FunctionAnnotationProcessor
-                        </annotationProcessor>
-                        <annotationProcessor>
-                            cn.procsl.ping.boot.data.processor.RepositoryProcessor
-                        </annotationProcessor>
-                    </annotationProcessors>
+<!--                    <annotationProcessors>-->
+<!--                        <annotationProcessor>-->
+<!--                            cn.procsl.ping.meta.process.FunctionAnnotationProcessor-->
+<!--                        </annotationProcessor>-->
+<!--                        <annotationProcessor>-->
+<!--                            cn.procsl.ping.boot.data.processor.RepositoryProcessor-->
+<!--                        </annotationProcessor>-->
+<!--                    </annotationProcessors>-->
                 </configuration>
             </plugin>
         </plugins>

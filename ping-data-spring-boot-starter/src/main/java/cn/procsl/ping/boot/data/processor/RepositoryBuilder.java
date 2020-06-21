@@ -17,7 +17,7 @@ public interface RepositoryBuilder {
      * 是否支持生成该类
      *
      * @param className 待测试的Repository类型名称
-     * @return 返回是否支持该Repository的逻辑值
+     * @return 返回是否支持该Repository
      */
     boolean support(String className);
 
