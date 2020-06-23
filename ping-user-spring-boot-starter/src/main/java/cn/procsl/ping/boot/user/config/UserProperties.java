@@ -17,7 +17,7 @@ public class UserProperties {
 
     public static final String COMPONENT_SCAN = "cn.procsl.ping.boot.user.domain.rbac.service";
 
-    public static final String ENTITY_SCAN = "cn.procsl.ping.boot.user.domain.rbac.model";
+    public static final String ENTITY_SCAN = "cn.procsl.ping.boot.user.domain.rbac.entity";
 
     boolean enableInitDefaultData = true;
 }

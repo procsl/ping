@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.user.domain.rbac.model;
+package cn.procsl.ping.boot.user.domain.rbac.entity;
 
 import cn.procsl.ping.boot.data.annotation.CreateRepository;
 import cn.procsl.ping.boot.data.annotation.Description;

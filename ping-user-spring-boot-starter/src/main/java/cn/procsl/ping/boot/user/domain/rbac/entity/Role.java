@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.user.domain.rbac.model;
+package cn.procsl.ping.boot.user.domain.rbac.entity;
 
 import cn.procsl.ping.boot.data.annotation.CreateRepository;
 import cn.procsl.ping.boot.data.annotation.DefaultValue;
@@ -14,7 +14,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Set;
 
-import static cn.procsl.ping.boot.user.domain.rbac.model.Permission.PERMISSION_ID_NAME;
+import static cn.procsl.ping.boot.user.domain.rbac.entity.Permission.PERMISSION_ID_NAME;
 import static lombok.AccessLevel.PRIVATE;
 
 /**

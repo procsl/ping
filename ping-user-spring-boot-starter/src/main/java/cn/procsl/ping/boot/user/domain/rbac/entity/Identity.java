@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.user.domain.rbac.model;
+package cn.procsl.ping.boot.user.domain.rbac.entity;
 
 import cn.procsl.ping.boot.data.annotation.CreateRepository;
 import cn.procsl.ping.boot.data.annotation.Description;
@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 import static cn.procsl.ping.boot.data.business.entity.GeneralEntity.GENERAL_ENTITY_ID_LENGTH;
-import static cn.procsl.ping.boot.user.domain.rbac.model.Role.ROLE_ID_NAME;
+import static cn.procsl.ping.boot.user.domain.rbac.entity.Role.ROLE_ID_NAME;
 import static lombok.AccessLevel.PRIVATE;
 
 /**
