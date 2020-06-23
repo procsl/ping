@@ -3,7 +3,6 @@ package cn.procsl.ping.boot.user.domain.rbac.model;
 import cn.procsl.ping.boot.data.annotation.CreateRepository;
 import cn.procsl.ping.boot.data.annotation.DefaultValue;
 import cn.procsl.ping.boot.data.annotation.Description;
-import cn.procsl.ping.boot.data.annotation.IfEmptyAutoCreate;
 import cn.procsl.ping.boot.data.business.entity.GeneralEntity;
 import cn.procsl.ping.boot.data.business.utils.BusinessException;
 import cn.procsl.ping.boot.user.domain.utils.CollectionsUtils;
@@ -51,7 +50,6 @@ public class Role extends GeneralEntity implements Serializable {
 
     @Column(length = NAME_LENGTH, nullable = false)
     @Description(comment = "角色名称")
-    @IfEmptyAutoCreate(type = "name")
     protected String name;
 
     @Column(length = GENERAL_ENTITY_ID_LENGTH, nullable = false)
@@ -99,7 +97,7 @@ public class Role extends GeneralEntity implements Serializable {
     /**
      * 设置继承的角色, 可以设置为null
      *
-     * @param parent
+     * @param parent 父节点ID
      */
     public void doExtendBy(@Nullable Long parent) {
         // TODO 获取注解的默认值 空角色
