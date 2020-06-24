@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.user.domain.rbac.entity;
+package cn.procsl.ping.boot.user.domain.resource.entity;
 
 import cn.procsl.ping.boot.data.business.entity.TreeNode;
 import lombok.Getter;

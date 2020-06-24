@@ -47,7 +47,7 @@
                         <arg>-Xlint</arg>
                         <arg>-parameters</arg>
                         <!--包名-->
-                        <arg>-Acreator.repository.package.name=cn.procsl.ping.demo.repository</arg>
+<!--                        <arg>-Acreator.repository.package.name=cn.procsl.ping.demo.repository</arg>-->
                         <!--生成的repo列表-->
                         <!--<arg>-Acreator.repository.includes=org.springframework.data.jpa.repository.JpaRepository</arg>-->
                     </compilerArgs>

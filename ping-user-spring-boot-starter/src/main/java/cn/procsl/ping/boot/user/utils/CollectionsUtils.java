@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.user.domain.utils;
+package cn.procsl.ping.boot.user.utils;
 
 import javax.annotation.Nullable;
 import java.util.Collection;

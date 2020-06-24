@@ -224,8 +224,24 @@ public class RepositoryProcessor extends AbstractProcessor {
             return this.packageName;
         }
 
+        Element packageType = entity.getEnclosingElement();
+        if (packageType == null) {
+            return "";
+        }
+
         // 返回当前的实体的包名
-        return entity.getEnclosingElement().asType().toString();
+        String fullName = packageType.asType().toString();
+        String simpleName = packageType.getSimpleName().toString();
+
+        if (simpleName == null || simpleName.isEmpty()) {
+            return fullName;
+        }
+
+        if (fullName.length() > simpleName.length() ) {
+            return fullName.substring(0, fullName.length() - simpleName.length()) + "repository";
+        }
+
+        return fullName;
     }
 
 

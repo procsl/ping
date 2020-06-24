@@ -13,6 +13,7 @@ import static cn.procsl.ping.boot.data.business.entity.GeneralEntity.GENERAL_ENT
 import static lombok.AccessLevel.PRIVATE;
 
 /**
+ * 用户权限实体
  * @author procsl
  * @date 2020/04/08
  */
@@ -32,8 +33,7 @@ public class Permission implements Serializable {
     protected Long id;
 
     @Description(comment = "对应的的资源ID")
-    @OneToOne
-    protected Resource resource;
+    protected Long resourceId;
 
     @CollectionTable(uniqueConstraints = @UniqueConstraint(columnNames = {PERMISSION_ID_NAME, "operation"}))
     @ElementCollection

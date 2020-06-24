@@ -5,7 +5,7 @@ import cn.procsl.ping.boot.data.annotation.DefaultValue;
 import cn.procsl.ping.boot.data.annotation.Description;
 import cn.procsl.ping.boot.data.business.entity.GeneralEntity;
 import cn.procsl.ping.boot.data.business.utils.BusinessException;
-import cn.procsl.ping.boot.user.domain.utils.CollectionsUtils;
+import cn.procsl.ping.boot.user.utils.CollectionsUtils;
 import lombok.*;
 import org.springframework.util.StringUtils;
 
@@ -79,6 +79,16 @@ public class Role extends GeneralEntity implements Serializable {
     @Column(name = PERMISSION_ID_NAME, nullable = false, updatable = false, length = GENERAL_ENTITY_ID_LENGTH)
     @Description(comment = "权限IDs")
     protected Set<Long> permissions;
+
+    @Description(comment = "对应的的资源ID")
+    protected Long resourceId;
+
+    @CollectionTable(uniqueConstraints = @UniqueConstraint(columnNames = {PERMISSION_ID_NAME, "operation"}))
+    @ElementCollection
+    @Column(name = "operation", updatable = false, length = 20)
+    @Description(comment = "支持的操作, 针对当前关联的资源")
+    protected Set<String> operations;
+
 
 
     @Builder(buildMethodName = "done", builderMethodName = "create")

@@ -2,7 +2,7 @@ package cn.procsl.ping.boot.user.domain.rbac.entity;
 
 import cn.procsl.ping.boot.data.annotation.CreateRepository;
 import cn.procsl.ping.boot.data.annotation.Description;
-import cn.procsl.ping.boot.user.domain.utils.CollectionsUtils;
+import cn.procsl.ping.boot.user.utils.CollectionsUtils;
 import lombok.*;
 
 import javax.persistence.*;

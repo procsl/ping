@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.user.domain.rbac.entity;
+package cn.procsl.ping.boot.user.domain.resource.entity;
 
 /**
  * 资源类型

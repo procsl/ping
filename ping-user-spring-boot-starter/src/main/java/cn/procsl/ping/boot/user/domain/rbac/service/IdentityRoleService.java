@@ -9,6 +9,6 @@ import javax.inject.Singleton;
  */
 @Named
 @Singleton
-public class UserRoleService {
+public class IdentityRoleService {
 
 }

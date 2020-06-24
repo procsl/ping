@@ -20,10 +20,10 @@ import static cn.procsl.ping.boot.user.config.UserProperties.*;
 @Configuration
 @EnableConfigurationProperties({UserProperties.class})
 @RequiredArgsConstructor
-@ComponentScan({COMPONENT_SCAN})
+@ComponentScan(RBAC_COMPONENT_SCAN)
 @ConditionalOnMissingBean({UserAutoConfiguration.class, UserAutoConfiguration.class})
-@EnableJpaRepositories(basePackages = REPOSITORY_PATH)
-@EntityScan(basePackages = ENTITY_SCAN)
+@EnableJpaRepositories(basePackages = RBAC_REPOSITORY_PATH)
+@EntityScan(basePackages = {RBAC_ENTITY})
 public class UserAutoConfiguration {
 
     final UserProperties properties;
