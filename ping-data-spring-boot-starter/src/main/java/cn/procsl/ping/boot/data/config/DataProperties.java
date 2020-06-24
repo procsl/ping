@@ -20,8 +20,8 @@ public class DataProperties {
 
     private String indexNamePrefix = "in";
 
-    protected String tablePrefix ="pb";
+    private String tablePrefix ="pb";
 
-    protected String dot = "_";
+    private String dot = "_";
 
 }

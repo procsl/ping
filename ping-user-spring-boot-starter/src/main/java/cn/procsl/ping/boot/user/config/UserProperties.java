@@ -13,11 +13,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 public class UserProperties {
 
-    public static final String RBAC_REPOSITORY_PATH = "cn.procsl.ping.boot.user.rbac.repository";
-
-    public static final String RBAC_COMPONENT_SCAN = "cn.procsl.ping.boot.user.domain.rbac.service";
-
-    public static final String RBAC_ENTITY = "cn.procsl.ping.boot.user.domain.rbac.entity";
-
     boolean enableInitDefaultData = true;
 }

@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.data.business.utils;
+package cn.procsl.ping.boot.data.business;
 
 import lombok.extern.slf4j.Slf4j;
 

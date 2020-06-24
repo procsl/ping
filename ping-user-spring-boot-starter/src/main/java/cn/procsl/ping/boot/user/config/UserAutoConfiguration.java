@@ -8,8 +8,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-import static cn.procsl.ping.boot.user.config.UserProperties.*;
-
 
 /**
  * 用户模块自动配置项
@@ -20,10 +18,23 @@ import static cn.procsl.ping.boot.user.config.UserProperties.*;
 @Configuration
 @EnableConfigurationProperties({UserProperties.class})
 @RequiredArgsConstructor
-@ComponentScan(RBAC_COMPONENT_SCAN)
-@ConditionalOnMissingBean({UserAutoConfiguration.class, UserAutoConfiguration.class})
-@EnableJpaRepositories(basePackages = RBAC_REPOSITORY_PATH)
-@EntityScan(basePackages = {RBAC_ENTITY})
+@ComponentScan({
+        "cn.procsl.ping.boot.user.domain.rbac.service",
+        "cn.procsl.ping.boot.user.domain.resource.service",
+        "cn.procsl.ping.boot.user.domain.user.service",
+})
+@ConditionalOnMissingBean({UserAutoConfiguration.class})
+@EnableJpaRepositories(
+        basePackages = {
+                "cn.procsl.ping.boot.user.domain.rbac.repository",
+                "cn.procsl.ping.boot.user.domain.resource.repository",
+                "cn.procsl.ping.boot.user.domain.user.repository"
+        })
+@EntityScan(basePackages = {
+        "cn.procsl.ping.boot.user.domain.rbac.entity",
+        "cn.procsl.ping.boot.user.domain.resource.entity",
+        "cn.procsl.ping.boot.user.domain.user.entity",
+})
 public class UserAutoConfiguration {
 
     final UserProperties properties;
