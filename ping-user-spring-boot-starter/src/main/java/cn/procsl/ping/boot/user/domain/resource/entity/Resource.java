@@ -41,11 +41,11 @@ public class Resource extends GeneralEntity {
     @Basic(fetch = FetchType.LAZY)
     protected ResourceTreeNode node;
 
-    @CollectionTable(uniqueConstraints = @UniqueConstraint(columnNames = {RESOURCE_ID_NAME, "operation"}))
+    @CollectionTable(uniqueConstraints = @UniqueConstraint(columnNames = {RESOURCE_ID_NAME, "depend_id"}))
     @ElementCollection
-    @Column(name = "operation", updatable = false, length = 20)
-    @Description(comment = "支持的操作, 针对当前关联的资源")
-    protected Set<String> operations;
+    @Column(name = "depend_id", nullable = false, updatable = false, length = GENERAL_ENTITY_ID_LENGTH)
+    @Description(comment = "依赖的资源")
+    protected Set<Long> depends;
 
     @Description(comment = "资源类型")
     @Enumerated(STRING)

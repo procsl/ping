@@ -30,6 +30,11 @@ public class User {
     @Id
     private Long id;
 
+    /**
+     * 用户身份
+     */
+    private Long identityId;
+
     private String name;
 
     private String desc;

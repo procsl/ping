@@ -20,7 +20,7 @@ import static lombok.AccessLevel.PRIVATE;
  */
 @Entity
 @Table
-@NoArgsConstructor
+@NoArgsConstructor(access = PRIVATE)
 @Description(comment = "用户身份聚合根")
 @Getter
 @Setter(PRIVATE)
@@ -35,11 +35,20 @@ public class Identity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Description(comment = "启用/禁用")
+    private boolean active;
+
     @CollectionTable(uniqueConstraints = @UniqueConstraint(columnNames = {IDENTITY_ID_NAME, ROLE_ID_NAME}))
     @ElementCollection
     @Column(name = ROLE_ID_NAME, nullable = false, updatable = false, length = GENERAL_ENTITY_ID_LENGTH)
     @Description(comment = "用户角色IDs")
     private Set<Long> roles;
+
+    @Builder(buildMethodName = "done", builderMethodName = "creator")
+    public Identity(boolean active, Set<Long> roles) {
+        this.active = active;
+        this.roles = roles;
+    }
 
     void addRole(@NonNull Long roleIds) {
         this.roles = CollectionsUtils.createAndAppend(this.roles, roleIds);
@@ -58,6 +67,14 @@ public class Identity implements Serializable {
             return false;
         }
         return this.roles.contains(roleId);
+    }
+
+    public void enable() {
+        this.active = true;
+    }
+
+    public void disable() {
+        this.active = false;
     }
 }
 

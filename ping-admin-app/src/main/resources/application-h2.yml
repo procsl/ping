@@ -1,7 +1,7 @@
 spring:
   #数据源配置
   datasource:
-    url: jdbc:h2:file:@project.basedir@/data/ping_app;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false;FILE_LOCK=NO;IGNORECASE=TRUE;
+    url: jdbc:h2:file:@project.basedir@/target/data/app;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false;FILE_LOCK=NO;IGNORECASE=TRUE;
     username: root
     password: 123456
     driver-class-name: org.h2.Driver

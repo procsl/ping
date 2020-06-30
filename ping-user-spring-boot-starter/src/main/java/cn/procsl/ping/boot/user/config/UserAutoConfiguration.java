@@ -19,6 +19,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableConfigurationProperties({UserProperties.class})
 @RequiredArgsConstructor
 @ComponentScan({
+        "cn.procsl.ping.boot.user.facade",
         "cn.procsl.ping.boot.user.domain.rbac.service",
         "cn.procsl.ping.boot.user.domain.resource.service",
         "cn.procsl.ping.boot.user.domain.user.service",

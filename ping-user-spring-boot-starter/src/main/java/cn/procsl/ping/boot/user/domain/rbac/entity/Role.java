@@ -5,8 +5,10 @@ import cn.procsl.ping.boot.data.annotation.DefaultValue;
 import cn.procsl.ping.boot.data.annotation.Description;
 import cn.procsl.ping.boot.data.business.BusinessException;
 import cn.procsl.ping.boot.data.business.entity.GeneralEntity;
-import cn.procsl.ping.boot.user.utils.CollectionsUtils;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Nullable;
@@ -14,7 +16,6 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Set;
 
-import static cn.procsl.ping.boot.user.domain.rbac.entity.Permission.PERMISSION_ID_NAME;
 import static lombok.AccessLevel.PRIVATE;
 
 /**
@@ -38,6 +39,8 @@ public class Role extends GeneralEntity implements Serializable {
 
     public final static String EXCLUDE_ID_NAME = "exclude_id";
 
+    public final static String PERMISSION_ID_NAME = "resource_id";
+
     public final static Long EMPTY_ROLE_ID = -1L;
 
     public final static int NAME_LENGTH = 50;
@@ -55,7 +58,7 @@ public class Role extends GeneralEntity implements Serializable {
     @Column(length = GENERAL_ENTITY_ID_LENGTH, nullable = false)
     @Description(comment = "继承的角色ID,当前角色拥有继承角色的所有权限, 与互斥的角色冲突。 默认-1角色, 即空角色")
     @DefaultValue(forFiled = "cn.procsl.ping.boot.user.domain.rbac.model.Role.EMPTY_ROLE_ID")
-    protected Long extendBy;
+    protected Long inheritBy;
 
     @Column(length = 5, nullable = false)
     @Description(comment = "最大数量约束, 拥有此角色时当前角色的拥有者拥有的角色数量必须少于等于此值, 默认值为0, 表示不限制, 继承角色不计入此限制")
@@ -76,32 +79,12 @@ public class Role extends GeneralEntity implements Serializable {
 
     @CollectionTable(uniqueConstraints = @UniqueConstraint(columnNames = {ROLE_ID_NAME, PERMISSION_ID_NAME}))
     @ElementCollection
-    @Column(name = PERMISSION_ID_NAME, nullable = false, updatable = false, length = GENERAL_ENTITY_ID_LENGTH)
-    @Description(comment = "权限IDs")
+    @Column(name = PERMISSION_ID_NAME, updatable = false, length = GENERAL_ENTITY_ID_LENGTH)
+    @Description(comment = "权限IDs 实际为资源ID")
     protected Set<Long> permissions;
 
-    @Description(comment = "对应的的资源ID")
-    protected Long resourceId;
-
-    @CollectionTable(uniqueConstraints = @UniqueConstraint(columnNames = {PERMISSION_ID_NAME, "operation"}))
-    @ElementCollection
-    @Column(name = "operation", updatable = false, length = 20)
-    @Description(comment = "支持的操作, 针对当前关联的资源")
-    protected Set<String> operations;
-
-
-
-    @Builder(buildMethodName = "done", builderMethodName = "create")
     public Role(String name) {
         this.name = name;
-    }
-
-    public void addPermission(@NonNull Long... permissions) {
-        this.permissions = CollectionsUtils.createAndAppend(this.permissions, permissions);
-    }
-
-    public void removePermission(@NonNull Long... permissions) {
-        CollectionsUtils.nullSafeRemove(this.permissions, permissions);
     }
 
     /**
@@ -112,7 +95,7 @@ public class Role extends GeneralEntity implements Serializable {
     public void doExtendBy(@Nullable Long parent) {
         // TODO 获取注解的默认值 空角色
         if (parent == null || EMPTY_ROLE_ID.equals(parent)) {
-            this.extendBy = EMPTY_ROLE_ID;
+            this.inheritBy = EMPTY_ROLE_ID;
         }
 
         // 继承的角色不能存在于互斥角色中
@@ -124,7 +107,7 @@ public class Role extends GeneralEntity implements Serializable {
                 throw new BusinessException("扩展角色{}与互斥角色冲突", parent);
             }
         } while (false);
-        this.extendBy = parent;
+        this.inheritBy = parent;
     }
 
     /**
