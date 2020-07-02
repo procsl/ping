@@ -30,8 +30,8 @@ class IdentityTest {
     QuerydslPredicateExecutor<Identity> identQueryDsl;
 
     @Test
-    void addRole() {
-        Identity ident = new Identity();
+    void testAddRole() {
+        Identity ident = Identity.creator().active(true).done();
         Long id = identityJpaRepository.save(ident).getId();
 
         Optional<Identity> ident1 = identityJpaRepository.findById(id);
@@ -42,8 +42,8 @@ class IdentityTest {
     }
 
     @Test
-    void remove() {
-        Identity ident = new Identity();
+    void testRemove() {
+        Identity ident = Identity.creator().active(true).done();
         ident.addRole(1L);
         ident.addRole(2L);
         ident.addRole(3L);
@@ -86,8 +86,8 @@ class IdentityTest {
     }
 
     @Test
-    void hasRole() {
-        Identity ident = new Identity();
+    void testHasRole() {
+        Identity ident = Identity.creator().active(true).done();
         ident.addRole(1L);
         Long id = identityJpaRepository.save(ident).getId();
         identityJpaRepository.flush();
@@ -100,5 +100,38 @@ class IdentityTest {
 
         boolean bool2 = tmp.get().hasRole(2L);
         Assert.assertFalse(bool2);
+    }
+
+
+    @Test
+    void enable() {
+        Identity ident = Identity.creator().active(false).done();
+        Long id = identityJpaRepository.save(ident).getId();
+        identityJpaRepository.flush();
+
+        Identity ident2 = identityJpaRepository.findById(id).get();
+        Assert.assertFalse(ident2.isActive());
+
+        ident.enable();
+        identityJpaRepository.save(ident);
+
+        Identity ident3 = identityJpaRepository.findById(id).get();
+        Assert.assertTrue(ident3.isActive());
+    }
+
+    @Test
+    void disable() {
+        Identity ident = Identity.creator().active(false).done();
+        Long id = identityJpaRepository.save(ident).getId();
+        identityJpaRepository.flush();
+
+        Identity ident2 = identityJpaRepository.findById(id).get();
+        Assert.assertFalse(ident2.isActive());
+
+        ident.disable();
+        identityJpaRepository.save(ident);
+
+        Identity ident3 = identityJpaRepository.findById(id).get();
+        Assert.assertFalse(ident3.isActive());
     }
 }
