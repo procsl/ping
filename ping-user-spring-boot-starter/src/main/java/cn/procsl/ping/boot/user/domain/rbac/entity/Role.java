@@ -92,7 +92,7 @@ public class Role extends GeneralEntity implements Serializable {
      *
      * @param parent 父节点ID
      */
-    public void doExtendBy(@Nullable Long parent) {
+    public void toInherit(@Nullable Long parent) {
         // TODO 获取注解的默认值 空角色
         if (parent == null || EMPTY_ROLE_ID.equals(parent)) {
             this.inheritBy = EMPTY_ROLE_ID;
@@ -128,13 +128,13 @@ public class Role extends GeneralEntity implements Serializable {
 
     @Builder(buildMethodName = "done", builderMethodName = "creator")
     public Role(String name,
-                Long extendBy,
+                Long inheritBy,
                 Integer max,
                 Set<Long> requires,
                 Set<Long> excludes,
                 Set<Long> permissions) {
         this.rename(name);
-        this.doExtendBy(extendBy);
+        this.toInherit(inheritBy);
         this.max = max;
         this.requires = requires;
         this.excludes = excludes;

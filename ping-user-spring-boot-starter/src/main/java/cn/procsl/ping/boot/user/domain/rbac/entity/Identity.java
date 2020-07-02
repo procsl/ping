@@ -45,12 +45,11 @@ public class Identity implements Serializable {
     private Set<Long> roles;
 
     @Builder(buildMethodName = "done", builderMethodName = "creator")
-    public Identity(boolean active, Set<Long> roles) {
+    public Identity(boolean active) {
         this.active = active;
-        this.roles = roles;
     }
 
-    void addRole(@NonNull Long roleIds) {
+    public void addRole(@NonNull Long roleIds) {
         this.roles = CollectionsUtils.createAndAppend(this.roles, roleIds);
     }
 
