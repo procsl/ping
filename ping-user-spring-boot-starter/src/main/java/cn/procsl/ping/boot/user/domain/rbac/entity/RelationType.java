@@ -6,4 +6,17 @@ package cn.procsl.ping.boot.user.domain.rbac.entity;
  */
 public enum RelationType {
 
+    REQUIRED("前置约束"),
+
+    EXCLUDE("互斥约束"),
+
+    ROLE_BASE("角色基数约束"),
+
+    USER_BASE("用户基数约束");
+
+    private final String desc;
+
+    RelationType(String desc) {
+        this.desc = desc;
+    }
 }
