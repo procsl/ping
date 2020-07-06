@@ -28,7 +28,7 @@ import static lombok.AccessLevel.PRIVATE;
 @CreateRepository
 public class Session implements Serializable {
 
-    public final static String IDENTITY_ID_NAME = "identity_id";
+    public final static String SESSION_ID_NAME = "session_id";
 
     @Id
     @Column(length = GENERAL_ENTITY_ID_LENGTH, updatable = false)
@@ -38,7 +38,7 @@ public class Session implements Serializable {
     @Description(comment = "启用/禁用")
     private boolean active;
 
-    @CollectionTable(uniqueConstraints = @UniqueConstraint(columnNames = {IDENTITY_ID_NAME, ROLE_ID_NAME}))
+    @CollectionTable(uniqueConstraints = @UniqueConstraint(columnNames = {SESSION_ID_NAME, ROLE_ID_NAME}))
     @ElementCollection
     @Column(name = ROLE_ID_NAME, nullable = false, updatable = false, length = GENERAL_ENTITY_ID_LENGTH)
     @Description(comment = "用户角色IDs")

@@ -77,6 +77,7 @@ public class Role extends GeneralEntity implements Serializable {
     public void changeInherit(@Nullable Long parent) {
         if (parent == null || parent <= EMPTY_ROLE_ID) {
             this.inheritBy = EMPTY_ROLE_ID;
+            return;
         }
         this.inheritBy = parent;
     }

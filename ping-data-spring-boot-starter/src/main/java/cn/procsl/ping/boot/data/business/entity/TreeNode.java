@@ -2,7 +2,10 @@ package cn.procsl.ping.boot.data.business.entity;
 
 import cn.procsl.ping.boot.data.annotation.DefaultValue;
 import cn.procsl.ping.boot.data.annotation.Description;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -21,9 +24,6 @@ import java.io.Serializable;
 @Setter(AccessLevel.PROTECTED)
 @MappedSuperclass
 public abstract class TreeNode<ID> implements Serializable {
-
-    @Description(comment = "父节点的ID")
-    protected ID parentId;
 
     @Description(comment = "ID路径, 以/分割, 默认为/自身ID")
     @Column(length = 1000)
