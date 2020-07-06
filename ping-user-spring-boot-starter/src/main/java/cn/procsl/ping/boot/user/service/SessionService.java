@@ -5,6 +5,7 @@ import cn.procsl.ping.boot.user.domain.rbac.entity.Role;
 import cn.procsl.ping.boot.user.domain.rbac.entity.Session;
 import cn.procsl.ping.boot.user.domain.rbac.entity.SessionId;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -30,6 +31,7 @@ import static java.util.Collections.EMPTY_SET;
 @RequiredArgsConstructor
 @Validated
 @Transactional(rollbackFor = Exception.class)
+@Slf4j
 public class SessionService {
 
     @Inject
@@ -45,11 +47,13 @@ public class SessionService {
      * @throws BusinessException 创建失败,则返回业务异常
      */
     public SessionId create() throws BusinessException {
+        log.trace("开始创建Session");
         Session session = Session
                 .creator()
                 .active(true)
                 .done();
         sessionJpaRepository.save(session);
+        log.trace("Session 创建成功");
         return new SessionId(session.getId());
     }
 
@@ -59,6 +63,7 @@ public class SessionService {
      * @param sessionId sessionID
      */
     public void delete(@NotNull SessionId sessionId) {
+        log.info("删除{}", sessionId);
         sessionJpaRepository.deleteById(sessionId.getId());
     }
 
@@ -69,10 +74,12 @@ public class SessionService {
      * @throws BusinessException 业务异常
      */
     public void disable(@NotNull SessionId sessionId) throws BusinessException {
+        log.trace("start-禁用{}", sessionId);
         this.sessionJpaRepository.findById(sessionId.getId())
                 .ifPresent(session -> {
                     session.disable();
                     this.sessionJpaRepository.save(session);
+                    log.info("{}被禁用", sessionId.getId());
                 });
     }
 
@@ -83,10 +90,12 @@ public class SessionService {
      * @throws BusinessException 业务异常
      */
     public void enable(@NotNull SessionId sessionId) throws BusinessException {
+        log.trace("start-启用{}", sessionId);
         this.sessionJpaRepository.findById(sessionId.getId())
                 .ifPresent(session -> {
                     session.enable();
                     this.sessionJpaRepository.save(session);
+                    log.info("{}被启用", sessionId.getId());
                 });
     }
 
@@ -98,6 +107,7 @@ public class SessionService {
      * @throws BusinessException 如果绑定的角色错误或者不存在, 抛出此异常
      */
     public void bindRoles(@NotNull SessionId sessionId, @NotEmpty Set<Long> roleIds) throws BusinessException {
+        log.debug("为session:{}绑定角色:{}", sessionId, roleIds);
         Session session = this.sessionJpaRepository
                 .findById(sessionId.getId())
                 .orElseThrow(() -> new BusinessException("session不存在", sessionId));
