@@ -42,7 +42,7 @@ public class RoleService {
     final QuerydslPredicateExecutor<Role> roleQueryDslPredicateExecutor;
 
     @Inject
-    final QuerydslPredicateExecutor<Session> identityQueryDslPredicateExecutor;
+    final QuerydslPredicateExecutor<Session> sessionQueryDslPredicateExecutor;
 
     /**
      * 创建角色
@@ -69,7 +69,7 @@ public class RoleService {
      * @throws BusinessException 如果角色被绑定, 则不可删除
      */
     public void delete(@NotNull Long roleId) throws BusinessException {
-        boolean exists = identityQueryDslPredicateExecutor.exists(QSession.session.roles.contains(roleId));
+        boolean exists = sessionQueryDslPredicateExecutor.exists(QSession.session.roles.contains(roleId));
         if (exists) {
             throw new BusinessException("该角色已被使用");
         }

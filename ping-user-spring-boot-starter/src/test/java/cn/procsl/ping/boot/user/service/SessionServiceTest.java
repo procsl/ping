@@ -39,7 +39,7 @@ public class SessionServiceTest {
         SessionId id = sessionService.create();
         Assert.assertNotNull(id);
 
-        Session session = sessionService.findById(id);
+        Session session = sessionService.load(id);
         Assert.assertNotNull(session);
     }
 
@@ -48,11 +48,11 @@ public class SessionServiceTest {
         SessionId id = sessionService.create();
         Assert.assertNotNull(id);
 
-        Session session = sessionService.findById(id);
+        Session session = sessionService.load(id);
         Assert.assertNotNull(session);
 
         sessionService.delete(id);
-        Session session1 = sessionService.findById(id);
+        Session session1 = sessionService.load(id);
         Assert.assertNull(session1);
     }
 
@@ -63,7 +63,7 @@ public class SessionServiceTest {
 
         sessionService.disable(id);
 
-        Session session = sessionService.findById(id);
+        Session session = sessionService.load(id);
         Assert.assertNotNull(session);
         Assert.assertFalse(session.isActive());
     }
@@ -75,7 +75,7 @@ public class SessionServiceTest {
 
         sessionService.enable(id);
 
-        Session session = sessionService.findById(id);
+        Session session = sessionService.load(id);
         Assert.assertNotNull(session);
         Assert.assertTrue(session.isActive());
     }
@@ -100,7 +100,7 @@ public class SessionServiceTest {
                 .collect(Collectors.toSet());
         sessionService.bindRoles(id, roles);
 
-        Session session = sessionService.findById(id);
+        Session session = sessionService.load(id);
         boolean bool = session.getRoles().containsAll(roles);
 
         Assert.assertTrue(bool);
@@ -126,7 +126,7 @@ public class SessionServiceTest {
                 .collect(Collectors.toSet());
         sessionService.bindRoles(id, roles);
 
-        Session session = sessionService.findById(id);
+        Session session = sessionService.load(id);
         boolean bool = session.getRoles().containsAll(roles);
 
         Assert.assertTrue(bool);
@@ -152,14 +152,14 @@ public class SessionServiceTest {
                 .collect(Collectors.toSet());
         sessionService.bindRoles(id, roles);
 
-        Session session = sessionService.findById(id);
+        Session session = sessionService.load(id);
         boolean bool = session.getRoles().containsAll(roles);
         Assert.assertTrue(bool);
 
         sessionService.unbindRole(id, role1.getId());
         sessionService.unbindRole(id, role2.getId());
 
-        Session session1 = sessionService.findById(id);
+        Session session1 = sessionService.load(id);
         boolean bool1 = session1.getRoles().contains(role1.getId());
         boolean bool2 = session1.getRoles().contains(role2.getId());
 

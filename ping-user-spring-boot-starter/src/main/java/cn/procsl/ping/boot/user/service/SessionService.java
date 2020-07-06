@@ -146,7 +146,7 @@ public class SessionService {
     }
 
     @Transactional(readOnly = true)
-    public Session findById(@NotNull SessionId sessionId) {
+    public Session load(@NotNull SessionId sessionId) {
         return sessionJpaRepository.findById(sessionId.getId()).orElse(null);
     }
 }
