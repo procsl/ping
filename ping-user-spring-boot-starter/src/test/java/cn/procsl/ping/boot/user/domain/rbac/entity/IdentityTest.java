@@ -24,17 +24,17 @@ import java.util.Optional;
 class IdentityTest {
 
     @Inject
-    JpaRepository<Identity, Long> identityJpaRepository;
+    JpaRepository<Session, Long> identityJpaRepository;
 
     @Inject
-    QuerydslPredicateExecutor<Identity> identQueryDsl;
+    QuerydslPredicateExecutor<Session> identQueryDsl;
 
     @Test
     void testAddRole() {
-        Identity ident = Identity.creator().active(true).done();
+        Session ident = Session.creator().active(true).done();
         Long id = identityJpaRepository.save(ident).getId();
 
-        Optional<Identity> ident1 = identityJpaRepository.findById(id);
+        Optional<Session> ident1 = identityJpaRepository.findById(id);
 
         ident1.get().addRole(1L);
         log.info("{}", ident1.get());
@@ -43,7 +43,7 @@ class IdentityTest {
 
     @Test
     void testRemove() {
-        Identity ident = Identity.creator().active(true).done();
+        Session ident = Session.creator().active(true).done();
         ident.addRole(1L);
         ident.addRole(2L);
         ident.addRole(3L);
@@ -56,7 +56,7 @@ class IdentityTest {
         identityJpaRepository.flush();
 
 
-        Optional<Identity> tmp = identityJpaRepository.findById(id);
+        Optional<Session> tmp = identityJpaRepository.findById(id);
         tmp.ifPresent(identity -> {
             identity.remove(1L);
             identity.remove(2L);
@@ -65,7 +65,7 @@ class IdentityTest {
         Assert.assertNotNull(tmp.get());
         identityJpaRepository.saveAndFlush(ident);
 
-        Optional<Identity> tmp2 = identityJpaRepository.findById(id);
+        Optional<Session> tmp2 = identityJpaRepository.findById(id);
         tmp2.ifPresent(identity -> {
             boolean bool1 = identity.getRoles().contains(1L);
             Assert.assertFalse(bool1);
@@ -87,12 +87,12 @@ class IdentityTest {
 
     @Test
     void testHasRole() {
-        Identity ident = Identity.creator().active(true).done();
+        Session ident = Session.creator().active(true).done();
         ident.addRole(1L);
         Long id = identityJpaRepository.save(ident).getId();
         identityJpaRepository.flush();
 
-        Optional<Identity> tmp = identityJpaRepository.findById(id);
+        Optional<Session> tmp = identityJpaRepository.findById(id);
         Assert.assertNotNull(tmp.get());
 
         boolean bool = tmp.get().hasRole(1L);
@@ -105,33 +105,33 @@ class IdentityTest {
 
     @Test
     void enable() {
-        Identity ident = Identity.creator().active(false).done();
+        Session ident = Session.creator().active(false).done();
         Long id = identityJpaRepository.save(ident).getId();
         identityJpaRepository.flush();
 
-        Identity ident2 = identityJpaRepository.findById(id).get();
+        Session ident2 = identityJpaRepository.findById(id).get();
         Assert.assertFalse(ident2.isActive());
 
         ident.enable();
         identityJpaRepository.save(ident);
 
-        Identity ident3 = identityJpaRepository.findById(id).get();
+        Session ident3 = identityJpaRepository.findById(id).get();
         Assert.assertTrue(ident3.isActive());
     }
 
     @Test
     void disable() {
-        Identity ident = Identity.creator().active(false).done();
+        Session ident = Session.creator().active(false).done();
         Long id = identityJpaRepository.save(ident).getId();
         identityJpaRepository.flush();
 
-        Identity ident2 = identityJpaRepository.findById(id).get();
+        Session ident2 = identityJpaRepository.findById(id).get();
         Assert.assertFalse(ident2.isActive());
 
         ident.disable();
         identityJpaRepository.save(ident);
 
-        Identity ident3 = identityJpaRepository.findById(id).get();
+        Session ident3 = identityJpaRepository.findById(id).get();
         Assert.assertFalse(ident3.isActive());
     }
 }

@@ -26,7 +26,7 @@ import static lombok.AccessLevel.PRIVATE;
 @Setter(PRIVATE)
 @ToString
 @CreateRepository
-public class Identity implements Serializable {
+public class Session implements Serializable {
 
     public final static String IDENTITY_ID_NAME = "identity_id";
 
@@ -45,7 +45,7 @@ public class Identity implements Serializable {
     private Set<Long> roles;
 
     @Builder(buildMethodName = "done", builderMethodName = "creator")
-    public Identity(boolean active) {
+    public Session(boolean active) {
         this.active = active;
     }
 

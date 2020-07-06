@@ -11,10 +11,10 @@ import lombok.NonNull;
  */
 @Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class IdentityId {
+public class SessionId {
     private Long id;
 
-    public IdentityId(@NonNull Long id) {
+    public SessionId(@NonNull Long id) {
         this.id = id;
     }
 }

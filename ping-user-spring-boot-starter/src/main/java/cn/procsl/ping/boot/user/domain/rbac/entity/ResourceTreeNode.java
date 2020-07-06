@@ -1,9 +1,7 @@
-package cn.procsl.ping.boot.user.domain.resource.entity;
+package cn.procsl.ping.boot.user.domain.rbac.entity;
 
 import cn.procsl.ping.boot.data.business.entity.TreeNode;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -18,9 +16,10 @@ import static cn.procsl.ping.boot.data.business.entity.GeneralEntity.GENERAL_ENT
 @Embeddable
 @Setter
 @Getter
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ResourceTreeNode extends TreeNode<Long> {
 
-    private final static ResourceTreeNode root = new ResourceTreeNode() {
+    public final static ResourceTreeNode root = new ResourceTreeNode() {
 
         @Override
         public final String getPath() {
@@ -42,11 +41,14 @@ public class ResourceTreeNode extends TreeNode<Long> {
     protected Long parentId;
 
     @Override
-    public ResourceTreeNode create(@NonNull Long id) {
+    public ResourceTreeNode create(@NonNull Long parentId) {
+        if (parentId == null || parentId < 0) {
+            return root;
+        }
         ResourceTreeNode tmp = new ResourceTreeNode();
-        tmp.setParentId(id);
+        tmp.setParentId(parentId);
         tmp.setDepth(1);
-        tmp.setPath(this.buildPath(root, id));
+        tmp.setPath(this.buildPath(root, parentId));
         return tmp;
     }
 

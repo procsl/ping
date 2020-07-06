@@ -1,11 +1,14 @@
-package cn.procsl.ping.boot.user.domain.resource.entity;
+package cn.procsl.ping.boot.user.domain.rbac.entity;
 
 import cn.procsl.ping.boot.data.annotation.CreateRepository;
 import cn.procsl.ping.boot.data.annotation.Description;
 import cn.procsl.ping.boot.data.business.entity.GeneralEntity;
+import cn.procsl.ping.boot.user.utils.CollectionsUtils;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -51,4 +54,46 @@ public class Resource extends GeneralEntity {
     @Enumerated(STRING)
     @Column(length = 15)
     protected ResourceType type;
+
+    public void rename(String name) {
+        if (StringUtils.isEmpty(name)) {
+            throw new IllegalArgumentException("资源名称不可为空");
+        }
+
+        if (name.length() > 20) {
+            throw new IllegalArgumentException("资源名称过长");
+        }
+        this.name = name;
+    }
+
+    public void grantDepend(Long resourceId) {
+        this.depends = CollectionsUtils.createAndAppend(this.depends, resourceId);
+    }
+
+    public void revokeDepend(Long resourceId) {
+        CollectionsUtils.nullSafeRemove(this.depends, resourceId);
+    }
+
+    public void changeType(ResourceType type) {
+        if (type == null) {
+            throw new IllegalArgumentException("资源类型不可为null");
+        }
+
+        this.type = type;
+    }
+
+    public void changeParentNode(Long parentId) {
+        ResourceTreeNode parent = ResourceTreeNode.root.create(parentId);
+        this.node = parent;
+    }
+
+    @Builder(buildMethodName = "done", builderMethodName = "creator")
+    public Resource(String name, Long parentId, Set<Long> depends, ResourceType type) {
+        this.rename(name);
+        this.changeType(type);
+        this.changeParentNode(parentId);
+        this.depends = depends;
+    }
+
+
 }

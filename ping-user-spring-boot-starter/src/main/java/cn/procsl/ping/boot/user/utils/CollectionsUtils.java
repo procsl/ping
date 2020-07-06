@@ -65,14 +65,14 @@ public class CollectionsUtils {
     /**
      * 空安全删除
      *
-     * @param collections 容器,必须支持可写
-     * @param elements    待删除的容器
-     * @param <T>         泛型类型
+     * @param collection 容器,必须支持可写
+     * @param elements   待删除的容器
+     * @param <T>        泛型类型
      * @throws UnsupportedOperationException 对于不支持写的操作抛出此异常
      */
     @SafeVarargs
-    public static <T> void nullSafeRemove(@Nullable Set<T> collections, @Nullable T... elements) throws UnsupportedOperationException {
-        if (collections == null || collections.isEmpty()) {
+    public static <T> void nullSafeRemove(@Nullable Set<T> collection, @Nullable T... elements) throws UnsupportedOperationException {
+        if (collection == null || collection.isEmpty()) {
             return;
         }
 
@@ -81,19 +81,19 @@ public class CollectionsUtils {
         }
 
         for (T element : elements) {
-            collections.remove(element);
+            collection.remove(element);
         }
     }
 
     /**
      * 空安全删除元素
      *
-     * @param collections 元素容器
-     * @param elements    待删除容器
-     * @param <T>         元素的泛型类型
+     * @param collection 元素容器
+     * @param elements   待删除容器
+     * @param <T>        元素的泛型类型
      */
-    public static <T> void nullSafeRemove(@Nullable Set<T> collections, @Nullable Collection<T> elements) throws UnsupportedOperationException {
-        if (collections == null || collections.isEmpty()) {
+    public static <T> void nullSafeRemove(@Nullable Set<T> collection, @Nullable Collection<T> elements) throws UnsupportedOperationException {
+        if (collection == null || collection.isEmpty()) {
             return;
         }
 
@@ -101,6 +101,26 @@ public class CollectionsUtils {
             return;
         }
 
-        collections.removeAll(elements);
+        collection.removeAll(elements);
+    }
+
+    /**
+     * 测试元素是否存在容器中
+     *
+     * @param collection 容器
+     * @param element    元素
+     * @param <T>        元素泛型
+     * @return 返回测试结果
+     */
+    public static <T> boolean nullSafeContains(@Nullable Collection<T> collection, @Nullable T element) {
+        if (element == null) {
+            return false;
+        }
+
+        if (collection == null || collection.isEmpty()) {
+            return false;
+        }
+
+        return collection.contains(element);
     }
 }
