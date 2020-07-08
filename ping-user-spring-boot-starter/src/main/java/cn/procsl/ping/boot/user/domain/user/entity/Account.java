@@ -9,35 +9,27 @@ import lombok.Setter;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 import static lombok.AccessLevel.PRIVATE;
 
 /**
- * 用户实体
+ * 用户账户
  *
  * @author procsl
- * @date 2020/06/24
+ * @date 2020/07/07
  */
 @Entity
 @Table
 @Getter
 @NoArgsConstructor
 @Setter(PRIVATE)
-@Description(comment = "用户实体")
+@Description(comment = "用户账户")
 @CreateRepository
-public class User {
+public class Account implements Serializable {
 
     @Id
     private Long id;
 
-    private Account account;
-
-    private Profile profile;
-
-    private Long session;
-
-    private String name;
-
-    private String description;
 
 }

@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import static cn.procsl.ping.boot.user.domain.rbac.entity.Role.ROLE_ID_NAME;
-import static cn.procsl.ping.boot.user.utils.CollectionsUtils.nullSafeRemove;
+import static cn.procsl.ping.boot.user.utils.CollectionUtils.nullSafeRemove;
 import static javax.persistence.EnumType.STRING;
 import static lombok.AccessLevel.PRIVATE;
 

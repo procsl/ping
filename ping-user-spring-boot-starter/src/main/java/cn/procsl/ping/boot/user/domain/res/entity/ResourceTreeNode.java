@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.user.domain.rbac.entity;
+package cn.procsl.ping.boot.user.domain.res.entity;
 
 import cn.procsl.ping.boot.data.annotation.Description;
 import cn.procsl.ping.boot.data.business.entity.TreeNode;

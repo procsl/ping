@@ -1,18 +1,18 @@
 package cn.procsl.ping.boot.user.domain.rbac.entity;
 
 import cn.procsl.ping.boot.data.annotation.CreateRepository;
-import cn.procsl.ping.boot.data.annotation.Description;
 import cn.procsl.ping.boot.data.business.entity.GeneralEntity;
-import cn.procsl.ping.boot.user.utils.CollectionsUtils;
-import lombok.Builder;
+import cn.procsl.ping.boot.user.utils.CollectionUtils;
+import cn.procsl.ping.boot.user.utils.ObjectUtils;
+import cn.procsl.ping.boot.user.utils.StringUtils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.Nullable;
 import javax.persistence.*;
-import java.io.Serializable;
+import java.util.Collection;
 import java.util.Set;
 
 import static lombok.AccessLevel.PRIVATE;
@@ -26,17 +26,12 @@ import static lombok.AccessLevel.PRIVATE;
 @Entity
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = "name")})
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = PRIVATE)
 @Setter(PRIVATE)
-@Description(comment = "用户角色作为单独的聚合根")
 @CreateRepository
-public class Role extends GeneralEntity implements Serializable {
+public class Role extends GeneralEntity {
 
     public final static String ROLE_ID_NAME = "role_id";
-
-    public final static String PERMISSION_ID_NAME = "resource_id";
-
-    public final static Long EMPTY_ROLE_ID = -1L;
 
     public final static int NAME_LENGTH = 50;
 
@@ -46,34 +41,49 @@ public class Role extends GeneralEntity implements Serializable {
     protected Long id;
 
     @Column(length = NAME_LENGTH, nullable = false)
-    @Description(comment = "角色名称")
     protected String name;
 
-    @Column(length = GENERAL_ENTITY_ID_LENGTH, nullable = false)
-    @Description(comment = "继承的角色ID,当前角色拥有继承角色的所有权限, 与互斥的角色冲突。 默认-1角色, 即空角色")
-    protected Long inheritBy;
+    protected Role inherit;
 
-    @CollectionTable(uniqueConstraints = @UniqueConstraint(columnNames = {ROLE_ID_NAME, PERMISSION_ID_NAME}))
     @ElementCollection
-    @Column(name = PERMISSION_ID_NAME, updatable = false, length = GENERAL_ENTITY_ID_LENGTH)
-    @Description(comment = "权限IDs 实际为资源ID")
-    protected Set<Long> permissions;
+    protected Set<Permission> permissions;
 
-    public Role(String name) {
-        this.name = name;
+    protected Role(String name) {
+        this.changeName(name);
+    }
+
+    protected Role(String name, Role inherit) {
+        this(name);
+        this.changeInherit(inherit);
+    }
+
+    protected Role(String name, Role inherit, Collection<Permission> permissions) {
+        this(name, inherit);
+        this.permissions = CollectionUtils.createAndAppend(this.permissions, permissions);
+    }
+
+    public static Role create(String name) {
+        return new Role(name);
+    }
+
+    public static Role create(String name, Role inherit) {
+        return new Role(name, inherit);
+    }
+
+    public static Role create(String name, Role inherit, Collection<Permission> permissions) {
+        return new Role(name, inherit, permissions);
     }
 
     /**
-     * 设置继承的角色, 可以设置为null
+     * 设置继承的角色
      *
      * @param parent 父节点ID
      */
-    public void changeInherit(@Nullable Long parent) {
-        if (parent == null || parent <= EMPTY_ROLE_ID) {
-            this.inheritBy = EMPTY_ROLE_ID;
-            return;
+    public void changeInherit(@Nullable Role parent) {
+        if (parent == null || ObjectUtils.nullSafeEquals(parent.id, id)) {
+            this.inherit = null;
         }
-        this.inheritBy = parent;
+        this.inherit = parent;
     }
 
     /**
@@ -81,7 +91,7 @@ public class Role extends GeneralEntity implements Serializable {
      *
      * @param name 新的角色名称
      */
-    public void rename(String name) {
+    public void changeName(@NonNull String name) {
         if (StringUtils.isEmpty(name)) {
             throw new IllegalArgumentException("角色名称不可为空");
         }
@@ -92,24 +102,16 @@ public class Role extends GeneralEntity implements Serializable {
         this.name = name;
     }
 
-    @Builder(buildMethodName = "done", builderMethodName = "creator")
-    public Role(String name,
-                Long inheritBy,
-                Set<Long> permissions) {
-        this.rename(name);
-        this.changeInherit(inheritBy);
-        this.permissions = permissions;
+    public void grantPermission(@NonNull Permission permission) {
+        this.permissions = CollectionUtils.createAndAppend(this.permissions, permission);
     }
 
-    public void grantPermission(Long permissions) {
-        this.permissions = CollectionsUtils.createAndAppend(this.permissions, permissions);
+    public void revokePermission(@NonNull Permission permission) {
+        CollectionUtils.nullSafeRemove(this.permissions, permission);
     }
 
-    public void revokePermission(Long resourceId) {
-        CollectionsUtils.nullSafeRemove(this.permissions, resourceId);
-    }
-
-    public boolean hasPermission(Long resourceId) {
-        return CollectionsUtils.nullSafeContains(this.permissions, resourceId);
+    public boolean hasPermission(@NonNull Permission permission) {
+        return CollectionUtils.nullSafeContains(this.permissions, permission);
     }
 }
+

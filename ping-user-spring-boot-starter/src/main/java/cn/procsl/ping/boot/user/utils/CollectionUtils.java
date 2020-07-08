@@ -1,16 +1,21 @@
 package cn.procsl.ping.boot.user.utils;
 
+import lombok.NoArgsConstructor;
+
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import static lombok.AccessLevel.PRIVATE;
+
 /**
  * @author procsl
  * @date 2020/04/15
  */
-public class CollectionsUtils {
+@NoArgsConstructor(access = PRIVATE)
+public class CollectionUtils {
 
     /**
      * 如果传入的collects 不支持写则抛出异常
@@ -26,7 +31,7 @@ public class CollectionsUtils {
     public static <T> Set<T> createAndAppend(@Nullable Set<T> collects, @Nullable T... elements) throws UnsupportedOperationException {
 
         if (elements == null || elements.length == 0) {
-            return null;
+            return collects;
         }
 
         if (collects == null) {
@@ -48,9 +53,9 @@ public class CollectionsUtils {
      * @throws UnsupportedOperationException 对于不支持写的操作抛出此异常
      */
     @Nullable
-    static <T> Set<T> createAndAppend(@Nullable Set<T> collects, @Nullable Collection<T> elements) throws UnsupportedOperationException {
-        if (elements == null || elements.isEmpty()) {
-            return null;
+    public static <T> Set<T> createAndAppend(@Nullable Set<T> collects, @Nullable Collection<T> elements) throws UnsupportedOperationException {
+        if (isEmpty(elements)) {
+            return collects;
         }
 
         if (collects == null) {
@@ -72,7 +77,7 @@ public class CollectionsUtils {
      */
     @SafeVarargs
     public static <T> void nullSafeRemove(@Nullable Set<T> collection, @Nullable T... elements) throws UnsupportedOperationException {
-        if (collection == null || collection.isEmpty()) {
+        if (isEmpty(collection)) {
             return;
         }
 
@@ -93,11 +98,11 @@ public class CollectionsUtils {
      * @param <T>        元素的泛型类型
      */
     public static <T> void nullSafeRemove(@Nullable Set<T> collection, @Nullable Collection<T> elements) throws UnsupportedOperationException {
-        if (collection == null || collection.isEmpty()) {
+        if (isEmpty(collection)) {
             return;
         }
 
-        if (elements == null || elements.isEmpty()) {
+        if (isEmpty(elements)) {
             return;
         }
 
@@ -117,10 +122,20 @@ public class CollectionsUtils {
             return false;
         }
 
-        if (collection == null || collection.isEmpty()) {
+        if (isEmpty(collection)) {
             return false;
         }
 
         return collection.contains(element);
+    }
+
+    /**
+     * 检测是否为null或empty
+     *
+     * @param collection 指定的集合
+     * @return 为空返回true
+     */
+    public static boolean isEmpty(@Nullable Collection collection) {
+        return (collection == null || collection.isEmpty());
     }
 }

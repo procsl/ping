@@ -1,10 +1,14 @@
-package cn.procsl.ping.boot.user.service;
+package cn.procsl.ping.boot.user.service.rbac;
 
 import cn.procsl.ping.boot.data.business.BusinessException;
+import cn.procsl.ping.boot.user.command.rbac.ChangeRoleInheritCommand;
+import cn.procsl.ping.boot.user.command.rbac.CreateRoleCommand;
+import cn.procsl.ping.boot.user.command.rbac.RenameRoleCommand;
 import cn.procsl.ping.boot.user.domain.rbac.entity.QRole;
 import cn.procsl.ping.boot.user.domain.rbac.entity.QSession;
 import cn.procsl.ping.boot.user.domain.rbac.entity.Role;
 import cn.procsl.ping.boot.user.domain.rbac.entity.Session;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
@@ -14,11 +18,8 @@ import org.springframework.validation.annotation.Validated;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.validation.constraints.NotBlank;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import static cn.procsl.ping.boot.user.domain.rbac.entity.Role.NAME_LENGTH;
 
 /**
  * 角色 服务接口
@@ -47,17 +48,20 @@ public class RoleService {
     /**
      * 创建角色
      *
-     * @param name          角色名称
-     * @param inheritRoleId 继承的角色
+     * @param command 创建角色表征
      * @return 返回角色ID
      * @throws BusinessException 如果角儿创建失败,例如角色已经存在 抛出此异常
      */
-    public Long create(@NotBlank @Size(min = 1, max = NAME_LENGTH) String name, Long inheritRoleId) throws BusinessException {
-        existsName(name);
+    public Long create(@NonNull @Valid CreateRoleCommand command) throws BusinessException {
+        existsName(command.getName());
 
-        checkInheritable(inheritRoleId);
+        Role parentRole = null;
+        if (command.getInheritRoleId() != null) {
+            parentRole = load(command.getInheritRoleId());
+        }
 
-        Role newRole = Role.creator().name(name).inheritBy(inheritRoleId).done();
+        Role newRole = Role.create(command.getName(), parentRole, command.getPermissions());
+
         return roleJpaRepository.save(newRole).getId();
     }
 
@@ -80,16 +84,15 @@ public class RoleService {
     /**
      * 角色重命名
      *
-     * @param roleId 指定的角色
-     * @param name   角色新名称
+     * @param command 重命名角色表征
      * @throws BusinessException 如果该名称被占用, 则抛出异常
      */
-    public void rename(@NotNull Long roleId, @NotBlank @Size(min = 1, max = NAME_LENGTH) String name) throws BusinessException {
-        Role role = load(roleId);
+    public void rename(@NonNull @Valid RenameRoleCommand command) throws BusinessException {
+        Role role = load(command.getRoleId());
 
-        checkNameable(role, name);
+        checkNameable(role, command.getName());
 
-        role.rename(name);
+        role.changeName(command.getName());
 
         this.roleJpaRepository.save(role);
     }
@@ -97,63 +100,33 @@ public class RoleService {
     /**
      * 修改继承角色
      *
-     * @param roleId        操作的角色
-     * @param inheritRoleId 继承的角色
+     * @param command 修改角色继承表征
      * @throws BusinessException 业务异常
      */
-    public void changeInherit(@NotNull Long roleId, @NotNull Long inheritRoleId) throws BusinessException {
-        checkInheritable(inheritRoleId);
+    public void changeInherit(@NonNull @Valid ChangeRoleInheritCommand command) throws BusinessException {
 
-        Role role = load(roleId);
+        Role role = load(command.getRoleId());
+        Role parent = null;
+        if (command.getInheritRoleId() != null) {
+            parent = load(command.getInheritRoleId());
+        }
 
-        role.changeInherit(inheritRoleId);
+        role.changeInherit(parent);
 
         roleJpaRepository.save(role);
     }
 
 
     /**
-     * 加载角色
-     *
-     * @param roleId 角色Id
-     * @return 加载成功后的角色
-     * @throws BusinessException 如果角色不存在则抛出异常
-     */
-    @Transactional(readOnly = true)
-    public Role load(@NotNull Long roleId) throws BusinessException {
-        return roleJpaRepository.findById(roleId)
-                .orElseThrow(() -> new BusinessException("角色不存在"));
-    }
-
-
-    /**
-     * 检验角色是否可以继承
-     *
-     * @param inheritRoleId 角色ID
-     * @throws BusinessException 如果不可继承则抛出异常
-     */
-    @Transactional(readOnly = true)
-    public void checkInheritable(Long inheritRoleId) throws BusinessException {
-        boolean existId = inheritRoleId == null ||
-                Role.EMPTY_ROLE_ID >= inheritRoleId ||
-                roleJpaRepository.existsById(inheritRoleId);
-        if (!existId) {
-            throw new BusinessException("指定继承的角色不存在");
-        }
-    }
-
-
-    /**
      * 检查是否可以命名名称
      *
-     * @param roleId 角色id
-     * @param name   指定的名称
+     * @param command 重命名角色表征
      * @throws BusinessException 如果不能修改的名称则抛出异常
      */
     @Transactional(readOnly = true)
-    public void checkNameable(@NotNull Long roleId, @NotBlank @Size(min = 1, max = NAME_LENGTH) String name) throws BusinessException {
-        Role role = load(roleId);
-        checkNameable(role, name);
+    public void checkNameable(@NonNull @Valid RenameRoleCommand command) throws BusinessException {
+        Role role = load(command.getRoleId());
+        checkNameable(role, command.getName());
     }
 
     private void checkNameable(Role role, String name) throws BusinessException {
@@ -168,6 +141,11 @@ public class RoleService {
         if (exists) {
             throw new BusinessException("该角色名称已被占用");
         }
+    }
+
+    Role load(@NotNull Long roleId) throws BusinessException {
+        return roleJpaRepository.findById(roleId)
+                .orElseThrow(() -> new BusinessException("角色不存在"));
     }
 
 }

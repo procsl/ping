@@ -2,7 +2,7 @@ package cn.procsl.ping.boot.user.domain.rbac.entity;
 
 import cn.procsl.ping.boot.data.annotation.CreateRepository;
 import cn.procsl.ping.boot.data.annotation.Description;
-import cn.procsl.ping.boot.user.utils.CollectionsUtils;
+import cn.procsl.ping.boot.user.utils.CollectionUtils;
 import lombok.*;
 
 import javax.persistence.*;
@@ -40,32 +40,30 @@ public class Session implements Serializable {
 
     @CollectionTable(uniqueConstraints = @UniqueConstraint(columnNames = {SESSION_ID_NAME, ROLE_ID_NAME}))
     @ElementCollection
-    @Column(name = ROLE_ID_NAME, nullable = false, updatable = false, length = GENERAL_ENTITY_ID_LENGTH)
+    @Column(name = ROLE_ID_NAME)
     @Description(comment = "用户角色IDs")
     private Set<Long> roles;
 
-    @Builder(buildMethodName = "done", builderMethodName = "creator")
     public Session(boolean active) {
         this.active = active;
     }
 
+    public Session(boolean active, Set<Long> roles) {
+        this(active);
+        this.roles = CollectionUtils.createAndAppend(this.roles, roles);
+    }
+
     public void addRole(@NonNull Long roleIds) {
-        this.roles = CollectionsUtils.createAndAppend(this.roles, roleIds);
+        this.roles = CollectionUtils.createAndAppend(this.roles, roleIds);
     }
 
     public void remove(@NonNull Long roleId) {
-        if (this.roles == null) {
-            return;
-        }
-        this.roles.remove(roleId);
+        CollectionUtils.nullSafeRemove(this.roles, roleId);
     }
 
     @Transient
     public boolean hasRole(Long roleId) {
-        if (this.roles == null) {
-            return false;
-        }
-        return this.roles.contains(roleId);
+        return CollectionUtils.nullSafeContains(this.roles, roleId);
     }
 
     public void enable() {

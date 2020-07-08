@@ -1,10 +1,8 @@
-package cn.procsl.ping.boot.user.service;
+package cn.procsl.ping.boot.user.service.rbac;
 
 import cn.procsl.ping.boot.data.business.BusinessException;
-import cn.procsl.ping.boot.user.domain.rbac.entity.QResource;
-import cn.procsl.ping.boot.user.domain.rbac.entity.Resource;
-import cn.procsl.ping.boot.user.domain.rbac.entity.ResourceType;
-import com.querydsl.core.types.dsl.BooleanExpression;
+import cn.procsl.ping.boot.user.domain.res.entity.Resource;
+import cn.procsl.ping.boot.user.domain.res.entity.ResourceType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
@@ -20,7 +18,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Set;
 
-import static cn.procsl.ping.boot.user.domain.rbac.entity.ResourceTreeNode.isRoot;
+import static cn.procsl.ping.boot.user.domain.res.entity.ResourceTreeNode.isRoot;
 
 /**
  * 资源服务
@@ -171,10 +169,10 @@ public class ResourceService {
      * @throws BusinessException
      */
     public void checkNameable(@NotBlank @Size(max = 20, min = 1) String name) throws BusinessException {
-        boolean exists = resourceQueryDslPredicateExecutor.exists(QResource.resource.name.eq(name));
-        if (exists) {
-            throw new BusinessException("资源名称已存在");
-        }
+//        boolean exists = resourceQueryDslPredicateExecutor.exists(QResource.resource.name.eq(name));
+//        if (exists) {
+//            throw new BusinessException("资源名称已存在");
+//        }
     }
 
     /**
@@ -186,13 +184,14 @@ public class ResourceService {
      */
     public boolean existsName(@NotNull Long resourceId, @NotBlank @Size(max = 20, min = 1) String name) {
 
-        BooleanExpression eqName = QResource.resource.name.eq(name);
+//        BooleanExpression eqName = QResource.resource.name.eq(name);
 
-        boolean isEq = this.resourceQueryDslPredicateExecutor.exists(QResource.resource.id.eq(resourceId).and(eqName));
-        if (isEq) {
-            return false;
-        }
-        return this.resourceQueryDslPredicateExecutor.exists(eqName);
+//        boolean isEq = this.resourceQueryDslPredicateExecutor.exists(QResource.resource.id.eq(resourceId).and(eqName));
+//        if (isEq) {
+//            return false;
+//        }
+//        return this.resourceQueryDslPredicateExecutor.exists(eqName);
+        return false;
     }
 
     /**

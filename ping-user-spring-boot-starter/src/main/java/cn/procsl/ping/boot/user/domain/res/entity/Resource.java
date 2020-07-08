@@ -1,9 +1,9 @@
-package cn.procsl.ping.boot.user.domain.rbac.entity;
+package cn.procsl.ping.boot.user.domain.res.entity;
 
 import cn.procsl.ping.boot.data.annotation.CreateRepository;
 import cn.procsl.ping.boot.data.annotation.Description;
 import cn.procsl.ping.boot.data.business.entity.GeneralEntity;
-import cn.procsl.ping.boot.user.utils.CollectionsUtils;
+import cn.procsl.ping.boot.user.utils.CollectionUtils;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -67,11 +67,11 @@ public class Resource extends GeneralEntity {
     }
 
     public void grantDepend(Long resourceId) {
-        this.depends = CollectionsUtils.createAndAppend(this.depends, resourceId);
+        this.depends = CollectionUtils.createAndAppend(this.depends, resourceId);
     }
 
     public void revokeDepend(Long resourceId) {
-        CollectionsUtils.nullSafeRemove(this.depends, resourceId);
+        CollectionUtils.nullSafeRemove(this.depends, resourceId);
     }
 
     public void changeType(ResourceType type) {

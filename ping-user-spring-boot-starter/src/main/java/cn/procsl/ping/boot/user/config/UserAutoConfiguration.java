@@ -21,19 +21,19 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @ComponentScan({
         "cn.procsl.ping.boot.user.service",
         "cn.procsl.ping.boot.user.domain.rbac.service",
-        "cn.procsl.ping.boot.user.domain.resource.service",
+        "cn.procsl.ping.boot.user.domain.res.service",
         "cn.procsl.ping.boot.user.domain.user.service",
 })
 @ConditionalOnMissingBean({UserAutoConfiguration.class})
 @EnableJpaRepositories(
         basePackages = {
                 "cn.procsl.ping.boot.user.domain.rbac.repository",
-                "cn.procsl.ping.boot.user.domain.resource.repository",
+                "cn.procsl.ping.boot.user.domain.res.repository",
                 "cn.procsl.ping.boot.user.domain.user.repository"
         })
 @EntityScan(basePackages = {
         "cn.procsl.ping.boot.user.domain.rbac.entity",
-        "cn.procsl.ping.boot.user.domain.resource.entity",
+        "cn.procsl.ping.boot.user.domain.res.entity",
         "cn.procsl.ping.boot.user.domain.user.entity",
 })
 public class UserAutoConfiguration {
