@@ -15,7 +15,7 @@ import static lombok.AccessLevel.PRIVATE;
  * @date 2020/07/08
  */
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = "name")
 @Setter(PRIVATE)
 @Getter
 @Embeddable

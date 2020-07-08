@@ -125,13 +125,13 @@ public class SessionService {
 
 
     /**
-     * 获取指定session的所有角色
+     * 获取指定session的直接角色
      *
      * @param sessionId
      * @return
      */
     @Transactional(readOnly = true)
-    public Set<Long> getRoles(@NotNull Long sessionId) {
+    public Set<Long> getDirectRoles(@NotNull Long sessionId) {
         Session session = load(sessionId);
 
         if (!session.isActive()) {

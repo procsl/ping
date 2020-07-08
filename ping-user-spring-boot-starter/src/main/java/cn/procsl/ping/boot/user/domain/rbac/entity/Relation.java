@@ -3,6 +3,7 @@ package cn.procsl.ping.boot.user.domain.rbac.entity;
 import cn.procsl.ping.boot.data.annotation.CreateRepository;
 import cn.procsl.ping.boot.data.annotation.Description;
 import cn.procsl.ping.boot.data.business.entity.GeneralEntity;
+import cn.procsl.ping.boot.user.utils.StringUtils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -10,10 +11,10 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 import static cn.procsl.ping.boot.user.domain.rbac.entity.Role.ROLE_ID_NAME;
-import static cn.procsl.ping.boot.user.utils.CollectionUtils.nullSafeRemove;
 import static javax.persistence.EnumType.STRING;
 import static lombok.AccessLevel.PRIVATE;
 
@@ -57,21 +58,24 @@ public class Relation extends GeneralEntity {
     @Description(comment = "受到关系约束的角色ID")
     private Set<Long> roles;
 
-    public void changeRoles(@NonNull Collection roles) {
+    public void changeRoles(@NonNull Collection<Long> roles) {
         if (roles.isEmpty()) {
             throw new IllegalArgumentException("roles 不可为空");
         }
-        nullSafeRemove(this.roles, roles);
+        this.roles = new HashSet<>(roles);
     }
 
     public void changeScript(String script) {
-        if (script != null || script.length() > 1000) {
+        if (script != null && script.length() > 1000) {
             throw new IllegalArgumentException("script不可超过1000");
         }
         this.script = script;
     }
 
     public void changeName(@NonNull String name) {
+        if (StringUtils.isEmpty(name)) {
+            throw new IllegalArgumentException("名称不可为空");
+        }
 
         if (name.length() > 20) {
             throw new IllegalArgumentException("名称不可超过20");
@@ -83,4 +87,16 @@ public class Relation extends GeneralEntity {
         this.type = type;
     }
 
+
+    Relation(RelationType type, String name, String script, Collection<Long> roles) {
+        this.changeName(name);
+        this.changeType(type);
+        this.changeScript(script);
+        this.changeRoles(roles);
+    }
+
+
+    public static Relation create(String name, RelationType type, String script, Collection<Long> roles) {
+        return new Relation(type, name, script, roles);
+    }
 }

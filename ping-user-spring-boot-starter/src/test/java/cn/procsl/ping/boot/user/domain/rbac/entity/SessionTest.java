@@ -7,8 +7,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.List;
 
 import static java.util.Collections.EMPTY_SET;
 
@@ -19,14 +18,14 @@ import static java.util.Collections.EMPTY_SET;
 @Slf4j
 public class SessionTest {
 
-    private Set<Long> roles;
     private Session sesssion0;
     private Session sesssion1;
+    private List<Long> roles;
 
     @Before
     public void before() {
         this.sesssion0 = new Session(true);
-        this.roles = Arrays.asList(1L, 2L, 3L).stream().collect(Collectors.toSet());
+        this.roles = Arrays.asList(1L, 2L, 3L);
         this.sesssion1 = new Session(false, roles);
     }
 

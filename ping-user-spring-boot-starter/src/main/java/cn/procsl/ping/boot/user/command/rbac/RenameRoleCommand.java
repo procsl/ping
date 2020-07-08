@@ -1,6 +1,8 @@
 package cn.procsl.ping.boot.user.command.rbac;
 
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -13,7 +15,9 @@ import static cn.procsl.ping.boot.user.domain.rbac.entity.Role.NAME_LENGTH;
  * @author procsl
  * @date 2020/07/08
  */
-@Value
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class RenameRoleCommand implements Serializable {
 
     @NotNull Long roleId;

@@ -4,6 +4,7 @@ import cn.procsl.ping.boot.data.business.BusinessException;
 import cn.procsl.ping.boot.user.command.rbac.PermissionCommand;
 import cn.procsl.ping.boot.user.domain.rbac.entity.Permission;
 import cn.procsl.ping.boot.user.domain.rbac.entity.Role;
+import cn.procsl.ping.boot.user.service.res.ResourceService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -7,6 +7,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Set;
 
 import static cn.procsl.ping.boot.data.business.entity.GeneralEntity.GENERAL_ENTITY_ID_LENGTH;
@@ -48,7 +49,7 @@ public class Session implements Serializable {
         this.active = active;
     }
 
-    public Session(boolean active, Set<Long> roles) {
+    public Session(boolean active, Collection<Long> roles) {
         this(active);
         this.roles = CollectionUtils.createAndAppend(this.roles, roles);
     }
