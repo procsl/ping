@@ -3,7 +3,6 @@ package cn.procsl.ping.app.admin.index;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,11 +20,6 @@ public class IndexController {
 
     @Autowired
     HttpServletRequest request;
-//
-//    {
-//        String[] SESSION_ID = new String[]{"jsessionid", "[SESSION_ID]"};
-//        String[] setting = new String[]{"setting", "[SESSION_ID]"};
-//    }
 
     @GetMapping
     public void index(HttpSession session, HttpServletResponse response) throws IOException {
