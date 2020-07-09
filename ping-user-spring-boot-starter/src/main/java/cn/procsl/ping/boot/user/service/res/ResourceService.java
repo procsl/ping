@@ -1,8 +1,14 @@
 package cn.procsl.ping.boot.user.service.res;
 
 import cn.procsl.ping.boot.data.business.BusinessException;
+import cn.procsl.ping.boot.user.command.res.ChangeNameCommand;
+import cn.procsl.ping.boot.user.command.res.ChangeParentCommand;
+import cn.procsl.ping.boot.user.command.res.ChangeTypeCommand;
+import cn.procsl.ping.boot.user.command.res.CreateCommand;
+import cn.procsl.ping.boot.user.domain.res.entity.QResource;
 import cn.procsl.ping.boot.user.domain.res.entity.Resource;
-import cn.procsl.ping.boot.user.domain.res.entity.ResourceType;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
@@ -13,10 +19,10 @@ import org.springframework.validation.annotation.Validated;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.Set;
 
 import static cn.procsl.ping.boot.user.domain.res.entity.ResourceTreeNode.isRoot;
 
@@ -42,22 +48,19 @@ public class ResourceService {
     /**
      * 创建资源
      *
-     * @param name     资源名称
-     * @param type     资源类型
-     * @param parentId 父资源ID
-     * @param depends  依赖的资源IDs
+     * @param command 创建资源
      * @return 返回创建成功后的资源ID
      * @throws BusinessException 创建失败抛出此异常
      */
-    public Long create(@NotBlank @Size(max = 20, min = 1) String name, @NotNull ResourceType type, Long parentId, Set<Long> depends) throws BusinessException {
-        this.checkNameable(name);
+    public Long create(@NonNull @Valid CreateCommand command) throws BusinessException {
+        this.checkNameable(command.getName());
 
         Resource resource = Resource
                 .creator()
-                .name(name)
-                .parentId(parentId)
-                .type(type)
-                .depends(depends)
+                .name(command.getName())
+                .parentId(command.getParentId())
+                .type(command.getType())
+                .depends(command.getDepends())
                 .done();
         resourceJpaRepository.save(resource);
         return resource.getId();
@@ -73,59 +76,50 @@ public class ResourceService {
         resourceJpaRepository.deleteById(resourceId);
     }
 
-    /**
-     * 加载资源
-     *
-     * @param resourceId 资源ID
-     * @return 返回被加载的资源
-     * @throws BusinessException 如果加载的资源不存在则抛出异常
-     */
-    public Resource load(@NotNull Long resourceId) throws BusinessException {
+    Resource load(@NotNull Long resourceId) throws BusinessException {
         return resourceJpaRepository.findById(resourceId).orElseThrow(() -> new BusinessException("资源不存在"));
     }
 
     /**
      * 修改资源类型
      *
-     * @param resourceId 资源ID
-     * @param type       资源类型
+     * @param command 修改资源类型
      * @throws BusinessException 当资源未找到时
      */
-    public void changeType(@NotNull Long resourceId, @NotNull ResourceType type) throws BusinessException {
-        Resource resource = load(resourceId);
-        if (type == resource.getType()) {
+    public void changeType(@NonNull @Valid ChangeTypeCommand command) throws BusinessException {
+        Resource resource = load(command.getResourceId());
+        if (command.getType() == resource.getType()) {
             return;
         }
-        resource.changeType(type);
+        resource.changeType(command.getType());
         resourceJpaRepository.save(resource);
     }
 
     /**
      * 修改资源父节点
      *
-     * @param resourceId 资源ID
-     * @param parentId   父资源
+     * @param command 修改资源节点
      * @throws BusinessException 当资源未找到时
      */
-    public void changeParent(@NotNull Long resourceId, Long parentId) throws BusinessException {
-        Resource resource = load(resourceId);
+    public void changeParent(@NonNull @Valid ChangeParentCommand command) throws BusinessException {
+        Resource resource = load(command.getResourceId());
 
         do {
-            if (ObjectUtils.nullSafeEquals(resource.getNode().getParentId(), parentId)) {
+            if (ObjectUtils.nullSafeEquals(resource.getNode().getParentId(), command.getParentId())) {
                 return;
             }
 
-            if (isRoot(parentId)) {
+            if (isRoot(command.getParentId())) {
                 break;
             }
 
-            if (!this.resourceJpaRepository.existsById(parentId)) {
+            if (!this.resourceJpaRepository.existsById(command.getParentId())) {
                 throw new BusinessException("parent 不存在");
             }
 
         } while (false);
 
-        resource.changeParentNode(parentId);
+        resource.changeParentNode(command.getParentId());
 
         resourceJpaRepository.save(resource);
     }
@@ -133,31 +127,30 @@ public class ResourceService {
     /**
      * 修改名称
      *
-     * @param resourceId 资源ID
-     * @param name       资源名称
+     * @param command 修改名称对象
      * @throws BusinessException 当资源未找到时
      */
-    public void changeName(@NotNull Long resourceId, @NotBlank @Size(max = 20, min = 1) String name) throws BusinessException {
+    public void changeName(@NonNull @Valid ChangeNameCommand command) throws BusinessException {
 
-        Resource resource = load(resourceId);
-        if (resource.getName().equals(name)) {
+        Resource resource = load(command.getResourceId());
+        if (resource.getName().equals(command.getName())) {
             return;
         }
 
-        this.checkNameable(name);
+        this.checkNameable(command.getName());
 
-        resource.rename(name);
+        resource.rename(command.getName());
         resourceJpaRepository.save(resource);
     }
 
     /**
      * 校验名称是否存在
      *
-     * @param name 名称
+     * @param command 名称
      * @throws BusinessException 如果资源名称存在抛出异常
      */
-    public void checkNameable(@NotNull Long resourceId, @NotBlank @Size(min = 1, max = 20) String name) throws BusinessException {
-        if (existsName(resourceId, name)) {
+    public void checkNameable(@NonNull @Valid ChangeNameCommand command) throws BusinessException {
+        if (existsName(command)) {
             throw new BusinessException("资源名称已存在");
         }
     }
@@ -169,29 +162,27 @@ public class ResourceService {
      * @throws BusinessException
      */
     public void checkNameable(@NotBlank @Size(max = 20, min = 1) String name) throws BusinessException {
-//        boolean exists = resourceQueryDslPredicateExecutor.exists(QResource.resource.name.eq(name));
-//        if (exists) {
-//            throw new BusinessException("资源名称已存在");
-//        }
+        boolean exists = resourceQueryDslPredicateExecutor.exists(QResource.resource.name.eq(name));
+        if (exists) {
+            throw new BusinessException("资源名称已存在");
+        }
     }
 
     /**
      * 检查名称是否存在
      *
-     * @param resourceId 资源ID
-     * @param name       资源名称
+     * @param command 资源名称
      * @return 如果存在返回true
      */
-    public boolean existsName(@NotNull Long resourceId, @NotBlank @Size(max = 20, min = 1) String name) {
+    public boolean existsName(@Valid @NonNull ChangeNameCommand command) {
 
-//        BooleanExpression eqName = QResource.resource.name.eq(name);
+        BooleanExpression eqName = QResource.resource.name.eq(command.getName());
 
-//        boolean isEq = this.resourceQueryDslPredicateExecutor.exists(QResource.resource.id.eq(resourceId).and(eqName));
-//        if (isEq) {
-//            return false;
-//        }
-//        return this.resourceQueryDslPredicateExecutor.exists(eqName);
-        return false;
+        boolean isEq = this.resourceQueryDslPredicateExecutor.exists(QResource.resource.id.eq(command.getResourceId()).and(eqName));
+        if (isEq) {
+            return false;
+        }
+        return this.resourceQueryDslPredicateExecutor.exists(eqName);
     }
 
     /**
