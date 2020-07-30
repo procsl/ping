@@ -2,12 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-        <modelVersion>4.0.0</modelVersion>
-<!--    <parent>-->
-<!--        <artifactId>ping</artifactId>-->
-<!--        <groupId>cn.procsl</groupId>-->
-<!--        <version>0.0.1-SNAPSHOT</version>-->
-<!--    </parent>-->
+    <modelVersion>4.0.0</modelVersion>
+    <!--    <parent>-->
+    <!--        <artifactId>ping</artifactId>-->
+    <!--        <groupId>cn.procsl</groupId>-->
+    <!--        <version>0.0.1-SNAPSHOT</version>-->
+    <!--    </parent>-->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -20,9 +20,9 @@
     <packaging>jar</packaging>
 
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.compilerVersion>11</maven.compiler.compilerVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
