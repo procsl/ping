@@ -18,11 +18,14 @@
     </properties>
 
     <modules>
-        <module>../../ping-business-tools</module>
         <module>../../ping-admin-app</module>
         <module>../../ping-meta-apt</module>
         <module>../../ping-demo-meta</module>
-        <module>../starter</module>
+        <module>../../ping-business-tools</module>
+        <module>../../ping-rest-spring-boot-starter</module>
+        <module>../../ping-doc-spring-boot-starter</module>
+        <module>../../ping-domain-spring-boot-starter</module>
+        <module>../../ping-user-spring-boot-starter</module>
     </modules>
     <name>all</name>
 

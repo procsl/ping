@@ -1,1 +1,1 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=cn.procsl.ping.boot.data.config.DataAutoConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=cn.procsl.ping.boot.domain.config.DataAutoConfiguration

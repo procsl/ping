@@ -177,6 +177,7 @@
                     </generatedSourcesDirectory>
                     <!--保留参数名称-->
                     <compilerArgument>-parameters</compilerArgument>
+                    <compilerArgument>-Xlint:unchecked</compilerArgument>
                     <compilerVersion>${compiler.version}</compilerVersion>
                 </configuration>
             </plugin>

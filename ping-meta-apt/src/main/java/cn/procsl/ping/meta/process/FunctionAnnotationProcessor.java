@@ -6,9 +6,8 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic;
+import java.util.Collections;
 import java.util.Set;
-
-import static java.util.Collections.EMPTY_SET;
 
 /**
  * 注解功能处理器
@@ -25,8 +24,7 @@ public class FunctionAnnotationProcessor extends AbstractProcessor {
     @Override
     public Set<String> getSupportedAnnotationTypes() {
         messager.printMessage(Diagnostic.Kind.NOTE, "getSupportedAnnotationTypes");
-//        return Collections.singleton(Extends.class.getName());
-        return EMPTY_SET;
+        return Collections.emptySet();
     }
 
     @Override

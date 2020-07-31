@@ -20,8 +20,8 @@ spring:
     #hibernate配
     hibernate:
       naming:
-        physical-strategy: cn.procsl.ping.boot.data.naming.LowCasePhysicalNamingStrategy
-        implicit-strategy: cn.procsl.ping.boot.data.naming.NameImplicitNamingStrategy
+        physical-strategy: cn.procsl.ping.boot.domain.naming.LowCasePhysicalNamingStrategy
+        implicit-strategy: cn.procsl.ping.boot.domain.naming.NameImplicitNamingStrategy
       use-new-id-generator-mappings: true
       ddl-auto: update
 

@@ -1,10 +1,9 @@
 package cn.procsl.ping.business.tools;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
-import static java.util.Collections.EMPTY_LIST;
 
 /**
  * @author procsl
@@ -30,7 +29,7 @@ public abstract class AbstractTree<K extends Serializable, V> implements Tree<K,
 
         List<Tree<K, V>> child = this.child();
         if (child == null) {
-            return EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         // 从一级层面搜索

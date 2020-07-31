@@ -2,10 +2,9 @@ package cn.procsl.ping.boot.rest.utils;
 
 import org.springframework.http.MediaType;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import static java.util.Collections.EMPTY_MAP;
 
 /**
  * @author procsl
@@ -20,7 +19,7 @@ public class MediaTypeUtils {
 
     public static Map<String, String> parameters(String... kv) {
         if (kv == null || kv.length == 0) {
-            return EMPTY_MAP;
+            return Collections.emptyMap();
         }
 
         if (kv.length / 2 == 0) {

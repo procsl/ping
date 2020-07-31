@@ -1,6 +1,6 @@
 package cn.procsl.ping.demo.domain.entity;
 
-import cn.procsl.ping.boot.data.annotation.CreateRepository;
+import cn.procsl.ping.boot.domain.annotation.CreateRepository;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

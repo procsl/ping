@@ -6,11 +6,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHan
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.List;
-
-import static java.util.Collections.EMPTY_LIST;
-
-//import ;
 
 /**
  * @author procsl
@@ -54,7 +51,7 @@ public class SpringWrapperUtil {
         } catch (IllegalAccessException e) {
         } catch (InvocationTargetException e) {
         }
-        return EMPTY_LIST;
+        return Collections.emptyList();
     }
 
 
