@@ -2,6 +2,7 @@ package cn.procsl.ping.boot.domain.config;
 
 import cn.procsl.ping.boot.domain.naming.LowCasePhysicalNamingStrategy;
 import cn.procsl.ping.boot.domain.naming.NameImplicitNamingStrategy;
+import cn.procsl.ping.boot.domain.support.exector.DomainRepositoryFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.repository.config.BootstrapMode;
 
 /**
  * 自动配置 用于注册加载时依赖注入和包扫描
@@ -21,16 +23,24 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
  * @date 2020/03/21
  */
 @Configuration
-@ConditionalOnMissingBean(DataAutoConfiguration.class)
-@EnableConfigurationProperties({DataProperties.class, HibernateProperties.class})
+@ConditionalOnMissingBean(DomainAutoConfiguration.class)
+@EnableConfigurationProperties({DomainProperties.class, HibernateProperties.class})
 @AutoConfigureBefore(JpaBaseConfiguration.class)
 @Slf4j
 @EnableJpaAuditing
-@EnableJpaRepositories(basePackages = "cn.procsl.ping.boot.domain.business.repository")
+@EnableJpaRepositories(basePackages = {
+        "cn.procsl.ping.boot.domain.business.repository",
+//        "cn.procsl.ping.boot.domain.support.jpa",
+//        "cn.procsl.ping.boot.domain.support.querydsl",
+//        "cn.procsl.ping.boot.domain.support.business"
+},
+        repositoryFactoryBeanClass = DomainRepositoryFactory.class,
+        bootstrapMode = BootstrapMode.LAZY
+)
 @EntityScan(basePackages = "cn.procsl.ping.boot.data.business.entity")
-public class DataAutoConfiguration {
+public class DomainAutoConfiguration {
 
-    final DataProperties dataProperties;
+    final DomainProperties dataProperties;
 
     final HibernateProperties hibernateProperties;
 
@@ -47,7 +57,7 @@ public class DataAutoConfiguration {
         return new LowCasePhysicalNamingStrategy(dataProperties);
     }
 
-    public DataAutoConfiguration(DataProperties dataProperties, HibernateProperties hibernateProperties) {
+    public DomainAutoConfiguration(DomainProperties dataProperties, HibernateProperties hibernateProperties) {
         this.dataProperties = dataProperties;
         this.hibernateProperties = hibernateProperties;
         String phy = hibernateProperties.getNaming().getImplicitStrategy();

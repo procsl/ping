@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.domain.naming;
 
-import cn.procsl.ping.boot.domain.config.DataProperties;
+import cn.procsl.ping.boot.domain.config.DomainProperties;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Converter;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 @RequiredArgsConstructor
 public class LowCasePhysicalNamingStrategy implements PhysicalNamingStrategy {
 
-    final DataProperties dataProperties;
+    final DomainProperties dataProperties;
 
     private Converter<String, String> converter = CaseFormat.LOWER_CAMEL.converterTo(CaseFormat.LOWER_UNDERSCORE);
 

@@ -12,7 +12,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "ping.data")
 @Getter
 @Setter
-public class DataProperties {
+public class DomainProperties {
 
     private String foreignKeyNamePrefix = "fk";
 

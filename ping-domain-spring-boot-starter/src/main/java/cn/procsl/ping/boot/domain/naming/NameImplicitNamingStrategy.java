@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.domain.naming;
 
-import cn.procsl.ping.boot.domain.config.DataProperties;
+import cn.procsl.ping.boot.domain.config.DomainProperties;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.boot.model.naming.*;
 
@@ -13,7 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NameImplicitNamingStrategy extends ImplicitNamingStrategyJpaCompliantImpl {
 
-    final DataProperties properties;
+    final DomainProperties properties;
 
     @Override
     public Identifier determineForeignKeyName(ImplicitForeignKeyNameSource source) {
