@@ -17,10 +17,10 @@ import java.util.Optional;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @Slf4j
-public class DataAutoConfigurationTest {
+public class DomainAutoConfigurationTest {
 
     @Inject
-    Optional<DataAutoConfiguration> dataAutoConfiguration;
+    Optional<DomainAutoConfiguration> dataAutoConfiguration;
 
     @Test
     public void test() {
