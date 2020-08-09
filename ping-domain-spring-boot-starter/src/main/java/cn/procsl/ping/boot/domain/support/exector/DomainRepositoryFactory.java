@@ -4,7 +4,6 @@ import cn.procsl.ping.boot.domain.support.business.AdjacencyTreeRepository;
 import cn.procsl.ping.boot.domain.support.jpa.PersistenceRepository;
 import cn.procsl.ping.boot.domain.support.querydsl.QueryDslPersistenceRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.jpa.provider.QueryExtractor;
 import org.springframework.data.jpa.repository.query.EscapeCharacter;
 import org.springframework.data.jpa.repository.support.CrudMethodMetadata;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
@@ -41,8 +40,8 @@ public class DomainRepositoryFactory extends JpaRepositoryFactory {
 
         JpaEntityInformation<?, Serializable> entityInformation = getEntityInformation(metadata.getDomainType());
 
-        QueryExtractor queryExtractor = findField(JpaRepositoryFactory.class,
-                this, "extractor", QueryExtractor.class);
+//        QueryExtractor queryExtractor = findField(JpaRepositoryFactory.class,
+//                this, "extractor", QueryExtractor.class);
 
         EntityManager entityManager = findField(JpaRepositoryFactory.class,
                 this, "entityManager", EntityManager.class);

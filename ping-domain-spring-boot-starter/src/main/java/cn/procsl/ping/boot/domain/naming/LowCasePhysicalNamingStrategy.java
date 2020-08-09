@@ -17,7 +17,7 @@ public class LowCasePhysicalNamingStrategy implements PhysicalNamingStrategy {
 
     final DomainProperties dataProperties;
 
-    private Converter<String, String> converter = CaseFormat.LOWER_CAMEL.converterTo(CaseFormat.LOWER_UNDERSCORE);
+    private final Converter<String, String> converter = CaseFormat.LOWER_CAMEL.converterTo(CaseFormat.LOWER_UNDERSCORE);
 
     @Override
     public Identifier toPhysicalCatalogName(Identifier name, JdbcEnvironment jdbcEnvironment) {

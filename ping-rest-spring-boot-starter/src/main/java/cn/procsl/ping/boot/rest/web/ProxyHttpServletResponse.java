@@ -20,7 +20,7 @@ public enum ProxyHttpServletResponse implements HttpServletResponse {
     INSTANCE;
 
 
-    private ProxyHttpServletResponse() {
+    ProxyHttpServletResponse() {
     }
 
     @Override
