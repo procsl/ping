@@ -12,7 +12,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 public class PagingAndSortingRepositoryBuilder extends EntityAndIdRepositoryBuilder {
 
     @Override
-    protected Class getSupportRepositoryClass() {
+    protected Class<PagingAndSortingRepository> getSupportRepositoryClass() {
         return PagingAndSortingRepository.class;
     }
 }

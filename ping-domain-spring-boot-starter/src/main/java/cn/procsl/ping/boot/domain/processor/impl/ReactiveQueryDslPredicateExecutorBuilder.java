@@ -9,7 +9,7 @@ import org.springframework.data.querydsl.ReactiveQuerydslPredicateExecutor;
  */
 public class ReactiveQueryDslPredicateExecutorBuilder extends EntityRepositoryBuilder {
     @Override
-    protected Class getSupportRepositoryClass() {
+    protected Class<ReactiveQuerydslPredicateExecutor> getSupportRepositoryClass() {
         return ReactiveQuerydslPredicateExecutor.class;
     }
 }

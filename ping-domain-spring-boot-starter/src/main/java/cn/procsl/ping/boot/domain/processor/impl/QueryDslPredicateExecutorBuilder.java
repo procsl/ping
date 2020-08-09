@@ -10,7 +10,7 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 public class QueryDslPredicateExecutorBuilder extends EntityRepositoryBuilder {
 
     @Override
-    protected Class getSupportRepositoryClass() {
+    protected Class<QuerydslPredicateExecutor> getSupportRepositoryClass() {
         return QuerydslPredicateExecutor.class;
     }
 }

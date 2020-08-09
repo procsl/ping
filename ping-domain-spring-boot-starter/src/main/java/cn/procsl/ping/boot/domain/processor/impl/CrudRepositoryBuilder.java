@@ -9,7 +9,7 @@ import org.springframework.data.repository.CrudRepository;
  */
 public class CrudRepositoryBuilder extends EntityAndIdRepositoryBuilder {
     @Override
-    protected Class getSupportRepositoryClass() {
+    protected Class<CrudRepository> getSupportRepositoryClass() {
         return CrudRepository.class;
     }
 }

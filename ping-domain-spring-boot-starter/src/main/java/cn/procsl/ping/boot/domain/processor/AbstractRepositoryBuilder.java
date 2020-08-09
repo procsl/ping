@@ -19,7 +19,7 @@ public abstract class AbstractRepositoryBuilder implements RepositoryBuilder {
      *
      * @return 返回支持的Repository 对象
      */
-    protected abstract Class getSupportRepositoryClass();
+    protected abstract Class<?> getSupportRepositoryClass();
 
     @Override
     public boolean support(String className) {

@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public class JpaRepositoryBuilder extends EntityAndIdRepositoryBuilder {
     @Override
-    protected Class getSupportRepositoryClass() {
+    protected Class<JpaRepository> getSupportRepositoryClass() {
         return JpaRepository.class;
     }
 }

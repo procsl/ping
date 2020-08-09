@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  */
 public class JpaSpecificationExecutorBuilder extends EntityRepositoryBuilder {
     @Override
-    protected Class getSupportRepositoryClass() {
+    protected Class<JpaSpecificationExecutor> getSupportRepositoryClass() {
         return JpaSpecificationExecutor.class;
     }
 }
