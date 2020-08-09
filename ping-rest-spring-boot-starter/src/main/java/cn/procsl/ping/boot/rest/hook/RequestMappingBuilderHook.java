@@ -30,9 +30,9 @@ public class RequestMappingBuilderHook implements RegisterMappingHook {
 
     private final RestWebProperties properties;
 
-    private String[] consumer;
+    private final String[] consumer;
 
-    private String[] product;
+    private final String[] product;
 
     public RequestMappingBuilderHook(RestWebProperties properties, Map<RestWebProperties.MetaMediaType, List<MediaType>> mediaTypes) {
         this.properties = properties;

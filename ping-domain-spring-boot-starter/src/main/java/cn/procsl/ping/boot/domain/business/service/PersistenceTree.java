@@ -13,7 +13,7 @@ import java.util.LinkedList;
  */
 abstract class PersistenceTree<K extends Serializable, V> extends AbstractTree<K, V> {
 
-    private boolean load = false;
+    private final boolean load = false;
 
     private K key;
 

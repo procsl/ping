@@ -27,7 +27,7 @@ public class RestExtensionContentNegotiationStrategy implements ContentNegotiati
 
     private final EnumMap<RestWebProperties.MetaMediaType, List<MediaType>> mediaTypes;
 
-    private String content = "format";
+    private final String content = "format";
 
     @Setter
     private ServletContext servletContext;

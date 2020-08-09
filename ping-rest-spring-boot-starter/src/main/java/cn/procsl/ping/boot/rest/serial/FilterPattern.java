@@ -125,11 +125,8 @@ public class FilterPattern {
         // map中存在该节点
         if (bool) {
             // 最后的节点
-            if (map.get(key) == null) {
-                return false;
-            }
+            return map.get(key) != null;
             // 非最后的节点, 说明map还有子节点
-            return true;
         }
 
         // map中不存在该节点
