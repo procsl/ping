@@ -1,5 +1,6 @@
-package cn.procsl.ping.boot.domain.support;
+package cn.procsl.ping.boot.domain.support.exector;
 
+import cn.procsl.ping.boot.domain.support.jpa.PersistenceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +19,7 @@ import javax.persistence.EntityManager;
 @Slf4j
 @RequiredArgsConstructor
 @Transactional
-public class PersistenceExecutorImpl<T, ID> implements PersistenceExecutor<T, ID> {
+public class PersistenceExecutor<T, ID> implements PersistenceRepository<T, ID> {
 
     private final JpaEntityInformation<T, ?> entityInformation;
     private final EntityManager em;

@@ -1,5 +1,6 @@
-package cn.procsl.ping.boot.domain.support.querydsl;
+package cn.procsl.ping.boot.domain.support.exector;
 
+import cn.procsl.ping.boot.domain.support.querydsl.QueryDslPersistenceRepository;
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
@@ -13,7 +14,7 @@ import javax.persistence.EntityManager;
  * @date 2020/04/13
  */
 @RequiredArgsConstructor
-public class QueryDslPersistenceExecutorImpl<T, ID> implements QueryDslPersistenceExecutor<T, ID> {
+public class QueryDslPersistenceExecutor<T, ID> implements QueryDslPersistenceRepository<T, ID> {
 
     final private EntityManager entityManager;
 

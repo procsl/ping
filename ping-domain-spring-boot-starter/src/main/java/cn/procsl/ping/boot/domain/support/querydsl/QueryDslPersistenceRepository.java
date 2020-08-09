@@ -10,7 +10,7 @@ import org.springframework.data.repository.Repository;
  * @date 2020/04/12
  */
 @NoRepositoryBean
-public interface QueryDslPersistenceExecutor<T, ID> extends Repository<T, ID> {
+public interface QueryDslPersistenceRepository<T, ID> extends Repository<T, ID> {
 
     /**
      * 根据条件 持久化 当前实体

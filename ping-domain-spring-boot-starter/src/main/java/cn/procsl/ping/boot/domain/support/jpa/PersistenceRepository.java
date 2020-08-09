@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.domain.support;
+package cn.procsl.ping.boot.domain.support.jpa;
 
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.Repository;
@@ -8,6 +8,6 @@ import org.springframework.data.repository.Repository;
  * @date 2020/04/12
  */
 @NoRepositoryBean
-public interface PersistenceExecutor<T, ID> extends Repository<T, ID> {
+public interface PersistenceRepository<T, ID> extends Repository<T, ID> {
 
 }
