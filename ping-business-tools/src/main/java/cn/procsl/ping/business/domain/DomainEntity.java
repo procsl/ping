@@ -9,5 +9,7 @@ import java.io.Serializable;
  * @date 2020/07/28
  */
 public interface DomainEntity extends Serializable {
-    int GENERAL_ENTITY_ID_LENGTH = 20;
+    int LONG_ID_LENGTH = 20;
+
+    int UUID_LENGTH = 32;
 }
