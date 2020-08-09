@@ -27,8 +27,8 @@ public interface AdjacencyTreeRepository<T extends AdjacencyNode, ID> extends Re
     /**
      * 查询指定节点的所有子节点
      *
-     * @param id
-     * @return
+     * @param id 指定的id
+     * @return 返回子节点stream
      */
     Stream<T> children(ID id);
 

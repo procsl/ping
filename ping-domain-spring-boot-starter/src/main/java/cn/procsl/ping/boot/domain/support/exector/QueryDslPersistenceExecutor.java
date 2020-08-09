@@ -4,8 +4,14 @@ import cn.procsl.ping.boot.domain.support.querydsl.QueryDslPersistenceRepository
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
-import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.querydsl.core.types.dsl.PathBuilder;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.provider.PersistenceProvider;
+import org.springframework.data.jpa.repository.query.EscapeCharacter;
+import org.springframework.data.jpa.repository.support.CrudMethodMetadata;
+import org.springframework.data.jpa.repository.support.JpaEntityInformation;
+import org.springframework.data.jpa.repository.support.Querydsl;
+import org.springframework.data.querydsl.EntityPathResolver;
 
 import javax.persistence.EntityManager;
 
@@ -14,18 +20,43 @@ import javax.persistence.EntityManager;
  * @date 2020/04/13
  */
 @RequiredArgsConstructor
-public class QueryDslPersistenceExecutor<T, ID> implements QueryDslPersistenceRepository<T, ID> {
+class QueryDslPersistenceExecutor<T, ID> implements QueryDslPersistenceRepository<T, ID> {
 
-    final private EntityManager entityManager;
+    final JpaEntityInformation<T, ?> entityInformation;
 
-    final private JPAQueryFactory queryFactory;
+    final EntityManager em;
 
-    final private EntityPath<T> fullPath;
+    final PersistenceProvider provider;
+
+    final CrudMethodMetadata metadata;
+
+    final EscapeCharacter escapeCharacter;
+
+    final EntityPathResolver resolver;
+
+    final EntityPath<T> fullPath;
+
+    final Querydsl querydsl;
+
+    public QueryDslPersistenceExecutor(JpaEntityInformation<T, ?> entityInformation,
+                                       EntityManager em,
+                                       CrudMethodMetadata metadata,
+                                       EscapeCharacter escapeCharacter,
+                                       EntityPathResolver resolver
+    ) {
+        this.entityInformation = entityInformation;
+        this.em = em;
+        this.provider = PersistenceProvider.fromEntityManager(em);
+        this.metadata = metadata;
+        this.escapeCharacter = escapeCharacter;
+        this.resolver = resolver;
+        this.fullPath = resolver.createPath(entityInformation.getJavaType());
+        this.querydsl = new Querydsl(em, new PathBuilder<T>(fullPath.getType(), fullPath.getMetadata()));
+    }
 
     @Override
     public long update(T entity, Predicate predicate) {
-//        new PathBuilder(fullPath.getMetadata(),).as(entity.getClass());
-        return queryFactory.update(fullPath).set(fullPath, entity).where(predicate).execute();
+        return 0;
     }
 
     @Override

@@ -1,8 +1,6 @@
 package cn.procsl.ping.boot.domain.support.exector;
 
 import cn.procsl.ping.boot.domain.support.jpa.PersistenceRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.provider.PersistenceProvider;
 import org.springframework.data.jpa.repository.query.EscapeCharacter;
@@ -17,16 +15,29 @@ import javax.persistence.EntityManager;
  * @date 2020/04/12
  */
 @Slf4j
-@RequiredArgsConstructor
 @Transactional
-public class PersistenceExecutor<T, ID> implements PersistenceRepository<T, ID> {
+class PersistenceExecutor<T, ID> implements PersistenceRepository<T, ID> {
 
     private final JpaEntityInformation<T, ?> entityInformation;
+
     private final EntityManager em;
+
     private final PersistenceProvider provider;
 
-    @Setter
-    private CrudMethodMetadata metadata;
+    private final CrudMethodMetadata metadata;
 
-    private EscapeCharacter escapeCharacter = EscapeCharacter.DEFAULT;
+    private final EscapeCharacter escapeCharacter;
+
+    public PersistenceExecutor(JpaEntityInformation<T, ?> entityInformation,
+                               EntityManager em,
+                               CrudMethodMetadata metadata,
+                               EscapeCharacter escapeCharacter) {
+        this.entityInformation = entityInformation;
+        this.em = em;
+        this.metadata = metadata;
+        this.escapeCharacter = escapeCharacter;
+        this.provider = PersistenceProvider.fromEntityManager(em);
+    }
+
+
 }
