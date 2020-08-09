@@ -40,7 +40,7 @@
             <artifactId>lombok</artifactId>
             <optional>true</optional>
             <scope>compile</scope>
-            <version>1.18.10</version>
+            <version>1.18.12</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
