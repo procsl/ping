@@ -3,15 +3,10 @@ package cn.procsl.ping.boot.domain.support.exector;
 import cn.procsl.ping.boot.domain.business.entity.AdjacencyNode;
 import cn.procsl.ping.boot.domain.support.business.AdjacencyTreeRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.jpa.provider.PersistenceProvider;
-import org.springframework.data.jpa.repository.query.EscapeCharacter;
-import org.springframework.data.jpa.repository.support.CrudMethodMetadata;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -26,19 +21,6 @@ import java.util.stream.Stream;
 @NoRepositoryBean
 @Transactional(readOnly = true)
 public class AdjacencyTreeRepositoryImpl<T extends AdjacencyNode, ID> implements AdjacencyTreeRepository<T, ID> {
-
-//    private final JpaEntityInformation<T, ?> info;
-
-//    @PersistenceContext
-    private final EntityManager manager;
-
-    //    @Inject
-    private PersistenceProvider provider;
-
-    @Setter
-    private CrudMethodMetadata metadata;
-
-    private EscapeCharacter escapeCharacter = EscapeCharacter.DEFAULT;
 
     /**
      * 查询当前节点的父节点

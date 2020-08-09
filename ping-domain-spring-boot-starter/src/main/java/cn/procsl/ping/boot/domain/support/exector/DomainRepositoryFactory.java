@@ -1,57 +1,36 @@
 package cn.procsl.ping.boot.domain.support.exector;
 
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.data.jpa.repository.query.EscapeCharacter;
-import org.springframework.data.querydsl.EntityPathResolver;
-import org.springframework.data.querydsl.SimpleEntityPathResolver;
-import org.springframework.data.repository.Repository;
-import org.springframework.data.repository.core.support.TransactionalRepositoryFactoryBeanSupport;
-import org.springframework.lang.Nullable;
+import cn.procsl.ping.boot.domain.support.business.AdjacencyTreeRepository;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import org.springframework.data.jpa.repository.support.JpaRepositoryFactory;
+import org.springframework.data.repository.core.RepositoryMetadata;
+import org.springframework.data.repository.core.support.RepositoryComposition;
+import org.springframework.data.repository.core.support.RepositoryFragment;
 
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
-/**
- * @author procsl
- * @date 2020/08/03
- */
-public class DomainRepositoryFactory<T extends Repository<S, ID>, S, ID>
-        extends TransactionalRepositoryFactoryBeanSupport<T, S, ID> {
-
-    private @Nullable EntityManager entityManager;
-
-    private EntityPathResolver entityPathResolver;
-
-    private EscapeCharacter escapeCharacter = EscapeCharacter.DEFAULT;
+@Slf4j
+public class DomainRepositoryFactory extends JpaRepositoryFactory {
 
     /**
-     * Creates a new {@link TransactionalRepositoryFactoryBeanSupport} for the given repository interface.
+     * Creates a new {@link JpaRepositoryFactory}.
      *
-     * @param repositoryInterface must not be {@literal null}.
+     * @param entityManager must not be {@literal null}
      */
-    protected DomainRepositoryFactory(Class<? extends T> repositoryInterface) {
-        super(repositoryInterface);
+    public DomainRepositoryFactory(EntityManager entityManager) {
+        super(entityManager);
     }
 
     @Override
-    protected DomainRepositoryFactorySupport doCreateRepositoryFactory() {
-        DomainRepositoryFactorySupport support = new DomainRepositoryFactorySupport(this.entityManager);
-//        support.setEntityPathResolver(entityPathResolver);
-//        support.setEscapeCharacter(escapeCharacter);
-        return support;
+    protected RepositoryComposition.RepositoryFragments getRepositoryFragments(RepositoryMetadata metadata) {
+        log.info("build domain repositories");
+        val fragments = super.getRepositoryFragments(metadata);
+        boolean bool = AdjacencyTreeRepository.class.isAssignableFrom(metadata.getRepositoryInterface());
+        if (bool) {
+            Object fragment = getTargetRepositoryViaReflection(AdjacencyTreeRepositoryImpl.class);
+            return fragments.append(RepositoryFragment.implemented(fragment));
+        }
+        return fragments;
     }
-
-
-    @PersistenceContext
-    public void setEntityManager(EntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
-
-    @Inject
-    public void setEntityPathResolver(ObjectProvider<EntityPathResolver> resolver) {
-        this.entityPathResolver = resolver.getIfAvailable(() -> SimpleEntityPathResolver.INSTANCE);
-    }
-
 }
-

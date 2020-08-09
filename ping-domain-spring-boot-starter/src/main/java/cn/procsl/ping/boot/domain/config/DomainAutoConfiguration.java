@@ -2,7 +2,7 @@ package cn.procsl.ping.boot.domain.config;
 
 import cn.procsl.ping.boot.domain.naming.LowCasePhysicalNamingStrategy;
 import cn.procsl.ping.boot.domain.naming.NameImplicitNamingStrategy;
-import cn.procsl.ping.boot.domain.support.exector.DomainRepositoryFactory;
+import cn.procsl.ping.boot.domain.support.exector.DomainRepositoryFactoryBean;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -30,11 +30,8 @@ import org.springframework.data.repository.config.BootstrapMode;
 @EnableJpaAuditing
 @EnableJpaRepositories(basePackages = {
         "cn.procsl.ping.boot.domain.business.repository",
-//        "cn.procsl.ping.boot.domain.support.jpa",
-//        "cn.procsl.ping.boot.domain.support.querydsl",
-//        "cn.procsl.ping.boot.domain.support.business"
 },
-        repositoryFactoryBeanClass = DomainRepositoryFactory.class,
+        repositoryFactoryBeanClass = DomainRepositoryFactoryBean.class,
         bootstrapMode = BootstrapMode.LAZY
 )
 @EntityScan(basePackages = "cn.procsl.ping.boot.data.business.entity")
