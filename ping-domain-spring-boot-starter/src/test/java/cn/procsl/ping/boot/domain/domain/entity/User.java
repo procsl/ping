@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.domain.domain;
+package cn.procsl.ping.boot.domain.domain.entity;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -9,6 +9,8 @@ import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import java.util.Date;
+
+import static cn.procsl.ping.business.domain.DomainEntity.UUID_LENGTH;
 
 /**
  * 用户对实体对象
@@ -21,15 +23,15 @@ import java.util.Date;
 @Getter
 @Setter
 @NoArgsConstructor
-public class User{
+public class User {
 
     @Id
-    @Column(length = 32, updatable = false)
-    @GenericGenerator(name = "idGenerator", strategy = "uuid")
+    @Column(length = UUID_LENGTH)
+    @GenericGenerator(name = "idGenerator", strategy = "uuid2")
     @GeneratedValue(generator = "idGenerator")
     protected String id;
 
-    @Column(length = 15, nullable = false)
+    @Column(length = UUID_LENGTH, nullable = false)
     protected String name;
 
     @Version

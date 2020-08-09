@@ -1,5 +1,7 @@
 package cn.procsl.ping.boot.domain.business.entity;
 
+import cn.procsl.ping.business.domain.DomainEntity;
+
 import java.io.Serializable;
 import java.util.Set;
 
@@ -9,7 +11,7 @@ import java.util.Set;
  * @author procsl
  * @date 2020/07/29
  */
-public interface AdjacencyNode<ID extends Serializable> extends Serializable {
+public interface AdjacencyNode<ID extends Serializable> extends Serializable, DomainEntity {
 
     ID getId();
 
@@ -17,5 +19,5 @@ public interface AdjacencyNode<ID extends Serializable> extends Serializable {
 
     Integer getDepth();
 
-    Set<AdjacencyPathNode<ID>> getPath();
+    Set<? extends AdjacencyPathNode<ID>> getPath();
 }
