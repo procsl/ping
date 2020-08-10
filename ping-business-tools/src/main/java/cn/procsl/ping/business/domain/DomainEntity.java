@@ -12,4 +12,7 @@ public interface DomainEntity extends Serializable {
     int LONG_ID_LENGTH = 20;
 
     int UUID_LENGTH = 32;
+
+    int UUID_2_LENGTH = 36;
+
 }

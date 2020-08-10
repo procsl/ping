@@ -3,8 +3,10 @@ package cn.procsl.ping.boot.domain.support.exector;
 import cn.procsl.ping.boot.domain.business.entity.AdjacencyNode;
 import cn.procsl.ping.boot.domain.support.business.AdjacencyTreeRepository;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.data.jpa.provider.PersistenceProvider;
 import org.springframework.data.jpa.repository.query.EscapeCharacter;
+import org.springframework.data.jpa.repository.query.QueryUtils;
 import org.springframework.data.jpa.repository.support.CrudMethodMetadata;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.repository.NoRepositoryBean;
@@ -12,6 +14,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.FlushModeType;
+import javax.persistence.LockModeType;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -37,6 +41,10 @@ class AdjacencyTreeExecutor<T extends AdjacencyNode, ID> implements AdjacencyTre
     private final @Nullable
     CrudMethodMetadata metadata;
 
+    private final Class<T> javaType;
+
+    private final Class<?> idType;
+
     public AdjacencyTreeExecutor(JpaEntityInformation<T, ?> entityInformation,
                                  EntityManager em,
                                  EscapeCharacter escapeCharacter,
@@ -46,6 +54,8 @@ class AdjacencyTreeExecutor<T extends AdjacencyNode, ID> implements AdjacencyTre
         this.escapeCharacter = escapeCharacter;
         this.metadata = metadata;
         this.provider = PersistenceProvider.fromEntityManager(em);
+        javaType = this.entityInformation.getJavaType();
+        idType = this.entityInformation.getIdType();
     }
 
     /**
@@ -56,8 +66,13 @@ class AdjacencyTreeExecutor<T extends AdjacencyNode, ID> implements AdjacencyTre
      */
     @Override
     public Stream<T> parents(ID id) {
-        log.info("call parents");
-        return null;
+        String query = QueryUtils.getQueryString("FROM %s", javaType.getName());
+        val tmp = this.em
+                .createQuery(query, javaType)
+                .setLockMode(LockModeType.READ)
+                .setFlushMode(FlushModeType.AUTO)
+                .getResultStream();
+        return tmp;
     }
 
     @Override
