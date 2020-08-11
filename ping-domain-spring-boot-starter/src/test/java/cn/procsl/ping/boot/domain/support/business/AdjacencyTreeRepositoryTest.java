@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.domain.support.business;
 
+import cn.procsl.ping.boot.domain.domain.entity.QTreeEntity;
 import cn.procsl.ping.boot.domain.domain.entity.TreeEntity;
 import cn.procsl.ping.boot.domain.domain.repository.TreeEntityTestRepository;
 import cn.procsl.ping.boot.domain.support.exector.DomainRepositoryFactoryBean;
@@ -22,8 +23,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import static cn.procsl.ping.boot.domain.domain.entity.TreeEntity.root;
 
@@ -38,7 +39,7 @@ import static cn.procsl.ping.boot.domain.domain.entity.TreeEntity.root;
         bootstrapMode = BootstrapMode.LAZY
 )
 @EntityScan(basePackages = "cn.procsl.ping.boot.domain.domain.entity")
-@Rollback(false)
+@Rollback
 public class AdjacencyTreeRepositoryTest {
 
     @Inject
@@ -71,28 +72,50 @@ public class AdjacencyTreeRepositoryTest {
 
     @Before
     public void init() {
+        Optional<TreeEntity> optional = querydslPredicateExecutor.findOne(QTreeEntity.treeEntity.name.eq("root"));
+        if (optional.isPresent()) {
+            BeanUtils.copyProperties(optional.get(), root);
+            return;
+        }
 
         TreeEntity persistence = new TreeEntity();
         BeanUtils.copyProperties(root, persistence);
         jpaRepository.save(persistence);
         BeanUtils.copyProperties(persistence, root);
 
+        int context = 1;
         for (int i = 0; i < 500; i++) {
-            TreeEntity child = new TreeEntity();
-            child.fullByParent(root);
-            child.setName(FAKER.name().name());
-            TreeEntity entity = jpaRepository.save(child);
-            jpaRepository.save(entity);
+            create(root, context);
         }
+    }
+
+    private void create(TreeEntity parent, int context) {
+
+        log.info("{}context 递归{}:{}", getTab(context), context);
+        context++;
+
+        TreeEntity child = new TreeEntity();
+        child.fullByParent(parent);
+        child.setName(FAKER.name().name());
+        TreeEntity entity = jpaRepository.save(child);
+
+        if (FAKER.number().numberBetween(0, 9) < 3) {
+            log.info("{}context 回归:{}", getTab(context - 1), context);
+            return;
+        }
+        create(entity, context);
+    }
+
+    String getTab(int times) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < times; i++) {
+            builder.append('\t');
+        }
+        return builder.toString();
     }
 
     @Test
     public void parents() {
-        List<TreeEntity> all = jpaRepository.findAll();
-        for (TreeEntity entity : all) {
-            log.info(entity.toString());
-        }
-
         treeExecutor.parents("id");
     }
 

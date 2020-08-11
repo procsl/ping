@@ -23,7 +23,8 @@ public class PathNode implements AdjacencyPathNode<String>, DomainEntity {
     @Column(length = UUID_2_LENGTH)
     String pathId;
 
-    Integer seq;
+//    @OrderBy("seq ASC")
+Integer seq;
 
     /**
      * 转换

@@ -85,7 +85,7 @@ public class TreeEntity implements AdjacencyNode<String, PathNode> {
         String id = parentNode.getId();
         this.parentId = id;
 
-        Set<PathNode> pathNode = this.createPathBy(id);
+        Set<PathNode> pathNode = this.createPathBy(id, parentNode.getPath());
         this.path = pathNode;
 
         depth = pathNode.size();
