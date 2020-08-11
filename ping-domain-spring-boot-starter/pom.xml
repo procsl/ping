@@ -38,7 +38,6 @@
             <scope>compile</scope>
         </dependency>
 
-
         <!-- https://mvnrepository.com/artifact/com.squareup/javapoet -->
         <dependency>
             <groupId>com.squareup</groupId>
@@ -222,6 +221,7 @@
             <properties>
                 <profiles.active>h2</profiles.active>
             </properties>
+
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
@@ -248,6 +248,7 @@
                 </dependency>
             </dependencies>
         </profile>
+
     </profiles>
 
 </project>

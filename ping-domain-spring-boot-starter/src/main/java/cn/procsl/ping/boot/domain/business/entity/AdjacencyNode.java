@@ -4,7 +4,7 @@ import cn.procsl.ping.boot.domain.business.utils.CollectionUtils;
 import cn.procsl.ping.business.domain.DomainEntity;
 
 import javax.annotation.Nonnull;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
@@ -17,6 +17,7 @@ import java.util.Set;
  * @author procsl
  * @date 2020/07/29
  */
+@MappedSuperclass
 public interface AdjacencyNode<ID extends Serializable, T extends AdjacencyPathNode<ID>> extends Serializable, DomainEntity {
 
     ID getId();
@@ -25,6 +26,8 @@ public interface AdjacencyNode<ID extends Serializable, T extends AdjacencyPathN
 
     Integer getDepth();
 
+    @ElementCollection
+    @CollectionTable(joinColumns = @JoinColumn(name = "id"))
     Set<T> getPath();
 
     /**
@@ -62,7 +65,13 @@ public interface AdjacencyNode<ID extends Serializable, T extends AdjacencyPathN
         return newPaths;
     }
 
+    /**
+     * 创建路径节点实例方法
+     *
+     * @param parentId
+     * @param seq
+     * @return
+     */
     T createPathNode(ID parentId, Integer seq);
-
 
 }

@@ -1,5 +1,7 @@
 package cn.procsl.ping.boot.domain.business.entity;
 
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.OrderBy;
 import java.io.Serializable;
 
@@ -9,7 +11,18 @@ import java.io.Serializable;
  * @author procsl
  * @date 2020/07/29
  */
+@MappedSuperclass
 public interface AdjacencyPathNode<ID extends Serializable> extends Serializable {
+
+    /**
+     * 绑定的treeId
+     *
+     * @return
+     */
+    @Column(updatable = false, insertable = false)
+    default ID getId() {
+        return null;
+    }
 
     /**
      * 路径树 父节点ID
@@ -23,7 +36,7 @@ public interface AdjacencyPathNode<ID extends Serializable> extends Serializable
      *
      * @return
      */
-    @OrderBy("seq asc")
+    @OrderBy("asc")
     Integer getSeq();
 
 }
