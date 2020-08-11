@@ -6,6 +6,7 @@ import cn.procsl.ping.business.domain.DomainEntity;
 import javax.annotation.Nonnull;
 import javax.persistence.Transient;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -49,13 +50,14 @@ public interface AdjacencyNode<ID extends Serializable, T extends AdjacencyPathN
      *
      * @return 返回追加成功的节点集合
      */
-    default Set<T> createPathBy(ID parentId) {
+    default Set<T> createPathBy(ID parentId, Collection<T> path) {
         if (isRoot()) {
             return Collections.emptySet();
         }
-        int seq = CollectionUtils.isEmpty(this.getPath()) ? 0 : this.getPath().size();
+        int seq = CollectionUtils.isEmpty(path) ? 0 : path.size();
 
         Set<T> newPaths = new HashSet<>(seq + 1);
+        newPaths.addAll(path);
         newPaths.add(this.createPathNode(parentId, seq + 1));
         return newPaths;
     }

@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.domain.business.entity;
 
+import javax.persistence.OrderBy;
 import java.io.Serializable;
 
 /**
@@ -22,6 +23,7 @@ public interface AdjacencyPathNode<ID extends Serializable> extends Serializable
      *
      * @return
      */
+    @OrderBy("seq asc")
     Integer getSeq();
 
 }
