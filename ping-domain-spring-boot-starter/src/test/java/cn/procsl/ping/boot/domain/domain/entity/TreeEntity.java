@@ -72,12 +72,8 @@ public class TreeEntity implements AdjacencyNode<String, PathNode> {
     Integer depth;
 
     @ElementCollection
+    @CollectionTable(joinColumns = @JoinColumn(name = "id"))
     Set<PathNode> path;
-
-    @Override
-    public Set<PathNode> getPath() {
-        return path;
-    }
 
     @Override
     public void fullByParent(@NonNull AdjacencyNode<String, PathNode> parentNode) {
@@ -117,6 +113,5 @@ public class TreeEntity implements AdjacencyNode<String, PathNode> {
     public PathNode createPathNode(String parentId, Integer seq) {
         return new PathNode(parentId, seq);
     }
-
 
 }

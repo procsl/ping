@@ -2,6 +2,7 @@ package cn.procsl.ping.boot.domain.support.business;
 
 import cn.procsl.ping.boot.domain.domain.entity.QTreeEntity;
 import cn.procsl.ping.boot.domain.domain.entity.TreeEntity;
+import cn.procsl.ping.boot.domain.domain.repository.AdjacencyTreeRepositoryTestRepository;
 import cn.procsl.ping.boot.domain.domain.repository.TreeEntityTestRepository;
 import cn.procsl.ping.boot.domain.support.exector.DomainRepositoryFactoryBean;
 import com.github.javafaker.Faker;
@@ -39,7 +40,7 @@ import static cn.procsl.ping.boot.domain.domain.entity.TreeEntity.root;
         bootstrapMode = BootstrapMode.LAZY
 )
 @EntityScan(basePackages = "cn.procsl.ping.boot.domain.domain.entity")
-@Rollback
+@Rollback(value = false)
 public class AdjacencyTreeRepositoryTest {
 
     @Inject
@@ -53,6 +54,9 @@ public class AdjacencyTreeRepositoryTest {
 
     @Inject
     TreeEntityTestRepository treeEntityRepository;
+
+    @Inject
+    AdjacencyTreeRepositoryTestRepository adjacencyTreeRepositoryTestRepository;
 
     private static final Faker FAKER;
 
@@ -84,7 +88,7 @@ public class AdjacencyTreeRepositoryTest {
         BeanUtils.copyProperties(persistence, root);
 
         int context = 1;
-        for (int i = 0; i < 500; i++) {
+        for (int i = 0; i < 5; i++) {
             create(root, context);
         }
     }
@@ -115,7 +119,15 @@ public class AdjacencyTreeRepositoryTest {
     }
 
     @Test
+    public void query() {
+        adjacencyTreeRepositoryTestRepository.parentTrees();
+    }
+
+    @Test
     public void parents() {
+
+//        QTreeEntity.treeEntity
+//        querydslPredicateExecutor.findAll();
         treeExecutor.parents("id");
     }
 
