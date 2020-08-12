@@ -4,6 +4,7 @@ import cn.procsl.ping.boot.domain.business.entity.AdjacencyNode;
 import cn.procsl.ping.boot.domain.business.entity.AdjacencyPathNode;
 import cn.procsl.ping.boot.domain.support.business.AdjacencyTreeRepository;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.core.ResolvableType;
 import org.springframework.data.jpa.provider.PersistenceProvider;
 import org.springframework.data.jpa.repository.query.EscapeCharacter;
@@ -14,6 +15,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.FlushModeType;
+import javax.persistence.LockModeType;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -30,7 +33,7 @@ class AdjacencyTreeExecutor<T extends AdjacencyNode, ID> implements AdjacencyTre
 
     final JpaEntityInformation<T, ?> entityInformation;
 
-    final EntityManager em;
+    final EntityManager entityManager;
 
     final PersistenceProvider provider;
 
@@ -45,17 +48,17 @@ class AdjacencyTreeExecutor<T extends AdjacencyNode, ID> implements AdjacencyTre
 
     final Class<? extends AdjacencyPathNode> pathNodeType;
 
-    final String query = "select A from %s A inner join %s B on A.id = B.pathId where B. =:parent_id order by B.seq asc";
+    final String query;
 
     public AdjacencyTreeExecutor(JpaEntityInformation<T, ?> entityInformation,
-                                 EntityManager em,
+                                 EntityManager entityManager,
                                  EscapeCharacter escapeCharacter,
                                  @Nullable CrudMethodMetadata metadata) {
         this.entityInformation = entityInformation;
-        this.em = em;
+        this.entityManager = entityManager;
         this.escapeCharacter = escapeCharacter;
         this.metadata = metadata;
-        this.provider = PersistenceProvider.fromEntityManager(em);
+        this.provider = PersistenceProvider.fromEntityManager(entityManager);
 
         // 实体类型
         javaType = this.entityInformation.getJavaType();
@@ -65,6 +68,10 @@ class AdjacencyTreeExecutor<T extends AdjacencyNode, ID> implements AdjacencyTre
 
         // 路径节点类型
         pathNodeType = this.findPathNodType(javaType);
+
+        String template = "select tree from %s as tree where tree.id in (select b.pathId from %s as a inner join a.path as b where b.id =:parent_id) order by tree.depth asc";
+        String name = javaType.getName();
+        this.query = String.format(template, name, name);
     }
 
     /**
@@ -75,15 +82,13 @@ class AdjacencyTreeExecutor<T extends AdjacencyNode, ID> implements AdjacencyTre
      */
     @Override
     public Stream<T> parents(ID id) {
-//        String query =
-//                "select a from TreeEntity as a inner join TreeEntity.path as b on a.id = b.pathId where b=:parent_id order by b.seq asc";
-//        val tmp = this.em
-//                .createQuery(query, javaType)
-//                .setLockMode(LockModeType.READ)
-//                .setFlushMode(FlushModeType.AUTO)
-//                .getResultStream();
-//        return tmp;
-        return null;
+        val tmp = this.entityManager
+                .createQuery(query, javaType)
+                .setLockMode(LockModeType.NONE)
+                .setFlushMode(FlushModeType.COMMIT)
+                .setParameter("parent_id", id)
+                .getResultStream();
+        return tmp;
     }
 
     /**
