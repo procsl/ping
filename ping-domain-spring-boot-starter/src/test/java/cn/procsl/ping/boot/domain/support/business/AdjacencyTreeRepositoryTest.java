@@ -9,6 +9,7 @@ import com.github.javafaker.Faker;
 import com.github.jsonzou.jmockdata.MockConfig;
 import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -144,11 +145,14 @@ public class AdjacencyTreeRepositoryTest {
 
     @Test
     public void children() {
-        treeExecutor.children("id");
+        @Cleanup
+        Stream<TreeEntity> children = treeExecutor.children(root.getId());
+        children.limit(10).forEach(item -> log.info(item.getName()));
     }
 
     @Test
     public void directParent() {
-        treeExecutor.directParent("id");
+        Optional<TreeEntity> opera = treeExecutor.directParent("id");
+        Assert.assertTrue(opera.isEmpty());
     }
 }
