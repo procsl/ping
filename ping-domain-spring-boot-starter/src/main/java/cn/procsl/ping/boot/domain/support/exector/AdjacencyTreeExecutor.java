@@ -46,9 +46,13 @@ class AdjacencyTreeExecutor<T extends AdjacencyNode, ID> implements AdjacencyTre
 
     final Class<?> idType;
 
-    final Class<? extends AdjacencyPathNode> pathNodeType;
+//    final Class<? extends AdjacencyPathNode> pathNodeType;
 
-    final String query;
+    final String QUERY_PARENTS_JPQL;
+
+    final String QUERY_CHILDREN_JPQL;
+
+    final String QUERY_DIRECT_JPQL;
 
     public AdjacencyTreeExecutor(JpaEntityInformation<T, ?> entityInformation,
                                  EntityManager entityManager,
@@ -67,11 +71,18 @@ class AdjacencyTreeExecutor<T extends AdjacencyNode, ID> implements AdjacencyTre
         idType = this.entityInformation.getIdType();
 
         // 路径节点类型
-        pathNodeType = this.findPathNodType(javaType);
+//        pathNodeType = this.findPathNodType(javaType);
 
-        String template = "select tree from %s as tree where tree.id in (select b.pathId from %s as a inner join a.path as b where b.id =:parent_id) order by tree.depth asc";
         String name = javaType.getName();
-        this.query = String.format(template, name, name);
+        String parents = "select tree from %s as tree where tree.id in (select b.pathId from %s as a inner join a.path as b where b.id =:parent_id) order by tree.depth asc";
+        this.QUERY_PARENTS_JPQL = String.format(parents, name, name);
+
+        String children = "select tree from %s as tree where tree.parentId =:id order by tree.id";
+        this.QUERY_CHILDREN_JPQL = String.format(children, name);
+
+        String direct = "select tree from %s as tree where tree.id in (select a.parentId from %s as a where id=:id)";
+        this.QUERY_DIRECT_JPQL = String.format(direct, name, name);
+
     }
 
     /**
@@ -83,8 +94,8 @@ class AdjacencyTreeExecutor<T extends AdjacencyNode, ID> implements AdjacencyTre
     @Override
     public Stream<T> parents(ID id) {
         val tmp = this.entityManager
-                .createQuery(query, javaType)
-                .setLockMode(LockModeType.NONE)
+                .createQuery(QUERY_PARENTS_JPQL, javaType)
+                .setLockMode(LockModeType.PESSIMISTIC_READ)
                 .setFlushMode(FlushModeType.COMMIT)
                 .setParameter("parent_id", id)
                 .getResultStream();
@@ -92,15 +103,20 @@ class AdjacencyTreeExecutor<T extends AdjacencyNode, ID> implements AdjacencyTre
     }
 
     /**
-     * 获取所有的子节点
+     * 获取指定节点的直接子节点
      *
      * @param id 指定的id
      * @return 子节点
      */
     @Override
     public Stream<T> children(ID id) {
-        log.info("call children");
-        return null;
+        Stream<T> tmp = this.entityManager
+                .createQuery(this.QUERY_CHILDREN_JPQL, javaType)
+                .setLockMode(LockModeType.PESSIMISTIC_READ)
+                .setFlushMode(FlushModeType.COMMIT)
+                .setParameter("id", id)
+                .getResultStream();
+        return tmp;
     }
 
     /**
@@ -111,8 +127,12 @@ class AdjacencyTreeExecutor<T extends AdjacencyNode, ID> implements AdjacencyTre
      */
     @Override
     public Optional<T> directParent(ID id) {
-        log.info("directParent");
-        return Optional.empty();
+        return this.entityManager.createQuery(this.QUERY_DIRECT_JPQL, javaType)
+                .setParameter("id", id)
+                .setLockMode(LockModeType.PESSIMISTIC_READ)
+                .setFlushMode(FlushModeType.AUTO)
+                .setMaxResults(1)
+                .getResultStream().findFirst();
     }
 
     /**
