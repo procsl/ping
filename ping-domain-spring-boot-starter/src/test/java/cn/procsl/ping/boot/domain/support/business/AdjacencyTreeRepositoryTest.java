@@ -7,6 +7,7 @@ import cn.procsl.ping.boot.domain.domain.repository.TreeEntityTestRepository;
 import cn.procsl.ping.boot.domain.support.exector.DomainRepositoryFactoryBean;
 import com.github.javafaker.Faker;
 import com.github.jsonzou.jmockdata.MockConfig;
+import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,8 +25,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static cn.procsl.ping.boot.domain.domain.entity.TreeEntity.root;
 
@@ -58,6 +61,9 @@ public class AdjacencyTreeRepositoryTest {
     @Inject
     AdjacencyTreeRepositoryTestRepository adjacencyTreeRepositoryTestRepository;
 
+    @Inject
+    EntityManager entityManager;
+
     private static final Faker FAKER;
 
     private static final MockConfig mockConfig;
@@ -88,7 +94,7 @@ public class AdjacencyTreeRepositoryTest {
         BeanUtils.copyProperties(persistence, root);
 
         int context = 1;
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 5000; i++) {
             create(root, context);
         }
     }
@@ -120,15 +126,20 @@ public class AdjacencyTreeRepositoryTest {
 
     @Test
     public void query() {
-        adjacencyTreeRepositoryTestRepository.parentTrees();
+        String query = "select tree from TreeEntity as tree where tree.id in (select b.pathId from TreeEntity as a inner join a.path as b where b.id =:id) order by tree.depth asc";
+        entityManager
+                .createQuery(query, TreeEntity.class)
+                .setParameter("id", "b34eeffa-b6ac-4caa-89b6-b197d4be5e4d")
+                .getResultList()
+                .forEach(item -> log.info("---------------->" + item.getName() + ":" + item.getDepth() + ":" + item.getId()));
     }
 
     @Test
+    @Transactional(readOnly = true)
     public void parents() {
-
-//        QTreeEntity.treeEntity
-//        querydslPredicateExecutor.findAll();
-        treeExecutor.parents("id");
+        @Cleanup
+        Stream<TreeEntity> parent = treeExecutor.parents("b34eeffa-b6ac-4caa-89b6-b197d4be5e4d");
+        parent.forEach(item -> log.info(item.getName()));
     }
 
     @Test
