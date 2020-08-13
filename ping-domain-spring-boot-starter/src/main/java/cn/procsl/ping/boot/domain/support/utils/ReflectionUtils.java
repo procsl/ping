@@ -26,6 +26,7 @@ public final class ReflectionUtils {
         }
         try {
             field.setAccessible(true);
+            @SuppressWarnings("unchecked")
             T tmp = (T) field.get(instance);
             field.setAccessible(false);
             return tmp;
