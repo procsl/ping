@@ -18,17 +18,18 @@ import javax.persistence.OrderBy;
 @Embeddable
 public class PathNode implements AdjacencyPathNode<String>, DomainEntity {
 
-    @Column(length = UUID_2_LENGTH, updatable = false, insertable = false)
-    String id;
+//    @Column(length = UUID_2_LENGTH, updatable = false, insertable = false)
+//    String id;
 
     @Column(length = UUID_2_LENGTH)
     String pathId;
 
-    @OrderBy("asc")
     Integer seq;
 
     public PathNode(String pathId, Integer seq) {
         this.pathId = pathId;
         this.seq = seq;
     }
+
+
 }

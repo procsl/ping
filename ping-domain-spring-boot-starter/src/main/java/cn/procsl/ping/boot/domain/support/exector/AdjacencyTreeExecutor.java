@@ -141,6 +141,7 @@ class AdjacencyTreeExecutor<T extends AdjacencyNode, ID> implements AdjacencyTre
      * @param javaType 实体类型
      * @return PathNode 类型
      */
+    @SuppressWarnings("unchecked")
     protected Class<? extends AdjacencyPathNode> findPathNodType(Class<?> javaType) {
 
         ResolvableType entityType = ResolvableType.forClass(javaType, AdjacencyNode.class);
