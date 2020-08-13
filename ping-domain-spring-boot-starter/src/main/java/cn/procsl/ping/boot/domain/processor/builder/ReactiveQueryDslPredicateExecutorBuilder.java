@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.domain.processor.impl;
+package cn.procsl.ping.boot.domain.processor.builder;
 
 import cn.procsl.ping.boot.domain.processor.EntityRepositoryBuilder;
 import org.springframework.data.querydsl.ReactiveQuerydslPredicateExecutor;

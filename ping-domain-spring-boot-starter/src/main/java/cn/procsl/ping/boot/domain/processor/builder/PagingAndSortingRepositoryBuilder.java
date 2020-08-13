@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.domain.processor.impl;
+package cn.procsl.ping.boot.domain.processor.builder;
 
 import cn.procsl.ping.boot.domain.processor.EntityAndIdRepositoryBuilder;
 import org.springframework.data.repository.PagingAndSortingRepository;

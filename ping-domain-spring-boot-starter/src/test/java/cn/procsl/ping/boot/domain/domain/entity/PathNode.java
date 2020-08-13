@@ -1,15 +1,15 @@
 package cn.procsl.ping.boot.domain.domain.entity;
 
-import cn.procsl.ping.boot.domain.business.entity.AdjacencyPathNode;
+import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyPathNode;
 import cn.procsl.ping.business.domain.DomainEntity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.OrderBy;
 
 /**
+ * 树节点
  * @author procsl
  * @date 2020/07/31
  */
@@ -17,9 +17,6 @@ import javax.persistence.OrderBy;
 @Data
 @Embeddable
 public class PathNode implements AdjacencyPathNode<String>, DomainEntity {
-
-//    @Column(length = UUID_2_LENGTH, updatable = false, insertable = false)
-//    String id;
 
     @Column(length = UUID_2_LENGTH)
     String pathId;

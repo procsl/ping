@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.domain.support.exector;
 
-import cn.procsl.ping.boot.domain.support.business.AdjacencyTreeRepository;
+import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository;
 import cn.procsl.ping.boot.domain.support.jpa.PersistenceRepository;
 import cn.procsl.ping.boot.domain.support.querydsl.QueryDslPersistenceRepository;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.domain.business.audit;
+package cn.procsl.ping.boot.domain.business;
 
 import cn.procsl.ping.business.domain.DomainEntity;
 import lombok.Data;
@@ -9,24 +9,22 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 
 /**
- * 审计实体
+ * 通用实体
  *
  * @author procsl
  * @date 2020/04/19
  */
-@Data
 @EntityListeners(AuditingEntityListener.class)
-@Embeddable
-public class AuditEntity implements DomainEntity {
+@MappedSuperclass
+public interface CommonEntity extends DomainEntity {
 
     @Version
     @ColumnDefault("0")
     @Column(nullable = false, insertable = false)
-    private Long version;
-
+    Long getVersion();
 
     @CreatedDate
     @Column(updatable = false, nullable = false)
     @OrderBy
-    private Long createAt;
+    Long getCreateAt();
 }

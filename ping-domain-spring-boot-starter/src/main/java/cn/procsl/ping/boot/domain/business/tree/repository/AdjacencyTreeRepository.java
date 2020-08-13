@@ -1,6 +1,6 @@
-package cn.procsl.ping.boot.domain.support.business;
+package cn.procsl.ping.boot.domain.business.tree.repository;
 
-import cn.procsl.ping.boot.domain.business.entity.AdjacencyNode;
+import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyNode;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.Repository;
 

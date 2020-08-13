@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.domain.business.entity;
+package cn.procsl.ping.boot.domain.business.tree.model;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
@@ -36,7 +36,6 @@ public interface AdjacencyPathNode<ID extends Serializable> extends Serializable
      *
      * @return
      */
-    @OrderBy("asc")
     Integer getSeq();
 
 }

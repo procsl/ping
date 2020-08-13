@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.domain.business.entity;
+package cn.procsl.ping.boot.domain.business.tree.model;
 
 import cn.procsl.ping.boot.domain.business.utils.CollectionUtils;
 import cn.procsl.ping.business.domain.DomainEntity;

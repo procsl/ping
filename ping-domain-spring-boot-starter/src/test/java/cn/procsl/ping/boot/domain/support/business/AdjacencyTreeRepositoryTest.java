@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.domain.support.business;
 
+import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository;
 import cn.procsl.ping.boot.domain.domain.entity.QTreeEntity;
 import cn.procsl.ping.boot.domain.domain.entity.TreeEntity;
 import cn.procsl.ping.boot.domain.domain.repository.AdjacencyTreeRepositoryTestRepository;
@@ -95,7 +96,7 @@ public class AdjacencyTreeRepositoryTest {
         BeanUtils.copyProperties(persistence, root);
 
         int context = 1;
-        for (int i = 0; i < 5000; i++) {
+        for (int i = 0; i < 5; i++) {
             create(root, context);
         }
     }

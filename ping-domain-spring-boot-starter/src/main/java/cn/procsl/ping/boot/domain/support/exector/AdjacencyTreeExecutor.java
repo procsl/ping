@@ -1,8 +1,8 @@
 package cn.procsl.ping.boot.domain.support.exector;
 
-import cn.procsl.ping.boot.domain.business.entity.AdjacencyNode;
-import cn.procsl.ping.boot.domain.business.entity.AdjacencyPathNode;
-import cn.procsl.ping.boot.domain.support.business.AdjacencyTreeRepository;
+import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyNode;
+import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyPathNode;
+import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.core.ResolvableType;

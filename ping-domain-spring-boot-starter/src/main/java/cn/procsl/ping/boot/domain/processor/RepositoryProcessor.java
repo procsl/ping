@@ -1,7 +1,7 @@
 package cn.procsl.ping.boot.domain.processor;
 
 import cn.procsl.ping.boot.domain.annotation.CreateRepository;
-import cn.procsl.ping.boot.domain.processor.impl.*;
+import cn.procsl.ping.boot.domain.processor.builder.*;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;

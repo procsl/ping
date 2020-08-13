@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.domain.domain.entity;
 
-import cn.procsl.ping.boot.domain.business.entity.AdjacencyNode;
+import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyNode;
 import cn.procsl.ping.boot.domain.business.utils.StringUtils;
 import lombok.Data;
 import lombok.NonNull;
