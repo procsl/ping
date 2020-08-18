@@ -10,6 +10,6 @@ import org.springframework.stereotype.Repository;
  * @date 2020/07/31
  */
 @Repository
-public interface TreeEntityTestRepository extends JpaRepository<TreeEntity, String>,
+public interface TreeEntityTestRepository extends JpaRepository<TreeEntity, Long>,
         QuerydslPredicateExecutor<TreeEntity> {
 }

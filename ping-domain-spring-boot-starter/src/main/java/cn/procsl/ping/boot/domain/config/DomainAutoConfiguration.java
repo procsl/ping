@@ -2,19 +2,16 @@ package cn.procsl.ping.boot.domain.config;
 
 import cn.procsl.ping.boot.domain.naming.LowCasePhysicalNamingStrategy;
 import cn.procsl.ping.boot.domain.naming.NameImplicitNamingStrategy;
-import cn.procsl.ping.boot.domain.support.exector.DomainRepositoryFactoryBean;
+import cn.procsl.ping.boot.domain.support.exector.DomainEventListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateProperties;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.data.repository.config.BootstrapMode;
 
 /**
  * 自动配置 用于注册加载时依赖注入和包扫描
@@ -28,13 +25,13 @@ import org.springframework.data.repository.config.BootstrapMode;
 @AutoConfigureBefore(JpaBaseConfiguration.class)
 @Slf4j
 @EnableJpaAuditing
-@EnableJpaRepositories(basePackages = {
-        "cn.procsl.ping.boot.domain.business.repository",
-},
-        repositoryFactoryBeanClass = DomainRepositoryFactoryBean.class,
-        bootstrapMode = BootstrapMode.LAZY
-)
-@EntityScan(basePackages = "cn.procsl.ping.boot.data.business.entity")
+//@EnableJpaRepositories(basePackages = {
+//        "cn.procsl.ping.boot.domain.business.repository",
+//},
+//        repositoryFactoryBeanClass = DomainRepositoryFactoryBean.class,
+//        bootstrapMode = BootstrapMode.LAZY
+//)
+//@EntityScan(basePackages = "cn.procsl.ping.boot.data.business.entity")
 public class DomainAutoConfiguration {
 
     final DomainProperties dataProperties;

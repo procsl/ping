@@ -231,7 +231,6 @@
                     <groupId>com.h2database</groupId>
                     <artifactId>h2</artifactId>
                 </dependency>
-
             </dependencies>
         </profile>
 
@@ -249,6 +248,20 @@
             </dependencies>
         </profile>
 
+        <profile>
+            <id>postgresql</id>
+            <properties>
+                <profiles.active>postgresql</profiles.active>
+            </properties>
+            <dependencies>
+                <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
+                <dependency>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                    <version>42.2.14</version>
+                </dependency>
+            </dependencies>
+        </profile>
     </profiles>
 
 </project>

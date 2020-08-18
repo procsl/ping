@@ -4,6 +4,7 @@ import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyPathNode;
 import cn.procsl.ping.business.domain.DomainEntity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -16,14 +17,13 @@ import javax.persistence.Embeddable;
 @NoArgsConstructor
 @Data
 @Embeddable
-public class PathNode implements AdjacencyPathNode<String>, DomainEntity {
+public class PathNode implements AdjacencyPathNode<Long>, DomainEntity {
 
-    @Column(length = UUID_2_LENGTH)
-    String pathId;
+    Long pathId;
 
     Integer seq;
 
-    public PathNode(String pathId, Integer seq) {
+    public PathNode(@NonNull Long pathId,@NonNull Integer seq) {
         this.pathId = pathId;
         this.seq = seq;
     }

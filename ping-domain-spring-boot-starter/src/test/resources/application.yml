@@ -19,4 +19,3 @@ spring:
         bootstrap-mode: lazy
   profiles:
     active: @profiles.active@
-

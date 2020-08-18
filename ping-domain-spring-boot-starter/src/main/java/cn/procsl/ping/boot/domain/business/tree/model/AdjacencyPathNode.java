@@ -16,9 +16,11 @@ public interface AdjacencyPathNode<ID extends Serializable> extends Serializable
 
     /**
      * 绑定的treeId
+     * 不要设置此值的字段
      *
      * @return
      */
+    @Deprecated
     @Column(updatable = false, insertable = false)
     default ID getId() {
         return null;

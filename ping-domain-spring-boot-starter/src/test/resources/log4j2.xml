@@ -11,6 +11,7 @@
         <logger name="org.junit" level="info"/>
         <logger name="org.springframework.web" level="info"/>
         <logger name="org.springframework.data.repository" level="trace"/>
+        <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="trace"/>
         <root level="info">
             <appender-ref ref="Console"/>
         </root>

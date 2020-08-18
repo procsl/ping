@@ -10,7 +10,10 @@ spring:
   jpa:
     database: h2
     database-platform: org.hibernate.dialect.H2Dialect
-
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 10
   #h2数据库配置
   h2:
     console:

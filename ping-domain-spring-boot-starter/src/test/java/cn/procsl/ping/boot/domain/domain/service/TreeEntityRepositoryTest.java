@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.domain.domain.service;
 
+import cn.procsl.ping.boot.domain.domain.entity.PathNode;
 import cn.procsl.ping.boot.domain.domain.entity.TreeEntity;
 import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,7 @@ import javax.inject.Inject;
 public class TreeEntityRepositoryTest {
 
     @Inject
-    AdjacencyTreeRepository<TreeEntity, String> adjacencyTreeExecutor;
+    AdjacencyTreeRepository<TreeEntity, Long, PathNode> adjacencyTreeExecutor;
 
     @Test
     public void test() {

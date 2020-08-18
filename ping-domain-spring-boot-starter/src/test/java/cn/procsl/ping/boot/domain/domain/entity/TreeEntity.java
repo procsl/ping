@@ -1,14 +1,14 @@
 package cn.procsl.ping.boot.domain.domain.entity;
 
 import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyNode;
-import cn.procsl.ping.boot.domain.business.utils.StringUtils;
+import cn.procsl.ping.boot.domain.support.exector.DomainEventListener;
 import lombok.Data;
-import lombok.NonNull;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author procsl
@@ -17,56 +17,18 @@ import java.util.Set;
 @Data
 @Entity
 @Table
-public class TreeEntity implements AdjacencyNode<String, PathNode> {
-
-    public static final TreeEntity root;
-    public static final String DEFAULT_ROOT_NAME = "root";
-
-    static {
-        root = new TreeEntity() {
-            @Override
-            public boolean isRoot() {
-                return true;
-            }
-
-            @Override
-            public final void setId(String id) {
-                if (this.id != null && this.id.isEmpty()) {
-                    return;
-                }
-                this.id = id;
-            }
-
-            @Override
-            public final void setParentId(String parentId) {
-            }
-
-            @Override
-            public final void setDepth(Integer depth) {
-            }
-
-            @Override
-            public final void setPath(Set<PathNode> path) {
-            }
-
-            @Override
-            public final void fullByParent(AdjacencyNode<String, PathNode> parentNode) {
-            }
-        };
-        root.name = DEFAULT_ROOT_NAME;
-        root.depth = 0;
-        root.path = Collections.emptySet();
-    }
+@EntityListeners(DomainEventListener.class)
+public class TreeEntity implements AdjacencyNode<Long, PathNode> {
 
     @Id
-    @Column(length = UUID_2_LENGTH)
-    @GeneratedValue(generator = "idGenerator")
-    @GenericGenerator(name = "idGenerator", strategy = "uuid2")
-    String id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "general")
+    @SequenceGenerator(allocationSize = 500, name = "general")
+    @Column(updatable = false, nullable = false)
+    Long id;
 
-    @Column(length = UUID_2_LENGTH)
-    String parentId;
+    Long parentId;
 
+    @Lob
     String name;
 
     Integer depth;
@@ -76,42 +38,64 @@ public class TreeEntity implements AdjacencyNode<String, PathNode> {
     Set<PathNode> path;
 
     @Override
-    public void fullByParent(@NonNull AdjacencyNode<String, PathNode> parentNode) {
-        @NonNull
-        String id = parentNode.getId();
+    public PathNode createPathNode(Long pathId, Integer seq) {
+        return new PathNode(pathId, seq);
+    }
+
+    @Override
+    public void changeParent(AdjacencyNode<Long, PathNode> parent) {
+        if (!(parent instanceof TreeEntity)) {
+            throw new IllegalArgumentException("required " + this.getClass().getName());
+        }
+        this.empty();
+        this.parentId = parent.getId();
+        this.depth = ((TreeEntity) parent).depth + 1;
+        // 添加父节点的路径
+        this.path.addAll(parent.getPath());
+        // 添加父节点
+        this.path.add(this.createPathNode(parentId, parent.getDepth()));
+        // 把当前的子节点更新进去, 在合适的时机
+        this.selfUpdate();
+    }
+
+    void empty() {
+        // 如果为root则parentId == id
         this.parentId = id;
-
-        Set<PathNode> pathNode = this.createPathBy(id, parentNode.getPath());
-        this.path = pathNode;
-
-        depth = pathNode.size();
-    }
-
-    @Override
-    public TreeEntity root() {
-        return root;
-    }
-
-    @Override
-    @Transient
-    public boolean isRoot() {
-        // 说明未持久化
-        if (this.root() == null || StringUtils.isEmpty(this.root().id)) {
-            // 检查 depth
-            if (depth == null || depth == 0) {
-                return true;
-            }
+        this.depth = 0;
+        if (path == null) {
+            this.path = new HashSet<>();
+        } else {
+            this.path.clear();
         }
-        // 如果ID相等, 则说明是root
-        if (this.root().equals(id)) {
-            return true;
-        }
-        return false;
     }
 
+    /**
+     * 创建当前的节点, 并且填充
+     */
     @Override
-    public PathNode createPathNode(String parentId, Integer seq) {
-        return new PathNode(parentId, seq);
+    public void postPersist() {
+        selfUpdate();
     }
 
+    public void init() {
+        empty();
+    }
+
+    void selfUpdate() {
+        if (id == null) {
+            return;
+        }
+
+        // 添加当前节点
+        if (this.parentId == null) {
+            this.parentId = id;
+        }
+
+        this.path.add(this.createPathNode(this.id, this.depth));
+        List<String> tmp = this.path
+                .stream()
+                .sorted((pre, next) -> pre.getSeq() - next.getSeq())
+                .map(item -> String.valueOf(item.getPathId())).collect(Collectors.toList());
+        this.setName("/" + String.join("/", tmp));
+    }
 }
