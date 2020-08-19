@@ -46,7 +46,32 @@ public interface AdjacencyTreeRepository<
      * @param id 指定的id
      * @return 返回子节点stream
      */
-    Stream<T> getChildren(ID id);
+    Stream<T> getDirectChildren(ID id);
+
+    /**
+     * 获取指定子节点的IDs
+     *
+     * @param id 指定的节点ID
+     * @return 返回子节点IDs
+     */
+    Stream<ID> getDirectChildrenIds(ID id);
+
+
+    /**
+     * 查询所有的子节点, 包含自身节点ID
+     *
+     * @param id 指定的节点ID
+     * @return 返回所有的子节点ID
+     */
+    Stream<ID> getAllChildrenIds(ID id);
+
+    /**
+     * 获取所有的子节点包含自身节点
+     *
+     * @param id 指定的节点
+     * @return 返回所有的子节点
+     */
+    Stream<T> getAllChildren(ID id);
 
     /**
      * 获取直接父节点
@@ -86,10 +111,10 @@ public interface AdjacencyTreeRepository<
     /**
      * 移动指定的树节点至目标节点下(即子节点)
      *
-     * @param source 源节点
+     * @param root   源节点
      * @param target 目标节点
      */
-    void moveTo(ID source, ID target);
+    void mount(ID root, ID target);
 
     /**
      * 删除指定的节点, 包括子节点
@@ -135,5 +160,5 @@ public interface AdjacencyTreeRepository<
      * @param target
      * @return
      */
-    ID findChildId(ID source, ID target);
+    ID calcChildId(ID source, ID target);
 }

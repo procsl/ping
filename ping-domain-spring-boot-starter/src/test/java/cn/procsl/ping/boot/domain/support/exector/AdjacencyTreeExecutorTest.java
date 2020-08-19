@@ -29,7 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import java.util.*;
+import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -43,7 +44,7 @@ import java.util.stream.Stream;
         bootstrapMode = BootstrapMode.LAZY
 )
 @EntityScan(basePackages = "cn.procsl.ping.boot.domain.domain.entity")
-@Rollback(value = false)
+@Rollback(value = true)
 public class AdjacencyTreeExecutorTest {
 
     @Inject
@@ -64,11 +65,14 @@ public class AdjacencyTreeExecutorTest {
     @Inject
     EntityManager entityManager;
 
+//    PersistanceManager persistanceManager;
+
     private static final Faker FAKER;
 
     private static final MockConfig mockConfig;
 
     TreeEntity root;
+
 
     static {
         mockConfig = new MockConfig()
@@ -84,7 +88,7 @@ public class AdjacencyTreeExecutorTest {
 
     @Before
     public void init() {
-        Optional<TreeEntity> optional = querydslPredicateExecutor.findOne(QTreeEntity.treeEntity.name.eq("/"));
+        Optional<TreeEntity> optional = querydslPredicateExecutor.findOne(QTreeEntity.treeEntity.name.eq("/1"));
         if (optional.isPresent()) {
             root = optional.get();
             return;
@@ -152,7 +156,7 @@ public class AdjacencyTreeExecutorTest {
     @Test
     public void children() {
         @Cleanup
-        Stream<TreeEntity> children = treeExecutor.getChildren(root.getId());
+        Stream<TreeEntity> children = treeExecutor.getDirectChildren(root.getId());
         children.limit(10).forEach(item -> log.info(item.getName()));
     }
 
@@ -182,16 +186,13 @@ public class AdjacencyTreeExecutorTest {
 
     @Test
     public void moveTo() {
-        // 删除
-        int item = this.entityManager
-                .createQuery("delete from TreeEntity where id in (:items)")
-                .setParameter("items", Collections.singleton(1))
-                .executeUpdate();
-        log.info("{}", item);
+        this.treeExecutor.mount(1L, 2L);
     }
 
     @Test
     public void remove() {
+//        this.treeExecutor.remove(2L);
+        this.jpaRepository.deleteById(1L);
     }
 
     @Test

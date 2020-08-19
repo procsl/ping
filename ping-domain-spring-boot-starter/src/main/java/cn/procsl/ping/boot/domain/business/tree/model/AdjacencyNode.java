@@ -1,13 +1,13 @@
 package cn.procsl.ping.boot.domain.business.tree.model;
 
 import cn.procsl.ping.boot.domain.business.utils.ObjectUtils;
+import cn.procsl.ping.boot.domain.support.exector.DomainEventListener;
 import cn.procsl.ping.business.domain.DomainEntity;
 import cn.procsl.ping.business.domain.DomainEvents;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -17,7 +17,8 @@ import java.util.Set;
  * @date 2020/07/29
  */
 @MappedSuperclass
-//@EntityListeners(DomainEventListener.class)
+@EntityListeners(DomainEventListener.class)
+@DynamicUpdate
 public interface AdjacencyNode<ID extends Serializable, T extends AdjacencyPathNode<ID>>
         extends DomainEntity, DomainEvents {
 
@@ -33,7 +34,7 @@ public interface AdjacencyNode<ID extends Serializable, T extends AdjacencyPathN
 
     @Transient
     default boolean isRoot() {
-        return ObjectUtils.nullSafeEquals(getId(), getParentId());
+        return ObjectUtils.nullSafeEquals(getId(), getParentId()) || ObjectUtils.nullSafeEquals(getDepth(), 0);
     }
 
     /**
