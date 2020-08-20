@@ -30,4 +30,10 @@ public interface RepositoryBuilder {
      */
     TypeName build(Element entity, RoundEnvironment roundEnv);
 
+    /**
+     * 是否独立实现, 不同时继承多个(某些接口有冲突的情况下)
+     *
+     * @return 如果独立创建,则返回true
+     */
+    boolean isSingleton();
 }

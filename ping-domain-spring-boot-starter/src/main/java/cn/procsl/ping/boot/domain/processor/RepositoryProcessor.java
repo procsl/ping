@@ -1,12 +1,12 @@
 package cn.procsl.ping.boot.domain.processor;
 
 import cn.procsl.ping.boot.domain.annotation.CreateRepository;
-import cn.procsl.ping.boot.domain.processor.builder.*;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import org.springframework.stereotype.Indexed;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.processing.*;
@@ -16,12 +16,9 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.persistence.Entity;
+import javax.tools.Diagnostic;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
@@ -48,7 +45,11 @@ public class RepositoryProcessor extends AbstractProcessor {
 
     private List<RepositoryBuilder> builders;
 
+    private List<RepositoryBuilder> singletonBuilders;
+
     private String prefix;
+
+    private List<String> includes;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -79,7 +80,7 @@ public class RepositoryProcessor extends AbstractProcessor {
     }
 
     @Override
-    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+    public synchronized boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         if (roundEnv.processingOver()) {
             return false;
         }
@@ -88,7 +89,11 @@ public class RepositoryProcessor extends AbstractProcessor {
 
         try {
             for (Element entity : entities) {
-                this.generateSourceCode(entity, roundEnv);
+                String name = this.createPackageName(entity, roundEnv);
+                // 生成多继承源文件
+                this.generateSourceCode(entity, name, roundEnv);
+                // 生成单继承源文件
+                this.generateSingletonSourceCode(entity, name, roundEnv);
             }
         } catch (IOException e) {
             messager.printMessage(ERROR, "Source code output error:" + e.getMessage());
@@ -100,6 +105,33 @@ public class RepositoryProcessor extends AbstractProcessor {
         return true;
     }
 
+    private void generateSingletonSourceCode(Element entity, String packageName, RoundEnvironment roundEnv) throws IOException {
+
+        List<RepositoryBuilder> matcher = this.matcher(this.singletonBuilders, entity);
+        if (matcher.isEmpty()) {
+            return;
+        }
+
+        int count = 0;
+        for (RepositoryBuilder builder : matcher) {
+            String className = this.createClassName(entity, String.valueOf(count), roundEnv);
+
+            TypeSpec typeSpec = this.buildRepository(className, entity, roundEnv)
+                    .addSuperinterface(builder.build(entity, roundEnv))
+                    .build();
+            count++;
+            writer(packageName, typeSpec);
+        }
+    }
+
+    private void writer(String packageName, TypeSpec typeSpec) throws IOException {
+        // java 源文件表示
+        JavaFile file = JavaFile.builder(packageName, typeSpec).build();
+
+        // 写入class
+        file.writeTo(filer);
+    }
+
     /**
      * 初始化包含的类型
      *
@@ -107,9 +139,13 @@ public class RepositoryProcessor extends AbstractProcessor {
      */
     private void initIncludes(ProcessingEnvironment processingEnv) {
 
+        ClassLoader currentClassLoad = this.getClass().getClassLoader();
+        ServiceLoader<RepositoryBuilder> services = ServiceLoader.load(RepositoryBuilder.class, currentClassLoad);
+
         String tmp = processingEnv.getOptions().get("creator.repository.includes");
 
-        List<String> includes;
+//        processingEnv.getFiler().getResource(StandardLocation.CLASS_PATH,"","repository.build.properties");
+
         if (StringUtils.isEmpty(tmp)) {
             messager.printMessage(WARNING, "Create default repositories");
             includes = asList(
@@ -120,34 +156,17 @@ public class RepositoryProcessor extends AbstractProcessor {
             includes = asList(tmp.split(","));
         }
 
-        this.initBuilder(includes);
-    }
-
-    /**
-     * 初始化生成器
-     *
-     * @param includes 包含的类型
-     */
-    private void initBuilder(List<String> includes) {
-        List<RepositoryBuilder> tmp = Arrays.asList(
-                new JpaRepositoryBuilder(),
-                new PagingAndSortingRepositoryBuilder(),
-                new JpaSpecificationExecutorBuilder(),
-                new CrudRepositoryBuilder(),
-                new QueryDslPredicateExecutorBuilder(),
-                new ReactiveQueryDslPredicateExecutorBuilder());
-
-        // 过滤掉不支持的
-        this.builders = tmp.stream().filter(item -> {
-            for (String s : includes) {
-                boolean isSupport = item.support(s);
-                if (isSupport) {
-                    return true;
-                }
+        this.builders = new LinkedList<>();
+        this.singletonBuilders = new LinkedList<>();
+        Iterator<RepositoryBuilder> itor = services.iterator();
+        if (itor.hasNext()) {
+            RepositoryBuilder curr = itor.next();
+            if (curr.isSingleton()) {
+                this.singletonBuilders.add(curr);
+            } else {
+                this.builders.add(curr);
             }
-            return false;
-        }).collect(Collectors.toList());
-
+        }
     }
 
     /**
@@ -179,25 +198,26 @@ public class RepositoryProcessor extends AbstractProcessor {
     /**
      * 代码生成
      *
-     * @param entity   实体文件
-     * @param roundEnv 上下文
+     * @param entity      实体文件
+     * @param roundEnv    上下文
+     * @param packageName 包名
      */
-    private void generateSourceCode(Element entity, RoundEnvironment roundEnv) throws IOException {
-
-        // 包名
-        String packageName = this.createPackageName(entity, roundEnv);
+    private void generateSourceCode(Element entity, String packageName, RoundEnvironment roundEnv) throws IOException {
 
         // 类名
-        String className = this.createClassName(entity, roundEnv);
+        String className = this.createClassName(entity, "", roundEnv);
+
+        Iterable<? extends TypeName> inter = this.getMultipleInterfaceType(entity, roundEnv);
+        if (inter == null || !inter.iterator().hasNext()) {
+            messager.printMessage(Diagnostic.Kind.NOTE, "Not matcher repository:" + className + ":" + entity.getSimpleName());
+            return;
+        }
 
         // 获取待生成的Repository
-        TypeSpec repository = this.buildRepository(className, entity, roundEnv);
+        TypeSpec repository = this.buildRepository(className, entity, roundEnv)
+                .addSuperinterfaces(inter).build();
 
-        // java 源文件表示
-        JavaFile file = JavaFile.builder(packageName, repository).build();
-
-        // 写入class
-        file.writeTo(filer);
+        this.writer(packageName, repository);
     }
 
     /**
@@ -207,8 +227,8 @@ public class RepositoryProcessor extends AbstractProcessor {
      * @param roundEnv 上下文环境
      * @return 类名
      */
-    private String createClassName(Element entity, RoundEnvironment roundEnv) {
-        return this.prefix + entity.getSimpleName() + "Repository";
+    private String createClassName(Element entity, String sign, RoundEnvironment roundEnv) {
+        return this.prefix + entity.getSimpleName() + sign + "Repository";
     }
 
     /**
@@ -257,14 +277,12 @@ public class RepositoryProcessor extends AbstractProcessor {
      * @param environment 编译器上下文
      * @return 返回repository对象
      */
-    private TypeSpec buildRepository(String className, Element entity, RoundEnvironment environment) {
+    private TypeSpec.Builder buildRepository(String className, Element entity, RoundEnvironment environment) {
         return TypeSpec
                 .interfaceBuilder(className)
                 .addAnnotation(Repository.class)
                 .addAnnotation(Indexed.class)
-                .addModifiers(Modifier.PUBLIC)
-                .addSuperinterfaces(this.reduce(entity, environment))
-                .build();
+                .addModifiers(Modifier.PUBLIC);
     }
 
     /**
@@ -274,9 +292,17 @@ public class RepositoryProcessor extends AbstractProcessor {
      * @param environment 编译器上下文
      * @return 返回创建的TypeNames
      */
-    private Iterable<? extends TypeName> reduce(Element entity, RoundEnvironment environment) {
+    private Iterable<? extends TypeName> getMultipleInterfaceType(Element entity, RoundEnvironment environment) {
+
+        List<RepositoryBuilder> matcher = this.matcher(this.builders, entity);
+
+        // 如果没有匹配到, 直接退出
+        if (matcher.isEmpty()) {
+            return null;
+        }
+
         HashSet<TypeName> types = new HashSet<>();
-        for (RepositoryBuilder builder : this.builders) {
+        for (RepositoryBuilder builder : matcher) {
             TypeName type = builder.build(entity, environment);
             if (type != null) {
                 types.add(type);
@@ -285,4 +311,47 @@ public class RepositoryProcessor extends AbstractProcessor {
         return types;
     }
 
+
+    /**
+     * 查找匹配的构建器
+     *
+     * @param builders 构建器列表
+     * @param entity   对应实体
+     * @return 返回匹配成功的构建器
+     */
+    private List<RepositoryBuilder> matcher(List<RepositoryBuilder> builders, Element entity) {
+        if (CollectionUtils.isEmpty(builders)) {
+            return Collections.emptyList();
+        }
+
+        List<RepositoryBuilder> matcher = new LinkedList();
+        for (RepositoryBuilder builder : builders) {
+            for (String include : this.includes) {
+                if (builder.support(include)) {
+                    matcher.add(builder);
+                }
+            }
+        }
+
+        // 如果没有匹配到, 直接退出
+        if (matcher.isEmpty()) {
+            return matcher;
+        }
+
+        String[] currentBuilders = entity.getAnnotation(CreateRepository.class).builders();
+        if (currentBuilders == null || currentBuilders.length == 0) {
+            return matcher;
+        }
+
+        // 如果有单独指定, 则再次匹配
+        List<RepositoryBuilder> tmp = new LinkedList<>();
+        for (String builder : currentBuilders) {
+            for (RepositoryBuilder repositoryBuilder : matcher) {
+                if (repositoryBuilder.support(builder)) {
+                    tmp.add(repositoryBuilder);
+                }
+            }
+        }
+        return tmp;
+    }
 }

@@ -53,4 +53,13 @@ public abstract class AbstractRepositoryBuilder implements RepositoryBuilder {
         return get(entity.asType());
     }
 
+    /**
+     * 是否独立实现, 不同时继承多个(某些接口有冲突的情况下)
+     *
+     * @return 如果独立创建, 则返回true
+     */
+    @Override
+    public boolean isSingleton() {
+        return false;
+    }
 }
