@@ -12,4 +12,14 @@ public class ReactiveQueryDslPredicateExecutorBuilder extends EntityRepositoryBu
     protected Class<ReactiveQuerydslPredicateExecutor> getSupportRepositoryClass() {
         return ReactiveQuerydslPredicateExecutor.class;
     }
+
+    /**
+     * 这个接口有冲突, 需要独立
+     *
+     * @return true
+     */
+    @Override
+    public boolean isSingleton() {
+        return true;
+    }
 }

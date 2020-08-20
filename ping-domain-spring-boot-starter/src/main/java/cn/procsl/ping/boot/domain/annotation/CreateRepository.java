@@ -17,4 +17,13 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 @Target(TYPE)
 @Retention(SOURCE)
 public @interface CreateRepository {
+
+    /**
+     * 可以手动指定当前实体生成的 builder
+     * 如果未手动指定,则使用全局的builder
+     *
+     * @return
+     */
+    String[] builders() default {};
+
 }

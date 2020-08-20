@@ -1,0 +1,7 @@
+cn.procsl.ping.boot.domain.processor.builder.JpaRepositoryBuilder
+cn.procsl.ping.boot.domain.processor.builder.CrudRepositoryBuilder
+cn.procsl.ping.boot.domain.processor.builder.JpaSpecificationExecutorBuilder
+cn.procsl.ping.boot.domain.processor.builder.PagingAndSortingRepositoryBuilder
+cn.procsl.ping.boot.domain.processor.builder.QueryDslPredicateExecutorBuilder
+cn.procsl.ping.boot.domain.processor.builder.ReactiveQueryDslPredicateExecutorBuilder
+cn.procsl.ping.boot.domain.processor.builder.AdjacencyTreeRepositoryBuilder
