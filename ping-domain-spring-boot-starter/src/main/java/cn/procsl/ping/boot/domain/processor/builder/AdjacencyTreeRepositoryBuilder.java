@@ -3,6 +3,7 @@ package cn.procsl.ping.boot.domain.processor.builder;
 import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository;
 import cn.procsl.ping.boot.domain.processor.AbstractRepositoryBuilder;
 import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeSpec;
 
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
@@ -29,5 +30,19 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
     @Override
     public TypeName build(Element entity, RoundEnvironment roundEnv) {
         return null;
+    }
+
+    protected TypeSpec createPathNodeType(Element element) {
+        return null;
+    }
+
+    /**
+     * 是否独立实现, 不同时继承多个(某些接口有冲突的情况下)
+     *
+     * @return 如果独立创建, 则返回true
+     */
+    @Override
+    public boolean isSingleton() {
+        return true;
     }
 }

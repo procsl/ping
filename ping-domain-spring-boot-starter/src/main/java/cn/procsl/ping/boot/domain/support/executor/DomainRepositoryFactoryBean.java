@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.domain.support.exector;
+package cn.procsl.ping.boot.domain.support.executor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.query.EscapeCharacter;

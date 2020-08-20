@@ -1,7 +1,7 @@
 package cn.procsl.ping.boot.domain.business.tree.model;
 
 import cn.procsl.ping.boot.domain.business.utils.ObjectUtils;
-import cn.procsl.ping.boot.domain.support.exector.DomainEventListener;
+import cn.procsl.ping.boot.domain.support.executor.DomainEventListener;
 import cn.procsl.ping.business.domain.DomainEntity;
 import cn.procsl.ping.business.domain.DomainEvents;
 import org.hibernate.annotations.DynamicUpdate;

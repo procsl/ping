@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.domain.support.exector;
+package cn.procsl.ping.boot.domain.support.executor;
 
 import cn.procsl.ping.boot.domain.business.Operator;
 import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyNode;
@@ -20,7 +20,6 @@ import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.naming.InitialContext;
 import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;

@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.domain.support.exector;
+package cn.procsl.ping.boot.domain.support.executor;
 
 import cn.procsl.ping.boot.domain.support.jpa.PersistenceRepository;
 import lombok.extern.slf4j.Slf4j;

@@ -2,7 +2,7 @@ package cn.procsl.ping.boot.domain.support.querydsl;
 
 import cn.procsl.ping.boot.domain.domain.entity.QUser;
 import cn.procsl.ping.boot.domain.domain.entity.User;
-import cn.procsl.ping.boot.domain.support.exector.DomainRepositoryFactoryBean;
+import cn.procsl.ping.boot.domain.support.executor.DomainRepositoryFactoryBean;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;

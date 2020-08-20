@@ -53,12 +53,12 @@
                     </compilerArgs>
                     <annotationProcessors>
                         <annotationProcessor>
-                            cn.procsl.ping.meta.process.FunctionAnnotationProcessor
-                        </annotationProcessor>
-                        <annotationProcessor>
                             cn.procsl.ping.boot.domain.processor.RepositoryProcessor
                         </annotationProcessor>
                     </annotationProcessors>
+
+                    <showWarnings>true</showWarnings>
+                    <showDeprecation>true</showDeprecation>
                 </configuration>
             </plugin>
         </plugins>

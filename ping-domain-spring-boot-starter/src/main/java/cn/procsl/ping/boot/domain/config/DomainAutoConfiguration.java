@@ -2,7 +2,6 @@ package cn.procsl.ping.boot.domain.config;
 
 import cn.procsl.ping.boot.domain.naming.LowCasePhysicalNamingStrategy;
 import cn.procsl.ping.boot.domain.naming.NameImplicitNamingStrategy;
-import cn.procsl.ping.boot.domain.support.exector.DomainEventListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

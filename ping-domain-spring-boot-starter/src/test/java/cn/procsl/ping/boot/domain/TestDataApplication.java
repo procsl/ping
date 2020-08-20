@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.domain;
 
-import cn.procsl.ping.boot.domain.support.exector.DomainRepositoryFactoryBean;
+import cn.procsl.ping.boot.domain.support.executor.DomainRepositoryFactoryBean;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;

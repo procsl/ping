@@ -1,7 +1,7 @@
 package cn.procsl.ping.boot.domain.domain.entity;
 
 import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyNode;
-import cn.procsl.ping.boot.domain.support.exector.DomainEventListener;
+import cn.procsl.ping.boot.domain.support.executor.DomainEventListener;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.DynamicUpdate;

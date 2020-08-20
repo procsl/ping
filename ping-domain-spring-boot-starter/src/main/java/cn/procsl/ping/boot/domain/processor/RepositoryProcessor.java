@@ -4,6 +4,7 @@ import cn.procsl.ping.boot.domain.annotation.CreateRepository;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+import lombok.Cleanup;
 import org.springframework.stereotype.Indexed;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
@@ -18,13 +19,15 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.persistence.Entity;
 import javax.tools.Diagnostic;
-import javax.tools.FileObject;
 import javax.tools.StandardLocation;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.*;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singleton;
 import static javax.tools.Diagnostic.Kind.ERROR;
 import static javax.tools.Diagnostic.Kind.WARNING;
 
@@ -37,8 +40,6 @@ import static javax.tools.Diagnostic.Kind.WARNING;
  * @date 2020/05/18
  */
 public class RepositoryProcessor extends AbstractProcessor {
-
-    private Elements elementUtils;
 
     private Messager messager;
 
@@ -59,12 +60,10 @@ public class RepositoryProcessor extends AbstractProcessor {
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
-        this.elementUtils = processingEnv.getElementUtils();
         this.messager = processingEnv.getMessager();
         this.filer = processingEnv.getFiler();
 
         try {
-
             initConfig();
 
             initPackageName();
@@ -84,17 +83,18 @@ public class RepositoryProcessor extends AbstractProcessor {
      */
     private void initConfig() {
         try {
-            FileObject out = processingEnv
-                    .getFiler()
-                    .getResource(StandardLocation.CLASS_OUTPUT, "", "factory.config");
+            @Cleanup
+            InputStream is = filer
+                    .getResource(StandardLocation.CLASS_PATH, "", "META-INF/factory.config")
+                    .openInputStream();
 
             Properties properties = new Properties();
-            properties.load(out.openReader(true));
+            properties.load(is);
             this.config = properties;
             return;
 
         } catch (Exception e) {
-            messager.printMessage(WARNING, "Not found config file: repository-factories.properties");
+            messager.printMessage(WARNING, "Not found config file: factories.properties,error:" + e.getMessage());
         }
         this.config = emptyMap();
     }
@@ -136,6 +136,22 @@ public class RepositoryProcessor extends AbstractProcessor {
     }
 
     /**
+     * 打印错误信息及堆栈
+     *
+     * @param exception
+     */
+    private void print(Exception exception) {
+
+    }
+
+    /**
+     * 打印错误信息堆栈
+     */
+    private void clear() {
+
+    }
+
+    /**
      * 生成单文件继承
      *
      * @param entity      指定的实体
@@ -153,8 +169,13 @@ public class RepositoryProcessor extends AbstractProcessor {
         for (RepositoryBuilder builder : matcher) {
             String className = this.createClassName(entity, String.valueOf(count), roundEnv);
 
+            TypeName superInf = builder.build(entity, roundEnv);
+            if (superInf == null) {
+                continue;
+            }
+
             TypeSpec typeSpec = this.buildRepository(className, entity, roundEnv)
-                    .addSuperinterface(builder.build(entity, roundEnv))
+                    .addSuperinterface(superInf)
                     .build();
             count++;
             writer(packageName, typeSpec);
@@ -177,22 +198,25 @@ public class RepositoryProcessor extends AbstractProcessor {
         ClassLoader currentClassLoad = this.getClass().getClassLoader();
         ServiceLoader<RepositoryBuilder> services = ServiceLoader.load(RepositoryBuilder.class, currentClassLoad);
 
-        String tmp = this.getConfig("creator.repository.includes");
+        String tmp = this.getConfig("factory.repository.includes");
 
         if (StringUtils.isEmpty(tmp)) {
             messager.printMessage(WARNING, "Create default repositories");
-            includes = asList(
-                    "org.springframework.data.jpa.repository.JpaRepository",
-                    "org.springframework.data.querydsl.QuerydslPredicateExecutor"
-            );
+            includes = asList("org.springframework.data.jpa.repository.JpaRepository");
         } else {
-            includes = asList(tmp.split(","));
+            includes = Arrays.stream(tmp.split(","))
+                    .filter(item -> !StringUtils.isEmpty(item))
+                    .map(item -> item.trim())
+                    .distinct()
+                    .filter(this::isAvailable)
+                    .sorted()
+                    .collect(Collectors.toList());
         }
 
         this.builders = new LinkedList<>();
         this.singletonBuilders = new LinkedList<>();
         Iterator<RepositoryBuilder> itor = services.iterator();
-        if (itor.hasNext()) {
+        while (itor.hasNext()) {
             RepositoryBuilder curr = itor.next();
             if (curr.isSingleton()) {
                 this.singletonBuilders.add(curr);
@@ -202,11 +226,21 @@ public class RepositoryProcessor extends AbstractProcessor {
         }
     }
 
+    private boolean isAvailable(String clazz) {
+        try {
+            Class<?> ext = Class.forName(clazz);
+            return ext != null;
+        } catch (ClassNotFoundException e) {
+            messager.printMessage(WARNING, "Not found class:" + clazz);
+        }
+        return false;
+    }
+
     /**
      * 初始化包名
      */
     private void initPackageName() {
-        this.packageName = this.getConfig("creator.repository.package.name");
+        this.packageName = this.getConfig("factory.repository.package.name");
         if (StringUtils.isEmpty(packageName)) {
             messager.printMessage(WARNING, "Use default package name");
         }
@@ -216,7 +250,7 @@ public class RepositoryProcessor extends AbstractProcessor {
      * 初始化repository前缀
      */
     private void initPrefix() {
-        String tmp = this.getConfig("create.repository.prefix");
+        String tmp = this.getConfig("factory.repository.prefix");
         if (StringUtils.isEmpty(tmp)) {
             this.prefix = "Ping";
             return;
@@ -378,6 +412,7 @@ public class RepositoryProcessor extends AbstractProcessor {
             return Collections.emptyList();
         }
 
+        @SuppressWarnings("unchecked")
         List<RepositoryBuilder> matcher = new LinkedList();
         for (RepositoryBuilder builder : builders) {
             for (String include : this.includes) {
