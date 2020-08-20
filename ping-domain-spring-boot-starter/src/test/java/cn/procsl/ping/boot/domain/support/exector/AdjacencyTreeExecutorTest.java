@@ -194,6 +194,8 @@ public class AdjacencyTreeExecutorTest {
 
     @Test
     public void calcDepth() {
+        Integer depth = this.treeExecutor.calcDepth(1L, 2L);
+        log.info("{}", depth);
     }
 
     @Test
@@ -212,5 +214,17 @@ public class AdjacencyTreeExecutorTest {
     public void findLinkIds() {
         Stream<Long> links = this.treeExecutor.findLinkIds(1L, 13L);
         links.forEach(item -> log.info(item.toString()));
+    }
+
+    @Test
+    public void getAllChildrenIds() {
+        Stream<Long> children = this.treeExecutor.getAllChildrenIds(1L);
+        children.forEach(item -> log.info("id: ->{}", item));
+    }
+
+    @Test
+    public void getAllChildren() {
+        Stream<TreeEntity> children = this.treeExecutor.getAllChildren(1L);
+        children.forEach(item -> log.info("id: ->{}", item.getName()));
     }
 }

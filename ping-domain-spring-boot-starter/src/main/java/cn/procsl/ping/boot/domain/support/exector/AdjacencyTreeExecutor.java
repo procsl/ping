@@ -89,6 +89,7 @@ class AdjacencyTreeExecutor<
     final String QUERY_ALL_CHILDREN_JPQL;
 
     Random rand = new Random();
+    private ID id;
 
     public AdjacencyTreeExecutor(JpaEntityInformation<E, ID> entityInformation,
                                  EntityManager entityManager,
@@ -221,6 +222,7 @@ class AdjacencyTreeExecutor<
      */
     @Override
     public Stream<E> getAllChildren(@NonNull ID id) {
+        this.id = id;
         if (log.isDebugEnabled()) {
             log.debug("查询节点:{}的所有子节点", id);
         }
