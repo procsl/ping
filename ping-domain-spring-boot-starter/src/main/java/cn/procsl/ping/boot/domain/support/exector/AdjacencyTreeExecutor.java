@@ -20,6 +20,7 @@ import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.naming.InitialContext;
 import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;
@@ -87,8 +88,6 @@ class AdjacencyTreeExecutor<
 
     final String QUERY_ALL_CHILDREN_JPQL;
 
-    final String DELETE_BY_ID;
-
     Random rand = new Random();
 
     public AdjacencyTreeExecutor(JpaEntityInformation<E, ID> entityInformation,
@@ -131,8 +130,6 @@ class AdjacencyTreeExecutor<
         this.QUERY_ALL_CHILDREN_ID_JPQL = String.format("select b.id from %s as b inner join b.path as c where c.pathId=:id order by b.depth asc", name);
 
         this.QUERY_ALL_CHILDREN_JPQL = String.format("select b from %s as b inner join b.path as c where c.pathId=:id order by b.depth asc", name);
-
-        this.DELETE_BY_ID = String.format("delete from %s where id in (:ids)", name);
     }
 
     @Override
@@ -348,7 +345,7 @@ class AdjacencyTreeExecutor<
     protected void recursion(E parent) {
         long curr = rand.nextLong();
         log.info("进入递归方法:标识符为{}", curr);
-        if (log.isTraceEnabled()) {
+        if (log.isDebugEnabled()) {
             log.debug("刷入上一批id:{}修改的数据", parent == null ? null : parent.getId());
         }
         entityManager.flush();
@@ -356,7 +353,7 @@ class AdjacencyTreeExecutor<
         @Cleanup
         Stream<E> children = this.getDirectChildren(parent.getId());
         // 修改子节点, 修改且合并
-        children.map(item -> changeAndMerge(item, parent))
+        children.map(child -> changeAndMerge(parent, child))
                 // 递归子节点, 属于深度优先递归
                 .forEach(this::recursion);
         log.info("退出递归方法,标识符为:{}", curr);
@@ -374,10 +371,6 @@ class AdjacencyTreeExecutor<
             this.entityManager.remove(refer);
             count.getAndIncrement();
         });
-
-//        int exec = this.entityManager.createQuery(this.DELETE_BY_ID)
-//                .setParameter("ids", stream)
-//                .executeUpdate();
         log.info("删除成功, 影响条数为:{}", count.get());
     }
 

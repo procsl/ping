@@ -65,8 +65,6 @@ public class AdjacencyTreeExecutorTest {
     @Inject
     EntityManager entityManager;
 
-//    PersistanceManager persistanceManager;
-
     private static final Faker FAKER;
 
     private static final MockConfig mockConfig;
@@ -191,8 +189,7 @@ public class AdjacencyTreeExecutorTest {
 
     @Test
     public void remove() {
-//        this.treeExecutor.remove(2L);
-        this.jpaRepository.deleteById(1L);
+        this.treeExecutor.remove(2L);
     }
 
     @Test
