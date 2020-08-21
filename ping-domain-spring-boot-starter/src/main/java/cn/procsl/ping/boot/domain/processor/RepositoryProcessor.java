@@ -16,7 +16,6 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.util.Elements;
 import javax.persistence.Entity;
 import javax.tools.Diagnostic;
 import javax.tools.StandardLocation;
@@ -25,7 +24,6 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
 import static javax.tools.Diagnostic.Kind.ERROR;
@@ -78,8 +76,6 @@ public class RepositoryProcessor extends AbstractProcessor {
 
     /**
      * 加载基础配置
-     *
-     * @return
      */
     private void initConfig() {
         try {
@@ -94,7 +90,7 @@ public class RepositoryProcessor extends AbstractProcessor {
             return;
 
         } catch (Exception e) {
-            messager.printMessage(WARNING, "Not found config file: factories.properties,error:" + e.getMessage());
+            messager.printMessage(WARNING, "Not found config file: META-INF/factory.config. by error:" + e.getMessage());
         }
         this.config = emptyMap();
     }
@@ -119,7 +115,7 @@ public class RepositoryProcessor extends AbstractProcessor {
 
         try {
             for (Element entity : entities) {
-                String name = this.createPackageName(entity, roundEnv);
+                String name = this.createPackageName(entity);
                 // 生成多继承源文件
                 this.generateSourceCode(entity, name, roundEnv);
                 // 生成单继承源文件
@@ -136,27 +132,11 @@ public class RepositoryProcessor extends AbstractProcessor {
     }
 
     /**
-     * 打印错误信息及堆栈
-     *
-     * @param exception
-     */
-    private void print(Exception exception) {
-
-    }
-
-    /**
-     * 打印错误信息堆栈
-     */
-    private void clear() {
-
-    }
-
-    /**
      * 生成单文件继承
      *
      * @param entity      指定的实体
      * @param packageName 包名
-     * @throws IOException
+     * @throws IOException 当文件写入失败时发生
      */
     private void generateSingletonSourceCode(Element entity, String packageName, RoundEnvironment roundEnv) throws IOException {
 
@@ -167,14 +147,14 @@ public class RepositoryProcessor extends AbstractProcessor {
 
         int count = 0;
         for (RepositoryBuilder builder : matcher) {
-            String className = this.createClassName(entity, String.valueOf(count), roundEnv);
+            String className = this.createClassName(entity, String.valueOf(count));
 
             TypeName superInf = builder.build(entity, roundEnv);
             if (superInf == null) {
                 continue;
             }
 
-            TypeSpec typeSpec = this.buildRepository(className, entity, roundEnv)
+            TypeSpec typeSpec = this.buildRepository(className)
                     .addSuperinterface(superInf)
                     .build();
             count++;
@@ -202,11 +182,11 @@ public class RepositoryProcessor extends AbstractProcessor {
 
         if (StringUtils.isEmpty(tmp)) {
             messager.printMessage(WARNING, "Create default repositories");
-            includes = asList("org.springframework.data.jpa.repository.JpaRepository");
+            includes = Collections.singletonList("org.springframework.data.jpa.repository.JpaRepository");
         } else {
             includes = Arrays.stream(tmp.split(","))
                     .filter(item -> !StringUtils.isEmpty(item))
-                    .map(item -> item.trim())
+                    .map(String::trim)
                     .distinct()
                     .filter(this::isAvailable)
                     .sorted()
@@ -215,9 +195,7 @@ public class RepositoryProcessor extends AbstractProcessor {
 
         this.builders = new LinkedList<>();
         this.singletonBuilders = new LinkedList<>();
-        Iterator<RepositoryBuilder> itor = services.iterator();
-        while (itor.hasNext()) {
-            RepositoryBuilder curr = itor.next();
+        for (RepositoryBuilder curr : services) {
             if (curr.isSingleton()) {
                 this.singletonBuilders.add(curr);
             } else {
@@ -228,8 +206,8 @@ public class RepositoryProcessor extends AbstractProcessor {
 
     private boolean isAvailable(String clazz) {
         try {
-            Class<?> ext = Class.forName(clazz);
-            return ext != null;
+            Class.forName(clazz);
+            return true;
         } catch (ClassNotFoundException e) {
             messager.printMessage(WARNING, "Not found class:" + clazz);
         }
@@ -293,7 +271,7 @@ public class RepositoryProcessor extends AbstractProcessor {
     private void generateSourceCode(Element entity, String packageName, RoundEnvironment roundEnv) throws IOException {
 
         // 类名
-        String className = this.createClassName(entity, "", roundEnv);
+        String className = this.createClassName(entity, "");
 
         Iterable<? extends TypeName> inter = this.getMultipleInterfaceType(entity, roundEnv);
         if (inter == null || !inter.iterator().hasNext()) {
@@ -302,7 +280,7 @@ public class RepositoryProcessor extends AbstractProcessor {
         }
 
         // 获取待生成的Repository
-        TypeSpec repository = this.buildRepository(className, entity, roundEnv)
+        TypeSpec repository = this.buildRepository(className)
                 .addSuperinterfaces(inter).build();
 
         this.writer(packageName, repository);
@@ -311,22 +289,20 @@ public class RepositoryProcessor extends AbstractProcessor {
     /**
      * 创建当前的repository类名
      *
-     * @param entity   对应的实体
-     * @param roundEnv 上下文环境
+     * @param entity 对应的实体
      * @return 类名
      */
-    private String createClassName(Element entity, String sign, RoundEnvironment roundEnv) {
+    private String createClassName(Element entity, String sign) {
         return this.prefix + entity.getSimpleName() + sign + "Repository";
     }
 
     /**
      * 创建当前的repository的包名
      *
-     * @param entity      对应的实体
-     * @param environment 上下文环境
+     * @param entity 对应的实体
      * @return 包名
      */
-    private String createPackageName(Element entity, RoundEnvironment environment) {
+    private String createPackageName(Element entity) {
         boolean isOk = StringUtils.hasText(this.packageName);
         if (isOk) {
             return this.packageName;
@@ -360,12 +336,10 @@ public class RepositoryProcessor extends AbstractProcessor {
     /**
      * 创建Repository对象
      *
-     * @param className   类名称
-     * @param entity      对应的entity名称
-     * @param environment 编译器上下文
+     * @param className 类名称
      * @return 返回repository对象
      */
-    private TypeSpec.Builder buildRepository(String className, Element entity, RoundEnvironment environment) {
+    private TypeSpec.Builder buildRepository(String className) {
         return TypeSpec
                 .interfaceBuilder(className)
                 .addAnnotation(Repository.class)
@@ -412,8 +386,7 @@ public class RepositoryProcessor extends AbstractProcessor {
             return Collections.emptyList();
         }
 
-        @SuppressWarnings("unchecked")
-        List<RepositoryBuilder> matcher = new LinkedList();
+        List<RepositoryBuilder> matcher = new LinkedList<>();
         for (RepositoryBuilder builder : builders) {
             for (String include : this.includes) {
                 if (builder.support(include)) {
@@ -428,7 +401,7 @@ public class RepositoryProcessor extends AbstractProcessor {
         }
 
         String[] currentBuilders = entity.getAnnotation(CreateRepository.class).builders();
-        if (currentBuilders == null || currentBuilders.length == 0) {
+        if (currentBuilders.length == 0) {
             return matcher;
         }
 
