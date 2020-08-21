@@ -8,7 +8,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>ping-demo-meta</artifactId>
+    <artifactId>ping-demo</artifactId>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -17,7 +17,7 @@
     <dependencies>
         <dependency>
             <groupId>cn.procsl</groupId>
-            <artifactId>ping-meta-apt</artifactId>
+            <artifactId>ping-apt-processor</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
@@ -47,9 +47,9 @@
                         <arg>-Xlint</arg>
                         <arg>-parameters</arg>
                         <!--包名-->
-                        <!--                        <arg>-Acreator.repository.package.name=cn.procsl.ping.demo.repository</arg>-->
+                        <!--<arg>-Afactory.repository.package.name=cn.procsl.ping.demo.repository</arg>-->
                         <!--生成的repo列表-->
-                        <!--<arg>-Acreator.repository.includes=org.springframework.data.jpa.repository.JpaRepository</arg>-->
+                        <!--<arg>-Afactory.repository.includes=org.springframework.data.jpa.repository.JpaRepository</arg>-->
                     </compilerArgs>
                     <annotationProcessors>
                         <annotationProcessor>

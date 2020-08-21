@@ -1,4 +1,4 @@
-package cn.procsl.ping.meta.process;
+package cn.procsl.ping.apt.processor;
 
 
 import javax.annotation.processing.*;
