@@ -78,7 +78,7 @@
         </dependency>
 
         <dependency>
-            <artifactId>ping-business-tools</artifactId>
+            <artifactId>ping-business-model</artifactId>
             <groupId>cn.procsl</groupId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>

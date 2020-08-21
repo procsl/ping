@@ -22,7 +22,7 @@
         <module>ping-doc-spring-boot-starter</module>
         <module>ping-domain-spring-boot-starter</module>
         <module>ping-user-spring-boot-starter</module>
-        <module>ping-business-tools</module>
+        <module>ping-business-model</module>
     </modules>
     <name>ping</name>
 
