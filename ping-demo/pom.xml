@@ -46,12 +46,16 @@
                         <arg>-g</arg>
                         <arg>-Xlint</arg>
                         <arg>-parameters</arg>
+                        <arg>-Aquerydsl.useGetters=true</arg>
                         <!--包名-->
                         <!--<arg>-Afactory.repository.package.name=cn.procsl.ping.demo.repository</arg>-->
                         <!--生成的repo列表-->
                         <!--<arg>-Afactory.repository.includes=org.springframework.data.jpa.repository.JpaRepository</arg>-->
                     </compilerArgs>
                     <annotationProcessors>
+                        <annotationProcessor>
+                            com.querydsl.apt.jpa.JPAAnnotationProcessor
+                        </annotationProcessor>
                         <annotationProcessor>
                             cn.procsl.ping.boot.domain.processor.RepositoryProcessor
                         </annotationProcessor>

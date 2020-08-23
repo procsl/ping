@@ -1,0 +1,60 @@
+package cn.procsl.ping.demo.domain.entity;
+
+import cn.procsl.ping.boot.domain.annotation.CreateRepository;
+import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyNode;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import java.util.Set;
+
+@Entity
+@Table
+@CreateRepository
+public class Node extends User<PathNode> {
+
+    @Id
+    String id;
+
+    @Override
+    public String getId() {
+        return null;
+    }
+
+    @Override
+    public String getParentId() {
+        return null;
+    }
+
+    @Override
+    public Integer getDepth() {
+        return null;
+    }
+
+    @Override
+    public Set<PathNode> getPath() {
+        return null;
+    }
+
+    /**
+     * 创建路径节点实例方法
+     *
+     * @param pathId
+     * @param seq
+     * @return
+     */
+    @Override
+    public PathNode createPathNode(String pathId, Integer seq) {
+        return null;
+    }
+
+    /**
+     * 修改父节点
+     *
+     * @param parent 指定的父节点
+     */
+    @Override
+    public void changeParent(AdjacencyNode<String, PathNode> parent) {
+
+    }
+}

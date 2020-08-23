@@ -1,20 +1,17 @@
 package cn.procsl.ping.demo.domain.entity;
 
-import cn.procsl.ping.boot.domain.annotation.CreateRepository;
+import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyNode;
 
-import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Table;
 
 /**
  * @author procsl
  * @date 2020/05/18
  */
-@Entity
-@Table
-@CreateRepository
-public class User {
+public abstract class User<T extends PathNode> implements AdjacencyNode<String, T> {
 
     @Id
     String id;
+
+
 }
