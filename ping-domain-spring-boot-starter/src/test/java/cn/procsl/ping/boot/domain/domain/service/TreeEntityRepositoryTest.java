@@ -1,8 +1,8 @@
 package cn.procsl.ping.boot.domain.domain.service;
 
+import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository;
 import cn.procsl.ping.boot.domain.domain.entity.PathNode;
 import cn.procsl.ping.boot.domain.domain.entity.TreeEntity;
-import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;

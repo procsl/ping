@@ -2,7 +2,6 @@ package cn.procsl.ping.boot.domain.business.tree.model;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.OrderBy;
 import java.io.Serializable;
 
 /**

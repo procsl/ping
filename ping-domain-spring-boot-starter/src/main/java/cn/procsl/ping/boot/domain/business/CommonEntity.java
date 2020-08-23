@@ -1,7 +1,6 @@
 package cn.procsl.ping.boot.domain.business;
 
 import cn.procsl.ping.business.domain.DomainEntity;
-import lombok.Data;
 import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;

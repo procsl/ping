@@ -1,8 +1,8 @@
 package cn.procsl.ping.boot.domain.domain.repository;
 
+import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository;
 import cn.procsl.ping.boot.domain.domain.entity.PathNode;
 import cn.procsl.ping.boot.domain.domain.entity.TreeEntity;
-import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
