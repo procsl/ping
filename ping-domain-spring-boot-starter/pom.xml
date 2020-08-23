@@ -14,7 +14,7 @@
 
     <artifactId>ping-domain-spring-boot-starter</artifactId>
     <groupId>cn.procsl</groupId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -80,7 +80,7 @@
         <dependency>
             <artifactId>ping-business-model</artifactId>
             <groupId>cn.procsl</groupId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.2-SNAPSHOT</version>
         </dependency>
 
         <dependency>

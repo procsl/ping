@@ -8,7 +8,7 @@
     <artifactId>ping-apt-processor</artifactId>
     <groupId>cn.procsl</groupId>
     <packaging>jar</packaging>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
