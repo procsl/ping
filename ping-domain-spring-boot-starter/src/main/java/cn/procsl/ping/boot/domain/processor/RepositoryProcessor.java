@@ -15,6 +15,7 @@ import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.persistence.Entity;
 import javax.tools.Diagnostic;
@@ -115,11 +116,16 @@ public class RepositoryProcessor extends AbstractProcessor {
 
         try {
             for (Element entity : entities) {
-                String name = this.createPackageName(entity);
+                if (!(entity instanceof TypeElement)) {
+                    messager.printMessage(WARNING, entity.asType().toString() + " is not class type", entity);
+                    continue;
+                }
+
+                String name = this.createPackageName((TypeElement) entity);
                 // 生成多继承源文件
-                this.generateSourceCode(entity, name, roundEnv);
+                this.generateSourceCode((TypeElement) entity, name, roundEnv);
                 // 生成单继承源文件
-                this.generateSingletonSourceCode(entity, name, roundEnv);
+                this.generateSingletonSourceCode((TypeElement) entity, name, roundEnv);
             }
         } catch (IOException e) {
             messager.printMessage(ERROR, "Source code output error:" + e.getMessage());
@@ -138,7 +144,7 @@ public class RepositoryProcessor extends AbstractProcessor {
      * @param packageName 包名
      * @throws IOException 当文件写入失败时发生
      */
-    private void generateSingletonSourceCode(Element entity, String packageName, RoundEnvironment roundEnv) throws IOException {
+    private void generateSingletonSourceCode(TypeElement entity, String packageName, RoundEnvironment roundEnv) throws IOException {
 
         List<RepositoryBuilder> matcher = this.matcher(this.singletonBuilders, entity);
         if (matcher.isEmpty()) {
@@ -151,6 +157,7 @@ public class RepositoryProcessor extends AbstractProcessor {
 
             TypeName superInf = builder.build(entity, roundEnv);
             if (superInf == null) {
+                messager.printMessage(WARNING, entity.getSimpleName() + "create repository fail", entity);
                 continue;
             }
 
@@ -196,6 +203,7 @@ public class RepositoryProcessor extends AbstractProcessor {
         this.builders = new LinkedList<>();
         this.singletonBuilders = new LinkedList<>();
         for (RepositoryBuilder curr : services) {
+            curr.init(processingEnv, this::getConfig);
             if (curr.isSingleton()) {
                 this.singletonBuilders.add(curr);
             } else {
@@ -268,14 +276,14 @@ public class RepositoryProcessor extends AbstractProcessor {
      * @param roundEnv    上下文
      * @param packageName 包名
      */
-    private void generateSourceCode(Element entity, String packageName, RoundEnvironment roundEnv) throws IOException {
+    private void generateSourceCode(TypeElement entity, String packageName, RoundEnvironment roundEnv) throws IOException {
 
         // 类名
         String className = this.createClassName(entity, "");
 
         Iterable<? extends TypeName> inter = this.getMultipleInterfaceType(entity, roundEnv);
         if (inter == null || !inter.iterator().hasNext()) {
-            messager.printMessage(Diagnostic.Kind.NOTE, "Not matcher repository:" + className + ":" + entity.getSimpleName());
+            messager.printMessage(Diagnostic.Kind.NOTE, "Not matcher repository:" + className + ":" + entity.getSimpleName(), entity);
             return;
         }
 
@@ -302,34 +310,19 @@ public class RepositoryProcessor extends AbstractProcessor {
      * @param entity 对应的实体
      * @return 包名
      */
-    private String createPackageName(Element entity) {
+    private String createPackageName(TypeElement entity) {
         boolean isOk = StringUtils.hasText(this.packageName);
         if (isOk) {
             return this.packageName;
         }
 
-        Element packageType = entity.getEnclosingElement();
-        if (packageType == null) {
-            return "";
+        PackageElement packName = this.processingEnv.getElementUtils().getPackageOf(entity);
+
+        String name = packName.asType().toString();
+        if (name == null || name.isEmpty()) {
+            return "repository";
         }
-
-        // 返回当前的实体的包名
-        String fullName = packageType.asType().toString();
-
-        if (packageType.getSimpleName() == null) {
-            return fullName;
-        }
-        String simpleName = packageType.getSimpleName().toString();
-
-        if (simpleName.isEmpty()) {
-            return fullName;
-        }
-
-        if (fullName.length() > simpleName.length()) {
-            return fullName.substring(0, fullName.length() - simpleName.length()) + "repository";
-        }
-
-        return fullName;
+        return name.concat(".repository");
     }
 
 
@@ -354,7 +347,7 @@ public class RepositoryProcessor extends AbstractProcessor {
      * @param environment 编译器上下文
      * @return 返回创建的TypeNames
      */
-    private Iterable<? extends TypeName> getMultipleInterfaceType(Element entity, RoundEnvironment environment) {
+    private Iterable<? extends TypeName> getMultipleInterfaceType(TypeElement entity, RoundEnvironment environment) {
 
         List<RepositoryBuilder> matcher = this.matcher(this.builders, entity);
 
