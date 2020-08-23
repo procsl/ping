@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.domain.support.executor;
 
-import cn.procsl.ping.boot.domain.support.jpa.PersistenceRepository;
+import cn.procsl.ping.boot.domain.business.common.repository.PersistenceRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.provider.PersistenceProvider;
 import org.springframework.data.jpa.repository.query.EscapeCharacter;

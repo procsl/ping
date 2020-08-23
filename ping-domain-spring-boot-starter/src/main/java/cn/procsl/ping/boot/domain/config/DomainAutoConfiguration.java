@@ -25,7 +25,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @Slf4j
 @EnableJpaAuditing
 //@EnableJpaRepositories(basePackages = {
-//        "cn.procsl.ping.boot.domain.business.repository",
+//        "cn.procsl.ping.boot.domain.business.common.repository",
 //},
 //        repositoryFactoryBeanClass = DomainRepositoryFactoryBean.class,
 //        bootstrapMode = BootstrapMode.LAZY

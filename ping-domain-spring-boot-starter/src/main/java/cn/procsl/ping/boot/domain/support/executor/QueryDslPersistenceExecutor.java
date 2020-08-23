@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.domain.support.executor;
 
-import cn.procsl.ping.boot.domain.support.querydsl.QueryDslPersistenceRepository;
+import cn.procsl.ping.boot.domain.business.common.repository.QueryDslPersistenceRepository;
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;

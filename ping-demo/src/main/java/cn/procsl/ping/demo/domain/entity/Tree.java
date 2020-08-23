@@ -40,20 +40,18 @@ public class Tree implements AdjacencyNode<String, PathNode>, Serializable {
         return pathNodes;
     }
 
-    public void setPathNode(Set<PathNode> pathNode) {
-        this.pathNodes = pathNodes;
-    }
-
     /**
      * 创建路径节点实例方法
      *
-     * @param pathId
-     * @param seq
      * @return
      */
     @Override
-    public PathNode createPathNode(String pathId, Integer seq) {
+    public PathNode currentPathNode() {
         return null;
+    }
+
+    public void setPathNode(Set<PathNode> pathNode) {
+        this.pathNodes = pathNodes;
     }
 
     /**

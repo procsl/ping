@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.domain.support.querydsl;
 
+import cn.procsl.ping.boot.domain.business.common.repository.QueryDslPersistenceRepository;
 import cn.procsl.ping.boot.domain.domain.entity.QUser;
 import cn.procsl.ping.boot.domain.domain.entity.User;
 import cn.procsl.ping.boot.domain.support.executor.DomainRepositoryFactoryBean;

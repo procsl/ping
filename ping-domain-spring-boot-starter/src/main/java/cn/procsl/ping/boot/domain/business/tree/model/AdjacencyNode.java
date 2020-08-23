@@ -40,11 +40,9 @@ public interface AdjacencyNode<ID extends Serializable, T extends AdjacencyPathN
     /**
      * 创建路径节点实例方法
      *
-     * @param pathId
-     * @param seq
      * @return
      */
-    T createPathNode(ID pathId, Integer seq);
+    T currentPathNode();
 
     /**
      * 修改父节点

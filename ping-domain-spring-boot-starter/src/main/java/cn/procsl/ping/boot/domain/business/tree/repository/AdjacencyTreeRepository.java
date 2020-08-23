@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.domain.business.tree.repository;
 
-import cn.procsl.ping.boot.domain.business.Operator;
+import cn.procsl.ping.boot.domain.business.common.model.Operator;
 import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyNode;
 import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyPathNode;
 import org.springframework.data.domain.Sort;

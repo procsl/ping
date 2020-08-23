@@ -51,9 +51,15 @@ public class TreeEntity implements AdjacencyNode<Long, PathNode> {
     @CollectionTable(joinColumns = @JoinColumn(name = "id"))
     Set<PathNode> path;
 
+
+    /**
+     * 创建路径节点实例方法
+     *
+     * @return
+     */
     @Override
-    public PathNode createPathNode(Long pathId, Integer seq) {
-        return new PathNode(pathId, seq);
+    public PathNode currentPathNode() {
+        return new PathNode(this.id, this.depth);
     }
 
     @Override
@@ -68,14 +74,12 @@ public class TreeEntity implements AdjacencyNode<Long, PathNode> {
         log.debug("修改parentId:{}", parentId);
 
         this.depth = ((TreeEntity) parent).depth + 1;
-        log.debug("修改depth:{}",depth);
+        log.debug("修改depth:{}", depth);
 
         this.path.addAll(parent.getPath());
         log.debug("添加父节点的path:{}", this.path);
 
-        PathNode current = this.createPathNode(parentId, parent.getDepth());
-        this.path.add(current);
-        log.debug("添加父节点至path:{}", current);
+        this.path.add(parent.currentPathNode());
 
         this.selfUpdate();
     }
@@ -123,7 +127,7 @@ public class TreeEntity implements AdjacencyNode<Long, PathNode> {
             this.parentId = id;
         }
 
-        PathNode pathNode = this.createPathNode(this.id, this.depth);
+        PathNode pathNode = new PathNode(id, depth);
         log.debug("添加当前的节点至PathNodes:{}", pathNode);
         this.path.add(pathNode);
         List<String> tmp = this.path

@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.domain.business;
+package cn.procsl.ping.boot.domain.business.common.model;
 
 import cn.procsl.ping.business.domain.DomainEntity;
 import org.hibernate.annotations.ColumnDefault;

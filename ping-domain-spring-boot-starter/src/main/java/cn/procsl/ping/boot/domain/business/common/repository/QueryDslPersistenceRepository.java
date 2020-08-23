@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.domain.support.querydsl;
+package cn.procsl.ping.boot.domain.business.common.repository;
 
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;

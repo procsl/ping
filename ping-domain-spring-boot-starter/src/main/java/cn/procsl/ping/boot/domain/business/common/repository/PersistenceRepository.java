@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.domain.support.jpa;
+package cn.procsl.ping.boot.domain.business.common.repository;
 
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.Repository;

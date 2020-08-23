@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.domain.support.jpa;
 
+import cn.procsl.ping.boot.domain.business.common.repository.PersistenceRepository;
 import cn.procsl.ping.boot.domain.domain.entity.User;
 import cn.procsl.ping.boot.domain.support.executor.DomainRepositoryFactoryBean;
 import lombok.extern.slf4j.Slf4j;

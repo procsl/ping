@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.domain.support.executor;
 
-import cn.procsl.ping.boot.domain.business.Operator;
+import cn.procsl.ping.boot.domain.business.common.model.Operator;
 import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository;
 import cn.procsl.ping.boot.domain.domain.entity.PathNode;
 import cn.procsl.ping.boot.domain.domain.entity.QTreeEntity;

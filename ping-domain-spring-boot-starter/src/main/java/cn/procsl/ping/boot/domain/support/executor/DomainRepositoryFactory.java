@@ -1,8 +1,8 @@
 package cn.procsl.ping.boot.domain.support.executor;
 
 import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository;
-import cn.procsl.ping.boot.domain.support.jpa.PersistenceRepository;
-import cn.procsl.ping.boot.domain.support.querydsl.QueryDslPersistenceRepository;
+import cn.procsl.ping.boot.domain.business.common.repository.PersistenceRepository;
+import cn.procsl.ping.boot.domain.business.common.repository.QueryDslPersistenceRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.query.EscapeCharacter;
 import org.springframework.data.jpa.repository.support.CrudMethodMetadata;
