@@ -10,14 +10,14 @@ insert_final_newline = true
 charset = utf-8
 
 # Tab indentation (no size specified)
-[*.js]
+[*.java]
 indent_style = space
 
-# Indentation override for all JS under lib directory
-[lib/**.js]
+# Indentation override for all java
+[*/**.java]
 indent_size = 4
 
-# Matches the exact files either package.json or .travis.yml
-[{package.json, .travis.yml}]
+# Matches the exact files either *.json or *.yml
+[{*.json, *.yml}]
 indent_style = space
 indent_size = 2
