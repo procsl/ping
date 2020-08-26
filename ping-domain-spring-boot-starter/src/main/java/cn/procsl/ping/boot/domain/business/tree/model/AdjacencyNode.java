@@ -1,10 +1,7 @@
 package cn.procsl.ping.boot.domain.business.tree.model;
 
 import cn.procsl.ping.boot.domain.business.utils.ObjectUtils;
-import cn.procsl.ping.boot.domain.support.executor.DomainEventListener;
-import cn.procsl.ping.business.domain.DomainEntity;
 import cn.procsl.ping.business.domain.DomainEvents;
-import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -17,12 +14,7 @@ import java.util.Set;
  * @date 2020/07/29
  */
 @MappedSuperclass
-@EntityListeners(DomainEventListener.class)
-@DynamicUpdate
-public interface AdjacencyNode<ID extends Serializable, T extends AdjacencyPathNode<ID>>
-        extends DomainEntity, DomainEvents {
-
-    ID getId();
+public interface AdjacencyNode<ID extends Serializable, T extends AdjacencyPathNode<ID>> extends DomainEvents<ID> {
 
     ID getParentId();
 
@@ -40,7 +32,7 @@ public interface AdjacencyNode<ID extends Serializable, T extends AdjacencyPathN
     /**
      * 创建路径节点实例方法
      *
-     * @return
+     * @return 返回当前节点的 DictPath
      */
     T currentPathNode();
 

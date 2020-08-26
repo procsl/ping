@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @date 2020/04/06
  */
 
-@ConfigurationProperties(prefix = "ping.data")
+@ConfigurationProperties(prefix = "ping.domain")
 @Getter
 @Setter
 public class DomainProperties {
@@ -20,8 +20,10 @@ public class DomainProperties {
 
     private String indexNamePrefix = "in";
 
-    private String tablePrefix ="pb";
+    private String tablePrefix = "pb";
 
     private String dot = "_";
+
+    private String directoryDelimiter = "/";
 
 }

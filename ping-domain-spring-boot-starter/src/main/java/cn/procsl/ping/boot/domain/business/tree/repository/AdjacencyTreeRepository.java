@@ -101,10 +101,10 @@ public interface AdjacencyTreeRepository<
      * 查找指定树等于指定深度节点(含多个)
      *
      * @param id        自定的树ID
-     * @param depth
-     * @param operator
-     * @param direction
-     * @return 最大深度节点表
+     * @param depth     深度条件
+     * @param operator  操作符
+     * @param direction 排序条件
+     * @return 指定深度的列表
      */
     Stream<T> findDepthNodes(ID id, @Nullable Integer depth, Operator operator, Sort.Direction direction);
 
@@ -120,8 +120,9 @@ public interface AdjacencyTreeRepository<
      * 删除指定的节点, 包括子节点
      *
      * @param id 指定的节点
+     * @return 返回删除个数
      */
-    void remove(ID id);
+    int remove(ID id);
 
     /**
      * 查询链路节点
@@ -156,9 +157,23 @@ public interface AdjacencyTreeRepository<
     /**
      * 计算两个节点中谁为子节点, 并且返回子节点ID
      *
-     * @param source
-     * @param target
-     * @return
+     * @param pre  节点1
+     * @param next 节点2
+     * @return 返回子节点ID
      */
-    ID calcChildId(ID source, ID target);
+    ID calcChildId(ID pre, ID next);
+
+    /**
+     * 获取root节点列表
+     *
+     * @return root id
+     */
+    Stream<T> getRoots();
+
+    /**
+     * 获取root ids
+     *
+     * @return root 节点id
+     */
+    Stream<ID> getRootIds();
 }

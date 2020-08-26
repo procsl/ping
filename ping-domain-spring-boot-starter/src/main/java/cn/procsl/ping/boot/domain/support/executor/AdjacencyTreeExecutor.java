@@ -10,7 +10,6 @@ import cn.procsl.ping.business.exception.BusinessException;
 import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.provider.PersistenceProvider;
 import org.springframework.data.jpa.repository.query.EscapeCharacter;
@@ -31,6 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
+import static javax.persistence.LockModeType.PESSIMISTIC_READ;
 
 /**
  * 邻接树数据库操作
@@ -63,32 +63,35 @@ class AdjacencyTreeExecutor<
 
     final Class<ID> idType;
 
-    final String QUERY_PARENTS_JPQL;
+    final String query_parents_jpql;
 
-    final String QUERY_CHILDREN_JPQL;
+    final String query_children_jpql;
 
-    final String QUERY_CHILDREN_ID_JPQL;
+    final String query_children_id_jpql;
 
-    final String QUERY_DIRECT_JPQL;
+    final String query_direct_jpql;
 
-    final String QUERY_DEPTH_JPQL;
+    final String query_depth_jpql;
 
-    final String QUERY_MAX_DEPTH_JPQL;
+    final String query_max_depth_jpql;
 
-    final String QUERY_DEPTH_NODE_JPQL;
+    final String query_depth_node_jpql;
 
-    final String QUERY_EXISTS_ID_JPQL;
+    final String query_exists_id_jpql;
 
-    final String QUERY_LINKS_JPQL;
+    final String query_links_jpql;
 
-    final String QUERY_PARENTS_ID_JPQL;
+    final String query_parents_id_jpql;
 
-    final String QUERY_ALL_CHILDREN_ID_JPQL;
+    final String query_all_children_id_jpql;
 
-    final String QUERY_ALL_CHILDREN_JPQL;
+    final String query_all_children_jpql;
+
+    final String query_roots_jpql;
+
+    final String query_root_ids_jpql;
 
     Random rand = new Random();
-    private ID id;
 
     public AdjacencyTreeExecutor(JpaEntityInformation<E, ID> entityInformation,
                                  EntityManager entityManager,
@@ -107,29 +110,33 @@ class AdjacencyTreeExecutor<
         idType = this.entityInformation.getIdType();
 
         String name = javaType.getName();
-        this.QUERY_PARENTS_JPQL = String.format("select tree from %s as tree where tree.id in (select b.pathId from %s as a inner join a.path as b where b.id =:parent_id) order by tree.depth asc", name, name);
+        this.query_parents_jpql = String.format("select tree from %s as tree where tree.id in (select b.pathId from %s as a inner join a.path as b where b.id =:parent_id) order by tree.depth asc", name, name);
 
-        this.QUERY_CHILDREN_JPQL = String.format("select tree from %s as tree where tree.parentId =:id order by tree.id", name);
+        this.query_children_jpql = String.format("select tree from %s as tree where tree.parentId =:id order by tree.id", name);
 
-        this.QUERY_CHILDREN_ID_JPQL = String.format("select tree.id from %s as tree where tree.parentId =:id order by tree.id", name);
+        this.query_children_id_jpql = String.format("select tree.id from %s as tree where tree.parentId =:id order by tree.id", name);
 
-        this.QUERY_DIRECT_JPQL = String.format("select tree from %s as tree where tree.id in (select a.parentId from %s as a where id=:id)", name, name);
+        this.query_direct_jpql = String.format("select tree from %s as tree where tree.id in (select a.parentId from %s as a where id=:id)", name, name);
 
-        this.QUERY_DEPTH_JPQL = String.format("select tree.depth from %s as tree where tree.id=:id", name);
+        this.query_depth_jpql = String.format("select tree.depth from %s as tree where tree.id=:id", name);
 
-        this.QUERY_MAX_DEPTH_JPQL = String.format("select a.depth from %s as a inner join a.path as b where b.pathId =:id order by a.depth desc", name);
+        this.query_max_depth_jpql = String.format("select a.depth from %s as a inner join a.path as b where b.pathId =:id order by a.depth desc", name);
 
-        this.QUERY_DEPTH_NODE_JPQL = String.format("select tree from %s as tree inner join tree.path as b where b.pathId =:id and tree.depth ", name);
+        this.query_depth_node_jpql = String.format("select tree from %s as tree inner join tree.path as b where b.pathId =:id and tree.depth ", name);
 
-        this.QUERY_EXISTS_ID_JPQL = String.format("select count(a.id) from %s as a where a.id=:id", name);
+        this.query_exists_id_jpql = String.format("select count(a.id) from %s as a where a.id=:id", name);
 
-        this.QUERY_LINKS_JPQL = String.format("select a.id from %s as a inner join a.path as b where b.pathId in (:start,:end) and (a.parentId = :start or a.parentId = :end)  group by a.id having count(a.id) >= 2", name);
+        this.query_links_jpql = String.format("select a.id from %s as a inner join a.path as b where b.pathId in (:start,:end) and (a.parentId = :start or a.parentId = :end)  group by a.id having count(a.id) >= 2", name);
 
-        this.QUERY_PARENTS_ID_JPQL = String.format("select tree.id from %s as tree where tree.id in (select b.pathId from %s as a inner join a.path as b where b.id =:parent_id) order by tree.depth asc", name, name);
+        this.query_parents_id_jpql = String.format("select tree.id from %s as tree where tree.id in (select b.pathId from %s as a inner join a.path as b where b.id =:parent_id) order by tree.depth asc", name, name);
 
-        this.QUERY_ALL_CHILDREN_ID_JPQL = String.format("select b.id from %s as b inner join b.path as c where c.pathId=:id order by b.depth asc", name);
+        this.query_all_children_id_jpql = String.format("select b.id from %s as b inner join b.path as c where c.pathId=:id order by b.depth asc", name);
 
-        this.QUERY_ALL_CHILDREN_JPQL = String.format("select b from %s as b inner join b.path as c where c.pathId=:id order by b.depth asc", name);
+        this.query_all_children_jpql = String.format("select b from %s as b inner join b.path as c where c.pathId=:id order by b.depth asc", name);
+
+        this.query_roots_jpql = String.format("select a from %s as a where a.id = a.parentId or a.depth = 0", name);
+
+        this.query_root_ids_jpql = String.format("select a.id from %s as a where a.id = a.parentId or a.depth = 0", name);
     }
 
     @Override
@@ -137,13 +144,12 @@ class AdjacencyTreeExecutor<
         if (log.isDebugEnabled()) {
             log.debug("查询节点:{}的父节点", id);
         }
-        val tmp = this.entityManager
-                .createQuery(QUERY_PARENTS_JPQL, javaType)
-                .setLockMode(LockModeType.PESSIMISTIC_READ)
+        return this.entityManager
+                .createQuery(query_parents_jpql, javaType)
+                .setLockMode(PESSIMISTIC_READ)
                 .setFlushMode(FlushModeType.COMMIT)
                 .setParameter("parent_id", id)
                 .getResultStream();
-        return tmp;
     }
 
     @Override
@@ -151,13 +157,12 @@ class AdjacencyTreeExecutor<
         if (log.isDebugEnabled()) {
             log.debug("查询节点:{}的父节点IDs", id);
         }
-        Stream<ID> tmp = this.entityManager
-                .createQuery(QUERY_PARENTS_ID_JPQL, idType)
-                .setLockMode(LockModeType.PESSIMISTIC_READ)
+        return this.entityManager
+                .createQuery(query_parents_id_jpql, idType)
+                .setLockMode(PESSIMISTIC_READ)
                 .setFlushMode(FlushModeType.COMMIT)
                 .setParameter("parent_id", id)
                 .getResultStream();
-        return tmp;
     }
 
     @Override
@@ -165,13 +170,12 @@ class AdjacencyTreeExecutor<
         if (log.isDebugEnabled()) {
             log.debug("查询节点:{}的直接子节点", id);
         }
-        Stream<E> tmp = this.entityManager
-                .createQuery(this.QUERY_CHILDREN_JPQL, javaType)
-                .setLockMode(LockModeType.PESSIMISTIC_READ)
+        return this.entityManager
+                .createQuery(this.query_children_jpql, javaType)
+                .setLockMode(PESSIMISTIC_READ)
                 .setFlushMode(FlushModeType.COMMIT)
                 .setParameter("id", id)
                 .getResultStream();
-        return tmp;
     }
 
     /**
@@ -185,13 +189,12 @@ class AdjacencyTreeExecutor<
         if (log.isDebugEnabled()) {
             log.debug("查询节点:{}的直接子节点IDs", id);
         }
-        Stream<ID> tmp = this.entityManager
-                .createQuery(this.QUERY_CHILDREN_ID_JPQL, idType)
-                .setLockMode(LockModeType.PESSIMISTIC_READ)
+        return this.entityManager
+                .createQuery(this.query_children_id_jpql, idType)
+                .setLockMode(PESSIMISTIC_READ)
                 .setFlushMode(FlushModeType.COMMIT)
                 .setParameter("id", id)
                 .getResultStream();
-        return tmp;
     }
 
     /**
@@ -206,9 +209,9 @@ class AdjacencyTreeExecutor<
             log.debug("查询节点:{}的所有子节点IDs", id);
         }
         return this.entityManager
-                .createQuery(this.QUERY_ALL_CHILDREN_ID_JPQL, idType)
+                .createQuery(this.query_all_children_id_jpql, idType)
                 .setParameter("id", id)
-                .setLockMode(LockModeType.PESSIMISTIC_READ)
+                .setLockMode(PESSIMISTIC_READ)
                 .setFlushMode(FlushModeType.AUTO)
                 .getResultStream();
     }
@@ -221,13 +224,12 @@ class AdjacencyTreeExecutor<
      */
     @Override
     public Stream<E> getAllChildren(@NonNull ID id) {
-        this.id = id;
         if (log.isDebugEnabled()) {
             log.debug("查询节点:{}的所有子节点", id);
         }
-        return this.entityManager.createQuery(this.QUERY_ALL_CHILDREN_JPQL, javaType)
+        return this.entityManager.createQuery(this.query_all_children_jpql, javaType)
                 .setParameter("id", id)
-                .setLockMode(LockModeType.PESSIMISTIC_READ)
+                .setLockMode(PESSIMISTIC_READ)
                 .setFlushMode(FlushModeType.AUTO)
                 .getResultStream();
     }
@@ -237,9 +239,9 @@ class AdjacencyTreeExecutor<
         if (log.isDebugEnabled()) {
             log.debug("查询节点:{}的直接父节点", id);
         }
-        return this.entityManager.createQuery(this.QUERY_DIRECT_JPQL, javaType)
+        return this.entityManager.createQuery(this.query_direct_jpql, javaType)
                 .setParameter("id", id)
-                .setLockMode(LockModeType.PESSIMISTIC_READ)
+                .setLockMode(PESSIMISTIC_READ)
                 .setFlushMode(FlushModeType.AUTO)
                 .setMaxResults(1)
                 .getResultStream().findFirst();
@@ -250,10 +252,10 @@ class AdjacencyTreeExecutor<
         if (log.isDebugEnabled()) {
             log.debug("获取指定节点:{}的深度", id);
         }
-        List<Integer> result = this.entityManager.createQuery(this.QUERY_DEPTH_JPQL, Integer.class)
+        List<Integer> result = this.entityManager.createQuery(this.query_depth_jpql, Integer.class)
                 .setParameter("id", id)
                 .setMaxResults(1)
-                .setLockMode(LockModeType.PESSIMISTIC_READ)
+                .setLockMode(PESSIMISTIC_READ)
                 .setFlushMode(FlushModeType.COMMIT)
                 .getResultList();
         return CollectionUtils.isEmpty(result) ? -1 : result.get(0);
@@ -265,10 +267,10 @@ class AdjacencyTreeExecutor<
             log.debug("获取指定节点:{}的的最大子节点深度", id);
         }
         List<Integer> list = this.entityManager
-                .createQuery(this.QUERY_MAX_DEPTH_JPQL, Integer.class)
+                .createQuery(this.query_max_depth_jpql, Integer.class)
                 .setParameter("id", id)
                 .setMaxResults(1)
-                .setLockMode(LockModeType.PESSIMISTIC_READ)
+                .setLockMode(PESSIMISTIC_READ)
                 .setFlushMode(FlushModeType.AUTO)
                 .getResultList();
         return CollectionUtils.isEmpty(list) ? -1 : list.get(0);
@@ -282,7 +284,7 @@ class AdjacencyTreeExecutor<
         if (operator == null) {
             operator = Operator.GE;
         }
-        String jpql = this.QUERY_DEPTH_NODE_JPQL + operator.getOperator() + " :depth order by tree.depth " + direction.name();
+        String jpql = this.query_depth_node_jpql + operator.getOperator() + " :depth order by tree.depth " + direction.name();
         if (log.isDebugEnabled()) {
             log.debug("查询指定节点子节点:{},深度:{},条件:{},排序:{}", id, depth, operator, direction);
         }
@@ -290,7 +292,7 @@ class AdjacencyTreeExecutor<
                 .createQuery(jpql, javaType)
                 .setParameter("id", id)
                 .setParameter("depth", depth)
-                .setLockMode(LockModeType.PESSIMISTIC_READ)
+                .setLockMode(PESSIMISTIC_READ)
                 .setFlushMode(FlushModeType.COMMIT)
                 .getResultStream();
     }
@@ -317,13 +319,13 @@ class AdjacencyTreeExecutor<
                 throw new BusinessException("不可将父节点附加至自身子节点");
             }
 
-            sourceNode = this.entityManager.find(javaType, root, LockModeType.PESSIMISTIC_READ);
-            if (isNull(root)) {
+            sourceNode = this.entityManager.find(javaType, root, PESSIMISTIC_READ);
+            if (isNull(sourceNode)) {
                 throw new IllegalArgumentException("找不到源节点对应的实体");
             }
         }
 
-        E targetNode = this.entityManager.find(javaType, target, LockModeType.PESSIMISTIC_READ);
+        E targetNode = this.entityManager.find(javaType, target, PESSIMISTIC_READ);
         if (isNull(targetNode)) {
             throw new IllegalArgumentException("Target node not found!");
         }
@@ -351,6 +353,7 @@ class AdjacencyTreeExecutor<
         }
         entityManager.flush();
         // 加载直接子节点
+        assert parent != null;
         @Cleanup
         Stream<E> children = this.getDirectChildren(parent.getId());
         // 修改子节点, 修改且合并
@@ -361,9 +364,9 @@ class AdjacencyTreeExecutor<
     }
 
     @Override
-    public void remove(@NonNull ID id) {
+    public int remove(@NonNull ID id) {
         Stream<ID> stream = this.getAllChildrenIds(id);
-        AtomicInteger count = new AtomicInteger();
+        AtomicInteger count = new AtomicInteger(0);
         stream.forEach(item -> {
             E refer = this.entityManager.getReference(javaType, item);
             if (log.isTraceEnabled()) {
@@ -372,7 +375,9 @@ class AdjacencyTreeExecutor<
             this.entityManager.remove(refer);
             count.getAndIncrement();
         });
+        this.entityManager.flush();
         log.info("删除成功, 影响条数为:{}", count.get());
+        return count.get();
     }
 
     @Override
@@ -415,24 +420,48 @@ class AdjacencyTreeExecutor<
     }
 
     @Override
-    public ID calcChildId(ID source, ID target) {
+    public ID calcChildId(ID pre, ID next) {
         List<ID> tmp =
                 this.entityManager
-                        .createQuery(this.QUERY_LINKS_JPQL, this.idType)
-                        .setParameter("start", source)
-                        .setParameter("end", target)
+                        .createQuery(this.query_links_jpql, this.idType)
+                        .setParameter("start", pre)
+                        .setParameter("end", next)
                         .setLockMode(LockModeType.NONE)
                         .setMaxResults(1)
                         .getResultList();
         if (CollectionUtils.isEmpty(tmp)) {
             if (log.isDebugEnabled()) {
-                log.debug("source:{}与target:{}不存在父子关系", source, target);
+                log.debug("source:{}与target:{}不存在父子关系", pre, next);
             }
             return null;
         }
         if (log.isDebugEnabled()) {
-            log.debug("source:{},target:{}中的子节点为:{}", source, target, tmp.get(0));
+            log.debug("source:{},target:{}中的子节点为:{}", pre, next, tmp.get(0));
         }
         return tmp.get(0);
+    }
+
+    /**
+     * 获取root节点列表
+     *
+     * @return 返回root节点
+     */
+    @Override
+    public Stream<E> getRoots() {
+        return this.entityManager.createQuery(this.query_roots_jpql, javaType)
+                .setFlushMode(FlushModeType.AUTO)
+                .getResultStream();
+    }
+
+    /**
+     * 获取root ids
+     *
+     * @return root 节点id
+     */
+    @Override
+    public Stream<ID> getRootIds() {
+        return this.entityManager.createQuery(this.query_roots_jpql, idType)
+                .setFlushMode(FlushModeType.AUTO)
+                .getResultStream();
     }
 }

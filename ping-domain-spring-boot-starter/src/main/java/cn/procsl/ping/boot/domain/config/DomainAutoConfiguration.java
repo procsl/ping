@@ -1,16 +1,32 @@
 package cn.procsl.ping.boot.domain.config;
 
+import cn.procsl.ping.boot.domain.business.dictionary.model.DictPath;
+import cn.procsl.ping.boot.domain.business.dictionary.model.Dictionary;
+import cn.procsl.ping.boot.domain.business.dictionary.repository.CustomDictionaryRepository;
+import cn.procsl.ping.boot.domain.business.dictionary.repository.CustomDictionaryRepositoryImpl;
+import cn.procsl.ping.boot.domain.business.dictionary.service.DictionaryService;
+import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository;
 import cn.procsl.ping.boot.domain.naming.LowCasePhysicalNamingStrategy;
 import cn.procsl.ping.boot.domain.naming.NameImplicitNamingStrategy;
+import cn.procsl.ping.boot.domain.support.executor.DomainRepositoryFactoryBean;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateProperties;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
+import org.springframework.data.repository.config.BootstrapMode;
+
+import javax.persistence.EntityManager;
 
 /**
  * 自动配置 用于注册加载时依赖注入和包扫描
@@ -24,13 +40,15 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @AutoConfigureBefore(JpaBaseConfiguration.class)
 @Slf4j
 @EnableJpaAuditing
-//@EnableJpaRepositories(basePackages = {
-//        "cn.procsl.ping.boot.domain.business.common.repository",
-//},
-//        repositoryFactoryBeanClass = DomainRepositoryFactoryBean.class,
-//        bootstrapMode = BootstrapMode.LAZY
-//)
-//@EntityScan(basePackages = "cn.procsl.ping.boot.data.business.entity")
+@EnableJpaRepositories(basePackages = {
+    "cn.procsl.ping.boot.domain.business.dictionary.repository",
+},
+    repositoryFactoryBeanClass = DomainRepositoryFactoryBean.class,
+    bootstrapMode = BootstrapMode.LAZY
+)
+@EntityScan(basePackages = {
+    "cn.procsl.ping.boot.domain.business.dictionary.model"
+})
 public class DomainAutoConfiguration {
 
     final DomainProperties dataProperties;
@@ -50,6 +68,34 @@ public class DomainAutoConfiguration {
         return new LowCasePhysicalNamingStrategy(dataProperties);
     }
 
+    @Bean
+    @ConditionalOnMissingBean
+    public DictionaryService dictionaryService(
+        @Autowired AdjacencyTreeRepository<Dictionary, Long, DictPath> dataDictionaryRepository,
+        @Autowired JpaRepository<Dictionary, Long> jpaRepository,
+        @Autowired QuerydslPredicateExecutor<Dictionary> querydslPredicateExecutor,
+        @Autowired CustomDictionaryRepository customDictionaryRepositoryImpl
+    ) {
+        return new DictionaryService(dataDictionaryRepository,
+            jpaRepository,
+            querydslPredicateExecutor,
+            customDictionaryRepositoryImpl
+        );
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public CustomDictionaryRepository customDictionaryRepositoryImpl(@Autowired JPAQueryFactory jpaQueryFactory) {
+        return new CustomDictionaryRepositoryImpl(jpaQueryFactory);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public JPAQueryFactory jpaQueryFactory(@Autowired EntityManager entityManager) {
+        return new JPAQueryFactory(entityManager);
+    }
+
+
     public DomainAutoConfiguration(DomainProperties dataProperties, HibernateProperties hibernateProperties) {
         this.dataProperties = dataProperties;
         this.hibernateProperties = hibernateProperties;
@@ -68,5 +114,11 @@ public class DomainAutoConfiguration {
             hibernateProperties.getNaming().setImplicitStrategy(name);
         }
 
+        Dictionary.setDelimit(this::get);
+
+    }
+
+    protected String get() {
+        return this.dataProperties.getDirectoryDelimiter();
     }
 }
