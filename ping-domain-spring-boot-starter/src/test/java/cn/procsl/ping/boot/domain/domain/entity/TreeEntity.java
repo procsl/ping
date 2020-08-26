@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,8 +26,8 @@ import java.util.stream.Collectors;
 public class TreeEntity implements AdjacencyNode<Long, PathNode> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "general")
-    @SequenceGenerator(allocationSize = 500, name = "general")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator")
+    @SequenceGenerator(allocationSize = 500, name = "generator", sequenceName = "tree_entity_seq")
     @Column(updatable = false, nullable = false)
     Long id;
 
@@ -132,7 +133,7 @@ public class TreeEntity implements AdjacencyNode<Long, PathNode> {
         this.path.add(pathNode);
         List<String> tmp = this.path
                 .stream()
-                .sorted((pre, next) -> pre.getSeq() - next.getSeq())
+                .sorted(Comparator.comparingInt(PathNode::getSeq))
                 .map(item -> String.valueOf(item.getPathId())).collect(Collectors.toList());
         this.setName("/" + String.join("/", tmp));
         log.debug("设置当前的name属性为:{}", name);
