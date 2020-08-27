@@ -1,18 +1,18 @@
 package cn.procsl.ping.boot.domain.business.utils;
 
-import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;
 
 import java.util.Arrays;
-
-import static lombok.AccessLevel.PRIVATE;
 
 /**
  * @author procsl
  * @date 2020/07/08
  */
-@NoArgsConstructor(access = PRIVATE)
-public class ObjectUtils {
+public final class ObjectUtils {
+
+    private ObjectUtils() {
+        throw new UnsupportedOperationException();
+    }
 
     public static boolean nullSafeEquals(@Nullable Object o1, @Nullable Object o2) {
         if (o1 == o2) {

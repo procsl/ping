@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 public final class ReflectionUtils {
 
     private ReflectionUtils() {
+        throw new UnsupportedOperationException();
     }
 
     /**

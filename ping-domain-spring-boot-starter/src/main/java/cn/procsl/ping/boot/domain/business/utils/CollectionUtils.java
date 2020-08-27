@@ -1,21 +1,22 @@
 package cn.procsl.ping.boot.domain.business.utils;
 
-import lombok.NoArgsConstructor;
-
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import static lombok.AccessLevel.PRIVATE;
-
 /**
+ * 容器工具
+ *
  * @author procsl
  * @date 2020/04/15
  */
-@NoArgsConstructor(access = PRIVATE)
-public class CollectionUtils {
+public final class CollectionUtils {
+
+    private CollectionUtils() {
+        throw new UnsupportedOperationException();
+    }
 
     /**
      * 如果传入的collects 不支持写则抛出异常
