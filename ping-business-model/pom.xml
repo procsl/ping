@@ -13,7 +13,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jdk.version>11</jdk.version>
         <compiler.version>11</compiler.version>
-        <querydsl.version>4.1.3</querydsl.version>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.compilerVersion>11</maven.compiler.compilerVersion>
