@@ -1,8 +1,7 @@
 package cn.procsl.ping.boot.domain.business.dictionary.service;
 
-import cn.procsl.ping.boot.domain.business.dictionary.model.DictValueDTO;
-import cn.procsl.ping.boot.domain.business.dictionary.model.Type;
-import cn.procsl.ping.boot.domain.business.dictionary.model.Value;
+import cn.procsl.ping.boot.domain.business.dictionary.model.*;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Assert;
@@ -26,11 +25,14 @@ public class DictionaryServiceTest {
     @Inject
     DictionaryService dictionaryService;
 
+    @Inject
+    JPAQueryFactory jpaQueryFactory;
+
     private Long rootId;
 
     @Before
     public void setUp() {
-        rootId = dictionaryService.create("/root");
+//        rootId = dictionaryService.create("/root");
     }
 
     @After
@@ -84,5 +86,10 @@ public class DictionaryServiceTest {
 
     @Test
     public void contains() {
+
+        QDictionary d = QDictionary.dictionary;
+        QDictPath p = QDictPath.dictPath;
+
+        jpaQueryFactory.select(p.pathId).innerJoin(d, d).innerJoin(d.path, p);
     }
 }

@@ -1,26 +1,32 @@
 package cn.procsl.ping.boot.domain.support.executor;
 
-import cn.procsl.ping.boot.domain.business.common.model.Operator;
 import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository;
 import cn.procsl.ping.boot.domain.domain.entity.PathNode;
+import cn.procsl.ping.boot.domain.domain.entity.QPathNode;
 import cn.procsl.ping.boot.domain.domain.entity.QTreeEntity;
 import cn.procsl.ping.boot.domain.domain.entity.TreeEntity;
 import cn.procsl.ping.boot.domain.domain.repository.AdjacencyTreeRepositoryTestRepository;
 import cn.procsl.ping.boot.domain.domain.repository.TreeEntityTestRepository;
 import com.github.javafaker.Faker;
 import com.github.jsonzou.jmockdata.MockConfig;
-import lombok.Cleanup;
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.*;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.querydsl.QPageRequest;
+import org.springframework.data.querydsl.QSort;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.config.BootstrapMode;
 import org.springframework.test.annotation.Rollback;
@@ -29,9 +35,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static com.querydsl.core.types.Projections.constructor;
 
 @Slf4j
 @SpringBootTest
@@ -39,12 +50,11 @@ import java.util.stream.Stream;
 @Transactional
 @SpringBootApplication
 @EnableJpaRepositories(
-        basePackages = "cn.procsl.ping.boot.domain.domain.repository",
-        repositoryFactoryBeanClass = DomainRepositoryFactoryBean.class,
-        bootstrapMode = BootstrapMode.LAZY
+    basePackages = "cn.procsl.ping.boot.domain.domain.repository",
+    repositoryFactoryBeanClass = DomainRepositoryFactoryBean.class,
+    bootstrapMode = BootstrapMode.LAZY
 )
 @EntityScan(basePackages = "cn.procsl.ping.boot.domain.domain.entity")
-@Rollback(value = true)
 public class AdjacencyTreeExecutorTest {
 
     @Inject
@@ -60,39 +70,48 @@ public class AdjacencyTreeExecutorTest {
     TreeEntityTestRepository treeEntityRepository;
 
     @Inject
-    AdjacencyTreeRepositoryTestRepository adjacencyTreeRepositoryTestRepository;
+    AdjacencyTreeRepositoryTestRepository repo;
+
+    @Inject
+    JPAQueryFactory jpaQueryFactory;
 
     @Inject
     EntityManager entityManager;
+
+    @Inject
+    BeanFactory beanFactory;
 
     private static final Faker FAKER;
 
     private static final MockConfig mockConfig;
 
-    TreeEntity root;
+    private QTreeEntity T = QTreeEntity.treeEntity;
 
+    private QPathNode P = QPathNode.pathNode;
 
     static {
         mockConfig = new MockConfig()
-                .globalConfig()
-                .subConfig(TreeEntity.class, "name")
-                .stringRegex("[a-z0-9_]{20,20}")
+            .globalConfig()
+            .subConfig(TreeEntity.class, "name")
+            .stringRegex("[a-z0-9_]{20,20}")
 
-                .globalConfig()
-                .excludes(TreeEntity.class, "id", "path");
+            .globalConfig()
+            .excludes(TreeEntity.class, "id", "path");
 
         FAKER = new Faker(Locale.CHINA);
     }
 
+    private List<Long> roots;
+
     @Before
     public void init() {
-        Optional<TreeEntity> optional = querydslPredicateExecutor.findOne(QTreeEntity.treeEntity.name.eq("/1"));
-        if (optional.isPresent()) {
-            root = optional.get();
+        List<Long> roots = this.repo.getRoots(T.id).collect(Collectors.toList());
+        if (!roots.isEmpty()) {
+            roots = this.roots;
             return;
         }
 
-        root = new TreeEntity();
+        TreeEntity root = new TreeEntity();
         root.init();
         jpaRepository.save(root);
         root.postPersist();
@@ -134,62 +153,9 @@ public class AdjacencyTreeExecutorTest {
     }
 
     @Test
-    public void query() {
-        String query = "select tree from TreeEntity as tree where tree.id in (select b.pathId from TreeEntity as a inner join a.path as b where b.id =:id) order by tree.depth asc";
-        entityManager
-                .createQuery(query, TreeEntity.class)
-                .setParameter("id", 1L)
-                .getResultList()
-                .forEach(item -> log.info("---------------->" + item.getName() + ":" + item.getDepth() + ":" + item.getId()));
-    }
-
-    @Test
-    @Transactional
-    public void parents() {
-        @Cleanup
-        Stream<TreeEntity> parent = treeExecutor.getParents(0L);
-        parent.forEach(item -> log.info(item.getName()));
-    }
-
-    @Test
-    public void children() {
-        @Cleanup
-        Stream<TreeEntity> children = treeExecutor.getDirectChildren(root.getId());
-        children.limit(10).forEach(item -> log.info(item.getName()));
-    }
-
-    @Test
-    public void directParent() {
-        Optional<TreeEntity> opera = treeExecutor.getDirectParent(0L);
-        Assert.assertTrue(opera.isEmpty());
-    }
-
-    @Test
-    public void depth() {
-        int depth = treeExecutor.getDepth(root.getId());
-        Assert.assertNotEquals(-1, depth);
-    }
-
-    @Test
-    public void maxDepth() {
-        int max = treeExecutor.findMaxDepth(root.getId());
-        Assert.assertNotEquals(0, max);
-    }
-
-    @Test
-    public void findDepthNodes() {
-        Stream<TreeEntity> stream = this.treeExecutor.findDepthNodes(root.getId(), 28, Operator.EQ, Sort.Direction.DESC);
-        stream.forEach(item -> log.info(item.toString()));
-    }
-
-    @Test
-    public void moveTo() {
-        this.treeExecutor.mount(1L, 2L);
-    }
-
-    @Test
     public void remove() {
-        this.treeExecutor.remove(2L);
+        int count = this.repo.remove(11L);
+        log.info("count:{}", count);
     }
 
     @Test
@@ -200,31 +166,134 @@ public class AdjacencyTreeExecutorTest {
 
     @Test
     public void findLinks() {
-        Stream<TreeEntity> links = this.treeExecutor.findLinks(1L, 13L);
-        links.forEach(item -> log.info(item.getName()));
-    }
-
-    @Test
-    public void parentIds() {
-        Stream<Long> ids = this.treeExecutor.getParentIds(13L);
-        ids.forEach(item -> log.info(item.toString()));
-    }
-
-    @Test
-    public void findLinkIds() {
-        Stream<Long> links = this.treeExecutor.findLinkIds(1L, 13L);
-        links.forEach(item -> log.info(item.toString()));
-    }
-
-    @Test
-    public void getAllChildrenIds() {
-        Stream<Long> children = this.treeExecutor.getAllChildrenIds(1L);
-        children.forEach(item -> log.info("id: ->{}", item));
+        @Cleanup
+        Stream<Tuple> links = this.treeExecutor.findLinks(Projections.tuple(T.id, T.name), 11L, 15L, T.depth.in(13, 14, 15));
+        links.forEach(item -> {
+            log.info("id:{}", item.get(T.id));
+            log.info("name:{}", item.get(T.name));
+        });
     }
 
     @Test
     public void getAllChildren() {
-        Stream<TreeEntity> children = this.treeExecutor.getAllChildren(1L);
-        children.forEach(item -> log.info("id: ->{}", item.getName()));
+        Stream<Long> ids = this.repo.getAllChildren(T.id, 11L);
+        ids.forEach(id -> log.info("id:{}", id));
     }
+
+    @Test
+    public void getRoots() {
+        Page<Long> ids = this.repo.getRoots(T.id, QPageRequest.of(0, 10, QSort.by(T.depth.asc())));
+        ids.forEach(id -> log.info("id:{}", id));
+    }
+
+    @Test
+    public void testGetRoots() {
+        Stream<Long> stream = this.repo
+            .getRoots(Projections.fields(T.id, T.id), T.parentId.eq(10L));
+        stream.forEach(item -> log.info(item.toString()));
+    }
+
+    @Test
+    public void getParents() {
+        QTreeEntity tree = QTreeEntity.treeEntity;
+
+        @Cleanup
+        Stream<Long> ids = this.repo.getParents(tree.id, 8011L);
+
+        @Cleanup
+        Stream<TreeEntity> entity = this.repo.getParents(tree, 8011L);
+
+        // 投影查询 构造函数构造, 参数位置需要和查询字段对应
+        ConstructorExpression<SimpleDTO> constructor = constructor(SimpleDTO.class, tree.id, tree.name);
+
+        // 需要默认构造函数用于反射实例化, 并且如果field是不可访问的, 则会调用setter
+        QBean<SimpleDTO> beans = Projections.bean(SimpleDTO.class, tree.id, tree.name);
+
+        // 字段注入
+        QBean<SimpleDTO> fields = Projections.fields(SimpleDTO.class, tree.id, tree.name);
+
+        // 以list的形式返回
+        QList list = Projections.list(tree.id, tree.name);
+
+        // 返回map形式
+        QMap map = Projections.map(tree.id, tree.name);
+
+        QTuple tuple = Projections.tuple(tree.id, tree.name);
+
+        @Cleanup
+        Stream<SimpleDTO> consProj = this.repo.getParents(constructor, 8011L);
+
+        @Cleanup
+        Stream<SimpleDTO> beanProj = this.repo.getParents(beans, 8011L);
+
+        @Cleanup
+        Stream<SimpleDTO> fieldProj = this.repo.getParents(fields, 8011L);
+
+        @Cleanup
+        Stream<Map<Expression<?>, ?>> mapProj = this.repo.getParents(map, 8011L);
+
+        @Cleanup
+        Stream<List<?>> listProj = this.repo.getParents(list, 8011L);
+
+        @Cleanup
+        Stream<Tuple> tupleProj = this.repo.getParents(tuple, 8011L);
+
+        ids.forEach(i -> log.info("id:{}", i.toString()));
+
+        entity.forEach(i -> log.info("entity:{}", i.toString()));
+
+        consProj.forEach(i -> log.info("proj:{}", i.toString()));
+
+        beanProj.forEach(i -> log.info("beans:{}", i.toString()));
+
+        fieldProj.forEach(i -> log.info("fields:{}", i.toString()));
+
+        mapProj.forEach(i -> log.info("map:{}", i.toString()));
+
+        listProj.forEach(i -> log.info("list:{}", i.toString()));
+
+        tupleProj.forEach(i -> log.info("tuple:{}", i.toString()));
+    }
+
+    @AllArgsConstructor
+    @Setter
+    @Getter
+    @ToString
+    @NoArgsConstructor
+    public static class SimpleDTO {
+        Long id;
+        String name;
+    }
+
+
+    @Test
+    public void getDirectChildren() {
+        Stream<TreeEntity> stream = this.repo.getDirectChildren(T, 0L);
+        stream.forEach(item -> log.info("item:{}", item));
+    }
+
+    @Test
+    public void getDirectParent() {
+        Optional<Tuple> direct = this.repo.getDirectParent(Projections.tuple(T.id, T.name), 1L);
+        direct.ifPresent(item -> log.info("item:{}", item));
+    }
+
+    @Test
+    public void getDepth() {
+        int depth = treeExecutor.getDepth(roots.get(0));
+        Assert.assertNotEquals(-1, depth);
+    }
+
+    @Test
+    public void findMaxDepth() {
+        int max = treeExecutor.findMaxDepth(roots.get(0));
+        Assert.assertNotEquals(0, max);
+    }
+
+    @Test
+    @Rollback(value = false)
+    public void mount() {
+        this.treeExecutor.mount(16L, 2L);
+    }
+
 }
