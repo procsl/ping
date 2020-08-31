@@ -6,6 +6,7 @@ import org.springframework.data.jpa.provider.PersistenceProvider;
 import org.springframework.data.jpa.repository.query.EscapeCharacter;
 import org.springframework.data.jpa.repository.support.CrudMethodMetadata;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
+import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
@@ -15,7 +16,7 @@ import javax.persistence.EntityManager;
  * @date 2020/04/12
  */
 @Slf4j
-@Transactional
+@NoRepositoryBean
 class PersistenceExecutor<T, ID> implements PersistenceRepository<T, ID> {
 
     private final JpaEntityInformation<T, ?> entityInformation;

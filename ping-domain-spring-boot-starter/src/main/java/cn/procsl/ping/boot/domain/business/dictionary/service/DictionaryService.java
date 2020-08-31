@@ -17,8 +17,6 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -34,8 +32,6 @@ import static cn.procsl.ping.boot.domain.business.dictionary.repository.CustomDi
  * @author procsl
  * @date 2020年8月24日
  */
-@Named
-@Singleton
 @AllArgsConstructor
 @Validated
 @Transactional(rollbackFor = Exception.class)

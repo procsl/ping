@@ -1,12 +1,14 @@
 package cn.procsl.ping.boot.domain.business.tree.repository;
 
-import cn.procsl.ping.boot.domain.business.common.model.Operator;
 import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyNode;
 import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyPathNode;
-import org.springframework.data.domain.Sort;
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.Predicate;
+import lombok.NonNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.Repository;
-import org.springframework.lang.Nullable;
 
 import java.io.Serializable;
 import java.util.Optional;
@@ -20,66 +22,82 @@ import java.util.stream.Stream;
  */
 @NoRepositoryBean
 public interface AdjacencyTreeRepository<
-        T extends AdjacencyNode<ID, P>,
-        ID extends Serializable,
-        P extends AdjacencyPathNode<ID>> extends Repository<T, ID> {
+    T extends AdjacencyNode<ID, P>,
+    ID extends Serializable,
+    P extends AdjacencyPathNode<ID>> extends Repository<T, ID> {
 
     /**
      * 查询父节点列表, 通过指定的id
      *
-     * @param id 指定的ID
-     * @return 返回父节点Stream
+     * @param select       字段信息
+     * @param id           指定的id
+     * @param predicates   查询条件
+     * @param <Projection> 投影
+     * @return 返回投影类型的Stream
      */
-    Stream<T> getParents(ID id);
+    <Projection> Stream<Projection> getParents(@NonNull Expression<Projection> select,
+                                               @NonNull ID id, Predicate... predicates);
 
     /**
-     * 获取指定节点的所有父节点IDs
+     * 分页查询
      *
-     * @param id 指定的ID
-     * @return 返回父节点Stream
+     * @param select       指定查询字段
+     * @param pageable     分页条件
+     * @param id           指定的id
+     * @param predicates   自定义条件
+     * @param <Projection> 投影类
+     * @return 返回分页的投影信息
      */
-    Stream<ID> getParentIds(ID id);
+    <Projection> Page<Projection> getParents(@NonNull Expression<Projection> select,
+                                             Pageable pageable,
+                                             @NonNull ID id, Predicate... predicates);
 
     /**
      * 查询指定节点的所有直接子节点
      *
-     * @param id 指定的id
+     * @param select     选择器
+     * @param id         指定的id
+     * @param predicates 查询条件
      * @return 返回子节点stream
      */
-    Stream<T> getDirectChildren(ID id);
-
-    /**
-     * 获取指定子节点的IDs
-     *
-     * @param id 指定的节点ID
-     * @return 返回子节点IDs
-     */
-    Stream<ID> getDirectChildrenIds(ID id);
+    <Projection> Stream<Projection> getDirectChildren(@NonNull Expression<Projection> select,
+                                                      @NonNull ID id, Predicate... predicates);
 
 
     /**
-     * 查询所有的子节点, 包含自身节点ID
+     * 获取指定节点的所有子节点
      *
-     * @param id 指定的节点ID
-     * @return 返回所有的子节点ID
+     * @param select       选择器
+     * @param id           指定节点id
+     * @param predicates   条件
+     * @param <Projection> 投影类型
+     * @return 返回指定投影类型的Stream
      */
-    Stream<ID> getAllChildrenIds(ID id);
+    <Projection> Stream<Projection> getAllChildren(@NonNull Expression<Projection> select,
+                                                   @NonNull ID id, Predicate... predicates);
 
     /**
-     * 获取所有的子节点包含自身节点
+     * 分页查询指定节点的所有子节点
      *
-     * @param id 指定的节点
-     * @return 返回所有的子节点
+     * @param pageable     分页条件
+     * @param select       选择器
+     * @param id           指定节点id
+     * @param predicates   条件
+     * @param <Projection> 投影类型
+     * @return 返回分页投影
      */
-    Stream<T> getAllChildren(ID id);
+    <Projection> Page<Projection> getAllChildren(@NonNull Expression<Projection> select,
+                                                 @NonNull Pageable pageable,
+                                                 ID id, Predicate... predicates);
 
     /**
      * 获取直接父节点
      *
-     * @param id 指定的节点ID
+     * @param select 选择器
+     * @param id     指定的节点ID
      * @return 返回直接父节点
      */
-    Optional<T> getDirectParent(ID id);
+    <Projection> Optional<Projection> getDirectParent(@NonNull Expression<Projection> select, @NonNull ID id);
 
     /**
      * 树的深度
@@ -96,17 +114,6 @@ public interface AdjacencyTreeRepository<
      * @return 返回指定树的最大深度
      */
     int findMaxDepth(ID id);
-
-    /**
-     * 查找指定树等于指定深度节点(含多个)
-     *
-     * @param id        自定的树ID
-     * @param depth     深度条件
-     * @param operator  操作符
-     * @param direction 排序条件
-     * @return 指定深度的列表
-     */
-    Stream<T> findDepthNodes(ID id, @Nullable Integer depth, Operator operator, Sort.Direction direction);
 
     /**
      * 移动指定的树节点至目标节点下(即子节点)
@@ -128,20 +135,31 @@ public interface AdjacencyTreeRepository<
      * 查询链路节点
      * 从小到大排序
      *
-     * @param start 头节点
-     * @param end   尾节点
+     * @param start        头节点
+     * @param end          尾节点
+     * @param select       选择器,选择返回指定的值
+     * @param predicates   过滤条件, 可以过滤指定的条件
+     * @param <Projection> 投影信息
      * @return 如果两个节点为父子关系, 则返回他们的关系链路列表
      */
-    Stream<T> findLinks(ID start, ID end);
+    <Projection> Stream<Projection> findLinks(@NonNull Expression<Projection> select,
+                                              @NonNull ID start, @NonNull ID end, Predicate... predicates);
 
     /**
-     * 获取链路ID
+     * 分页查询指定的链路
      *
-     * @param start 起始节点
-     * @param end   尾节点
-     * @return 如果两个节点为父子关系, 则返回他们的关系链路列表id
+     * @param select       选择器
+     * @param pageable     分页
+     * @param start        起始节点
+     * @param end          结束节点
+     * @param predicates   条件
+     * @param <Projection> 投影
+     * @return 返回分页投影
      */
-    Stream<ID> findLinkIds(ID start, ID end);
+    <Projection> Page<Projection> findLinks(@NonNull Expression<Projection> select,
+                                            @NonNull Pageable pageable,
+                                            ID start,
+                                            ID end, Predicate... predicates);
 
     /**
      * 计算两个节点之间的关系, 返回深度差
@@ -155,25 +173,49 @@ public interface AdjacencyTreeRepository<
     Integer calcDepth(ID source, ID target);
 
     /**
-     * 计算两个节点中谁为子节点, 并且返回子节点ID
+     * 计算两个节点中谁为子节点, 并且返回子节点信息
      *
-     * @param pre  节点1
-     * @param next 节点2
-     * @return 返回子节点ID
+     * @param select       选择的节点字段
+     * @param pre          节点1
+     * @param next         节点2
+     * @param <Projection> 投影信息
+     * @return 返回指定的投影的信息, 如果不存在关系, 则返回null
      */
-    ID calcChildId(ID pre, ID next);
+    <Projection> Projection calcChildren(@NonNull Expression<Projection> select,
+                                         @NonNull ID pre, @NonNull ID next);
 
     /**
-     * 获取root节点列表
+     * 计算父节点
      *
-     * @return root id
+     * @param select       选择的节点字段
+     * @param pre          节点1
+     * @param next         节点2
+     * @param <Projection> 投影信息
+     * @return 返回指定的投影的信息, 如果不存在, 则返回null
      */
-    Stream<T> getRoots();
+    <Projection> Projection calcParent(@NonNull Expression<Projection> select,
+                                       @NonNull ID pre, @NonNull ID next);
 
     /**
-     * 获取root ids
+     * 获取根节点Stream
      *
-     * @return root 节点id
+     * @param select       用于指定返回的值
+     * @param predicates   查询条件
+     * @param <Projection> 投影
+     * @return 返回指定值的投影Stream
      */
-    Stream<ID> getRootIds();
+    <Projection> Stream<Projection> getRoots(@NonNull Expression<Projection> select,
+                                             Predicate... predicates);
+
+    /**
+     * @param select       指定返回的值
+     * @param pageable     分页条件
+     * @param predicates   条件
+     * @param <Projection> 投影
+     * @return 返回指定值的投影
+     */
+    <Projection> Page<Projection> getRoots(@NonNull Expression<Projection> select,
+                                           @NonNull Pageable pageable,
+                                           Predicate... predicates);
+
 }

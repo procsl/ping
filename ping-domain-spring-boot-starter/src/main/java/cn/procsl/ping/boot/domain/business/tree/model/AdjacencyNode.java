@@ -16,6 +16,12 @@ import java.util.Set;
 @MappedSuperclass
 public interface AdjacencyNode<ID extends Serializable, T extends AdjacencyPathNode<ID>> extends DomainEvents<ID> {
 
+    int ROOT_DEPTH = 0;
+
+    @Override
+    @Id
+    ID getId();
+
     ID getParentId();
 
     Integer getDepth();

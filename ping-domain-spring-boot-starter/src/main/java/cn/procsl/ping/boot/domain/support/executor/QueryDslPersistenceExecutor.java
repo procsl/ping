@@ -12,14 +12,18 @@ import org.springframework.data.jpa.repository.support.CrudMethodMetadata;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.Querydsl;
 import org.springframework.data.querydsl.EntityPathResolver;
+import org.springframework.data.repository.NoRepositoryBean;
 
 import javax.persistence.EntityManager;
 
 /**
+ * querydsl 持久化类
+ *
  * @author procsl
  * @date 2020/04/13
  */
 @RequiredArgsConstructor
+@NoRepositoryBean
 class QueryDslPersistenceExecutor<T, ID> implements QueryDslPersistenceRepository<T, ID> {
 
     final JpaEntityInformation<T, ?> entityInformation;
@@ -31,8 +35,6 @@ class QueryDslPersistenceExecutor<T, ID> implements QueryDslPersistenceRepositor
     final CrudMethodMetadata metadata;
 
     final EscapeCharacter escapeCharacter;
-
-    final EntityPathResolver resolver;
 
     final EntityPath<T> fullPath;
 
@@ -49,7 +51,6 @@ class QueryDslPersistenceExecutor<T, ID> implements QueryDslPersistenceRepositor
         this.provider = PersistenceProvider.fromEntityManager(em);
         this.metadata = metadata;
         this.escapeCharacter = escapeCharacter;
-        this.resolver = resolver;
         this.fullPath = resolver.createPath(entityInformation.getJavaType());
         this.querydsl = new Querydsl(em, new PathBuilder<T>(fullPath.getType(), fullPath.getMetadata()));
     }

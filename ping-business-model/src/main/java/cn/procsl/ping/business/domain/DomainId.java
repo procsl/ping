@@ -1,5 +1,6 @@
 package cn.procsl.ping.business.domain;
 
+import javax.persistence.Id;
 import java.io.Serializable;
 
 /**
@@ -8,5 +9,6 @@ import java.io.Serializable;
  * @param <ID>
  */
 public interface DomainId<ID> extends Serializable {
+    @Id
     ID getId();
 }

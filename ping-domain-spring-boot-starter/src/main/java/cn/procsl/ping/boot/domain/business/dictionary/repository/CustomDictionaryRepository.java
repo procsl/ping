@@ -19,7 +19,6 @@ public interface CustomDictionaryRepository {
      * @return 如果找到, 则返回指定的值
      * @throws IllegalArgumentException 如果分割符不合法,则抛出此异常
      */
-    @SuppressWarnings("unchecked")
     <T extends DomainId<Long>> T search(@NotNull String path,
                                         @NotNull boolean ignoreActive, @NotNull Expression<T> select)
         throws IllegalArgumentException;

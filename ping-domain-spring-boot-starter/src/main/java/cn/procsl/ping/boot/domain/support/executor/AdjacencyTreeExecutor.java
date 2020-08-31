@@ -1,21 +1,40 @@
 package cn.procsl.ping.boot.domain.support.executor;
 
-import cn.procsl.ping.boot.domain.business.common.model.Operator;
 import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyNode;
 import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyPathNode;
+import cn.procsl.ping.boot.domain.business.tree.model.QAdjacencyNode;
+import cn.procsl.ping.boot.domain.business.tree.model.QAdjacencyPathNode;
 import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository;
 import cn.procsl.ping.boot.domain.business.utils.CollectionUtils;
 import cn.procsl.ping.boot.domain.business.utils.ObjectUtils;
+import cn.procsl.ping.boot.domain.support.SimplePathResolver;
 import cn.procsl.ping.business.exception.BusinessException;
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.FactoryExpression;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.EntityPathBase;
+import com.querydsl.core.types.dsl.PathBuilder;
+import com.querydsl.core.util.ArrayUtils;
+import com.querydsl.jpa.JPQLQuery;
+import com.querydsl.jpa.impl.AbstractJPAQuery;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.provider.PersistenceProvider;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.query.EscapeCharacter;
 import org.springframework.data.jpa.repository.support.CrudMethodMetadata;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
+import org.springframework.data.jpa.repository.support.Querydsl;
+import org.springframework.data.querydsl.EntityPathResolver;
 import org.springframework.data.repository.NoRepositoryBean;
+import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,9 +42,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;
 import java.io.Serializable;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
@@ -42,209 +64,207 @@ import static javax.persistence.LockModeType.PESSIMISTIC_READ;
 @NoRepositoryBean
 @Transactional(readOnly = true)
 class AdjacencyTreeExecutor<
-        E extends AdjacencyNode<ID, P>,
-        ID extends Serializable,
-        P extends AdjacencyPathNode<ID>>
-        implements AdjacencyTreeRepository<E, ID, P> {
+    E extends AdjacencyNode<ID, P>,
+    ID extends Serializable,
+    P extends AdjacencyPathNode<ID>>
+    implements AdjacencyTreeRepository<E, ID, P> {
 
-
-    final JpaEntityInformation<E, ID> entityInformation;
 
     final EntityManager entityManager;
 
-    final PersistenceProvider provider;
-
     final EscapeCharacter escapeCharacter;
 
-    final @Nullable
-    CrudMethodMetadata metadata;
+    final CrudMethodMetadata metadata;
 
     final Class<E> javaType;
 
     final Class<ID> idType;
 
-    final String query_parents_jpql;
+    final JPAQueryFactory jpaQueryFactory;
 
-    final String query_children_jpql;
+    final QAdjacencyNode Q;
 
-    final String query_children_id_jpql;
+    final QAdjacencyPathNode P;
 
-    final String query_direct_jpql;
+    final Querydsl querydsl;
+
+    final JpaEntityInformation<E, ID> entityInformation;
+
+    final QueryHints queryHint;
 
     final String query_depth_jpql;
 
     final String query_max_depth_jpql;
 
-    final String query_depth_node_jpql;
-
-    final String query_exists_id_jpql;
-
-    final String query_links_jpql;
-
-    final String query_parents_id_jpql;
-
-    final String query_all_children_id_jpql;
-
-    final String query_all_children_jpql;
-
-    final String query_roots_jpql;
-
-    final String query_root_ids_jpql;
-
-    Random rand = new Random();
-
     public AdjacencyTreeExecutor(JpaEntityInformation<E, ID> entityInformation,
                                  EntityManager entityManager,
                                  EscapeCharacter escapeCharacter,
-                                 @Nullable CrudMethodMetadata metadata) {
-        this.entityInformation = entityInformation;
-        this.entityManager = entityManager;
-        this.escapeCharacter = escapeCharacter;
-        this.metadata = metadata;
-        this.provider = PersistenceProvider.fromEntityManager(entityManager);
+                                 CrudMethodMetadata metadata,
+                                 BeanFactory beanFactory,
+                                 EntityPathResolver entityPathResolver
+    ) {
 
-        // 实体类型
-        javaType = this.entityInformation.getJavaType();
+        {
+            this.entityManager = entityManager;
+            this.escapeCharacter = escapeCharacter;
+            this.metadata = metadata;
+            this.jpaQueryFactory = beanFactory.getBean(JPAQueryFactory.class);
+            this.entityInformation = entityInformation;
+            this.javaType = entityInformation.getJavaType();
+            this.idType = entityInformation.getIdType();
 
-        // 主键类型
-        idType = this.entityInformation.getIdType();
+            this.Q = new QAdjacencyNode(entityPathResolver.createPath(javaType));
 
-        String name = javaType.getName();
-        this.query_parents_jpql = String.format("select tree from %s as tree where tree.id in (select b.pathId from %s as a inner join a.path as b where b.id =:parent_id) order by tree.depth asc", name, name);
+            Class<P> type = this.getNodeType(javaType);
 
-        this.query_children_jpql = String.format("select tree from %s as tree where tree.parentId =:id order by tree.id", name);
+            SimplePathResolver resolver = beanFactory.getBeanProvider(SimplePathResolver.class).getIfAvailable(() -> SimplePathResolver.INSTANCE);
+            this.P = new QAdjacencyPathNode(resolver.createPath(type));
 
-        this.query_children_id_jpql = String.format("select tree.id from %s as tree where tree.parentId =:id order by tree.id", name);
+            this.querydsl = new Querydsl(entityManager, new PathBuilder<>(javaType, this.Q.getMetadata()));
+            queryHint = metadata == null ? QueryHints.NoHints.INSTANCE : DefaultQueryHints.of(entityInformation, metadata);
+        }
 
-        this.query_direct_jpql = String.format("select tree from %s as tree where tree.id in (select a.parentId from %s as a where id=:id)", name, name);
+        // 方便折叠
+        {
+            String name = javaType.getName();
 
-        this.query_depth_jpql = String.format("select tree.depth from %s as tree where tree.id=:id", name);
+            this.query_depth_jpql = String.format("select tree.depth from %s as tree where tree.id=:id", name);
 
-        this.query_max_depth_jpql = String.format("select a.depth from %s as a inner join a.path as b where b.pathId =:id order by a.depth desc", name);
-
-        this.query_depth_node_jpql = String.format("select tree from %s as tree inner join tree.path as b where b.pathId =:id and tree.depth ", name);
-
-        this.query_exists_id_jpql = String.format("select count(a.id) from %s as a where a.id=:id", name);
-
-        this.query_links_jpql = String.format("select a.id from %s as a inner join a.path as b where b.pathId in (:start,:end) and (a.parentId = :start or a.parentId = :end)  group by a.id having count(a.id) >= 2", name);
-
-        this.query_parents_id_jpql = String.format("select tree.id from %s as tree where tree.id in (select b.pathId from %s as a inner join a.path as b where b.id =:parent_id) order by tree.depth asc", name, name);
-
-        this.query_all_children_id_jpql = String.format("select b.id from %s as b inner join b.path as c where c.pathId=:id order by b.depth asc", name);
-
-        this.query_all_children_jpql = String.format("select b from %s as b inner join b.path as c where c.pathId=:id order by b.depth asc", name);
-
-        this.query_roots_jpql = String.format("select a from %s as a where a.id = a.parentId or a.depth = 0", name);
-
-        this.query_root_ids_jpql = String.format("select a.id from %s as a where a.id = a.parentId or a.depth = 0", name);
+            this.query_max_depth_jpql = String.format("select a.depth from %s as a inner join a.path as b where b.pathId =:id order by a.depth desc", name);
+        }
     }
 
     @Override
-    public Stream<E> getParents(@NonNull ID id) {
-        if (log.isDebugEnabled()) {
-            log.debug("查询节点:{}的父节点", id);
+    @SuppressWarnings("unchecked")
+    public <Projection> Stream<Projection> getParents(Expression<Projection> select, @NonNull ID id, Predicate... predicates) {
+        // 查询 pathId = id的
+        JPAQuery<ID> subQuery = (JPAQuery<ID>) this.jpaQueryFactory
+            .select(P.pathId)
+            .from(Q)
+            .innerJoin(Q)
+            .innerJoin(Q.path, P)
+            .where(P.id.eq(id))
+            .distinct();
+
+        // 对于查询主键的, 特殊处理直接返回
+        if (select.equals(Q.id)) {
+            // 设置相关属性, 插入自定义查询条件
+            this.prop(subQuery, this.queryHint, predicates);
+            subQuery.orderBy(P.seq.asc());
+            return subQuery.createQuery().getResultStream();
         }
-        return this.entityManager
-                .createQuery(query_parents_jpql, javaType)
-                .setLockMode(PESSIMISTIC_READ)
-                .setFlushMode(FlushModeType.COMMIT)
-                .setParameter("parent_id", id)
-                .getResultStream();
+
+        JPAQuery<Projection> result = this.jpaQueryFactory
+            .select(select)
+            .from(Q)
+            .where(Q.id.in(subQuery))
+            .orderBy(Q.depth.asc());
+        // 设置相关属性, 插入自定义查询条件
+        this.prop(result, this.queryHint, predicates);
+
+        Stream stream = result
+            .createQuery()
+            .getResultStream();
+        return this.convertTo(select, stream);
     }
 
     @Override
-    public Stream<ID> getParentIds(@NonNull ID id) {
-        if (log.isDebugEnabled()) {
-            log.debug("查询节点:{}的父节点IDs", id);
+    public <Projection> Page<Projection> getParents(@NonNull Expression<Projection> select,
+                                                    @NonNull Pageable pageable,
+                                                    @NonNull ID id, Predicate... predicates) {
+        JPQLQuery<ID> subQuery =
+            (JPQLQuery<ID>) createQuery(predicates)
+                .select(P.pathId)
+                .from(Q)
+                .innerJoin(Q)
+                .innerJoin(Q.path, P)
+                .where(P.id.eq(id))
+                .distinct();
+
+        if (select.equals(Q.id)) {
+            JPQLQuery<ID> res = querydsl.applyPagination(pageable, subQuery);
+            return (Page<Projection>) PageableExecutionUtils.getPage(res.fetch(), pageable, res::fetchCount);
         }
-        return this.entityManager
-                .createQuery(query_parents_id_jpql, idType)
-                .setLockMode(PESSIMISTIC_READ)
-                .setFlushMode(FlushModeType.COMMIT)
-                .setParameter("parent_id", id)
-                .getResultStream();
+
+        JPQLQuery<Projection> query = createQuery(predicates)
+            .select(select)
+            .from(Q)
+            .where(Q.id.in(subQuery))
+            .orderBy(Q.depth.asc());
+
+        JPQLQuery<Projection> res = querydsl.applyPagination(pageable, query);
+        return PageableExecutionUtils.getPage(res.fetch(), pageable, query::fetchCount);
     }
 
     @Override
-    public Stream<E> getDirectChildren(@NonNull ID id) {
-        if (log.isDebugEnabled()) {
-            log.debug("查询节点:{}的直接子节点", id);
-        }
-        return this.entityManager
-                .createQuery(this.query_children_jpql, javaType)
-                .setLockMode(PESSIMISTIC_READ)
-                .setFlushMode(FlushModeType.COMMIT)
-                .setParameter("id", id)
-                .getResultStream();
+    public <Projection> Stream<Projection> getDirectChildren(@NonNull Expression<Projection> select, @NonNull ID id, Predicate... predicates) {
+        JPAQuery<Projection> query = this.jpaQueryFactory
+            .select(select)
+            .from(Q)
+            .where(Q.parentId.eq(id));
+        this.prop(query, this.queryHint, predicates);
+        Stream stream = query.createQuery().getResultStream();
+        return this.convertTo(select, stream);
     }
 
-    /**
-     * 获取指定子节点的IDs
-     *
-     * @param id 指定的节点ID
-     * @return 返回子节点IDs
-     */
-    @Override
-    public Stream<ID> getDirectChildrenIds(@NonNull ID id) {
-        if (log.isDebugEnabled()) {
-            log.debug("查询节点:{}的直接子节点IDs", id);
-        }
-        return this.entityManager
-                .createQuery(this.query_children_id_jpql, idType)
-                .setLockMode(PESSIMISTIC_READ)
-                .setFlushMode(FlushModeType.COMMIT)
-                .setParameter("id", id)
-                .getResultStream();
-    }
-
-    /**
-     * 查询所有的子节点, 包含自身节点ID
-     *
-     * @param id 指定的节点ID
-     * @return 返回所有的子节点ID
-     */
-    @Override
-    public Stream<ID> getAllChildrenIds(@NonNull ID id) {
-        if (log.isDebugEnabled()) {
-            log.debug("查询节点:{}的所有子节点IDs", id);
-        }
-        return this.entityManager
-                .createQuery(this.query_all_children_id_jpql, idType)
-                .setParameter("id", id)
-                .setLockMode(PESSIMISTIC_READ)
-                .setFlushMode(FlushModeType.AUTO)
-                .getResultStream();
-    }
-
-    /**
-     * 获取所有的子节点包含自身节点
-     *
-     * @param id 指定的节点
-     * @return 返回所有的子节点
-     */
-    @Override
-    public Stream<E> getAllChildren(@NonNull ID id) {
-        if (log.isDebugEnabled()) {
-            log.debug("查询节点:{}的所有子节点", id);
-        }
-        return this.entityManager.createQuery(this.query_all_children_jpql, javaType)
-                .setParameter("id", id)
-                .setLockMode(PESSIMISTIC_READ)
-                .setFlushMode(FlushModeType.AUTO)
-                .getResultStream();
+    public <Projection> Page<Projection> getDirectChildren(@NonNull Expression<Projection> select,
+                                                           @NonNull Pageable pageable,
+                                                           @NonNull ID id, Predicate... predicates) {
+        JPQLQuery<Projection> query = this.createQuery(predicates)
+            .select(select)
+            .from(Q)
+            .where(Q.parentId.eq(id));
+        JPQLQuery<Projection> res = querydsl.applyPagination(pageable, query);
+        return PageableExecutionUtils.getPage(res.fetch(), pageable, query::fetchCount);
     }
 
     @Override
-    public Optional<E> getDirectParent(@NonNull ID id) {
-        if (log.isDebugEnabled()) {
-            log.debug("查询节点:{}的直接父节点", id);
+    public <Projection> Stream<Projection> getAllChildren(@NonNull Expression<Projection> select,
+                                                          @NonNull ID id, Predicate... predicates) {
+        JPAQuery<Projection> query = this.jpaQueryFactory
+            .select(select)
+            .from(Q)
+            .innerJoin(Q)
+            .innerJoin(Q.path, P)
+            .where(P.pathId.eq(id))
+            .orderBy(Q.depth.asc());
+        this.prop(query, this.queryHint, predicates);
+        return this.convertTo(select, query.createQuery().getResultStream());
+    }
+
+    @Override
+    public <Projection> Page<Projection> getAllChildren(@NonNull Expression<Projection> select,
+                                                        @NonNull Pageable pageable,
+                                                        @NonNull ID id, Predicate... predicates) {
+        JPQLQuery<Projection> query = this.createQuery(predicates)
+            .select(select)
+            .from(Q)
+            .innerJoin(Q)
+            .innerJoin(Q.path, P)
+            .where(P.pathId.eq(id));
+        JPQLQuery<Projection> res = querydsl.applyPagination(pageable, query);
+        return PageableExecutionUtils.getPage(res.fetch(), pageable, query::fetchCount);
+    }
+
+    @Override
+    public <Projection> Optional<Projection> getDirectParent(@NonNull Expression<Projection> select, @NonNull ID id) {
+        @SuppressWarnings("unchecked")
+        JPAQuery<ID> subQuery = (JPAQuery<ID>) this.jpaQueryFactory
+            .select(Q.parentId)
+            .from(Q)
+            .where(Q.id.eq(id));
+
+        JPAQuery<Projection> query = this.jpaQueryFactory
+            .select(select)
+            .from(Q)
+            .where(Q.id.in(subQuery))
+            .limit(1);
+        this.prop(query, queryHint);
+        List<Projection> t = query.fetch();
+        if (t.isEmpty()) {
+            return Optional.empty();
         }
-        return this.entityManager.createQuery(this.query_direct_jpql, javaType)
-                .setParameter("id", id)
-                .setLockMode(PESSIMISTIC_READ)
-                .setFlushMode(FlushModeType.AUTO)
-                .setMaxResults(1)
-                .getResultStream().findFirst();
+        return Optional.of(t.get(0));
     }
 
     @Override
@@ -253,11 +273,11 @@ class AdjacencyTreeExecutor<
             log.debug("获取指定节点:{}的深度", id);
         }
         List<Integer> result = this.entityManager.createQuery(this.query_depth_jpql, Integer.class)
-                .setParameter("id", id)
-                .setMaxResults(1)
-                .setLockMode(PESSIMISTIC_READ)
-                .setFlushMode(FlushModeType.COMMIT)
-                .getResultList();
+            .setParameter("id", id)
+            .setMaxResults(1)
+            .setLockMode(PESSIMISTIC_READ)
+            .setFlushMode(FlushModeType.COMMIT)
+            .getResultList();
         return CollectionUtils.isEmpty(result) ? -1 : result.get(0);
     }
 
@@ -267,44 +287,15 @@ class AdjacencyTreeExecutor<
             log.debug("获取指定节点:{}的的最大子节点深度", id);
         }
         List<Integer> list = this.entityManager
-                .createQuery(this.query_max_depth_jpql, Integer.class)
-                .setParameter("id", id)
-                .setMaxResults(1)
-                .setLockMode(PESSIMISTIC_READ)
-                .setFlushMode(FlushModeType.AUTO)
-                .getResultList();
+            .createQuery(this.query_max_depth_jpql, Integer.class)
+            .setParameter("id", id)
+            .setMaxResults(1)
+            .setLockMode(PESSIMISTIC_READ)
+            .setFlushMode(FlushModeType.AUTO)
+            .getResultList();
         return CollectionUtils.isEmpty(list) ? -1 : list.get(0);
     }
 
-    @Override
-    public Stream<E> findDepthNodes(@NonNull ID id, @NonNull Integer depth, Operator operator, Sort.Direction direction) {
-        if (direction == null) {
-            direction = Sort.Direction.ASC;
-        }
-        if (operator == null) {
-            operator = Operator.GE;
-        }
-        String jpql = this.query_depth_node_jpql + operator.getOperator() + " :depth order by tree.depth " + direction.name();
-        if (log.isDebugEnabled()) {
-            log.debug("查询指定节点子节点:{},深度:{},条件:{},排序:{}", id, depth, operator, direction);
-        }
-        return this.entityManager
-                .createQuery(jpql, javaType)
-                .setParameter("id", id)
-                .setParameter("depth", depth)
-                .setLockMode(PESSIMISTIC_READ)
-                .setFlushMode(FlushModeType.COMMIT)
-                .getResultStream();
-    }
-
-    /**
-     * 移动目标节点至源节点下
-     * 算法思路
-     * 首先加载源节点
-     *
-     * @param root   源节点, 如果源节点为null, 则表示将指定的节点挂在到根节点下
-     * @param target 目标节点
-     */
     @Override
     public void mount(ID root, @NonNull ID target) {
         if (ObjectUtils.nullSafeEquals(root, target)) {
@@ -314,7 +305,8 @@ class AdjacencyTreeExecutor<
         E sourceNode = null;
         if (root != null) {
             // 如果target的节点为source的父节点
-            ID childId = calcChildId(root, target);
+            @SuppressWarnings("unchecked")
+            ID childId = (ID) calcChildren(Q.id, root, target);
             if (ObjectUtils.nullSafeEquals(childId, root)) {
                 throw new BusinessException("不可将父节点附加至自身子节点");
             }
@@ -332,7 +324,7 @@ class AdjacencyTreeExecutor<
 
         // 递归修改
         log.info("开始挂载节点: root:{} ---> target:{}", root, target);
-        this.recursion(changeAndMerge(sourceNode, targetNode));
+        this.recursion(changeAndMerge(sourceNode, targetNode), 0);
     }
 
     protected E changeAndMerge(E parent, E child) {
@@ -345,34 +337,39 @@ class AdjacencyTreeExecutor<
 
     // 这里是可以优化的, 但是懒得做了
     // 可以使用jpql更新部分字段, 然后使用部分更新可以避免再次更新主表
-    protected void recursion(E parent) {
-        long curr = rand.nextLong();
-        log.info("进入递归方法:标识符为{}", curr);
+    protected void recursion(E parent, int times) {
+        final int finalTimes = times + 1;
+
+        log.info("进入递归方法:标识符为{}", times);
         if (log.isDebugEnabled()) {
             log.debug("刷入上一批id:{}修改的数据", parent == null ? null : parent.getId());
         }
         entityManager.flush();
         // 加载直接子节点
         assert parent != null;
+
         @Cleanup
-        Stream<E> children = this.getDirectChildren(parent.getId());
+        @SuppressWarnings("unchecked")
+        Stream<E> children = this.getDirectChildren((EntityPathBase<E>) Q, parent.getId());
         // 修改子节点, 修改且合并
         children.map(child -> changeAndMerge(parent, child))
-                // 递归子节点, 属于深度优先递归
-                .forEach(this::recursion);
-        log.info("退出递归方法,标识符为:{}", curr);
+            // 递归子节点, 属于深度优先递归
+            .forEach(item -> recursion(item, finalTimes));
+        log.info("退出递归方法,标识符为:{}", times);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public int remove(@NonNull ID id) {
-        Stream<ID> stream = this.getAllChildrenIds(id);
+        @Cleanup
+        Stream<E> stream = (Stream<E>) this.getAllChildren(Q, id);
         AtomicInteger count = new AtomicInteger(0);
         stream.forEach(item -> {
-            E refer = this.entityManager.getReference(javaType, item);
             if (log.isTraceEnabled()) {
-                log.trace("删除:{}", item);
+                log.trace("删除:{}", item.getId());
             }
-            this.entityManager.remove(refer);
+            // 之所以不用jpql, 是因为方便生命周期的方法拦截做逻辑注入,而且jpql实现复杂
+            this.entityManager.remove(item);
             count.getAndIncrement();
         });
         this.entityManager.flush();
@@ -381,21 +378,50 @@ class AdjacencyTreeExecutor<
     }
 
     @Override
-    public Stream<E> findLinks(ID start, ID end) {
-        ID id = this.calcChildId(start, end);
-        if (id == null) {
+    public <Projection> Stream<Projection> findLinks(@NonNull Expression<Projection> select, @NonNull ID start, @NonNull ID end, Predicate... predicates) {
+        // 获取父节点的信息, id, 高度
+        Tuple tuple = this.calcParent(Projections.tuple(Q.id, Q.depth), start, end);
+        if (tuple == null || tuple.size() == 0) {
             return Stream.empty();
         }
-        return this.getParents(id);
+
+        // 指定的高度必须大于等于父节点当前的高度
+        BooleanExpression cond = Q.depth.goe(tuple.get(Q.depth));
+        @SuppressWarnings("unchecked")
+        ID id = tuple.get(Q.id).equals(start) ? end : start;
+
+        if (predicates != null && predicates.length > 0) {
+            Predicate[] newPred = Arrays.copyOf(predicates, predicates.length + 1);
+            newPred[predicates.length] = cond;
+            return this.getParents(select, id, newPred);
+        }
+
+        return this.getParents(select, id, cond);
     }
 
     @Override
-    public Stream<ID> findLinkIds(ID start, ID end) {
-        ID id = this.calcChildId(start, end);
-        if (id == null) {
-            return Stream.empty();
+    public <Projection> Page<Projection> findLinks(@NonNull Expression<Projection> select,
+                                                   @NonNull Pageable pageable,
+                                                   @NonNull ID start,
+                                                   @NonNull ID end, Predicate... predicates) {
+
+        // 获取父节点的信息, id, 高度
+        Tuple tuple = this.calcParent(Projections.tuple(Q.id, Q.depth), start, end);
+        if (tuple == null || tuple.size() == 0) {
+            return Page.empty();
         }
-        return this.getParentIds(id);
+
+        // 指定的高度必须大于等于父节点当前的高度
+        BooleanExpression cond = Q.depth.goe(tuple.get(Q.depth));
+        @SuppressWarnings("unchecked")
+        ID id = tuple.get(Q.id).equals(start) ? end : start;
+
+        if (predicates != null && predicates.length > 0) {
+            Predicate[] newPred = Arrays.copyOf(predicates, predicates.length + 1);
+            newPred[predicates.length] = cond;
+            return this.getParents(select, pageable, id, newPred);
+        }
+        return this.getParents(select, pageable, id, cond);
     }
 
     @Override
@@ -405,63 +431,188 @@ class AdjacencyTreeExecutor<
         }
 
         // 首先判断是否存在关系
-        ID id = calcChildId(source, target);
-        if (id != null) {
-            // 计算节点相对值
-            int sourceDepth = this.getDepth(source);
-            int targetDepth = this.getDepth(target);
-            if (log.isDebugEnabled()) {
-                log.debug("source:{}的深度为:{}", source, sourceDepth);
-                log.debug("target:{}的深度为:{}", target, targetDepth);
+        Tuple info = calcChildren(Projections.tuple(Q.id, Q.depth), source, target);
+        if (info == null || info.size() == 0) {
+            return null;
+        }
+        // 计算节点相对值
+        @SuppressWarnings("unchecked")
+        ID id = (ID) info.get(Q.id);
+        Integer depth = info.get(Q.depth);
+
+        assert id != null;
+        assert depth != null;
+
+        return id.equals(source) ? depth - this.getDepth(target) : this.getDepth(source) - depth;
+    }
+
+    @Override
+    public <Projection> Projection calcChildren(@NonNull Expression<Projection> select, @NonNull ID pre, @NonNull ID next) {
+        return this.calc(select, pre, next, 2);
+    }
+
+    protected <Projection> Projection calc(@NonNull Expression<Projection> select, @NonNull ID pre, @NonNull ID next, long having) {
+        JPAQuery<Projection> query = this.jpaQueryFactory
+            .select(select)
+            .from(Q)
+            .innerJoin(Q)
+            .innerJoin(Q.path, P)
+            .where(
+                P.pathId.in(pre, next).and(
+                    Q.id.eq(pre).or(Q.id.eq(next))
+                )
+            )
+            .groupBy(Q.id)
+            .having(Q.id.count().eq(having))
+            .limit(1);
+        this.prop(query, this.queryHint);
+        List<Projection> list = query.fetch();
+
+        if (list.isEmpty()) {
+            return null;
+        }
+
+        return list.get(0);
+    }
+
+    public <Projection> Projection calcParent(@NonNull Expression<Projection> select, @NonNull ID pre, @NonNull ID next) {
+        return this.calc(select, pre, next, 1);
+    }
+
+    @Override
+    public <Projection> Stream<Projection> getRoots(@NonNull Expression<Projection> select, Predicate... predicates) {
+
+        JPAQuery<Projection> query = this.jpaQueryFactory
+            .select(select).from(Q).where();
+
+        QueryHints hints = queryHint.withFetchGraphs(entityManager);
+        this.prop(query, hints, this.buildRootCondition(predicates));
+
+        Stream stream = query.createQuery().getResultStream();
+
+        return this.convertTo(select, stream);
+
+    }
+
+    @Override
+    public <Projection> Page<Projection> getRoots(@NonNull Expression<Projection> select, @NonNull Pageable pageable, Predicate... predicates) {
+        Predicate cond = this.buildRootCondition(predicates);
+        JPQLQuery<Projection> query = querydsl.applyPagination(pageable, createQuery(cond).select(select));
+        return PageableExecutionUtils.getPage(query.fetch(), pageable, createCountQuery(cond)::fetchCount);
+    }
+
+    protected Class<P> getNodeType(Class<? super E> clazz) {
+        Class<P> nodeClass = this.findNodeType(clazz.getGenericInterfaces());
+        if (nodeClass != null) {
+            return nodeClass;
+        }
+
+        // 查找超类的接口
+        Class<? super E> superClass = clazz.getSuperclass();
+        return this.getNodeType(superClass);
+    }
+
+    protected Class<P> findNodeType(Type... types) {
+        for (Type type : types) {
+            if (!(type instanceof ParameterizedType)) {
+                continue;
             }
-            return sourceDepth - targetDepth;
+
+            Type[] args = ((ParameterizedType) (type)).getActualTypeArguments();
+            for (Type arg : args) {
+                if (!(arg instanceof Class)) {
+                    continue;
+                }
+                Class c = (Class) arg;
+                if (AdjacencyPathNode.class.isAssignableFrom(c)) {
+                    return c;
+                }
+                if (c.isPrimitive()) {
+                    continue;
+                }
+
+                if (c.isArray()) {
+                    continue;
+                }
+
+                if (c.isEnum()) {
+                    continue;
+                }
+
+                if (c.getName().startsWith("javax.")) {
+                    continue;
+                }
+                if (c.getName().startsWith("java.")) {
+                    continue;
+                }
+                return this.findNodeType(((Class<?>) arg).getGenericInterfaces());
+            }
         }
         return null;
     }
 
-    @Override
-    public ID calcChildId(ID pre, ID next) {
-        List<ID> tmp =
-                this.entityManager
-                        .createQuery(this.query_links_jpql, this.idType)
-                        .setParameter("start", pre)
-                        .setParameter("end", next)
-                        .setLockMode(LockModeType.NONE)
-                        .setMaxResults(1)
-                        .getResultList();
-        if (CollectionUtils.isEmpty(tmp)) {
-            if (log.isDebugEnabled()) {
-                log.debug("source:{}与target:{}不存在父子关系", pre, next);
+    protected Predicate buildRootCondition(Predicate... others) {
+        // 根节点条件
+        BooleanExpression condition = this
+            .Q
+            .depth
+            .eq(AdjacencyNode.ROOT_DEPTH)
+            .or(this.Q.id.eq(this.Q.parentId));
+
+        //自定义条件
+        if (!ArrayUtils.isEmpty(others)) {
+            for (Predicate other : others) {
+                condition = condition.and(other);
             }
-            return null;
         }
-        if (log.isDebugEnabled()) {
-            log.debug("source:{},target:{}中的子节点为:{}", pre, next, tmp.get(0));
-        }
-        return tmp.get(0);
+        return condition;
     }
 
-    /**
-     * 获取root节点列表
-     *
-     * @return 返回root节点
-     */
-    @Override
-    public Stream<E> getRoots() {
-        return this.entityManager.createQuery(this.query_roots_jpql, javaType)
-                .setFlushMode(FlushModeType.AUTO)
-                .getResultStream();
+    protected JPQLQuery<?> createCountQuery(@Nullable Predicate... predicate) {
+        return doCreateQuery(getQueryHintsForCount(), predicate);
     }
 
-    /**
-     * 获取root ids
-     *
-     * @return root 节点id
-     */
-    @Override
-    public Stream<ID> getRootIds() {
-        return this.entityManager.createQuery(this.query_roots_jpql, idType)
-                .setFlushMode(FlushModeType.AUTO)
-                .getResultStream();
+    protected QueryHints getQueryHintsForCount() {
+        return metadata == null ? QueryHints.NoHints.INSTANCE
+            : DefaultQueryHints.of(entityInformation, metadata).forCounts();
     }
+
+    protected AbstractJPAQuery<?, ?> doCreateQuery(QueryHints hints, @Nullable Predicate... predicate) {
+        AbstractJPAQuery<?, ?> query = querydsl.createQuery(this.Q);
+        prop(query, hints, predicate);
+        return query;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <Projection> Stream<Projection> convertTo(Expression<Projection> select, Stream stream) {
+        if (select instanceof FactoryExpression) {
+            return stream.map(
+                item -> ((FactoryExpression<Projection>) select).newInstance((Object[]) item)
+            );
+        }
+        return stream;
+    }
+
+    protected void prop(AbstractJPAQuery<?, ?> query, QueryHints hints, @Nullable Predicate... predicate) {
+        if (predicate != null) {
+            query = query.where(predicate);
+        }
+
+        for (Map.Entry<String, Object> hint : hints) {
+            query.setHint(hint.getKey(), hint.getValue());
+        }
+    }
+
+    protected JPQLQuery<?> createQuery(Predicate... predicate) {
+
+        AbstractJPAQuery<?, ?> query = doCreateQuery(queryHint.withFetchGraphs(entityManager), predicate);
+
+        if (metadata == null) {
+            return query;
+        }
+
+        LockModeType type = metadata.getLockModeType();
+        return type == null ? query : query.setLockMode(type);
+    }
+
 }

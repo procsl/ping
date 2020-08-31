@@ -1,9 +1,11 @@
 package cn.procsl.ping.boot.domain.support.executor;
 
-import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository;
 import cn.procsl.ping.boot.domain.business.common.repository.PersistenceRepository;
 import cn.procsl.ping.boot.domain.business.common.repository.QueryDslPersistenceRepository;
+import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.data.jpa.repository.query.EscapeCharacter;
 import org.springframework.data.jpa.repository.support.CrudMethodMetadata;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
@@ -31,6 +33,7 @@ public class DomainRepositoryFactory extends JpaRepositoryFactory {
      */
     public DomainRepositoryFactory(EntityManager entityManager) {
         super(entityManager);
+
     }
 
     @Override
@@ -40,47 +43,49 @@ public class DomainRepositoryFactory extends JpaRepositoryFactory {
 
         JpaEntityInformation<?, Serializable> entityInformation = getEntityInformation(metadata.getDomainType());
 
-//        QueryExtractor queryExtractor = findField(JpaRepositoryFactory.class,
-//                this, "extractor", QueryExtractor.class);
-
         EntityManager entityManager = findField(JpaRepositoryFactory.class,
-                this, "entityManager", EntityManager.class);
+            this, "entityManager", EntityManager.class);
 
         EntityPathResolver entityPathResolver = findField(JpaRepositoryFactory.class,
-                this, "entityPathResolver", EntityPathResolver.class);
+            this, "entityPathResolver", EntityPathResolver.class);
 
         CrudMethodMetadata crudMethodMetadata = this.findCrudMethodMetadata();
 
         EscapeCharacter escapeCharacter = findField(JpaRepositoryFactory.class,
-                this, "escapeCharacter", EscapeCharacter.class);
+            this, "escapeCharacter", EscapeCharacter.class);
+
+        BeanFactory factory = findField(JpaRepositoryFactory.class, this,
+            "beanFactory", BeanFactory.class);
 
         if (AdjacencyTreeRepository.class.isAssignableFrom(metadata.getRepositoryInterface())) {
             Object target = getTargetRepositoryViaReflection(AdjacencyTreeExecutor.class,
-                    entityInformation,
-                    entityManager,
-                    escapeCharacter,
-                    crudMethodMetadata
+                entityInformation,
+                entityManager,
+                escapeCharacter,
+                crudMethodMetadata,
+                factory,
+                entityPathResolver
             );
             fragments = fragments.append(RepositoryFragment.implemented(target));
         }
 
         if (PersistenceRepository.class.isAssignableFrom(metadata.getRepositoryInterface())) {
             Object target = getTargetRepositoryViaReflection(PersistenceExecutor.class,
-                    entityInformation,
-                    entityManager,
-                    crudMethodMetadata,
-                    escapeCharacter
+                entityInformation,
+                entityManager,
+                crudMethodMetadata,
+                escapeCharacter
             );
             fragments = fragments.append(RepositoryFragment.implemented(target));
         }
 
         if (QueryDslPersistenceRepository.class.isAssignableFrom(metadata.getRepositoryInterface())) {
             Object target = getTargetRepositoryViaReflection(QueryDslPersistenceExecutor.class,
-                    entityInformation,
-                    entityManager,
-                    crudMethodMetadata,
-                    escapeCharacter,
-                    entityPathResolver
+                entityInformation,
+                entityManager,
+                crudMethodMetadata,
+                escapeCharacter,
+                entityPathResolver
             );
             fragments = fragments.append(RepositoryFragment.implemented(target));
         }
@@ -90,7 +95,7 @@ public class DomainRepositoryFactory extends JpaRepositoryFactory {
 
     private CrudMethodMetadata findCrudMethodMetadata() {
         Object crudMethodMetadataPostProcessor = findField(JpaRepositoryFactory.class,
-                this, "crudMethodMetadataPostProcessor", null);
+            this, "crudMethodMetadataPostProcessor", null);
 
         Method method = ReflectionUtils.findMethod(crudMethodMetadataPostProcessor.getClass(), "getCrudMethodMetadata");
         try {
@@ -102,6 +107,4 @@ public class DomainRepositoryFactory extends JpaRepositoryFactory {
             throw new IllegalArgumentException("method getCrudMethodMetadata not found.", e);
         }
     }
-
-
 }

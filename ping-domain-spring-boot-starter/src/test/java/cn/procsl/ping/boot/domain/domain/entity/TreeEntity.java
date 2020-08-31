@@ -2,7 +2,10 @@ package cn.procsl.ping.boot.domain.domain.entity;
 
 import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyNode;
 import cn.procsl.ping.boot.domain.support.executor.DomainEventListener;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -17,7 +20,10 @@ import java.util.stream.Collectors;
  * @author procsl
  * @date 2020/07/31
  */
-@Data
+@Setter
+@Getter
+@ToString(exclude = "path")
+@EqualsAndHashCode
 @Entity
 @Table
 @EntityListeners(DomainEventListener.class)
@@ -132,9 +138,9 @@ public class TreeEntity implements AdjacencyNode<Long, PathNode> {
         log.debug("添加当前的节点至PathNodes:{}", pathNode);
         this.path.add(pathNode);
         List<String> tmp = this.path
-                .stream()
-                .sorted(Comparator.comparingInt(PathNode::getSeq))
-                .map(item -> String.valueOf(item.getPathId())).collect(Collectors.toList());
+            .stream()
+            .sorted(Comparator.comparingInt(PathNode::getSeq))
+            .map(item -> String.valueOf(item.getPathId())).collect(Collectors.toList());
         this.setName("/" + String.join("/", tmp));
         log.debug("设置当前的name属性为:{}", name);
     }

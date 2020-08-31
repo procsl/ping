@@ -1,7 +1,6 @@
 package cn.procsl.ping.boot.domain.business.tree.model;
 
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.*;
 import java.io.Serializable;
 
 /**
@@ -11,6 +10,7 @@ import java.io.Serializable;
  * @date 2020/07/29
  */
 @MappedSuperclass
+@Embeddable
 public interface AdjacencyPathNode<ID extends Serializable> extends Serializable {
 
     /**
@@ -21,8 +21,13 @@ public interface AdjacencyPathNode<ID extends Serializable> extends Serializable
      */
     @Deprecated
     @Column(updatable = false, insertable = false)
+    @Access(value = AccessType.PROPERTY)
     default ID getId() {
         return null;
+    }
+
+
+    default void setId(ID id) {
     }
 
     /**
@@ -32,6 +37,9 @@ public interface AdjacencyPathNode<ID extends Serializable> extends Serializable
      */
     ID getPathId();
 
+    default void setPathId(ID id) {
+    }
+
     /**
      * 当前节点相对于root节点id的序号, root节点为seq为0
      *
@@ -39,4 +47,6 @@ public interface AdjacencyPathNode<ID extends Serializable> extends Serializable
      */
     Integer getSeq();
 
+    default void setSeq(Integer seq) {
+    }
 }
