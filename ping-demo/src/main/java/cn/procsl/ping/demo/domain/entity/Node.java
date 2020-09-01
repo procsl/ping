@@ -39,14 +39,13 @@ public class Node extends User<PathNode> {
     /**
      * 创建路径节点实例方法
      *
-     * @param pathId
-     * @param seq
-     * @return
+     * @return 返回当前节点的 DictPath
      */
     @Override
-    public PathNode createPathNode(String pathId, Integer seq) {
+    public PathNode currentPathNode() {
         return null;
     }
+
 
     /**
      * 修改父节点
