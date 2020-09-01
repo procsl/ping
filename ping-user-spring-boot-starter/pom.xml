@@ -32,15 +32,12 @@
             <groupId>cn.procsl</groupId>
             <artifactId>ping-domain-spring-boot-starter</artifactId>
             <version>0.0.2-SNAPSHOT</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
-            <scope>compile</scope>
-            <version>1.18.12</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
@@ -134,9 +131,10 @@
                         <arg>-g</arg>
                         <arg>-Xlint</arg>
                         <arg>-parameters</arg>
-                        <!--                        <arg>-Acreator.repository.package.name=cn.procsl.ping.boot.user.domain.rbac.repository</arg>-->
+                        <!--<arg>-Acreator.repository.package.name=cn.procsl.ping.boot.user.domain.rbac.repository</arg>-->
                         <arg>-Acreate.repository.prefix=P</arg>
                     </compilerArgs>
+
                 </configuration>
                 <dependencies>
                     <dependency>
