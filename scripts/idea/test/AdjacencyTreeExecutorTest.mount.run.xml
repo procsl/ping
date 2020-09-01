@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="AdjacencyTreeExecutorTest.moveTo" type="JUnit" factoryName="JUnit" nameIsGenerated="true">
+  <configuration default="false" name="AdjacencyTreeExecutorTest.mount" type="JUnit" factoryName="JUnit" nameIsGenerated="true">
     <module name="ping-domain-spring-boot-starter" />
     <useClassPathOnly />
     <extension name="coverage">
@@ -10,7 +10,7 @@
     </extension>
     <option name="PACKAGE_NAME" value="cn.procsl.ping.boot.domain.support.executor" />
     <option name="MAIN_CLASS_NAME" value="cn.procsl.ping.boot.domain.support.executor.AdjacencyTreeExecutorTest" />
-    <option name="METHOD_NAME" value="moveTo" />
+    <option name="METHOD_NAME" value="mount" />
     <option name="TEST_OBJECT" value="method" />
     <option name="VM_PARAMETERS" value="-ea -Dlog4j.skipJansi=false" />
     <option name="PARAMETERS" value="" />
