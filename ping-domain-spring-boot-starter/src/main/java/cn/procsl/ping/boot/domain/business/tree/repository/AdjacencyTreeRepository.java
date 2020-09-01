@@ -26,6 +26,14 @@ public interface AdjacencyTreeRepository<
     ID extends Serializable,
     P extends AdjacencyPathNode<ID>> extends Repository<T, ID> {
 
+
+    <Projection> Projection findOne(@NonNull Expression<Projection> select, Predicate... predicates);
+
+    <Projection> Stream<Projection> findAll(@NonNull Expression<Projection> select, Predicate... predicates);
+
+    <Projection> Page<Projection> findAll(@NonNull Expression<Projection> select,
+                                          @NonNull Pageable pageable, Predicate... predicates);
+
     /**
      * 查询父节点列表, 通过指定的id
      *

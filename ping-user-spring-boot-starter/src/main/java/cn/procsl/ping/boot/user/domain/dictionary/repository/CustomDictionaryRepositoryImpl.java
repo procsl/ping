@@ -1,13 +1,12 @@
-package cn.procsl.ping.boot.domain.business.dictionary.repository;
+package cn.procsl.ping.boot.user.domain.dictionary.repository;
 
-import cn.procsl.ping.boot.domain.business.dictionary.model.Dictionary;
-import cn.procsl.ping.business.domain.DomainId;
+import cn.procsl.ping.boot.user.domain.dictionary.model.Dictionary;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -16,14 +15,14 @@ public class CustomDictionaryRepositoryImpl implements CustomDictionaryRepositor
     final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public <T extends DomainId<Long>> T search(@NotNull String path,
-                                               @NotNull boolean ignoreActive, @NotNull Expression<T> select)
+    public <T> T search(@NonNull Expression<T> select, @NonNull String path,
+                        @NonNull boolean ignoreActive)
         throws IllegalArgumentException {
 
         List<String> nodes = Dictionary.split(path);
         Long parentId = null;
         for (int i = 0; i < nodes.size(); i++) {
-            // depth ==:depth and space == :space
+            //depth ==:depth and space == :space
             BooleanExpression where = dict.depth.eq(i).and(dict.space.eq(nodes.get(i)));
             if (!ignoreActive) {
                 // active is true
@@ -34,7 +33,8 @@ public class CustomDictionaryRepositoryImpl implements CustomDictionaryRepositor
             where.and(exp);
             // 最后一个
             if (i + 1 >= nodes.size()) {
-                return this.jpaQueryFactory.select(select).from(dict).where(where).fetchOne();
+                T tmp = this.jpaQueryFactory.select(select).from(dict).where(where).fetchOne();
+                return tmp;
             }
 
             // 如果不是最后一个, 继续使用条件查找, 如果没有找到, 那说明不存在这个节点, 直接返回
@@ -46,4 +46,10 @@ public class CustomDictionaryRepositoryImpl implements CustomDictionaryRepositor
         }
         return null;
     }
+
+
+    public <T> List<T> search(Expression<T> selector, String path) {
+        return null;
+    }
+
 }

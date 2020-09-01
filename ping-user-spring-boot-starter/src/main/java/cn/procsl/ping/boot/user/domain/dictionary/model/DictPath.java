@@ -1,13 +1,12 @@
-package cn.procsl.ping.boot.domain.business.dictionary.model;
+package cn.procsl.ping.boot.user.domain.dictionary.model;
 
 import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyPathNode;
 import lombok.*;
-import org.springframework.data.annotation.Immutable;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+
+import static cn.procsl.ping.boot.user.domain.dictionary.model.Dictionary.SPACE_NAME_LEN;
 
 /**
  * 少量依赖了 spring jpa
@@ -16,11 +15,8 @@ import javax.persistence.Embeddable;
 @Setter
 @Getter
 @ToString
-@EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED)// for jpa
-@Access(AccessType.PROPERTY) // call by setter and getter
 @Embeddable
-@Immutable
 public class DictPath implements AdjacencyPathNode<Long> {
 
     @Column(nullable = false, updatable = false)
@@ -29,8 +25,12 @@ public class DictPath implements AdjacencyPathNode<Long> {
     @Column(nullable = false, updatable = false)
     protected Integer seq;
 
-    public DictPath(@NonNull Long pathId, @NonNull Integer seq) {
+    @Column(length = SPACE_NAME_LEN, nullable = false)
+    protected String space;
+
+    public DictPath(@NonNull Long pathId, @NonNull Integer seq, @NonNull String space) {
         this.pathId = pathId;
         this.seq = seq;
+        this.space = space;
     }
 }

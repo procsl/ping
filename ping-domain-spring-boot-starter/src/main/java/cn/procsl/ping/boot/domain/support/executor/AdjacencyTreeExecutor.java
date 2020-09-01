@@ -134,6 +134,29 @@ class AdjacencyTreeExecutor<
         }
     }
 
+
+    public <Projection> Projection findOne(@NonNull Expression<Projection> select, Predicate... predicates) {
+        JPAQuery<Projection> query = this.jpaQueryFactory.select(select).from(Q);
+        this.prop(query, queryHint.withFetchGraphs(this.entityManager), predicates);
+        query = this.metadata == null ? query : query.setLockMode(this.metadata.getLockModeType());
+        return query.fetchOne();
+    }
+
+    public <Projection> Stream<Projection> findAll(@NonNull Expression<Projection> select, Predicate... predicates) {
+        JPAQuery<Projection> query = this.jpaQueryFactory.select(select).from(Q);
+        this.prop(query, this.queryHint.withFetchGraphs(this.entityManager), predicates);
+        query = this.metadata == null ? query : query.setLockMode(this.metadata.getLockModeType());
+        return this.convertTo(select, query.createQuery().getResultStream());
+    }
+
+    public <Projection> Page<Projection> findAll(@NonNull Expression<Projection> select,
+                                                 @NonNull Pageable pageable, Predicate... predicates) {
+        JPQLQuery<Projection> query = createQuery(predicates).select(select).from(Q);
+        JPQLQuery<Projection> res = querydsl.applyPagination(pageable, query);
+        return PageableExecutionUtils.getPage(res.fetch(), pageable, query::fetchCount);
+    }
+
+
     @Override
     @SuppressWarnings("unchecked")
     public <Projection> Stream<Projection> getParents(Expression<Projection> select, @NonNull ID id, Predicate... predicates) {
@@ -149,8 +172,9 @@ class AdjacencyTreeExecutor<
         // 对于查询主键的, 特殊处理直接返回
         if (select.equals(Q.id)) {
             // 设置相关属性, 插入自定义查询条件
-            this.prop(subQuery, this.queryHint, predicates);
             subQuery.orderBy(P.seq.asc());
+            this.prop(subQuery, this.queryHint.withFetchGraphs(this.entityManager), predicates);
+            subQuery = this.metadata == null ? subQuery : subQuery.setLockMode(this.metadata.getLockModeType());
             return subQuery.createQuery().getResultStream();
         }
 
@@ -160,7 +184,8 @@ class AdjacencyTreeExecutor<
             .where(Q.id.in(subQuery))
             .orderBy(Q.depth.asc());
         // 设置相关属性, 插入自定义查询条件
-        this.prop(result, this.queryHint, predicates);
+        this.prop(result, this.queryHint.withFetchGraphs(this.entityManager), predicates);
+        result = this.metadata == null ? result : result.setLockMode(this.metadata.getLockModeType());
 
         Stream stream = result
             .createQuery()
@@ -202,7 +227,8 @@ class AdjacencyTreeExecutor<
             .select(select)
             .from(Q)
             .where(Q.parentId.eq(id));
-        this.prop(query, this.queryHint, predicates);
+        this.prop(query, this.queryHint.withFetchGraphs(this.entityManager), predicates);
+        query = this.metadata == null ? query : query.setLockMode(this.metadata.getLockModeType());
         Stream stream = query.createQuery().getResultStream();
         return this.convertTo(select, stream);
     }
@@ -228,7 +254,8 @@ class AdjacencyTreeExecutor<
             .innerJoin(Q.path, P)
             .where(P.pathId.eq(id))
             .orderBy(Q.depth.asc());
-        this.prop(query, this.queryHint, predicates);
+        this.prop(query, this.queryHint.withFetchGraphs(this.entityManager), predicates);
+        query = this.metadata == null ? query : query.setLockMode(this.metadata.getLockModeType());
         return this.convertTo(select, query.createQuery().getResultStream());
     }
 
@@ -259,7 +286,8 @@ class AdjacencyTreeExecutor<
             .from(Q)
             .where(Q.id.in(subQuery))
             .limit(1);
-        this.prop(query, queryHint);
+        this.prop(query, queryHint.withFetchGraphs(this.entityManager));
+        query = this.metadata == null ? query : query.setLockMode(this.metadata.getLockModeType());
         List<Projection> t = query.fetch();
         if (t.isEmpty()) {
             return Optional.empty();
@@ -465,7 +493,8 @@ class AdjacencyTreeExecutor<
             .groupBy(Q.id)
             .having(Q.id.count().eq(having))
             .limit(1);
-        this.prop(query, this.queryHint);
+        this.prop(query, this.queryHint.withFetchGraphs(this.entityManager));
+        query = this.metadata == null ? query : query.setLockMode(this.metadata.getLockModeType());
         List<Projection> list = query.fetch();
 
         if (list.isEmpty()) {
@@ -487,6 +516,7 @@ class AdjacencyTreeExecutor<
 
         QueryHints hints = queryHint.withFetchGraphs(entityManager);
         this.prop(query, hints, this.buildRootCondition(predicates));
+        query = this.metadata == null ? query : query.setLockMode(this.metadata.getLockModeType());
 
         Stream stream = query.createQuery().getResultStream();
 

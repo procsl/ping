@@ -24,6 +24,4 @@ public class DomainProperties {
 
     private String dot = "_";
 
-    private String directoryDelimiter = "/";
-
 }

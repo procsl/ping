@@ -19,3 +19,6 @@ spring:
         bootstrap-mode: lazy
   profiles:
     active: @profiles.active@
+ping:
+  domain:
+    table-prefix: d

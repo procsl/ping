@@ -1,14 +1,13 @@
-package cn.procsl.ping.boot.domain.business.dictionary.model;
+package cn.procsl.ping.boot.user.domain.dictionary.model;
 
+import cn.procsl.ping.boot.domain.annotation.CreateRepository;
 import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyNode;
 import cn.procsl.ping.boot.domain.business.utils.StringUtils;
 import cn.procsl.ping.boot.domain.support.executor.DomainEventListener;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -26,14 +25,14 @@ import java.util.stream.Collectors;
  */
 @Setter(AccessLevel.PROTECTED) // for jpa
 @Getter
-@EqualsAndHashCode(exclude = "path")
-@ToString(exclude = "path")
+@EqualsAndHashCode
+@ToString(exclude = {"path", "payload"})
 @Table
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)// for jpa
 @Slf4j
-@DynamicUpdate
-@EntityListeners(value = DomainEventListener.class)
+@EntityListeners(DomainEventListener.class)
+@CreateRepository
 public class Dictionary implements AdjacencyNode<Long, DictPath> {
 
     @Id
@@ -44,11 +43,6 @@ public class Dictionary implements AdjacencyNode<Long, DictPath> {
 
     @Column(length = SPACE_NAME_LEN, nullable = false)
     protected String space;
-
-    @Embedded
-    @Setter(AccessLevel.PUBLIC)
-    @Column(nullable = false)
-    protected Value value;
 
     @Column(nullable = false)
     protected Long parentId;
@@ -61,73 +55,55 @@ public class Dictionary implements AdjacencyNode<Long, DictPath> {
     protected Boolean active;
 
     @ElementCollection
+    @Setter(AccessLevel.PUBLIC)
+    protected List<Payload> payload;
+
+    @ElementCollection
     @CollectionTable(joinColumns = @JoinColumn(name = "id"))
     protected Set<DictPath> path;
 
     @Transient
-    protected DictPath currentNode;
-
-    @Transient
-    static Supplier<String> delimiter;
+    static Supplier<String> delimiter = () -> "/";
 
     public static final int SPACE_NAME_LEN = 20;
 
     public static final int ROOT_DEPTH = 0;
 
-    public static final Value EMPTY_VALUE = new Value(Type.blank, null);
+    @Transient
+    private DictPath currentNode;
 
-    public Dictionary(@NonNull String nameSpace) {
+    public Dictionary(@NonNull String nameSpace, Payload... payloads) {
         this.empty();
         this.rename(nameSpace);
         this.setActive(true);
-        this.setValue(EMPTY_VALUE);
     }
 
-    public Dictionary(@NotNull String space, @NotNull Dictionary parent) {
+    public Dictionary(@NonNull String space, @NonNull Dictionary parent, Payload... payloads) {
         assert parent.getId() != null;
         this.rename(space);
         this.setActive(parent.getActive());
-        this.setValue(EMPTY_VALUE);
         this.changeParent(parent);
     }
 
-    /**
-     * on set id
-     *
-     * @param id id
-     */
-    public void setId(Long id) {
-        this.id = id;
-        // 查询的时候也会设置
-        if (this.parentId == null) {
-            this.parentId = id;
-        }
-    }
 
-    /**
-     * 设置分隔符
-     *
-     * @param delimiter 获取分隔符方法
-     */
-    public static void setDelimit(@NonNull Supplier<String> delimiter) {
-        Dictionary.delimiter = delimiter;
-    }
-
-    public static List<String> split(@NotNull String path) {
+    @Transient
+    public static List<String> split(@NonNull String path) {
         return Arrays.
             stream(path.split(delimiter.get()))
             .filter(item -> !StringUtils.isEmpty(item))
             .collect(Collectors.toUnmodifiableList());
     }
 
-    public static String getDelimiter() {
-        return delimiter.get();
+    public void setId(Long id) {
+        if (this.getParentId() == null) {
+            this.parentId = id;
+        }
     }
 
     @Override
     public DictPath currentPathNode() {
         if (this.currentNode == null) {
-            this.currentNode = new DictPath(this.getId(), this.getDepth());
+            this.currentNode = new DictPath(this.getId(), this.getDepth(), this.getSpace());
         }
         return this.currentNode;
     }
@@ -160,7 +136,7 @@ public class Dictionary implements AdjacencyNode<Long, DictPath> {
     /**
      * 更新自身信息
      */
-    public void upgrade() {
+    protected void upgrade() {
 
         log.trace("开始更新自身");
         if (this.getId() == null) {

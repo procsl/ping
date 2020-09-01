@@ -1,7 +1,6 @@
-package cn.procsl.ping.boot.domain.business.dictionary.repository;
+package cn.procsl.ping.boot.user.domain.dictionary.repository;
 
-import cn.procsl.ping.boot.domain.business.dictionary.model.QDictionary;
-import cn.procsl.ping.business.domain.DomainId;
+import cn.procsl.ping.boot.user.domain.dictionary.model.QDictionary;
 import com.querydsl.core.types.Expression;
 
 import javax.validation.constraints.NotNull;
@@ -19,8 +18,7 @@ public interface CustomDictionaryRepository {
      * @return 如果找到, 则返回指定的值
      * @throws IllegalArgumentException 如果分割符不合法,则抛出此异常
      */
-    <T extends DomainId<Long>> T search(@NotNull String path,
-                                        @NotNull boolean ignoreActive, @NotNull Expression<T> select)
+    <T> T search(@NotNull Expression<T> select, @NotNull String path, @NotNull boolean ignoreActive)
         throws IllegalArgumentException;
 
 }
