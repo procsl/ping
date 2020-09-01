@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.domain.domain.entity;
+package cn.procsl.ping.boot.domain.domain.model;
 
 import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyNode;
 import cn.procsl.ping.boot.domain.support.executor.DomainEventListener;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @EntityListeners(DomainEventListener.class)
 @DynamicUpdate
 @Slf4j
-public class TreeEntity implements AdjacencyNode<Long, PathNode> {
+public class Tree implements AdjacencyNode<Long, PathNode> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator")
@@ -72,7 +72,7 @@ public class TreeEntity implements AdjacencyNode<Long, PathNode> {
     @Override
     public void changeParent(AdjacencyNode<Long, PathNode> parent) {
         log.info("修改当前节点的父节点");
-        if (!(parent instanceof TreeEntity)) {
+        if (!(parent instanceof cn.procsl.ping.boot.domain.domain.model.Tree)) {
             throw new IllegalArgumentException("required " + this.getClass().getName());
         }
         this.empty();
@@ -80,7 +80,7 @@ public class TreeEntity implements AdjacencyNode<Long, PathNode> {
         this.parentId = parent.getId();
         log.debug("修改parentId:{}", parentId);
 
-        this.depth = ((TreeEntity) parent).depth + 1;
+        this.depth = ((cn.procsl.ping.boot.domain.domain.model.Tree) parent).depth + 1;
         log.debug("修改depth:{}", depth);
 
         this.path.addAll(parent.getPath());

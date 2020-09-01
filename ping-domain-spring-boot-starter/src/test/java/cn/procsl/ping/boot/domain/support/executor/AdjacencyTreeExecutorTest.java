@@ -1,12 +1,12 @@
 package cn.procsl.ping.boot.domain.support.executor;
 
 import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository;
-import cn.procsl.ping.boot.domain.domain.entity.PathNode;
-import cn.procsl.ping.boot.domain.domain.entity.QPathNode;
-import cn.procsl.ping.boot.domain.domain.entity.QTreeEntity;
-import cn.procsl.ping.boot.domain.domain.entity.TreeEntity;
+import cn.procsl.ping.boot.domain.domain.model.PathNode;
+import cn.procsl.ping.boot.domain.domain.model.QPathNode;
+import cn.procsl.ping.boot.domain.domain.model.QTree;
+import cn.procsl.ping.boot.domain.domain.model.Tree;
 import cn.procsl.ping.boot.domain.domain.repository.AdjacencyTreeRepositoryTestRepository;
-import cn.procsl.ping.boot.domain.domain.repository.TreeEntityTestRepository;
+import cn.procsl.ping.boot.domain.domain.repository.TreeTestRepository;
 import com.github.javafaker.Faker;
 import com.github.jsonzou.jmockdata.MockConfig;
 import com.querydsl.core.Tuple;
@@ -22,6 +22,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -42,8 +43,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.querydsl.core.types.Projections.constructor;
-
 @Slf4j
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -54,20 +53,21 @@ import static com.querydsl.core.types.Projections.constructor;
     repositoryFactoryBeanClass = DomainRepositoryFactoryBean.class,
     bootstrapMode = BootstrapMode.LAZY
 )
-@EntityScan(basePackages = "cn.procsl.ping.boot.domain.domain.entity")
+@EntityScan(basePackages = "cn.procsl.ping.boot.domain.domain.model")
+@ComponentScan("cn.procsl.ping.boot.domain.test")
 public class AdjacencyTreeExecutorTest {
 
     @Inject
-    AdjacencyTreeRepository<TreeEntity, Long, PathNode> treeExecutor;
+    AdjacencyTreeRepository<Tree, Long, PathNode> treeExecutor;
 
     @Inject
-    JpaRepository<TreeEntity, Long> jpaRepository;
+    JpaRepository<Tree, Long> jpaRepository;
 
     @Inject
-    QuerydslPredicateExecutor<TreeEntity> querydslPredicateExecutor;
+    QuerydslPredicateExecutor<Tree> querydslPredicateExecutor;
 
     @Inject
-    TreeEntityTestRepository treeEntityRepository;
+    TreeTestRepository treeEntityRepository;
 
     @Inject
     AdjacencyTreeRepositoryTestRepository repo;
@@ -85,18 +85,18 @@ public class AdjacencyTreeExecutorTest {
 
     private static final MockConfig mockConfig;
 
-    private QTreeEntity T = QTreeEntity.treeEntity;
+    private QTree T = QTree.tree;
 
     private QPathNode P = QPathNode.pathNode;
 
     static {
         mockConfig = new MockConfig()
             .globalConfig()
-            .subConfig(TreeEntity.class, "name")
+            .subConfig(cn.procsl.ping.boot.domain.domain.model.Tree.class, "name")
             .stringRegex("[a-z0-9_]{20,20}")
 
             .globalConfig()
-            .excludes(TreeEntity.class, "id", "path");
+            .excludes(cn.procsl.ping.boot.domain.domain.model.Tree.class, "id", "path");
 
         FAKER = new Faker(Locale.CHINA);
     }
@@ -105,13 +105,14 @@ public class AdjacencyTreeExecutorTest {
 
     @Before
     public void init() {
+
         List<Long> roots = this.repo.getRoots(T.id).collect(Collectors.toList());
         if (!roots.isEmpty()) {
             roots = this.roots;
             return;
         }
 
-        TreeEntity root = new TreeEntity();
+        cn.procsl.ping.boot.domain.domain.model.Tree root = new cn.procsl.ping.boot.domain.domain.model.Tree();
         root.init();
         jpaRepository.save(root);
         root.postPersist();
@@ -127,15 +128,15 @@ public class AdjacencyTreeExecutorTest {
         jpaRepository.flush();
     }
 
-    private void create(TreeEntity parent, int context) {
+    private void create(cn.procsl.ping.boot.domain.domain.model.Tree parent, int context) {
 
         log.info("{}context 递归{}:{}", getTab(context), context);
         context++;
 
-        TreeEntity child = new TreeEntity();
+        cn.procsl.ping.boot.domain.domain.model.Tree child = new cn.procsl.ping.boot.domain.domain.model.Tree();
         child.changeParent(parent);
 //        child.setName(FAKER.name().name());
-        TreeEntity entity = jpaRepository.save(child);
+        cn.procsl.ping.boot.domain.domain.model.Tree entity = jpaRepository.save(child);
 
         if (FAKER.number().numberBetween(0, 9) < 3) {
             log.info("{}context 回归:{}", getTab(context - 1), context);
@@ -195,30 +196,28 @@ public class AdjacencyTreeExecutorTest {
 
     @Test
     public void getParents() {
-        QTreeEntity tree = QTreeEntity.treeEntity;
+        @Cleanup
+        Stream<Long> ids = this.repo.getParents(T.id, 8011L);
 
         @Cleanup
-        Stream<Long> ids = this.repo.getParents(tree.id, 8011L);
-
-        @Cleanup
-        Stream<TreeEntity> entity = this.repo.getParents(tree, 8011L);
+        Stream<Tree> entity = this.repo.getParents(T, 8011L);
 
         // 投影查询 构造函数构造, 参数位置需要和查询字段对应
-        ConstructorExpression<SimpleDTO> constructor = constructor(SimpleDTO.class, tree.id, tree.name);
+        ConstructorExpression<SimpleDTO> constructor = Projections.constructor(SimpleDTO.class, T.id, T.name);
 
         // 需要默认构造函数用于反射实例化, 并且如果field是不可访问的, 则会调用setter
-        QBean<SimpleDTO> beans = Projections.bean(SimpleDTO.class, tree.id, tree.name);
+        QBean<SimpleDTO> beans = Projections.bean(SimpleDTO.class, T.id, T.name);
 
         // 字段注入
-        QBean<SimpleDTO> fields = Projections.fields(SimpleDTO.class, tree.id, tree.name);
+        QBean<SimpleDTO> fields = Projections.fields(SimpleDTO.class, T.id, T.name);
 
         // 以list的形式返回
-        QList list = Projections.list(tree.id, tree.name);
+        QList list = Projections.list(T.id, T.name);
 
         // 返回map形式
-        QMap map = Projections.map(tree.id, tree.name);
+        QMap map = Projections.map(T.id, T.name);
 
-        QTuple tuple = Projections.tuple(tree.id, tree.name);
+        QTuple tuple = Projections.tuple(T.id, T.name);
 
         @Cleanup
         Stream<SimpleDTO> consProj = this.repo.getParents(constructor, 8011L);
@@ -268,7 +267,7 @@ public class AdjacencyTreeExecutorTest {
 
     @Test
     public void getDirectChildren() {
-        Stream<TreeEntity> stream = this.repo.getDirectChildren(T, 0L);
+        Stream<Tree> stream = this.repo.getDirectChildren(T, 0L);
         stream.forEach(item -> log.info("item:{}", item));
     }
 

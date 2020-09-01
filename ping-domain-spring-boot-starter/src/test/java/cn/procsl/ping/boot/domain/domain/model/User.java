@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.domain.domain.entity;
+package cn.procsl.ping.boot.domain.domain.model;
 
 import lombok.Builder;
 import lombok.Getter;

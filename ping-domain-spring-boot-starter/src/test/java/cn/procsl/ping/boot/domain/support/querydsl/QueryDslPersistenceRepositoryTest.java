@@ -1,8 +1,8 @@
 package cn.procsl.ping.boot.domain.support.querydsl;
 
 import cn.procsl.ping.boot.domain.business.common.repository.QueryDslPersistenceRepository;
-import cn.procsl.ping.boot.domain.domain.entity.QUser;
-import cn.procsl.ping.boot.domain.domain.entity.User;
+import cn.procsl.ping.boot.domain.domain.model.QUser;
+import cn.procsl.ping.boot.domain.domain.model.User;
 import cn.procsl.ping.boot.domain.support.executor.DomainRepositoryFactoryBean;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -29,7 +29,7 @@ import java.util.Date;
         repositoryFactoryBeanClass = DomainRepositoryFactoryBean.class,
         bootstrapMode = BootstrapMode.LAZY
 )
-@EntityScan(basePackages = "cn.procsl.ping.boot.domain.domain.entity")
+@EntityScan(basePackages = "cn.procsl.ping.boot.domain.domain.model")
 public class QueryDslPersistenceRepositoryTest {
 
     @Inject

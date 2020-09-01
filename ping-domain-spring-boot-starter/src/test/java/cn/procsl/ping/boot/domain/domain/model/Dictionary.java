@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.domain.domain.entity;
+package cn.procsl.ping.boot.domain.domain.model;
 
 import cn.procsl.ping.boot.domain.support.executor.DomainEventListener;
 import cn.procsl.ping.business.domain.DomainEntity;
