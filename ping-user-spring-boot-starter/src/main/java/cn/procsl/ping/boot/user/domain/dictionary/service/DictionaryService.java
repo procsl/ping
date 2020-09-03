@@ -20,7 +20,7 @@ import javax.validation.constraints.Size;
 import java.util.List;
 
 import static cn.procsl.ping.boot.user.domain.dictionary.model.Dictionary.SPACE_NAME_LEN;
-import static cn.procsl.ping.boot.user.domain.dictionary.repository.CustomDictionaryRepository.dict;
+import static cn.procsl.ping.boot.user.domain.dictionary.repository.CustomDictionaryRepository.D;
 
 /**
  * 字典服务
@@ -47,6 +47,7 @@ public class DictionaryService {
      *
      * @param id       父节点ID
      * @param space    节点space
+     * @param check    是否校验,如果存在快速返回
      * @param payloads 节点数据
      * @return 返回创建成功后的节点ID
      * @throws EntityNotFoundException  如果父节点id不存在
@@ -54,10 +55,15 @@ public class DictionaryService {
      */
     public Long create(@NotNull Long id,
                        @NotBlank @Size(min = 1, max = SPACE_NAME_LEN) String space,
+                       @NotNull boolean check,
                        Payload... payloads) throws EntityNotFoundException,
         IllegalArgumentException {
 
-        Long currentId = this.adjDicRepo.findOne(dict.id, dict.parentId.eq(id).and(dict.space.eq(space)));
+        Long currentId = this.adjDicRepo.findOne(D.id, D.parentId.eq(id).and(D.space.eq(space)));
+        if (check) {
+            throw new BusinessException("space:" + space + "已存在");
+        }
+
         if (currentId != null) {
             return currentId;
         }
@@ -72,19 +78,45 @@ public class DictionaryService {
      *
      * @param path     指定分隔符的路径
      * @param payloads 负载/元数据
-     * @return 如果创建成功返回ID
+     * @return 如果创建成功返回ID, 如果已存在则返回null
      * @throws IllegalArgumentException 如果路径中分段长度不合法,报错
      */
-    public Long create(@NotBlank String path, Payload... payloads) throws IllegalArgumentException {
+    public Long create(@NotBlank String path,
+                       @NotNull boolean check,
+                       Payload... payloads) throws IllegalArgumentException {
         List<String> paths = Dictionary.split(path);
-        for (String s : paths) {
-            if (s.length() > SPACE_NAME_LEN) {
-                throw new IllegalArgumentException(s + ":space长度超长");
+
+        List<Long> ids = this.customRepo.search(paths, true);
+
+        if (ids.size() >= paths.size()) {
+            if (check) {
+                throw new BusinessException("space:" + path + "已存在");
             }
+            return ids.get(paths.size() - 1);
         }
 
-        this.customRepo.search(dict.id, path, true);
-        return null;
+        Dictionary parent = null;
+        int low = ids.size();
+        int high = paths.size();
+        if (!ids.isEmpty()) {
+            parent = this.jpaRepository.getOne(ids.get(low - 1));
+        }
+
+        // 循环创建
+        List<String> subPath = paths.subList(low, high);
+
+        for (int i = 0; i < subPath.size(); i++) {
+            String s = subPath.get(i);
+            Dictionary tmp;
+            if (parent == null) {
+                tmp = i == subPath.size() - 1 ? new Dictionary(s, payloads) : new Dictionary(s);
+            } else {
+                // 最后一个, 添加payloads
+                tmp = i == subPath.size() - 1 ? new Dictionary(s, parent, payloads) : new Dictionary(s, parent);
+            }
+            parent = this.jpaRepository.save(tmp);
+        }
+        return parent.getId();
     }
 
     /**
@@ -123,7 +155,7 @@ public class DictionaryService {
         throws EntityNotFoundException, BusinessException {
         // 首先通过 id == :id and space == :spaceName 匹配
         boolean isEquals = this.dictExecutor
-            .exists(dict.id.eq(id).and(dict.space.eq(spaceName)));
+            .exists(D.id.eq(id).and(D.space.eq(spaceName)));
 
         if (isEquals) {
             log.info("名称相同,跳过更改:id={},space={}", id, spaceName);

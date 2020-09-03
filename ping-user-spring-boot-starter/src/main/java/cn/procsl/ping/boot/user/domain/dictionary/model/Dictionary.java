@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @Getter
 @EqualsAndHashCode
 @ToString(exclude = {"path", "payload"})
-@Table
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"space", "parentId"})})
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)// for jpa
 @Slf4j
@@ -76,13 +76,22 @@ public class Dictionary implements AdjacencyNode<Long, DictPath> {
         this.empty();
         this.rename(nameSpace);
         this.setActive(true);
+        if (payloads != null) {
+            List<Payload> list = Arrays.asList(payloads);
+            this.setPayload(list);
+        }
+
     }
 
     public Dictionary(@NonNull String space, @NonNull Dictionary parent, Payload... payloads) {
-        assert parent.getId() != null;
         this.rename(space);
         this.setActive(parent.getActive());
         this.changeParent(parent);
+
+        if (payloads != null) {
+            List<Payload> list = Arrays.asList(payloads);
+            this.setPayload(list);
+        }
     }
 
 
@@ -95,6 +104,7 @@ public class Dictionary implements AdjacencyNode<Long, DictPath> {
     }
 
     public void setId(Long id) {
+        this.id = id;
         if (this.getParentId() == null) {
             this.parentId = id;
         }
@@ -103,7 +113,7 @@ public class Dictionary implements AdjacencyNode<Long, DictPath> {
     @Override
     public DictPath currentPathNode() {
         if (this.currentNode == null) {
-            this.currentNode = new DictPath(this.getId(), this.getDepth(), this.getSpace());
+            this.currentNode = new DictPath(this.getId(), this.getDepth());
         }
         return this.currentNode;
     }
@@ -114,13 +124,17 @@ public class Dictionary implements AdjacencyNode<Long, DictPath> {
      * @param parent 指定的父节点
      */
     @Override
-    public void changeParent(AdjacencyNode<Long, DictPath> parent) {
+    public void changeParent(@NonNull AdjacencyNode<Long, DictPath> parent) {
         log.info("修改当前节点的父节点");
         if (!(parent instanceof Dictionary)) {
             throw new IllegalArgumentException("required " + this.getClass().getName());
         }
         this.empty();
-        this.setParentId(parent.getId());
+
+        @NonNull
+        Long pid = parent.getId();
+
+        this.setParentId(pid);
         log.trace("修改parentId:{}", this.getParentId());
 
         this.setDepth(parent.getDepth() + 1);
