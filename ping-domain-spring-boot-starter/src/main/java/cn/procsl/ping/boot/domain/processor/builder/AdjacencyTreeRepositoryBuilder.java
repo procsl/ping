@@ -68,7 +68,7 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
             TypeMirror notType = this.type.erasure(mirror);
             // itself
             boolean bool = this.type.isSubtype(notType, node);
-            bool = bool && this.type.isSubtype(node, notType);
+//            bool = bool && this.type.isSubtype(node, notType);
             if (bool && mirror instanceof DeclaredType) {
                 return (DeclaredType) mirror;
             }
