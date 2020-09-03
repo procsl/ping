@@ -2,10 +2,7 @@ package cn.procsl.ping.boot.domain.domain.model;
 
 import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyNode;
 import cn.procsl.ping.boot.domain.support.executor.DomainEventListener;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -32,8 +29,8 @@ import java.util.stream.Collectors;
 public class Tree implements AdjacencyNode<Long, PathNode> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator")
-    @SequenceGenerator(allocationSize = 500, name = "generator", sequenceName = "tree_entity_seq")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "generator")
+    @SequenceGenerator(allocationSize = 500, name = "generator")
     @Column(updatable = false, nullable = false)
     Long id;
 
@@ -70,7 +67,7 @@ public class Tree implements AdjacencyNode<Long, PathNode> {
     }
 
     @Override
-    public void changeParent(AdjacencyNode<Long, PathNode> parent) {
+    public void changeParent(@NonNull AdjacencyNode<Long, PathNode> parent) {
         log.info("修改当前节点的父节点");
         if (!(parent instanceof cn.procsl.ping.boot.domain.domain.model.Tree)) {
             throw new IllegalArgumentException("required " + this.getClass().getName());

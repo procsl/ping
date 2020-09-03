@@ -1,0 +1,21 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="DictionaryServiceTest.rename" type="JUnit" factoryName="JUnit" nameIsGenerated="true">
+    <module name="ping-user-spring-boot-starter" />
+    <useClassPathOnly />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="cn.procsl.ping.boot.user.domain.dictionary.service.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <option name="PACKAGE_NAME" value="cn.procsl.ping.boot.user.domain.dictionary.service" />
+    <option name="MAIN_CLASS_NAME" value="cn.procsl.ping.boot.user.domain.dictionary.service.DictionaryServiceTest" />
+    <option name="METHOD_NAME" value="rename" />
+    <option name="TEST_OBJECT" value="method" />
+    <option name="VM_PARAMETERS" value="-ea -Dlog4j.skipJansi=false" />
+    <option name="PARAMETERS" value="" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

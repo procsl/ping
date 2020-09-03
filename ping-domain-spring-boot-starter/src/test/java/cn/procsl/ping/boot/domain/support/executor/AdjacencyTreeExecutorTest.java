@@ -55,6 +55,7 @@ import java.util.stream.Stream;
 )
 @EntityScan(basePackages = "cn.procsl.ping.boot.domain.domain.model")
 @ComponentScan("cn.procsl.ping.boot.domain.test")
+@Rollback(value = false)
 public class AdjacencyTreeExecutorTest {
 
     @Inject
