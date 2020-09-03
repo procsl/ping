@@ -207,6 +207,11 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
         return true;
     }
 
+    @Override
+    public String getName() {
+        return "AdjacencyTree";
+    }
+
     /**
      * 转化节点
      *

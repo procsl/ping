@@ -15,6 +15,16 @@ import java.util.function.Function;
  */
 public interface RepositoryBuilder {
 
+    String factory = "META-INF/factory.config";
+
+    String prefix = "factory.repository.prefix";
+
+    String index = "factory.repository.package.index";
+
+    String pageName = "factory.repository.package.name";
+
+    String include = "factory.repository.includes";
+
     /**
      * 初始化接口
      *
@@ -46,4 +56,6 @@ public interface RepositoryBuilder {
      * @return 如果独立创建, 则返回true
      */
     boolean isSingleton();
+
+    String getName();
 }

@@ -5,6 +5,7 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import lombok.Cleanup;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Indexed;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
@@ -17,6 +18,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.util.Elements;
 import javax.persistence.Entity;
 import javax.tools.Diagnostic;
 import javax.tools.StandardLocation;
@@ -25,6 +27,7 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static cn.procsl.ping.boot.domain.processor.RepositoryBuilder.*;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
 import static javax.tools.Diagnostic.Kind.ERROR;
@@ -38,19 +41,16 @@ import static javax.tools.Diagnostic.Kind.WARNING;
  * @author procsl
  * @date 2020/05/18
  */
+@Slf4j
 public class RepositoryProcessor extends AbstractProcessor {
 
     private Messager messager;
 
     private Filer filer;
 
-    private String packageName;
-
     private List<RepositoryBuilder> builders;
 
     private List<RepositoryBuilder> singletonBuilders;
-
-    private String prefix;
 
     private List<String> includes;
 
@@ -65,10 +65,6 @@ public class RepositoryProcessor extends AbstractProcessor {
         try {
             initConfig();
 
-            initPackageName();
-
-            initPrefix();
-
             initIncludes();
         } catch (Exception e) {
             messager.printMessage(ERROR, "Error: " + e.getMessage());
@@ -82,8 +78,8 @@ public class RepositoryProcessor extends AbstractProcessor {
         try {
             @Cleanup
             InputStream is = filer
-                    .getResource(StandardLocation.CLASS_PATH, "", "META-INF/factory.config")
-                    .openInputStream();
+                .getResource(StandardLocation.CLASS_PATH, "", factory)
+                .openInputStream();
 
             Properties properties = new Properties();
             properties.load(is);
@@ -91,7 +87,8 @@ public class RepositoryProcessor extends AbstractProcessor {
             return;
 
         } catch (Exception e) {
-            messager.printMessage(WARNING, "Not found config file: META-INF/factory.config. by error:" + e.getMessage());
+            messager.printMessage(WARNING, "Not found config file: '" + factory + "'. by error:" + e.getMessage());
+            log.warn("Not found config file: '{}'. by error:", factory, e);
         }
         this.config = emptyMap();
     }
@@ -117,7 +114,9 @@ public class RepositoryProcessor extends AbstractProcessor {
         try {
             for (Element entity : entities) {
                 if (!(entity instanceof TypeElement)) {
-                    messager.printMessage(WARNING, entity.asType().toString() + " is not class type", entity);
+                    String str = entity.asType().toString();
+                    messager.printMessage(WARNING, "'" + str + "' is not class type", entity);
+                    log.warn("{} is not class type", str);
                     continue;
                 }
 
@@ -151,9 +150,8 @@ public class RepositoryProcessor extends AbstractProcessor {
             return;
         }
 
-        int count = 0;
         for (RepositoryBuilder builder : matcher) {
-            String className = this.createClassName(entity, String.valueOf(count));
+            String className = this.createClassName(entity, builder.getName());
 
             TypeName superInf = builder.build(entity, roundEnv);
             if (superInf == null) {
@@ -162,9 +160,8 @@ public class RepositoryProcessor extends AbstractProcessor {
             }
 
             TypeSpec typeSpec = this.buildRepository(className)
-                    .addSuperinterface(superInf)
-                    .build();
-            count++;
+                .addSuperinterface(superInf)
+                .build();
             writer(packageName, typeSpec);
         }
     }
@@ -185,19 +182,19 @@ public class RepositoryProcessor extends AbstractProcessor {
         ClassLoader currentClassLoad = this.getClass().getClassLoader();
         ServiceLoader<RepositoryBuilder> services = ServiceLoader.load(RepositoryBuilder.class, currentClassLoad);
 
-        String tmp = this.getConfig("factory.repository.includes");
+        String tmp = this.getConfig(include);
 
         if (StringUtils.isEmpty(tmp)) {
             messager.printMessage(WARNING, "Create default repositories");
             includes = Collections.singletonList("org.springframework.data.jpa.repository.JpaRepository");
         } else {
             includes = Arrays.stream(tmp.split(","))
-                    .filter(item -> !StringUtils.isEmpty(item))
-                    .map(String::trim)
-                    .distinct()
-                    .filter(this::isAvailable)
-                    .sorted()
-                    .collect(Collectors.toList());
+                .filter(item -> !StringUtils.isEmpty(item))
+                .map(String::trim)
+                .distinct()
+                .filter(this::isAvailable)
+                .sorted()
+                .collect(Collectors.toList());
         }
 
         this.builders = new LinkedList<>();
@@ -220,28 +217,6 @@ public class RepositoryProcessor extends AbstractProcessor {
             messager.printMessage(WARNING, "Not found class:" + clazz);
         }
         return false;
-    }
-
-    /**
-     * 初始化包名
-     */
-    private void initPackageName() {
-        this.packageName = this.getConfig("factory.repository.package.name");
-        if (StringUtils.isEmpty(packageName)) {
-            messager.printMessage(WARNING, "Use default package name");
-        }
-    }
-
-    /**
-     * 初始化repository前缀
-     */
-    private void initPrefix() {
-        String tmp = this.getConfig("factory.repository.prefix");
-        if (StringUtils.isEmpty(tmp)) {
-            this.prefix = "Ping";
-            return;
-        }
-        this.prefix = tmp;
     }
 
     /**
@@ -289,7 +264,7 @@ public class RepositoryProcessor extends AbstractProcessor {
 
         // 获取待生成的Repository
         TypeSpec repository = this.buildRepository(className)
-                .addSuperinterfaces(inter).build();
+            .addSuperinterfaces(inter).build();
 
         this.writer(packageName, repository);
     }
@@ -301,7 +276,11 @@ public class RepositoryProcessor extends AbstractProcessor {
      * @return 类名
      */
     private String createClassName(Element entity, String sign) {
-        return this.prefix + entity.getSimpleName() + sign + "Repository";
+        String tmp = this.getConfig(prefix);
+        if (StringUtils.isEmpty(tmp)) {
+            tmp = "";
+        }
+        return tmp + entity.getSimpleName() + sign + "Repository";
     }
 
     /**
@@ -311,18 +290,44 @@ public class RepositoryProcessor extends AbstractProcessor {
      * @return 包名
      */
     private String createPackageName(TypeElement entity) {
-        boolean isOk = StringUtils.hasText(this.packageName);
-        if (isOk) {
-            return this.packageName;
+
+        // 绝对包名
+        String pgName = entity.getAnnotation(CreateRepository.class).packageName();
+        if (StringUtils.hasText(pgName)) {
+            return pgName;
         }
 
-        PackageElement packName = this.processingEnv.getElementUtils().getPackageOf(entity);
-
+        // 相对位置包名
+        int indexOf = entity.getAnnotation(CreateRepository.class).indexOf();
+        if (indexOf <= -1) {
+            String tmp = this.getConfig(index);
+            try {
+                indexOf = Integer.parseInt(tmp);
+            } catch (Exception e) {
+                log.warn("'" + index + "' format integer error:" + tmp);
+            }
+        }
+        Elements utils = this.processingEnv.getElementUtils();
+        PackageElement packName = utils.getPackageOf(entity);
         String name = packName.asType().toString();
-        if (name == null || name.isEmpty()) {
-            return "repository";
+        String[] seg = name.split("\\.");
+        if (indexOf > -1 && indexOf < seg.length) {
+            List<String> join = Arrays.stream(seg).limit(indexOf).collect(Collectors.toList());
+            name = String.join(".", join);
         }
-        return name.concat(".repository");
+
+        if (StringUtils.hasText(name)) {
+            return name.concat(".repository");
+        }
+
+        // 全局配置包名
+        String packageName = this.getConfig(pageName);
+        if (StringUtils.hasText(packageName)) {
+            return packageName;
+        }
+
+        // 默认的包名
+        return "repository";
     }
 
 
@@ -334,10 +339,10 @@ public class RepositoryProcessor extends AbstractProcessor {
      */
     private TypeSpec.Builder buildRepository(String className) {
         return TypeSpec
-                .interfaceBuilder(className)
-                .addAnnotation(Repository.class)
-                .addAnnotation(Indexed.class)
-                .addModifiers(Modifier.PUBLIC);
+            .interfaceBuilder(className)
+            .addAnnotation(Repository.class)
+            .addAnnotation(Indexed.class)
+            .addModifiers(Modifier.PUBLIC);
     }
 
     /**

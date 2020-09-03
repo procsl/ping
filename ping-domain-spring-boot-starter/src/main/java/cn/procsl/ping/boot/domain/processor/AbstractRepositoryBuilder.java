@@ -101,6 +101,11 @@ public abstract class AbstractRepositoryBuilder implements RepositoryBuilder {
         return false;
     }
 
+    @Override
+    public String getName() {
+        return "";
+    }
+
     /**
      * 用于统一抓取配置
      *

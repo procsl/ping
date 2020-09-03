@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.util.Map;
+
 /**
  * @author procsl
  * @date 2020/04/06
@@ -14,13 +16,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 public class DomainProperties {
 
-    private String foreignKeyNamePrefix = "fk";
+    private String foreignKeyNamePrefix = "";
 
-    private String uniqueKeyPrefix = "uk";
+    private String uniqueKeyPrefix = "";
 
-    private String indexNamePrefix = "in";
+    private String indexNamePrefix = "";
 
-    private String tablePrefix = "pb";
+    private String tablePrefix = "p";
+
+    private Map<String, String> tableNamePrefix;
 
     private String dot = "_";
 

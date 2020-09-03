@@ -13,6 +13,11 @@ public class ReactiveQueryDslPredicateExecutorBuilder extends EntityRepositoryBu
         return ReactiveQuerydslPredicateExecutor.class;
     }
 
+    @Override
+    public String getName() {
+        return "ReactiveQueryDslPredicate";
+    }
+
     /**
      * 这个接口有冲突, 需要独立
      *
