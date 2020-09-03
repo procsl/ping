@@ -2,6 +2,7 @@ package cn.procsl.ping.boot.domain.business.tree.model;
 
 import cn.procsl.ping.boot.domain.business.utils.ObjectUtils;
 import cn.procsl.ping.business.domain.DomainEvents;
+import lombok.NonNull;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -47,5 +48,5 @@ public interface AdjacencyNode<ID extends Serializable, T extends AdjacencyPathN
      *
      * @param parent 指定的父节点
      */
-    void changeParent(AdjacencyNode<ID, T> parent);
+    void changeParent(@NonNull AdjacencyNode<ID, T> parent);
 }

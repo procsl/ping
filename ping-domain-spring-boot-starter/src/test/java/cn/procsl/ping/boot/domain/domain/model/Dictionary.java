@@ -21,7 +21,7 @@ public class Dictionary implements DomainEntity<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator")
-    @SequenceGenerator(allocationSize = 500, name = "generator", sequenceName = "tree_entity_seq")
+    @SequenceGenerator(allocationSize = 500, name = "generator")
     @Column(updatable = false, nullable = false)
     Long id;
 
