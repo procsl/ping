@@ -1,10 +1,9 @@
 package cn.procsl.ping.boot.domain.business.utils;
 
+import lombok.NonNull;
+
 import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 容器工具
@@ -92,6 +91,18 @@ public final class CollectionUtils {
     }
 
     /**
+     * 清空指定的容器
+     *
+     * @param collection 指定的容器
+     */
+    public static void nullSafeClear(Collection collection) {
+        if (collection == null) {
+            return;
+        }
+        collection.clear();
+    }
+
+    /**
      * 空安全删除元素
      *
      * @param collection 元素容器
@@ -138,5 +149,51 @@ public final class CollectionUtils {
      */
     public static boolean isEmpty(@Nullable Collection collection) {
         return (collection == null || collection.isEmpty());
+    }
+
+    /**
+     * 将迭代器转换为容器
+     *
+     * @param iterable   指定的迭代器
+     * @param collection 指定的容器
+     * @param <E>        泛型
+     */
+    public static <E> void convertTo(@NonNull Iterable<E> iterable, @NonNull Collection<E> collection) {
+        Iterator<E> iterator = iterable.iterator();
+        while (iterator.hasNext()) {
+            collection.add(iterator.next());
+        }
+    }
+
+    /**
+     * 将指定的迭代器转换为List
+     *
+     * @param iterable 指定的迭代器
+     * @param <E>      范型
+     * @return 返回的List
+     */
+    public static <E> List<E> convertToList(@NonNull Iterable<E> iterable) {
+        if (iterable instanceof List) {
+            return (List<E>) iterable;
+        }
+        List<E> tmp = new ArrayList<>();
+        convertTo(iterable, tmp);
+        return tmp;
+    }
+
+    /**
+     * 将指定的迭代器转换为Set
+     *
+     * @param iterable 指定的迭代器
+     * @param <E>      泛型
+     * @return 返回转换后的Set
+     */
+    public static <E> Set<E> convertToSet(@NonNull Iterable<E> iterable) {
+        if (iterable instanceof Set) {
+            return (Set<E>) iterable;
+        }
+        Set<E> tmp = new HashSet<>();
+        convertTo(iterable, tmp);
+        return tmp;
     }
 }

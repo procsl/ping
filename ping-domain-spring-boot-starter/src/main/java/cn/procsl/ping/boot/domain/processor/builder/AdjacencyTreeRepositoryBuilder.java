@@ -5,6 +5,9 @@ import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyPathNode;
 import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository;
 import cn.procsl.ping.boot.domain.business.utils.CollectionUtils;
 import cn.procsl.ping.boot.domain.processor.AbstractRepositoryBuilder;
+import cn.procsl.ping.business.domain.DomainEntity;
+import cn.procsl.ping.business.domain.DomainEvents;
+import cn.procsl.ping.business.domain.DomainId;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
@@ -35,6 +38,13 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
 
     private TypeMirror path;
 
+    private TypeMirror domainEntity;
+
+    private TypeMirror domainId;
+
+    private TypeMirror domainEvents;
+
+
     /**
      * 内部初始化
      */
@@ -46,15 +56,20 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
         // 删除泛型
         node = this.type.erasure(adjacencyType.asType());
         path = this.type.erasure(this.ele.getTypeElement(AdjacencyPathNode.class.getName()).asType());
+
+        domainEntity = this.type.erasure(this.ele.getTypeElement(DomainEntity.class.getName()).asType());
+        domainId = this.type.erasure(this.ele.getTypeElement(DomainId.class.getName()).asType());
+        domainEvents = this.type.erasure(this.ele.getTypeElement(DomainEvents.class.getName()).asType());
     }
 
     protected DeclaredType getSubType(TypeElement entity) {
+        // jb 代码写的太垃圾了
         List<TypeElement> elementsClass = new LinkedList<>();
         List<TypeMirror> mirrorsClass = new LinkedList<>();
 
         List<TypeElement> elementsInf = new LinkedList<>();
         List<TypeMirror> mirrorsInf = new LinkedList<>();
-        this.findSuperClass(entity.asType(), elementsClass, mirrorsClass);
+        this.findSuperClass(entity, entity.asType(), elementsClass, mirrorsClass);
 
         // 查找所有的接口
         for (TypeElement element : elementsClass) {
@@ -64,16 +79,27 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
             }
         }
 
-        for (TypeMirror mirror : mirrorsInf) {
+        mirrorsClass.removeIf(element -> element.equals(entity.asType()));
+        // 过滤
+        for (TypeMirror mirror : mirrorsClass) {
             TypeMirror notType = this.type.erasure(mirror);
-            // itself
             boolean bool = this.type.isSubtype(notType, node);
-//            bool = bool && this.type.isSubtype(node, notType);
             if (bool && mirror instanceof DeclaredType) {
-                return (DeclaredType) mirror;
+                return ((DeclaredType) mirror);
             }
         }
 
+        mirrorsInf.removeIf(element -> {
+            element = type.erasure(element);
+            return element.equals(domainId) || element.equals(domainEntity) || element.equals(domainEvents);
+        });
+        for (TypeMirror mirror : mirrorsInf) {
+            TypeMirror notType = this.type.erasure(mirror);
+            boolean bool = this.type.isSubtype(notType, node);
+            if (bool && mirror instanceof DeclaredType) {
+                return ((DeclaredType) mirror);
+            }
+        }
 
         // 查询是否存在指定的接口
         return null;
@@ -85,7 +111,7 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
      * @param element  指定的元素
      * @param elements 容器
      */
-    protected void findSuperClass(@NonNull TypeMirror element,
+    protected void findSuperClass(TypeElement entity, @NonNull TypeMirror element,
                                   @NonNull List<TypeElement> elements,
                                   @NonNull List<TypeMirror> mirrors) {
         TypeElement tmp = this.convert(element);
@@ -105,7 +131,7 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
 
         mirrors.add(element);
         elements.add(tmp);
-        this.findSuperClass(tmp.getSuperclass(), elements, mirrors);
+        this.findSuperClass(entity, tmp.getSuperclass(), elements, mirrors);
 
     }
 
@@ -119,6 +145,7 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
         if (CollectionUtils.isEmpty(tmp.getInterfaces())) {
             return;
         }
+
         elements.add(tmp);
         mirrors.add(mirro);
 

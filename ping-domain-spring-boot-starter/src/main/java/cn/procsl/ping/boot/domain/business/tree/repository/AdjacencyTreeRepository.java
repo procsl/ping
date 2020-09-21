@@ -2,6 +2,9 @@ package cn.procsl.ping.boot.domain.business.tree.repository;
 
 import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyNode;
 import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyPathNode;
+import cn.procsl.ping.boot.domain.business.tree.model.QAdjacencyNode;
+import cn.procsl.ping.boot.domain.business.tree.model.QAdjacencyPathNode;
+import cn.procsl.ping.business.domain.DomainId;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Predicate;
 import lombok.NonNull;
@@ -11,7 +14,9 @@ import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.Repository;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 /**
@@ -27,10 +32,34 @@ public interface AdjacencyTreeRepository<
     P extends AdjacencyPathNode<ID>> extends Repository<T, ID> {
 
 
+    /**
+     * 查询一个元素
+     *
+     * @param select       选择器
+     * @param predicates   条件
+     * @param <Projection> 投影
+     * @return 返回投影信息
+     */
     <Projection> Projection findOne(@NonNull Expression<Projection> select, Predicate... predicates);
 
+    /**
+     * 查询指定条件的数据
+     *
+     * @param select       指定值
+     * @param predicates   条件
+     * @param <Projection> 投影
+     * @return 返回指定投影的Stream
+     */
     <Projection> Stream<Projection> findAll(@NonNull Expression<Projection> select, Predicate... predicates);
 
+    /**
+     * 分页查询指定条件的数据
+     *
+     * @param select       指定值
+     * @param predicates   条件
+     * @param <Projection> 投影
+     * @return 返回指定投影的分页数据
+     */
     <Projection> Page<Projection> findAll(@NonNull Expression<Projection> select,
                                           @NonNull Pageable pageable, Predicate... predicates);
 
@@ -71,6 +100,10 @@ public interface AdjacencyTreeRepository<
     <Projection> Stream<Projection> getDirectChildren(@NonNull Expression<Projection> select,
                                                       @NonNull ID id, Predicate... predicates);
 
+
+    <Projection> Page<Projection> getDirectChildren(@NonNull Expression<Projection> select,
+                                                    @NonNull Pageable pageable,
+                                                    ID id, Predicate... predicates);
 
     /**
      * 获取指定节点的所有子节点
@@ -154,6 +187,71 @@ public interface AdjacencyTreeRepository<
                                               @NonNull ID start, @NonNull ID end, Predicate... predicates);
 
     /**
+     * 搜索方法, 返回搜索到的最深节点列表
+     * 假定存在: /root/node_1/node_2
+     * <p>
+     * 如果开启严格匹配搜索节点
+     * 当搜索 /root/node_1/node_2/node_3/node_4/node_5 时, 由于不存在此节点, 因此返回 空数组
+     * <p>
+     * 当搜索 /root/node_1 时, 返回 root,node_1节点列表
+     * <p>
+     * 当搜索 /root/node_other 时, 由于不存在此节点, 返回 空
+     * <p>
+     * <p>
+     * 如果关闭严格搜索
+     * 当搜索 /root/node_1/node_2/node_3/node_4/node_5 时, 由于存在 /root/node_1/node_2 节点, 因此返回 root,node_1,node_2节点列表
+     * <p>
+     * 当搜索 /root/node_1/ 时, 返回root,node_1节点列表
+     * <p>
+     * 当搜索 /root/node_other 时, 由于不存在此节点, 返回 root
+     *
+     * @param selector      选择器
+     * @param nodes         待搜索节点/有顺序
+     * @param fun           匹配条件函数
+     * @param isFull        是否严格匹配搜索节点, true 开启严格匹配, false 关闭严格匹配
+     * @param <Projections> 投影
+     * @return 返回指定投影的数据
+     * @throws IllegalArgumentException 匹配条件错误
+     */
+    <Projections extends DomainId<ID>> List<Projections> searchAll(@NonNull Expression<Projections> selector,
+                                                                   @NonNull List<?> nodes,
+                                                                   @NonNull Function<Integer, Predicate> fun,
+                                                                   @NonNull boolean isFull) throws IllegalArgumentException;
+
+    /**
+     * 搜索方法, 返回搜索到的最深节
+     * 假定存在: /root/node_1/node_2/
+     * <p>
+     * 如果开启严格匹配搜索节点
+     * 当搜索 /root/node_1/node_2/node_3/node_4/node_5 时, 由于不存在此节点, 因此返回null
+     * <p>
+     * 当搜索 /root/node_1/ 时, 返回 node_1节点
+     * <p>
+     * 当搜索 /root/node_other 时, 由于不存在此节点, 返回null
+     * <p>
+     * <p>
+     * 如果关闭严格搜索
+     * 当搜索 /root/node_1/node_2/node_3/node_4/node_5 时, 由于存在 /root/node_1/node_2/ 节点, 因此返回 node_2节点信息
+     * <p>
+     * 当搜索 /root/node_1/ 时, 返回 node_1节点
+     * <p>
+     * 当搜索 /root/node_other 时, 由于不存在此节点, 返回null
+     *
+     * @param selector      选择器
+     * @param nodes         待搜索节点/有顺序
+     * @param fun           匹配条件函数
+     * @param isFull        是否严格匹配搜索节点, true 开启严格匹配, false 关闭严格匹配
+     * @param <Projections> 投影
+     * @return 返回指定投影的数据
+     * @throws IllegalArgumentException 匹配条件错误
+     */
+    <Projections extends DomainId<ID>> Projections searchOne(@NonNull Expression<Projections> selector,
+                                                             @NonNull List<?> nodes,
+                                                             @NonNull Function<Integer, Predicate> fun,
+                                                             @NonNull boolean isFull) throws IllegalArgumentException;
+
+
+    /**
      * 分页查询指定的链路
      *
      * @param select       选择器
@@ -226,4 +324,8 @@ public interface AdjacencyTreeRepository<
                                            @NonNull Pageable pageable,
                                            Predicate... predicates);
 
+
+    QAdjacencyNode getQAdjacency();
+
+    QAdjacencyPathNode getQAdjacencyPath();
 }

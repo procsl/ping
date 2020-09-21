@@ -31,6 +31,11 @@ public interface AdjacencyNode<ID extends Serializable, T extends AdjacencyPathN
     @CollectionTable(joinColumns = @JoinColumn(name = "id"))
     Set<T> getPath();
 
+    /**
+     * 判断是否为根节点
+     *
+     * @return 如果为root节点, 则返回true
+     */
     @Transient
     default boolean isRoot() {
         return ObjectUtils.nullSafeEquals(getId(), getParentId()) || ObjectUtils.nullSafeEquals(getDepth(), 0);
@@ -49,4 +54,13 @@ public interface AdjacencyNode<ID extends Serializable, T extends AdjacencyPathN
      * @param parent 指定的父节点
      */
     void changeParent(@NonNull AdjacencyNode<ID, T> parent);
+
+    /**
+     * 查找分隔符
+     *
+     * @return
+     */
+    default String findDelimiter() {
+        return "/";
+    }
 }

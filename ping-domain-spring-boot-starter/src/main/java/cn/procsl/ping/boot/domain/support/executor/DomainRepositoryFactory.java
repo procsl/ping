@@ -2,8 +2,8 @@ package cn.procsl.ping.boot.domain.support.executor;
 
 import cn.procsl.ping.boot.domain.business.common.repository.PersistenceRepository;
 import cn.procsl.ping.boot.domain.business.common.repository.QueryDslPersistenceRepository;
+import cn.procsl.ping.boot.domain.business.state.repository.BooleanStatefulRepository;
 import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.data.jpa.repository.query.EscapeCharacter;
@@ -33,7 +33,6 @@ public class DomainRepositoryFactory extends JpaRepositoryFactory {
      */
     public DomainRepositoryFactory(EntityManager entityManager) {
         super(entityManager);
-
     }
 
     @Override
@@ -57,6 +56,7 @@ public class DomainRepositoryFactory extends JpaRepositoryFactory {
         BeanFactory factory = findField(JpaRepositoryFactory.class, this,
             "beanFactory", BeanFactory.class);
 
+        // TODO 太丑了 要重构
         if (AdjacencyTreeRepository.class.isAssignableFrom(metadata.getRepositoryInterface())) {
             Object target = getTargetRepositoryViaReflection(AdjacencyTreeExecutor.class,
                 entityInformation,
@@ -65,6 +65,17 @@ public class DomainRepositoryFactory extends JpaRepositoryFactory {
                 crudMethodMetadata,
                 factory,
                 entityPathResolver
+            );
+            fragments = fragments.append(RepositoryFragment.implemented(target));
+        }
+
+        if (BooleanStatefulRepository.class.isAssignableFrom(metadata.getRepositoryInterface())) {
+            Object target = getTargetRepositoryViaReflection(BooleanStatefulExecutor.class,
+                entityInformation,
+                entityManager,
+                escapeCharacter,
+                crudMethodMetadata,
+                factory
             );
             fragments = fragments.append(RepositoryFragment.implemented(target));
         }

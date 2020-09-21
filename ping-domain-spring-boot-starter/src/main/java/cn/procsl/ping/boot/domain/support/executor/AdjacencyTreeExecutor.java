@@ -8,12 +8,12 @@ import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeReposito
 import cn.procsl.ping.boot.domain.business.utils.CollectionUtils;
 import cn.procsl.ping.boot.domain.business.utils.ObjectUtils;
 import cn.procsl.ping.boot.domain.support.SimplePathResolver;
+import cn.procsl.ping.business.domain.DomainId;
 import cn.procsl.ping.business.exception.BusinessException;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.FactoryExpression;
 import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.EntityPathBase;
 import com.querydsl.core.types.dsl.PathBuilder;
@@ -44,11 +44,9 @@ import javax.persistence.LockModeType;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
@@ -408,14 +406,13 @@ class AdjacencyTreeExecutor<
     @Override
     public <Projection> Stream<Projection> findLinks(@NonNull Expression<Projection> select, @NonNull ID start, @NonNull ID end, Predicate... predicates) {
         // 获取父节点的信息, id, 高度
-        Tuple tuple = this.calcParent(Projections.tuple(Q.id, Q.depth), start, end);
+        Tuple tuple = this.calcParent(com.querydsl.core.types.Projections.tuple(Q.id, Q.depth), start, end);
         if (tuple == null || tuple.size() == 0) {
             return Stream.empty();
         }
 
         // 指定的高度必须大于等于父节点当前的高度
         BooleanExpression cond = Q.depth.goe(tuple.get(Q.depth));
-        @SuppressWarnings("unchecked")
         ID id = tuple.get(Q.id).equals(start) ? end : start;
 
         if (predicates != null && predicates.length > 0) {
@@ -428,13 +425,61 @@ class AdjacencyTreeExecutor<
     }
 
     @Override
+    public <Projections extends DomainId<ID>> List<Projections> searchAll(@NonNull Expression<Projections> selector,
+                                                                          @NonNull List<?> nodes,
+                                                                          @NonNull Function<Integer, Predicate> fun,
+                                                                          @NonNull boolean isFull
+    ) throws IllegalArgumentException {
+        if (nodes.isEmpty()) {
+            return Collections.emptyList();
+        }
+        ArrayList<Projections> list = new ArrayList<>(nodes.size());
+
+        ID parentId = null;
+        for (int i = 0; i < nodes.size(); i++) {
+            BooleanExpression where = parentId == null ? Q.parentId.eq(Q.id) : Q.parentId.eq(parentId);
+
+            JPAQuery<Projections> query = this.jpaQueryFactory.select(selector).from(Q);
+
+            QueryHints hint = queryHint.withFetchGraphs(this.entityManager);
+
+            this.prop(query, hint, where, fun.apply(i));
+
+            query = this.metadata == null ? query : query.setLockMode(this.metadata.getLockModeType());
+
+            Projections projection = query.fetchOne();
+            if (projection == null) {
+                break;
+            }
+            parentId = projection.getId();
+            if (parentId == null) {
+                throw new IllegalArgumentException("必须设置ID项");
+            }
+            list.add(i, projection);
+        }
+        if (isFull) {
+            return list.size() == nodes.size() ? list : Collections.emptyList();
+        }
+        return list;
+    }
+
+    public <Projections extends DomainId<ID>> Projections searchOne(@NonNull Expression<Projections> selector,
+                                                                    @NonNull List<?> nodes,
+                                                                    @NonNull Function<Integer, Predicate> fun,
+                                                                    @NonNull boolean isFull) throws IllegalArgumentException {
+        List<Projections> tmp = this.searchAll(selector, nodes, fun, isFull);
+        return tmp.isEmpty() ? null : tmp.get(tmp.size() - 1);
+    }
+
+
+    @Override
     public <Projection> Page<Projection> findLinks(@NonNull Expression<Projection> select,
                                                    @NonNull Pageable pageable,
                                                    @NonNull ID start,
                                                    @NonNull ID end, Predicate... predicates) {
 
         // 获取父节点的信息, id, 高度
-        Tuple tuple = this.calcParent(Projections.tuple(Q.id, Q.depth), start, end);
+        Tuple tuple = this.calcParent(com.querydsl.core.types.Projections.tuple(Q.id, Q.depth), start, end);
         if (tuple == null || tuple.size() == 0) {
             return Page.empty();
         }
@@ -459,7 +504,7 @@ class AdjacencyTreeExecutor<
         }
 
         // 首先判断是否存在关系
-        Tuple info = calcChildren(Projections.tuple(Q.id, Q.depth), source, target);
+        Tuple info = calcChildren(com.querydsl.core.types.Projections.tuple(Q.id, Q.depth), source, target);
         if (info == null || info.size() == 0) {
             return null;
         }
@@ -529,6 +574,16 @@ class AdjacencyTreeExecutor<
         Predicate cond = this.buildRootCondition(predicates);
         JPQLQuery<Projection> query = querydsl.applyPagination(pageable, createQuery(cond).select(select));
         return PageableExecutionUtils.getPage(query.fetch(), pageable, createCountQuery(cond)::fetchCount);
+    }
+
+    @Override
+    public QAdjacencyNode getQAdjacency() {
+        return Q;
+    }
+
+    @Override
+    public QAdjacencyPathNode getQAdjacencyPath() {
+        return P;
     }
 
     protected Class<P> getNodeType(Class<? super E> clazz) {

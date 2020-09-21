@@ -5,3 +5,4 @@ cn.procsl.ping.boot.domain.processor.builder.PagingAndSortingRepositoryBuilder
 cn.procsl.ping.boot.domain.processor.builder.QueryDslPredicateExecutorBuilder
 cn.procsl.ping.boot.domain.processor.builder.ReactiveQueryDslPredicateExecutorBuilder
 cn.procsl.ping.boot.domain.processor.builder.AdjacencyTreeRepositoryBuilder
+cn.procsl.ping.boot.domain.processor.builder.BooleanStatefulRepositoryBuilder

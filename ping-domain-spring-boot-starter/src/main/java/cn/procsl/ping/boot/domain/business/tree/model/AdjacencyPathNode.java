@@ -17,7 +17,7 @@ public interface AdjacencyPathNode<ID extends Serializable> extends Serializable
      * 绑定的treeId
      * 不要设置此值的字段
      *
-     * @return
+     * @return id
      */
     @Deprecated
     @Column(updatable = false, insertable = false)
@@ -33,7 +33,7 @@ public interface AdjacencyPathNode<ID extends Serializable> extends Serializable
     /**
      * 路径树 父节点ID
      *
-     * @return
+     * @return parent id
      */
     ID getPathId();
 
@@ -43,7 +43,7 @@ public interface AdjacencyPathNode<ID extends Serializable> extends Serializable
     /**
      * 当前节点相对于root节点id的序号, root节点为seq为0
      *
-     * @return
+     * @return seq
      */
     Integer getSeq();
 
