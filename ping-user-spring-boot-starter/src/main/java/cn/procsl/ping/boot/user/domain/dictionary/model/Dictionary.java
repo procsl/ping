@@ -1,8 +1,8 @@
 package cn.procsl.ping.boot.user.domain.dictionary.model;
 
 import cn.procsl.ping.boot.domain.annotation.CreateRepository;
+import cn.procsl.ping.boot.domain.business.state.model.BooleanStateful;
 import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyNode;
-import cn.procsl.ping.boot.domain.business.utils.StringUtils;
 import cn.procsl.ping.boot.domain.support.executor.DomainEventListener;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +13,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 
 /**
@@ -23,22 +22,20 @@ import java.util.stream.Collectors;
  * @author procsl
  * @date 2020年8月23日
  */
-@Setter(AccessLevel.PROTECTED) // for jpa
+@Setter
 @Getter
 @EqualsAndHashCode
 @ToString(exclude = {"path", "payload"})
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"space", "parentId"})})
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)// for jpa
+@NoArgsConstructor
 @Slf4j
 @EntityListeners(DomainEventListener.class)
 @CreateRepository
-public class Dictionary implements AdjacencyNode<Long, DictPath> {
+public class Dictionary implements AdjacencyNode<Long, DictPath>, BooleanStateful<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "generator")
-    @SequenceGenerator(allocationSize = 100, name = "generator")
-    @Access(AccessType.PROPERTY)
     protected Long id;
 
     @Column(length = SPACE_NAME_LEN, nullable = false)
@@ -50,20 +47,17 @@ public class Dictionary implements AdjacencyNode<Long, DictPath> {
     @Column(nullable = false)
     protected Integer depth;
 
-    @Column(nullable = false)
-    @Setter(AccessLevel.PUBLIC)
-    protected Boolean active;
+    @Transient
+    public static Supplier<String> delimiter = () -> "/";
 
     @ElementCollection
-    @Setter(AccessLevel.PUBLIC)
     protected List<Payload> payload;
 
     @ElementCollection
     @CollectionTable(joinColumns = @JoinColumn(name = "id"))
     protected Set<DictPath> path;
-
-    @Transient
-    static Supplier<String> delimiter = () -> "/";
+    @Column(nullable = false)
+    protected Boolean state;
 
     public static final int SPACE_NAME_LEN = 20;
 
@@ -75,7 +69,7 @@ public class Dictionary implements AdjacencyNode<Long, DictPath> {
     public Dictionary(@NonNull String nameSpace, Payload... payloads) {
         this.empty();
         this.rename(nameSpace);
-        this.setActive(true);
+        this.setState(BooleanStateful.DISABLE_STATE);
         if (payloads != null) {
             List<Payload> list = Arrays.asList(payloads);
             this.setPayload(list);
@@ -85,22 +79,13 @@ public class Dictionary implements AdjacencyNode<Long, DictPath> {
 
     public Dictionary(@NonNull String space, @NonNull Dictionary parent, Payload... payloads) {
         this.rename(space);
-        this.setActive(parent.getActive());
+        this.setState(parent.getState());
         this.changeParent(parent);
 
         if (payloads != null) {
             List<Payload> list = Arrays.asList(payloads);
             this.setPayload(list);
         }
-    }
-
-
-    @Transient
-    public static List<String> split(@NonNull String path) {
-        return Arrays.
-            stream(path.split(delimiter.get()))
-            .filter(item -> !StringUtils.isEmpty(item))
-            .collect(Collectors.toUnmodifiableList());
     }
 
     public void setId(Long id) {
@@ -205,4 +190,13 @@ public class Dictionary implements AdjacencyNode<Long, DictPath> {
         this.setSpace(spaceName);
     }
 
+    /**
+     * 查找分隔符
+     *
+     * @return 分隔符
+     */
+    @Override
+    public String findDelimiter() {
+        return Dictionary.delimiter.get();
+    }
 }

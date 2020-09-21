@@ -32,12 +32,19 @@
             <groupId>cn.procsl</groupId>
             <artifactId>ping-domain-spring-boot-starter</artifactId>
             <version>0.0.2-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.projectlombok</groupId>
+                    <artifactId>lombok</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
+            <scope>compile</scope>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
@@ -45,6 +52,14 @@
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.querydsl</groupId>
+            <artifactId>querydsl-apt</artifactId>
+            <version>${querydsl.version}</version>
+            <classifier>jpa</classifier>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -118,7 +133,6 @@
         </testResources>
 
         <plugins>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -131,18 +145,9 @@
                         <arg>-g</arg>
                         <arg>-Xlint</arg>
                         <arg>-parameters</arg>
-                        <!--<arg>-Acreator.repository.package.name=cn.procsl.ping.boot.user.domain.rbac.repository</arg>-->
-                        <arg>-Acreate.repository.prefix=P</arg>
                     </compilerArgs>
-
                 </configuration>
                 <dependencies>
-                    <dependency>
-                        <groupId>com.querydsl</groupId>
-                        <artifactId>querydsl-apt</artifactId>
-                        <version>${querydsl.version}</version>
-                        <classifier>jpa</classifier>
-                    </dependency>
                 </dependencies>
             </plugin>
         </plugins>

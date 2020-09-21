@@ -1,36 +1,34 @@
 package cn.procsl.ping.boot.user.domain.dictionary.repository;
 
+import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository;
+import cn.procsl.ping.boot.domain.business.utils.PathUtils;
+import cn.procsl.ping.boot.user.domain.dictionary.model.DictPath;
 import cn.procsl.ping.boot.user.domain.dictionary.model.Dictionary;
 import cn.procsl.ping.business.domain.DomainId;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static cn.procsl.ping.boot.user.domain.dictionary.model.Dictionary.SPACE_NAME_LEN;
+import static cn.procsl.ping.boot.user.domain.dictionary.model.Dictionary.delimiter;
 
 @RequiredArgsConstructor
 public class CustomDictionaryRepositoryImpl implements CustomDictionaryRepository {
 
-    final JPAQueryFactory jpaQueryFactory;
-
-    final Function<Integer, Predicate> function = index -> null;
+    final AdjacencyTreeRepository<Dictionary, Long, DictPath> adjacencyTreeRepository;
 
     @Override
     public List<Long> search(@NonNull String path, @NonNull boolean ignoreActive)
         throws IllegalArgumentException {
 
-        List<DictId> ids = this.search(Projections.constructor(DictId.class, D.id), path, index -> ignoreActive ? null : D.active.isTrue());
+        List<DictId> ids = this.search(Projections.constructor(DictId.class, D.id), path, index -> ignoreActive ? null : D.state.isTrue());
         return ids.stream().map(id -> id.id).collect(Collectors.toList());
     }
 
@@ -44,7 +42,7 @@ public class CustomDictionaryRepositoryImpl implements CustomDictionaryRepositor
      */
     @Override
     public List<Long> search(@NonNull List<String> nodes, @NonNull boolean ignoreActive) throws IllegalArgumentException {
-        List<DictId> ids = this.search(Projections.constructor(DictId.class, D.id), nodes, index -> ignoreActive ? null : D.active.isTrue());
+        List<DictId> ids = this.search(Projections.constructor(DictId.class, D.id), nodes, index -> ignoreActive ? null : D.state.isTrue());
         return ids.stream().map(id -> id.id).collect(Collectors.toList());
     }
 
@@ -52,41 +50,18 @@ public class CustomDictionaryRepositoryImpl implements CustomDictionaryRepositor
     public <T extends DomainId<Long>> List<T> search(@NonNull Expression<T> selector,
                                                      @NonNull List<String> nodes,
                                                      Function<Integer, Predicate> fun) throws IllegalArgumentException {
-        if (nodes.isEmpty()) {
-            return Collections.emptyList();
-        }
-
         for (String s : nodes) {
             if (s.length() > SPACE_NAME_LEN) {
                 throw new IllegalArgumentException(s + ":space长度超长");
             }
         }
 
-        if (fun == null) {
-            fun = function;
-        }
-
-        ArrayList<T> list = new ArrayList<>(nodes.size());
-        T parent = null;
-        for (int i = 0; i < nodes.size(); i++) {
-            //depth ==:depth and space == :space
-            BooleanExpression where = D.depth.eq(i).and(D.space.eq(nodes.get(i)));
-
-            // parentId == id ; parentId == :parentId
-            BooleanExpression exp = parent == null ? D.parentId.eq(D.id) : D.parentId.eq(parent.getId());
-            where.and(exp);
-            Predicate tp = fun.apply(i);
-            if (tp != null) {
-                where = where.and(tp);
-            }
-
-            T projection = this.jpaQueryFactory.select(selector).from(D).where(where).fetchOne();
-            if (projection == null) {
-                break;
-            }
-            list.add(i, projection);
-        }
-        return list;
+        return adjacencyTreeRepository.searchAll(
+            selector,
+            nodes,
+            i -> D.depth.eq(i).and(D.space.eq(nodes.get(i)).and(fun.apply(i))),
+            false
+        );
     }
 
     /**
@@ -102,13 +77,13 @@ public class CustomDictionaryRepositoryImpl implements CustomDictionaryRepositor
                                                      @NonNull String path,
                                                      Function<Integer, Predicate> fun) throws IllegalArgumentException {
 
-        List<String> nodes = Dictionary.split(path);
+        List<String> nodes = PathUtils.split(path, delimiter.get());
         return this.search(selector, nodes, fun);
     }
 
     @Value
     protected static class DictId implements DomainId<Long> {
-        private final Long id;
+        Long id;
     }
 
 }

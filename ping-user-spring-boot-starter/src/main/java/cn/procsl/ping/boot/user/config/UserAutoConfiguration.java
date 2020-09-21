@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.user.config;
 
+import cn.procsl.ping.boot.domain.business.state.repository.BooleanStatefulRepository;
 import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository;
 import cn.procsl.ping.boot.domain.support.executor.DomainRepositoryFactoryBean;
 import cn.procsl.ping.boot.user.domain.dictionary.model.DictPath;
@@ -35,13 +36,13 @@ import javax.persistence.EntityManager;
 @ConditionalOnMissingBean({UserAutoConfiguration.class})
 @EnableJpaRepositories(basePackages = {
     "cn.procsl.ping.boot.user.domain.dictionary.repository",
-    "cn.procsl.ping.boot.user.domain.dictionary.model.repository",
 },
     repositoryFactoryBeanClass = DomainRepositoryFactoryBean.class,
     bootstrapMode = BootstrapMode.LAZY
 )
 @EntityScan(basePackages = {
-    "cn.procsl.ping.boot.user.domain.dictionary",
+    "cn.procsl.ping.boot.user.domain.dictionary.model",
+    "cn.procsl.ping.boot.user.domain.rbac.model"
 })
 
 public class UserAutoConfiguration {
@@ -52,15 +53,18 @@ public class UserAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public DictionaryService dictionaryService(
-        @Autowired AdjacencyTreeRepository<Dictionary, Long, DictPath> dataDictionaryRepository,
+        @Autowired AdjacencyTreeRepository<Dictionary, Long, DictPath> repository,
         @Autowired JpaRepository<Dictionary, Long> jpaRepository,
         @Autowired QuerydslPredicateExecutor<Dictionary> querydslPredicateExecutor,
-        @Autowired CustomDictionaryRepository customDictionaryRepositoryImpl
+        @Autowired CustomDictionaryRepository customDictionaryRepositoryImpl,
+        @Autowired BooleanStatefulRepository<Dictionary, Long> booleanStatefulRepository
     ) {
-        return new DictionaryService(dataDictionaryRepository,
+        return new DictionaryService(
             jpaRepository,
             querydslPredicateExecutor,
-            customDictionaryRepositoryImpl
+            repository,
+            customDictionaryRepositoryImpl,
+            booleanStatefulRepository
         );
     }
 
@@ -72,7 +76,9 @@ public class UserAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public CustomDictionaryRepository customDictionaryRepositoryImpl(@Autowired JPAQueryFactory jpaQueryFactory) {
-        return new CustomDictionaryRepositoryImpl(jpaQueryFactory);
+    public CustomDictionaryRepository customDictionaryRepositoryImpl(
+        @Autowired AdjacencyTreeRepository<Dictionary, Long, DictPath> adjacencyTreeRepository
+    ) {
+        return new CustomDictionaryRepositoryImpl(adjacencyTreeRepository);
     }
 }
