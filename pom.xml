@@ -18,12 +18,8 @@
     </properties>
 
     <modules>
-        <module>ping-rest-spring-boot-starter</module>
-        <module>ping-doc-spring-boot-starter</module>
         <module>ping-domain-spring-boot-starter</module>
-        <module>ping-user-spring-boot-starter</module>
         <module>ping-business-model</module>
-        <module>ping-producer-spring-boot-starter</module>
     </modules>
     <name>ping</name>
 
