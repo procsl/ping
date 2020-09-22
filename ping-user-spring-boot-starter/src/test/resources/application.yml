@@ -27,4 +27,5 @@ spring:
 debug: true
 ping:
   domain:
-    table-prefix: u
+    module-prefix:
+      "User": u
