@@ -587,9 +587,24 @@ class AdjacencyTreeExecutor<
     }
 
     protected Class<P> getNodeType(Class<? super E> clazz) {
-        Class<P> nodeClass = this.findNodeType(clazz.getGenericInterfaces());
+        Class<P> nodeClass = findNodeType(clazz);
+
         if (nodeClass != null) {
             return nodeClass;
+        }
+
+        nodeClass = findNodeType(clazz.getGenericSuperclass());
+        if (nodeClass != null) {
+            return nodeClass;
+        }
+
+        nodeClass = this.findNodeType(clazz.getGenericInterfaces());
+        if (nodeClass != null) {
+            return nodeClass;
+        }
+
+        if (clazz.equals(Object.class)) {
+            return null;
         }
 
         // 查找超类的接口
@@ -630,7 +645,8 @@ class AdjacencyTreeExecutor<
                 if (c.getName().startsWith("java.")) {
                     continue;
                 }
-                return this.findNodeType(((Class<?>) arg).getGenericInterfaces());
+
+                return this.findNodeType();
             }
         }
         return null;

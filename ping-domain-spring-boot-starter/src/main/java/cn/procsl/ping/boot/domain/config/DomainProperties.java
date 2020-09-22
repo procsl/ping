@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -22,10 +23,9 @@ public class DomainProperties {
 
     private String indexNamePrefix = "";
 
-    private String tablePrefix = "p";
+    private String tablePrefix = "";
 
-    private Map<String, String> tableNamePrefix;
+    private Map<String, String> modulePrefix = new HashMap<>();
 
     private String dot = "_";
-
 }

@@ -17,29 +17,31 @@ public class NameImplicitNamingStrategy extends ImplicitNamingStrategyJpaComplia
 
     @Override
     public Identifier determineForeignKeyName(ImplicitForeignKeyNameSource source) {
-        return this.join(this.properties.getForeignKeyNamePrefix()
-                        +
-                        this.properties.getDot() + source.getTableName(),
-                source.getColumnNames());
+        String prefix = this.properties.getForeignKeyNamePrefix();
+        String tableName = source.getTableName() == null ? "" : source.getTableName().getText();
+        String dot = prefix.isEmpty() ? "" : prefix;
+        return this.join(source.getColumnNames(), prefix, dot, tableName);
     }
 
     @Override
     public Identifier determineUniqueKeyName(ImplicitUniqueKeyNameSource source) {
-        return this.join(this.properties.getUniqueKeyPrefix()
-                        +
-                        this.properties.getDot() + source.getTableName(),
-                source.getColumnNames());
+        String prefix = this.properties.getUniqueKeyPrefix();
+        String tableName = source.getTableName() == null ? "" : source.getTableName().getText();
+        String dot = prefix.isEmpty() ? "" : prefix;
+        return this.join(source.getColumnNames(), prefix, dot, tableName);
     }
 
     @Override
     public Identifier determineIndexName(ImplicitIndexNameSource source) {
-        return this.join(this.properties.getIndexNamePrefix()
-                        +
-                        this.properties.getDot() + source.getTableName(),
-                source.getColumnNames());
+        String prefix = this.properties.getIndexNamePrefix();
+        String tableName = source.getTableName() == null ? "" : source.getTableName().getText();
+        String dot = prefix.isEmpty() ? "" : prefix;
+        return this.join(source.getColumnNames(), prefix, dot, tableName);
     }
 
-    private Identifier join(String prefix, List<Identifier> source) {
+    private Identifier join(List<Identifier> source, String... prefixes) {
+        String prefix = String.join("", prefixes);
+
         StringBuilder build = new StringBuilder();
         build.append(prefix);
         source.sort(Identifier::compareTo);
