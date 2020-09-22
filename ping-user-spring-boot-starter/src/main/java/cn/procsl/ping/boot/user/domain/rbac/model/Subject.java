@@ -15,8 +15,8 @@ import java.util.Set;
 @Getter
 @EqualsAndHashCode(exclude = "roles")
 @ToString
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"space", "parentId"})})
-@Entity(name = "r_user")
+@Table
+@Entity(name = "${User.Subject}")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)// for jpa
 @Slf4j
 @EntityListeners(DomainEventListener.class)
@@ -24,19 +24,20 @@ import java.util.Set;
 public class Subject implements DomainEntity<Long> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "generator")
+    @GeneratedValue(strategy = GenerationType.TABLE)
     @Access(AccessType.PROPERTY)
     Long id;
 
+    @JoinTable(name = "${User.subject_role}")
     @ManyToMany
-    Set<Role> roles;
+    Set<Role> role;
 
     public Subject(Collection<Role> roles) {
-        this.roles = CollectionUtils.createAndAppend(this.roles, roles);
+        this.role = CollectionUtils.createAndAppend(this.role, roles);
     }
 
     public void changeRoles(Collection<Role> roles) {
-        CollectionUtils.nullSafeClear(this.roles);
-        this.roles = CollectionUtils.createAndAppend(this.roles, roles);
+        CollectionUtils.nullSafeClear(this.role);
+        this.role = CollectionUtils.createAndAppend(this.role, roles);
     }
 }

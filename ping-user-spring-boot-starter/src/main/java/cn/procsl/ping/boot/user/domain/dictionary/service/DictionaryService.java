@@ -95,7 +95,6 @@ public class DictionaryService extends AbstractTreeService<Dictionary, Long, Dic
      * @return 如果创建成功返回ID, 如果已存在则返回null
      * @throws IllegalArgumentException 如果路径中分段长度不合法,报错
      */
-    @SuppressWarnings("unchecked")
     public Long create(@NotBlank String path,
                        @NotNull boolean check,
                        Payload... payloads) throws IllegalArgumentException {

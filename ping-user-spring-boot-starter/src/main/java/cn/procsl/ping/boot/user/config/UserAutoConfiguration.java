@@ -2,12 +2,16 @@ package cn.procsl.ping.boot.user.config;
 
 import cn.procsl.ping.boot.domain.business.state.repository.BooleanStatefulRepository;
 import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository;
+import cn.procsl.ping.boot.domain.config.DomainProperties;
 import cn.procsl.ping.boot.domain.support.executor.DomainRepositoryFactoryBean;
 import cn.procsl.ping.boot.user.domain.dictionary.model.DictPath;
 import cn.procsl.ping.boot.user.domain.dictionary.model.Dictionary;
 import cn.procsl.ping.boot.user.domain.dictionary.repository.CustomDictionaryRepository;
 import cn.procsl.ping.boot.user.domain.dictionary.repository.CustomDictionaryRepositoryImpl;
 import cn.procsl.ping.boot.user.domain.dictionary.service.DictionaryService;
+import cn.procsl.ping.boot.user.domain.rbac.model.Node;
+import cn.procsl.ping.boot.user.domain.rbac.model.Permission;
+import cn.procsl.ping.boot.user.domain.rbac.service.PermissionService;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +35,11 @@ import javax.persistence.EntityManager;
  * @date 2020/04/10
  */
 @Configuration
-@EnableConfigurationProperties({UserProperties.class})
-@RequiredArgsConstructor
+@EnableConfigurationProperties({UserProperties.class, DomainProperties.class})
 @ConditionalOnMissingBean({UserAutoConfiguration.class})
 @EnableJpaRepositories(basePackages = {
     "cn.procsl.ping.boot.user.domain.dictionary.repository",
+    "cn.procsl.ping.boot.user.domain.rbac.repository",
 },
     repositoryFactoryBeanClass = DomainRepositoryFactoryBean.class,
     bootstrapMode = BootstrapMode.LAZY
@@ -44,10 +48,12 @@ import javax.persistence.EntityManager;
     "cn.procsl.ping.boot.user.domain.dictionary.model",
     "cn.procsl.ping.boot.user.domain.rbac.model"
 })
-
+@RequiredArgsConstructor
 public class UserAutoConfiguration {
 
     final UserProperties properties;
+
+    final DomainProperties domainProperties;
 
 
     @Bean
@@ -81,4 +87,15 @@ public class UserAutoConfiguration {
     ) {
         return new CustomDictionaryRepositoryImpl(adjacencyTreeRepository);
     }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public PermissionService permissionService(
+        JpaRepository<Permission, Long> jpaRepository,
+        QuerydslPredicateExecutor<Permission> querydslRepository,
+        AdjacencyTreeRepository<Permission, Long, Node> treeRepository) {
+        return new PermissionService(jpaRepository, querydslRepository, treeRepository);
+    }
+
+
 }

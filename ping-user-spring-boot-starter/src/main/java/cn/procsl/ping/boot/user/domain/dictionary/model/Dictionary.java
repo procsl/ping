@@ -27,7 +27,7 @@ import java.util.function.Supplier;
 @EqualsAndHashCode
 @ToString(exclude = {"path", "payload"})
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"space", "parentId"})})
-@Entity
+@Entity(name = "${User.Dictionary}")
 @NoArgsConstructor
 @Slf4j
 @EntityListeners(DomainEventListener.class)
@@ -35,7 +35,7 @@ import java.util.function.Supplier;
 public class Dictionary implements AdjacencyNode<Long, DictPath>, BooleanStateful<Long> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "generator")
+    @GeneratedValue(strategy = GenerationType.TABLE)
     protected Long id;
 
     @Column(length = SPACE_NAME_LEN, nullable = false)
@@ -56,12 +56,11 @@ public class Dictionary implements AdjacencyNode<Long, DictPath>, BooleanStatefu
     @ElementCollection
     @CollectionTable(joinColumns = @JoinColumn(name = "id"))
     protected Set<DictPath> path;
+
     @Column(nullable = false)
     protected Boolean state;
 
     public static final int SPACE_NAME_LEN = 20;
-
-    public static final int ROOT_DEPTH = 0;
 
     @Transient
     private DictPath currentNode;

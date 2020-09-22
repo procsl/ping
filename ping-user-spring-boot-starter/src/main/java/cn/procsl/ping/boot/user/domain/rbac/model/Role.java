@@ -17,7 +17,7 @@ import java.util.Set;
 @EqualsAndHashCode(exclude = {"path", "users", "perms"})
 @ToString(exclude = {"path", "users", "perms"})
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"name"})})
-@Entity(name = "r_role")
+@Entity(name = "${User.Role}")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Slf4j
 @EntityListeners(DomainEventListener.class)
@@ -29,15 +29,17 @@ public class Role extends AbstractTree<Long, Node> implements BooleanStateful<Lo
     public final static String DELIMITER = "/";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "generator")
+    @GeneratedValue(strategy = GenerationType.TABLE)
     protected Long id;
 
     @ManyToMany
-    protected Set<Subject> users;
+    @JoinTable(name = "${User.subject_role}")
+    protected Set<Subject> subject;
 
+    @JoinTable(name = "${User.role_permission}")
     @ManyToMany
     @Setter(AccessLevel.PUBLIC)
-    protected Set<Permission> perms;
+    protected Set<Permission> permission;
 
     @Column(length = ROLE_NAME_LEN, nullable = false)
     @Setter(AccessLevel.PUBLIC)
@@ -60,10 +62,8 @@ public class Role extends AbstractTree<Long, Node> implements BooleanStateful<Lo
 
     public Role(@NonNull String name, Role parent, Collection<Permission> perms) {
         this.name = name;
-        if (parent != null) {
-            this.changeParent(parent);
-        }
-        this.perms = CollectionUtils.createAndAppend(this.perms, perms);
+        this.changeParent(parent);
+        this.permission = CollectionUtils.createAndAppend(this.permission, perms);
     }
 
     @Override
@@ -80,8 +80,8 @@ public class Role extends AbstractTree<Long, Node> implements BooleanStateful<Lo
     }
 
     public void changePermissions(Collection<Permission> permissions) {
-        CollectionUtils.nullSafeClear(this.perms);
-        this.perms = CollectionUtils.createAndAppend(this.perms, permissions);
+        CollectionUtils.nullSafeClear(this.permission);
+        this.permission = CollectionUtils.createAndAppend(this.permission, permissions);
     }
 
     /**

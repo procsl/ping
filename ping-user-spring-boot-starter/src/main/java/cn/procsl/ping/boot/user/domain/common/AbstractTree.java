@@ -26,7 +26,7 @@ public abstract class AbstractTree<ID extends Serializable, T extends AdjacencyP
      * @param parent 指定的父节点
      */
     @Override
-    public void changeParent(@NonNull AdjacencyNode<ID, T> parent) {
+    public void changeParent(AdjacencyNode<ID, T> parent) {
         if (parent == this || parent == null) {
             this.empty();
             return;

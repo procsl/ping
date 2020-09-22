@@ -35,20 +35,20 @@ public abstract class AbstractTreeService<T extends AdjacencyNode<ID, N>, ID ext
     /**
      * 搜索
      *
-     * @param pathNodes  路径
+     * @param paths      路径
      * @param predicate  搜索条件,可为空
      * @param onSearched 当搜索成功之后的回调
      * @return 返回搜索到的节点
      * @throws IllegalArgumentException 如果传入错误的参数
      */
     @Transactional(readOnly = true)
-    public Map<String, T> search(@NotNull List<String> pathNodes, Function<Integer, Predicate> predicate, BiFunction<T, String, T> onSearched) throws IllegalArgumentException {
-        if (CollectionUtils.isEmpty(pathNodes)) {
+    public Map<String, T> search(@NotNull Collection<String> paths, Function<Integer, Predicate> predicate, BiFunction<T, String, T> onSearched) throws IllegalArgumentException {
+        if (CollectionUtils.isEmpty(paths)) {
             return Collections.emptyMap();
         }
 
-        HashMap<String, T> map = new HashMap<>(pathNodes.size());
-        for (String path : pathNodes) {
+        HashMap<String, T> map = new HashMap<>(paths.size());
+        for (String path : paths) {
             T result = this.searchOne(path, predicate);
             if (onSearched != null) {
                 result = onSearched.apply(result, path);
@@ -105,25 +105,25 @@ public abstract class AbstractTreeService<T extends AdjacencyNode<ID, N>, ID ext
     /**
      * 按节点搜索
      *
-     * @param pathNodes  路径节点
+     * @param paths      路径节点
      * @param onSearched 当搜索到时
      * @return 返回搜索路径及对应的节点值
      * @throws IllegalArgumentException 参数错误时异常
      */
-    public Map<String, T> search(@NotNull List<String> pathNodes, @NonNull BiFunction<T, String, T> onSearched) throws IllegalArgumentException {
-        return this.search(pathNodes, null, onSearched);
+    public Map<String, T> search(@NotNull Collection<String> paths, @NonNull BiFunction<T, String, T> onSearched) throws IllegalArgumentException {
+        return this.search(paths, null, onSearched);
     }
 
     /**
      * 按节点搜索
      *
-     * @param pathNodes 路径结点
+     * @param paths 路径结点
      * @return 返回搜索到的路径对应的数据
      * @throws IllegalArgumentException 如果参数不合法
      */
     @Transactional
-    public Map<String, T> search(@NotNull List<String> pathNodes) throws IllegalArgumentException {
-        return this.search(pathNodes, null);
+    public Map<String, T> search(@NotNull Collection<String> paths) throws IllegalArgumentException {
+        return this.search(paths, null);
     }
 
 

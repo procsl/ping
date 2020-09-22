@@ -4,7 +4,6 @@ import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeReposito
 import cn.procsl.ping.boot.domain.business.utils.PathUtils;
 import cn.procsl.ping.boot.user.domain.common.AbstractTreeService;
 import cn.procsl.ping.boot.user.domain.rbac.model.Node;
-import cn.procsl.ping.boot.user.domain.rbac.model.Operator;
 import cn.procsl.ping.boot.user.domain.rbac.model.Permission;
 import cn.procsl.ping.boot.user.domain.rbac.model.QPermission;
 import com.querydsl.core.types.Predicate;
@@ -30,9 +29,10 @@ public class PermissionService
 
     public static final QPermission P = QPermission.permission;
 
-    public PermissionService(JpaRepository<Permission, Long> jpaRepository,
-                             QuerydslPredicateExecutor<Permission> querydslRepository,
-                             AdjacencyTreeRepository<Permission, Long, Node> treeRepository) {
+    public PermissionService(
+        JpaRepository<Permission, Long> jpaRepository,
+        QuerydslPredicateExecutor<Permission> querydslRepository,
+        AdjacencyTreeRepository<Permission, Long, Node> treeRepository) {
         super(jpaRepository, querydslRepository, treeRepository);
     }
 
@@ -66,7 +66,7 @@ public class PermissionService
                        @NotBlank @Size(min = 1, max = PERM_NAME_LEN) String name,
                        @NotBlank @Size(min = 1, max = PERM_TYPE_LEN) String type,
                        @NotBlank @Size(min = 1, max = PERM_TARGET_LEN) String target,
-                       @NotNull Operator operator
+                       @NotNull String operator
     ) {
         Permission parent = this.findById(parentId);
         Permission perm = this.jpaRepository.save(new Permission(name, type, target, operator, parent));

@@ -15,7 +15,7 @@ import java.util.Set;
 @EqualsAndHashCode(exclude = {"roles"})
 @ToString(exclude = "roles")
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = "name")})
-@Entity(name = "r_perm")
+@Entity(name = "${User.Permission}")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)// for jpa
 @Slf4j
 @EntityListeners(DomainEventListener.class)
@@ -31,7 +31,7 @@ public class Permission extends AbstractTree<Long, Node> implements DomainEntity
     final public static String DELIMITER = "/";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "generator")
+    @GeneratedValue(strategy = GenerationType.TABLE)
     @Access(AccessType.PROPERTY)
     Long id;
 
@@ -53,7 +53,8 @@ public class Permission extends AbstractTree<Long, Node> implements DomainEntity
     Set<Node> path;
 
     @ManyToMany
-    Set<Role> roles;
+    @JoinTable(name = "${User.role_permission}")
+    Set<Role> role;
 
     @Column(length = PERM_TYPE_LEN, nullable = false)
     String target;
@@ -62,15 +63,14 @@ public class Permission extends AbstractTree<Long, Node> implements DomainEntity
      * 操作符
      * 读 写 执行, 只读,等等 可自定义
      */
-    @Embedded
-    Operator operator;
+    String operator;
 
 
     public Permission(
         @NonNull String name,
         @NonNull String type,
         @NonNull String target,
-        @NonNull Operator operator,
+        @NonNull String operator,
         Permission parent
     ) {
         this.name = name;
@@ -93,10 +93,19 @@ public class Permission extends AbstractTree<Long, Node> implements DomainEntity
     /**
      * 查找分隔符
      *
-     * @return
+     * @return 分隔符
      */
     @Override
     public String findDelimiter() {
         return DELIMITER;
     }
+
+    @Override
+    public void setId(Long id) {
+        if (this.parentId == null) {
+            this.parentId = id;
+        }
+        this.id = id;
+    }
 }
+
