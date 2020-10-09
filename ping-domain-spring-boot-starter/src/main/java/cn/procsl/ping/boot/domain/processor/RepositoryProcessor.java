@@ -128,9 +128,11 @@ public class RepositoryProcessor extends AbstractProcessor {
             }
         } catch (IOException e) {
             messager.printMessage(ERROR, "Source code output error:" + e.getMessage());
+            log.error("Error:", e);
             return false;
         } catch (Exception e) {
             messager.printMessage(ERROR, "Error:" + e.getMessage());
+            log.error("Error:", e);
             return false;
         }
         return true;
@@ -155,7 +157,8 @@ public class RepositoryProcessor extends AbstractProcessor {
 
             TypeName superInf = builder.build(entity, roundEnv);
             if (superInf == null) {
-                messager.printMessage(WARNING, entity.getSimpleName() + "create repository fail", entity);
+                messager.printMessage(WARNING, entity.getSimpleName() + " Create repository failure", entity);
+                log.warn("Create repository:{} failure", entity.asType());
                 continue;
             }
 
@@ -186,6 +189,7 @@ public class RepositoryProcessor extends AbstractProcessor {
 
         if (StringUtils.isEmpty(tmp)) {
             messager.printMessage(WARNING, "Create default repositories");
+            log.warn("Create default repositories");
             includes = Collections.singletonList("org.springframework.data.jpa.repository.JpaRepository");
         } else {
             includes = Arrays.stream(tmp.split(","))
@@ -215,6 +219,7 @@ public class RepositoryProcessor extends AbstractProcessor {
             return true;
         } catch (ClassNotFoundException e) {
             messager.printMessage(WARNING, "Not found class:" + clazz);
+            log.warn("Not found class:{}", clazz);
         }
         return false;
     }
@@ -240,7 +245,8 @@ public class RepositoryProcessor extends AbstractProcessor {
             return String.valueOf(prop);
         }
 
-        messager.printMessage(WARNING, "property: " + key + "is not simple type");
+        messager.printMessage(WARNING, "property: [" + key + "] is not simple type");
+        log.warn("property: [{}] is not simple type", key);
         return null;
     }
 
@@ -259,6 +265,7 @@ public class RepositoryProcessor extends AbstractProcessor {
         Iterable<? extends TypeName> inter = this.getMultipleInterfaceType(entity, roundEnv);
         if (inter == null || !inter.iterator().hasNext()) {
             messager.printMessage(Diagnostic.Kind.NOTE, "Not matcher repository:" + className + ":" + entity.getSimpleName(), entity);
+            log.info("Not fatcher repository:{}:{}", className, entity.getSimpleName());
             return;
         }
 
@@ -291,34 +298,41 @@ public class RepositoryProcessor extends AbstractProcessor {
      */
     private String createPackageName(TypeElement entity) {
 
-        // 绝对包名
-        String pgName = entity.getAnnotation(CreateRepository.class).packageName();
-        if (StringUtils.hasText(pgName)) {
-            return pgName;
-        }
+        do {
+            CreateRepository repo = entity.getAnnotation(CreateRepository.class);
+            if (repo == null) {
+                break;
+            }
+            // 绝对包名
+            String pgName = repo.packageName();
+            if (StringUtils.hasText(pgName)) {
+                return pgName;
+            }
 
-        // 相对位置包名
-        int indexOf = entity.getAnnotation(CreateRepository.class).indexOf();
-        if (indexOf <= -1) {
-            String tmp = this.getConfig(index);
-            try {
-                indexOf = Integer.parseInt(tmp);
-            } catch (Exception e) {
-                log.warn("'" + index + "' format integer error:" + tmp);
+            // 相对位置包名
+            int indexOf = repo.indexOf();
+            if (indexOf <= -1) {
+                String tmp = this.getConfig(index);
+                try {
+                    indexOf = Integer.parseInt(tmp);
+                } catch (Exception e) {
+                    log.warn("'{}' can not format integer:", tmp);
+                }
+            }
+            Elements utils = this.processingEnv.getElementUtils();
+            PackageElement packName = utils.getPackageOf(entity);
+            String name = packName.asType().toString();
+            String[] seg = name.split("\\.");
+            if (indexOf > -1 && indexOf < seg.length) {
+                List<String> join = Arrays.stream(seg).limit(indexOf).collect(Collectors.toList());
+                name = String.join(".", join);
+            }
+
+            if (StringUtils.hasText(name)) {
+                return name.concat(".repository");
             }
         }
-        Elements utils = this.processingEnv.getElementUtils();
-        PackageElement packName = utils.getPackageOf(entity);
-        String name = packName.asType().toString();
-        String[] seg = name.split("\\.");
-        if (indexOf > -1 && indexOf < seg.length) {
-            List<String> join = Arrays.stream(seg).limit(indexOf).collect(Collectors.toList());
-            name = String.join(".", join);
-        }
-
-        if (StringUtils.hasText(name)) {
-            return name.concat(".repository");
-        }
+        while (false);
 
         // 全局配置包名
         String packageName = this.getConfig(pageName);
@@ -398,7 +412,12 @@ public class RepositoryProcessor extends AbstractProcessor {
             return matcher;
         }
 
-        String[] currentBuilders = entity.getAnnotation(CreateRepository.class).builders();
+        CreateRepository repo = entity.getAnnotation(CreateRepository.class);
+        if (repo == null) {
+            return matcher;
+        }
+
+        String[] currentBuilders = repo.builders();
         if (currentBuilders.length == 0) {
             return matcher;
         }
