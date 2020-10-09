@@ -11,7 +11,11 @@ import cn.procsl.ping.boot.user.domain.dictionary.repository.CustomDictionaryRep
 import cn.procsl.ping.boot.user.domain.dictionary.service.DictionaryService;
 import cn.procsl.ping.boot.user.domain.rbac.model.Node;
 import cn.procsl.ping.boot.user.domain.rbac.model.Permission;
+import cn.procsl.ping.boot.user.domain.rbac.model.Role;
+import cn.procsl.ping.boot.user.domain.rbac.model.Subject;
 import cn.procsl.ping.boot.user.domain.rbac.service.PermissionService;
+import cn.procsl.ping.boot.user.domain.rbac.service.RoleService;
+import cn.procsl.ping.boot.user.domain.rbac.service.SubjectService;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,9 +97,34 @@ public class UserAutoConfiguration {
     public PermissionService permissionService(
         JpaRepository<Permission, Long> jpaRepository,
         QuerydslPredicateExecutor<Permission> querydslRepository,
-        AdjacencyTreeRepository<Permission, Long, Node> treeRepository) {
-        return new PermissionService(jpaRepository, querydslRepository, treeRepository);
+        EntityManager entityManager
+    ) {
+        return new PermissionService(jpaRepository, querydslRepository, entityManager);
     }
 
+
+    @Bean
+    @ConditionalOnMissingBean
+    public RoleService RoleService(AdjacencyTreeRepository<Role, Long, Node> currentTreeRepository,
+                                   QuerydslPredicateExecutor<Role> querydslRepository,
+                                   PermissionService permissionService,
+                                   JpaRepository<Role, Long> jpaRepository,
+                                   BooleanStatefulRepository<Role, Long> booleanStatefulRepository
+    ) {
+        return new RoleService(currentTreeRepository,
+            querydslRepository,
+            permissionService,
+            jpaRepository,
+            booleanStatefulRepository);
+    }
+
+
+    @Bean
+    @ConditionalOnMissingBean
+    public SubjectService subjectService(JpaRepository<Subject, Long> jpaRepository,
+                                         QuerydslPredicateExecutor<Subject> querydslRepository,
+                                         RoleService roleService) {
+        return new SubjectService(jpaRepository, querydslRepository, roleService);
+    }
 
 }

@@ -2,110 +2,59 @@ package cn.procsl.ping.boot.user.domain.rbac.model;
 
 import cn.procsl.ping.boot.domain.annotation.CreateRepository;
 import cn.procsl.ping.boot.domain.support.executor.DomainEventListener;
-import cn.procsl.ping.boot.user.domain.common.AbstractTree;
 import cn.procsl.ping.business.domain.DomainEntity;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.Immutable;
 
 import javax.persistence.*;
 import java.util.Set;
 
-@Setter(AccessLevel.PROTECTED) // for jpa
+@Setter(AccessLevel.PROTECTED)
 @Getter
-@EqualsAndHashCode(exclude = {"roles"})
-@ToString(exclude = "roles")
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = "name")})
+@EqualsAndHashCode(exclude = {"role"})
+@ToString(exclude = {"role"})
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"operator", "resource"})})
 @Entity(name = "${User.Permission}")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)// for jpa
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Slf4j
 @EntityListeners(DomainEventListener.class)
 @CreateRepository
-public class Permission extends AbstractTree<Long, Node> implements DomainEntity<Long> {
+@Immutable
+public class Permission implements Target, DomainEntity<Long> {
 
-    final public static int PERM_NAME_LEN = 20;
+    public final static QPermission Q = QPermission.permission;
 
-    final public static int PERM_TYPE_LEN = 10;
+    final public static int OPS_LEN = 5;
 
-    final public static int PERM_TARGET_LEN = 10;
-
-    final public static String DELIMITER = "/";
+    final public static int RES_NO_LEN = 32;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "table_sequences")
     @Access(AccessType.PROPERTY)
     Long id;
 
-    @Column(length = PERM_NAME_LEN, nullable = false)
+    @Column(length = OPS_LEN, nullable = false)
     @Setter(AccessLevel.PUBLIC)
-    String name;
+    String operator;
 
-    @Column(length = PERM_TYPE_LEN, nullable = false)
-    String type;
-
-    @Column(nullable = false)
-    Integer depth;
-
-    @Column(nullable = false)
-    Long parentId;
-
-    @ElementCollection
-    @CollectionTable(joinColumns = @JoinColumn(name = "id"))
-    Set<Node> path;
+    @Column(length = RES_NO_LEN, nullable = false)
+    String resource;
 
     @ManyToMany
     @JoinTable(name = "${User.role_permission}")
     Set<Role> role;
 
-    @Column(length = PERM_TYPE_LEN, nullable = false)
-    String target;
-
-    /**
-     * 操作符
-     * 读 写 执行, 只读,等等 可自定义
-     */
-    String operator;
-
-
-    public Permission(
-        @NonNull String name,
-        @NonNull String type,
-        @NonNull String target,
-        @NonNull String operator,
-        Permission parent
+    public Permission(@NonNull String resource,
+                      @NonNull String operator
     ) {
-        this.name = name;
-        this.type = type;
-        this.target = target;
         this.operator = operator;
-        this.changeParent(parent);
+        this.resource = resource;
     }
 
-    /**
-     * 创建路径节点实例方法
-     *
-     * @return 返回当前节点的 DictPath
-     */
-    @Override
-    public Node currentPathNode() {
-        return new Node(this.parentId, this.depth);
+    public Permission(@NonNull Target target) {
+        this(target.getResource(), target.getOperator());
     }
 
-    /**
-     * 查找分隔符
-     *
-     * @return 分隔符
-     */
-    @Override
-    public String findDelimiter() {
-        return DELIMITER;
-    }
-
-    @Override
-    public void setId(Long id) {
-        if (this.parentId == null) {
-            this.parentId = id;
-        }
-        this.id = id;
-    }
 }
 

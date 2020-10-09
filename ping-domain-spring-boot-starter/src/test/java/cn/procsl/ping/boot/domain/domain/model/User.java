@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.domain.domain.model;
 
+import cn.procsl.ping.business.domain.DomainId;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,12 +19,12 @@ import static cn.procsl.ping.business.domain.DomainEntity.UUID_LENGTH;
  * @author procsl
  * @date 2019/12/14
  */
-@Entity
+@Entity(name = "${Domain.User}")
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = "name")})
 @Getter
 @Setter
 @NoArgsConstructor
-public class User {
+public class User implements DomainId<String> {
 
     @Id
     @Column(length = UUID_LENGTH)

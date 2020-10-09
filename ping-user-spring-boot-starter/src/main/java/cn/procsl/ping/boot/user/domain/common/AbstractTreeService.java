@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.*;
 import java.util.function.BiFunction;
@@ -23,6 +22,7 @@ import java.util.stream.Collectors;
 public abstract class AbstractTreeService<T extends AdjacencyNode<ID, N>, ID extends Serializable, N extends AdjacencyPathNode<ID>> extends AbstractService<ID, T> {
 
     final protected AdjacencyTreeRepository<T, ID, N> treeRepository;
+
 
     public AbstractTreeService(JpaRepository<T, ID> jpaRepository,
                                QuerydslPredicateExecutor<T> querydslRepository,
@@ -71,13 +71,12 @@ public abstract class AbstractTreeService<T extends AdjacencyNode<ID, N>, ID ext
     /**
      * id 转换为去重后的实体
      *
-     * @param ids       指定的ids
-     * @param delimiter 分隔符
+     * @param ids 指定的ids
      * @return 返回去重后的实体
      */
-    public <TYPE> Collection<TYPE> convertTo(Collection<ID> ids,
-                                             @NotNull Function<ID, TYPE> convert,
-                                             @NotBlank @Size(min = 1, max = 1) String delimiter) {
+    @SuppressWarnings("unchecked")
+    public <TYPE> Collection<TYPE> distinctAndConvert(Collection<ID> ids,
+                                                      @NotNull Function<ID, TYPE> convert) {
 
         if (ids == null || ids.isEmpty()) {
             return Collections.emptyList();
@@ -89,18 +88,32 @@ public abstract class AbstractTreeService<T extends AdjacencyNode<ID, N>, ID ext
                 .getParents(treeRepository.getQAdjacency().id, id)
                 .map(item -> (ID) item)
                 .collect(Collectors.toUnmodifiableList());
-            String path = PathUtils.standardize(String.join(delimiter, String.valueOf(nodes)), delimiter);
+
+            String[] array = nodes.stream().map(i -> i.toString()).toArray(String[]::new);
+            String node = String.join("/", array);
+            String path = PathUtils.standardize(node, "/");
             map.put(path, nodes);
         }
         // 通过路径去重
-        List<String> paths = PathUtils.distinct(map.keySet(), delimiter);
-        // 取最后一位角色
+        List<String> paths = PathUtils.distinct(map.keySet(), "/");
+        // 取最后的元素
         return paths.stream()
             .map(map::get)
             .map(item -> item.get(item.size() - 1))
-            .map(convert::apply)
+            .map(convert)
             .collect(Collectors.toUnmodifiableList());
     }
+
+    /**
+     * id去重
+     *
+     * @param ids id 列表
+     * @return 去重后的ID
+     */
+    public Collection<ID> distinct(Collection<ID> ids) {
+        return this.distinctAndConvert(ids, id -> id);
+    }
+
 
     /**
      * 按节点搜索

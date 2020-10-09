@@ -16,13 +16,13 @@ import javax.persistence.Embeddable;
 @NoArgsConstructor
 @Data
 @Embeddable
-public class PathNode implements AdjacencyPathNode<Long> {
+public class Path implements AdjacencyPathNode<Long> {
 
     Long pathId;
 
     Integer seq;
 
-    public PathNode(@NonNull Long pathId, @NonNull Integer seq) {
+    public Path(@NonNull Long pathId, @NonNull Integer seq) {
         this.pathId = pathId;
         this.seq = seq;
     }

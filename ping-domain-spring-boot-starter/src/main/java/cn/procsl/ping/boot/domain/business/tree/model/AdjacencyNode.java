@@ -19,8 +19,8 @@ public interface AdjacencyNode<ID extends Serializable, T extends AdjacencyPathN
 
     int ROOT_DEPTH = 0;
 
-    @Override
     @Id
+    @Override
     ID getId();
 
     ID getParentId();
@@ -38,13 +38,13 @@ public interface AdjacencyNode<ID extends Serializable, T extends AdjacencyPathN
      */
     @Transient
     default boolean isRoot() {
-        return ObjectUtils.nullSafeEquals(getId(), getParentId()) || ObjectUtils.nullSafeEquals(getDepth(), 0);
+        return ObjectUtils.nullSafeEquals(getId(), getParentId()) || ObjectUtils.nullSafeEquals(getDepth(), ROOT_DEPTH);
     }
 
     /**
      * 创建路径节点实例方法
      *
-     * @return 返回当前节点的 DictPath
+     * @return 返回当前节点的 path
      */
     T currentPathNode();
 
@@ -58,7 +58,7 @@ public interface AdjacencyNode<ID extends Serializable, T extends AdjacencyPathN
     /**
      * 查找分隔符
      *
-     * @return
+     * @return 分隔符
      */
     default String findDelimiter() {
         return "/";

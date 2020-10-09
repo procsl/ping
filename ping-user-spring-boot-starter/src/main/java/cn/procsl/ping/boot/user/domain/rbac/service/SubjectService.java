@@ -35,6 +35,7 @@ public class SubjectService
         super(jpaRepository, querydslRepository);
     }
 
+    @Inject
     public SubjectService(JpaRepository<Subject, Long> jpaRepository,
                           QuerydslPredicateExecutor<Subject> querydslRepository,
                           RoleService roleService) {
@@ -67,7 +68,7 @@ public class SubjectService
     @Transactional
     public Long createByRoleId(@Size(max = 100) Collection<Long> roleIds) throws IllegalArgumentException {
         Function<Long, Role> convert = this.roleService::getOne;
-        Collection<Role> roles = this.roleService.convertTo(roleIds, convert, Role.DELIMITER);
+        Collection<Role> roles = this.roleService.distinctAndConvert(roleIds, convert);
         return jpaRepository.save(new Subject(roles)).getId();
     }
 
@@ -98,7 +99,7 @@ public class SubjectService
     @Transactional
     public void changeRoleById(@NotNull Long subjectId, @NotNull @Size(min = 1, max = 100) Collection<Long> roleIds) {
         Function<Long, Role> convert = roleService::getOne;
-        Collection<Role> roles = this.roleService.convertTo(roleIds, convert, Role.DELIMITER);
+        Collection<Role> roles = this.roleService.distinctAndConvert(roleIds, convert);
 
         Subject subject = jpaRepository.getOne(subjectId);
         subject.changeRoles(roles);

@@ -92,15 +92,26 @@ public interface AdjacencyTreeRepository<
     /**
      * 查询指定节点的所有直接子节点
      *
-     * @param select     选择器
-     * @param id         指定的id
-     * @param predicates 查询条件
+     * @param select       选择器
+     * @param id           指定的id
+     * @param <Projection> 投影类
+     * @param predicates   查询条件
      * @return 返回子节点stream
      */
     <Projection> Stream<Projection> getDirectChildren(@NonNull Expression<Projection> select,
                                                       @NonNull ID id, Predicate... predicates);
 
 
+    /**
+     * 分页查询子节点
+     *
+     * @param select       选择器
+     * @param id           指定的id
+     * @param predicates   查询条件
+     * @param pageable     分页条件
+     * @param <Projection> 投影类
+     * @return
+     */
     <Projection> Page<Projection> getDirectChildren(@NonNull Expression<Projection> select,
                                                     @NonNull Pageable pageable,
                                                     ID id, Predicate... predicates);

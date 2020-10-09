@@ -12,17 +12,15 @@ import javax.persistence.*;
  * querydsl冲突测试
  */
 @Data
-@Entity(name = "Dict")
-@Table(name = "dict")
+@Entity(name = "${Domain.Dictionary}")
+@Table
 @EntityListeners(DomainEventListener.class)
 @DynamicUpdate
 @Slf4j
 public class Dictionary implements DomainEntity<Long> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator")
-    @SequenceGenerator(allocationSize = 500, name = "generator")
-    @Column(updatable = false, nullable = false)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "table_sequences")
     Long id;
 
 }

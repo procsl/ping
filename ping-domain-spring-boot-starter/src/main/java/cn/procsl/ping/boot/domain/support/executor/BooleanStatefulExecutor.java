@@ -59,11 +59,7 @@ class BooleanStatefulExecutor<T extends BooleanStateful, ID extends Serializable
     @Override
     @Transactional
     public int disable(@NonNull ID id) {
-        return entityManager
-            .createQuery(this.UPDATE_JPQL)
-            .setParameter("id", id)
-            .setParameter("state", BooleanStateful.DISABLE_STATE)
-            .executeUpdate();
+        return this.changeState(id, BooleanStateful.DISABLE_STATE);
     }
 
     /**
@@ -74,11 +70,7 @@ class BooleanStatefulExecutor<T extends BooleanStateful, ID extends Serializable
     @Override
     @Transactional
     public int enable(@NonNull ID id) {
-        return entityManager
-            .createQuery(this.UPDATE_JPQL)
-            .setParameter("id", id)
-            .setParameter("state", BooleanStateful.ENABLE_STATE)
-            .executeUpdate();
+        return this.changeState(id, BooleanStateful.ENABLE_STATE);
     }
 
     /**
@@ -90,11 +82,17 @@ class BooleanStatefulExecutor<T extends BooleanStateful, ID extends Serializable
     @Override
     @Transactional
     public int changeState(@NonNull ID id, @NonNull Boolean state) {
-        return entityManager
+        int tmp = entityManager
             .createQuery(this.UPDATE_JPQL)
             .setParameter("id", id)
             .setParameter("state", state)
             .executeUpdate();
+        if (tmp <= 0) {
+            return tmp;
+        }
+        T reference = entityManager.getReference(javaType, id);
+        entityManager.detach(reference);
+        return tmp;
     }
 
     /**

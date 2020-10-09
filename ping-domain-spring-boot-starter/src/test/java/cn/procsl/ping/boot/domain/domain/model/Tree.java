@@ -19,19 +19,19 @@ import java.util.stream.Collectors;
  */
 @Setter
 @Getter
-@ToString(exclude = "path")
-@EqualsAndHashCode
-@Entity
+@ToString(exclude = {"path"})
+@EqualsAndHashCode(exclude = {"path"})
+@Entity(name = "${Domain.Tree}")
 @Table
 @EntityListeners(DomainEventListener.class)
 @DynamicUpdate
 @Slf4j
-public class Tree implements AdjacencyNode<Long, PathNode> {
+@NoArgsConstructor
+public class Tree implements AdjacencyNode<Long, Path> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "generator")
-    @SequenceGenerator(allocationSize = 500, name = "generator")
-    @Column(updatable = false, nullable = false)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "table_sequences")
+    @Access(AccessType.PROPERTY)
     Long id;
 
     Long parentId;
@@ -39,53 +39,21 @@ public class Tree implements AdjacencyNode<Long, PathNode> {
     @Lob
     String name;
 
-    Integer test = 0;
-
-    Integer test1 = 1;
-
-    Integer test2 = 2;
-
-    Integer test3 = 3;
-
-    Integer test4 = 4;
-
     Integer depth;
 
     @ElementCollection
     @CollectionTable(joinColumns = @JoinColumn(name = "id"))
-    Set<PathNode> path;
+    Set<Path> path;
 
 
-    /**
-     * 创建路径节点实例方法
-     *
-     * @return
-     */
-    @Override
-    public PathNode currentPathNode() {
-        return new PathNode(this.id, this.depth);
+    public Tree(Tree parent) {
+        this.empty();
+        changeParent(parent);
     }
 
     @Override
-    public void changeParent(@NonNull AdjacencyNode<Long, PathNode> parent) {
-        log.info("修改当前节点的父节点");
-        if (!(parent instanceof cn.procsl.ping.boot.domain.domain.model.Tree)) {
-            throw new IllegalArgumentException("required " + this.getClass().getName());
-        }
-        this.empty();
-
-        this.parentId = parent.getId();
-        log.debug("修改parentId:{}", parentId);
-
-        this.depth = ((cn.procsl.ping.boot.domain.domain.model.Tree) parent).depth + 1;
-        log.debug("修改depth:{}", depth);
-
-        this.path.addAll(parent.getPath());
-        log.debug("添加父节点的path:{}", this.path);
-
-        this.path.add(parent.currentPathNode());
-
-        this.selfUpdate();
+    public Path currentPathNode() {
+        return new Path(this.id, this.depth);
     }
 
     void empty() {
@@ -113,9 +81,29 @@ public class Tree implements AdjacencyNode<Long, PathNode> {
         selfUpdate();
     }
 
-    public void init() {
-        log.debug("初始化当前实例");
-        empty();
+    @Override
+    public void changeParent(AdjacencyNode<Long, Path> parent) {
+        if (parent == null) {
+            this.empty();
+            return;
+        }
+
+        log.info("修改当前节点的父节点");
+        if (!(parent instanceof Tree)) {
+            throw new IllegalArgumentException("Required " + this.getClass().getName());
+        }
+        this.empty();
+
+        this.parentId = parent.getId();
+        log.debug("修改parentId:{}", parentId);
+
+        this.depth = ((Tree) parent).depth + 1;
+        log.debug("修改depth:{}", depth);
+
+        this.path.addAll(parent.getPath());
+        log.debug("添加父节点的path:{}", this.path);
+        this.getPath().add(parent.currentPathNode());
+        this.selfUpdate();
     }
 
     void selfUpdate() {
@@ -131,14 +119,27 @@ public class Tree implements AdjacencyNode<Long, PathNode> {
             this.parentId = id;
         }
 
-        PathNode pathNode = new PathNode(id, depth);
-        log.debug("添加当前的节点至PathNodes:{}", pathNode);
-        this.path.add(pathNode);
+        if (this.getId() == null) {
+            return;
+        }
+        // 添加当前节点
+        if (this.getParentId() == null) {
+            this.setParentId(this.getId());
+        }
+        this.getPath().add(this.currentPathNode());
+
         List<String> tmp = this.path
             .stream()
-            .sorted(Comparator.comparingInt(PathNode::getSeq))
+            .sorted(Comparator.comparingInt(Path::getSeq))
             .map(item -> String.valueOf(item.getPathId())).collect(Collectors.toList());
         this.setName("/" + String.join("/", tmp));
         log.debug("设置当前的name属性为:{}", name);
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+        if (this.parentId == null) {
+            this.parentId = id;
+        }
     }
 }

@@ -27,32 +27,32 @@ public abstract class AbstractTree<ID extends Serializable, T extends AdjacencyP
      */
     @Override
     public void changeParent(AdjacencyNode<ID, T> parent) {
+        this.empty();
         if (parent == this || parent == null) {
-            this.empty();
             return;
         }
-        this.empty();
         @NonNull
         ID pid = parent.getId();
         this.setParentId(pid);
         this.setDepth(parent.getDepth() + 1);
         this.getPath().addAll(parent.getPath());
-        this.getPath().add(parent.currentPathNode());
         this.upgrade();
     }
 
-    protected void upgrade() {
+    private void upgrade() {
         if (this.getId() == null) {
             return;
         }
-        // 添加当前节点
+
         if (this.getParentId() == null) {
             this.setParentId(this.getId());
         }
+
+        // 添加当前节点
         this.getPath().add(this.currentPathNode());
     }
 
-    protected void empty() {
+    private void empty() {
         this.setParentId(this.getId());
         this.setDepth(0);
         if (this.getPath() == null) {
@@ -63,5 +63,11 @@ public abstract class AbstractTree<ID extends Serializable, T extends AdjacencyP
 
     }
 
-
+    /**
+     * 当新对象被加入持久化上下文时回调方法
+     */
+    @Override
+    public void postPersist() {
+        this.upgrade();
+    }
 }

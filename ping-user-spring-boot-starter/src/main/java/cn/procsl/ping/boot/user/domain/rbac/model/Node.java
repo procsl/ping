@@ -2,6 +2,7 @@ package cn.procsl.ping.boot.user.domain.rbac.model;
 
 import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyPathNode;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.springframework.data.annotation.Immutable;
@@ -9,6 +10,7 @@ import org.springframework.data.annotation.Immutable;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
+@EqualsAndHashCode(exclude = "seq")
 @Data
 @Embeddable
 @Immutable

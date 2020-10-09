@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.user.domain.common;
 
+import cn.procsl.ping.boot.domain.business.utils.CollectionUtils;
 import cn.procsl.ping.business.domain.DomainEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
@@ -7,6 +8,8 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Collections;
 
 public abstract class AbstractService<ID extends Serializable, T extends DomainEntity<ID>> {
 
@@ -41,5 +44,19 @@ public abstract class AbstractService<ID extends Serializable, T extends DomainE
             return null;
         }
         return jpaRepository.findById(id).orElse(null);
+    }
+
+
+    /**
+     * 通过ID查找
+     *
+     * @param ids ids
+     * @return 返回id对应的实体
+     */
+    public Collection<T> findByIds(Collection<ID> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return jpaRepository.findAllById(ids);
     }
 }

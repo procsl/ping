@@ -35,7 +35,7 @@ import java.util.function.Supplier;
 public class Dictionary implements AdjacencyNode<Long, DictPath>, BooleanStateful<Long> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "table_sequences")
     protected Long id;
 
     @Column(length = SPACE_NAME_LEN, nullable = false)

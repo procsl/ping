@@ -37,7 +37,6 @@ public class DomainRepositoryFactory extends JpaRepositoryFactory {
 
     @Override
     protected RepositoryComposition.RepositoryFragments getRepositoryFragments(RepositoryMetadata metadata) {
-        log.info("build domain repositories");
         RepositoryComposition.RepositoryFragments fragments = super.getRepositoryFragments(metadata);
 
         JpaEntityInformation<?, Serializable> entityInformation = getEntityInformation(metadata.getDomainType());
@@ -56,6 +55,8 @@ public class DomainRepositoryFactory extends JpaRepositoryFactory {
         BeanFactory factory = findField(JpaRepositoryFactory.class, this,
             "beanFactory", BeanFactory.class);
 
+        log.info("Build domain repositories");
+
         // TODO 太丑了 要重构
         if (AdjacencyTreeRepository.class.isAssignableFrom(metadata.getRepositoryInterface())) {
             Object target = getTargetRepositoryViaReflection(AdjacencyTreeExecutor.class,
@@ -67,6 +68,7 @@ public class DomainRepositoryFactory extends JpaRepositoryFactory {
                 entityPathResolver
             );
             fragments = fragments.append(RepositoryFragment.implemented(target));
+            log.info("Add fragment:{}", AdjacencyTreeRepository.class);
         }
 
         if (BooleanStatefulRepository.class.isAssignableFrom(metadata.getRepositoryInterface())) {
@@ -78,6 +80,7 @@ public class DomainRepositoryFactory extends JpaRepositoryFactory {
                 factory
             );
             fragments = fragments.append(RepositoryFragment.implemented(target));
+            log.info("Add fragment:{}", BooleanStatefulRepository.class);
         }
 
         if (PersistenceRepository.class.isAssignableFrom(metadata.getRepositoryInterface())) {
@@ -88,6 +91,7 @@ public class DomainRepositoryFactory extends JpaRepositoryFactory {
                 escapeCharacter
             );
             fragments = fragments.append(RepositoryFragment.implemented(target));
+            log.info("Add fragment:{}", PersistenceRepository.class);
         }
 
         if (QueryDslPersistenceRepository.class.isAssignableFrom(metadata.getRepositoryInterface())) {
@@ -99,6 +103,7 @@ public class DomainRepositoryFactory extends JpaRepositoryFactory {
                 entityPathResolver
             );
             fragments = fragments.append(RepositoryFragment.implemented(target));
+            log.info("Add fragment:{}", QueryDslPersistenceRepository.class);
         }
 
         return fragments;

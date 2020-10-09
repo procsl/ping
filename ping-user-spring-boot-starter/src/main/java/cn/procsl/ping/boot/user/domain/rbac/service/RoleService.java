@@ -6,11 +6,7 @@ import cn.procsl.ping.boot.domain.business.utils.PathUtils;
 import cn.procsl.ping.boot.domain.business.utils.StringUtils;
 import cn.procsl.ping.boot.user.domain.common.AbstractBooleanStatefulService;
 import cn.procsl.ping.boot.user.domain.common.AbstractTreeService;
-import cn.procsl.ping.boot.user.domain.rbac.model.Node;
-import cn.procsl.ping.boot.user.domain.rbac.model.Permission;
-import cn.procsl.ping.boot.user.domain.rbac.model.QRole;
-import cn.procsl.ping.boot.user.domain.rbac.model.Role;
-import cn.procsl.ping.business.exception.BusinessException;
+import cn.procsl.ping.boot.user.domain.rbac.model.*;
 import com.querydsl.core.types.Predicate;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +22,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 import static cn.procsl.ping.boot.user.domain.rbac.model.Role.ROLE_NAME_LEN;
@@ -44,6 +39,7 @@ public class RoleService extends AbstractTreeService<Role, Long, Node>
     public static final QRole R = QRole.role;
     @Getter
     final BooleanStatefulRepository<Role, Long> booleanStatefulRepository;
+
     @Inject
     PermissionService permissionService;
 
@@ -62,15 +58,14 @@ public class RoleService extends AbstractTreeService<Role, Long, Node>
     /**
      * 创建角色
      *
-     * @param name            角色名称
-     * @param parentPath      父角色路径, 可为空, 如果为空则表示不继承
-     * @param permissionNames 权限名称列表, 可为空, 如果为空则表示不赋予任何权限
+     * @param name       角色名称
+     * @param parentPath 父角色路径, 可为空, 如果为空则表示不继承
      * @return 角色创建成功之后返回角色ID
      * @throws IllegalArgumentException 如果父角色,或者权限不存在则抛出此异常
      */
     @Transactional
     public Long create(@NotBlank @Size(min = 1, max = ROLE_NAME_LEN) String name,
-                       String parentPath, Collection<String> permissionNames) throws EntityNotFoundException {
+                       String parentPath, List<? extends Target> targets) throws EntityNotFoundException {
 
         Role parent = null;
         if (!StringUtils.isEmpty(parentPath)) {
@@ -78,9 +73,9 @@ public class RoleService extends AbstractTreeService<Role, Long, Node>
             ifNotFound(parent, parentPath);
         }
 
-        List<String> paths = PathUtils.distinct(permissionNames, Permission.DELIMITER);
-        Map<String, Permission> perms = this.permissionService.search(paths, BusinessException::ifNotFound);
-        Role role = jpaRepository.save(new Role(name, parent, perms.values()));
+        Collection<Permission> permissions = permissionService.getByTargets(targets);
+
+        Role role = jpaRepository.save(new Role(name, parent, permissions));
         return role.getId();
     }
 
@@ -96,12 +91,9 @@ public class RoleService extends AbstractTreeService<Role, Long, Node>
     @Transactional
     public Long create(@NotBlank @Size(min = 1, max = ROLE_NAME_LEN) String name,
                        Long parentId, Collection<Long> permissionIds) throws EntityNotFoundException {
-
-        Function<Long, Permission> convert = permissionService::getOne;
-        Collection<Permission> perms = this.permissionService.convertTo(permissionIds, convert, Permission.DELIMITER);
-
         Role parent = this.findById(parentId);
-        Role role = jpaRepository.save(new Role(name, parent, perms));
+        Collection<Permission> perms = this.permissionService.findByIds(permissionIds);
+        Role role = jpaRepository.saveAndFlush(new Role(name, parent, perms));
         return role.getId();
     }
 
@@ -136,17 +128,14 @@ public class RoleService extends AbstractTreeService<Role, Long, Node>
     /**
      * 修改角色指定的权限
      *
-     * @param roleId    指定的角色ID
-     * @param permPaths 权限Path
+     * @param roleId  指定的角色ID
+     * @param targets 权限Path
      * @throws IllegalArgumentException 如果指定的实体未找到
      */
-    public void changePermission(@NotNull Long roleId, Collection<String> permPaths) throws IllegalArgumentException {
+    public void changePermission(@NotNull Long roleId, Collection<? extends Target> targets) throws IllegalArgumentException {
         Role role = getOne(roleId);
-
-        List<String> paths = PathUtils.distinct(permPaths, Permission.DELIMITER);
-        Map<String, Permission> perms = this.permissionService.search(paths, BusinessException::ifNotFound);
-
-        role.changePermissions(perms.values());
+        Collection<Permission> perm = this.permissionService.getByTargets(targets);
+        role.changePermissions(perm);
         this.jpaRepository.save(role);
     }
 
@@ -159,10 +148,7 @@ public class RoleService extends AbstractTreeService<Role, Long, Node>
      */
     public void changePermissionById(@NotNull Long roleId, Collection<Long> permIds) throws IllegalArgumentException {
         Role role = getOne(roleId);
-
-        Function<Long, Permission> convert = permissionService::getOne;
-        Collection<Permission> perms = this.permissionService.convertTo(permIds, convert, Permission.DELIMITER);
-
+        Collection<Permission> perms = this.permissionService.findByIds(permIds);
         role.changePermissions(perms);
         this.jpaRepository.save(role);
     }

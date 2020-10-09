@@ -34,9 +34,9 @@ public class DomainRepositoryFactoryBean<T extends Repository<S, ID>, S, ID> ext
                 findField(JpaRepositoryFactoryBean.class, this, "entityPathResolver", EntityPathResolver.class)
         );
         domainRepositoryFactory.setEscapeCharacter(
-                findField(JpaRepositoryFactoryBean.class, this, "escapeCharacter", EscapeCharacter.class)
+            findField(JpaRepositoryFactoryBean.class, this, "escapeCharacter", EscapeCharacter.class)
         );
-        log.info("create domain repository factory.");
+        log.info("Create domain repository factory:{}", domainRepositoryFactory);
         return domainRepositoryFactory;
     }
 }

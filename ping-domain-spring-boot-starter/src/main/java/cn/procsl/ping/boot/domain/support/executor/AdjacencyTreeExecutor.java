@@ -41,6 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;
+import javax.persistence.NonUniqueResultException;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -133,13 +134,15 @@ class AdjacencyTreeExecutor<
     }
 
 
-    public <Projection> Projection findOne(@NonNull Expression<Projection> select, Predicate... predicates) {
+    @Override
+    public <Projection> Projection findOne(@NonNull Expression<Projection> select, Predicate... predicates) throws NonUniqueResultException {
         JPAQuery<Projection> query = this.jpaQueryFactory.select(select).from(Q);
         this.prop(query, queryHint.withFetchGraphs(this.entityManager), predicates);
         query = this.metadata == null ? query : query.setLockMode(this.metadata.getLockModeType());
         return query.fetchOne();
     }
 
+    @Override
     public <Projection> Stream<Projection> findAll(@NonNull Expression<Projection> select, Predicate... predicates) {
         JPAQuery<Projection> query = this.jpaQueryFactory.select(select).from(Q);
         this.prop(query, this.queryHint.withFetchGraphs(this.entityManager), predicates);
@@ -147,6 +150,7 @@ class AdjacencyTreeExecutor<
         return this.convertTo(select, query.createQuery().getResultStream());
     }
 
+    @Override
     public <Projection> Page<Projection> findAll(@NonNull Expression<Projection> select,
                                                  @NonNull Pageable pageable, Predicate... predicates) {
         JPQLQuery<Projection> query = createQuery(predicates).select(select).from(Q);
@@ -205,6 +209,7 @@ class AdjacencyTreeExecutor<
                 .distinct();
 
         if (select.equals(Q.id)) {
+            subQuery.orderBy(P.seq.asc());
             JPQLQuery<ID> res = querydsl.applyPagination(pageable, subQuery);
             return (Page<Projection>) PageableExecutionUtils.getPage(res.fetch(), pageable, res::fetchCount);
         }
@@ -221,23 +226,21 @@ class AdjacencyTreeExecutor<
 
     @Override
     public <Projection> Stream<Projection> getDirectChildren(@NonNull Expression<Projection> select, @NonNull ID id, Predicate... predicates) {
-        JPAQuery<Projection> query = this.jpaQueryFactory
-            .select(select)
-            .from(Q)
-            .where(Q.parentId.eq(id));
+        JPAQuery<Projection> query = this.jpaQueryFactory.select(select).from(Q).where(Q.parentId.eq(id).and(Q.id.ne(id)));
         this.prop(query, this.queryHint.withFetchGraphs(this.entityManager), predicates);
         query = this.metadata == null ? query : query.setLockMode(this.metadata.getLockModeType());
         Stream stream = query.createQuery().getResultStream();
         return this.convertTo(select, stream);
     }
 
+    @Override
     public <Projection> Page<Projection> getDirectChildren(@NonNull Expression<Projection> select,
                                                            @NonNull Pageable pageable,
                                                            @NonNull ID id, Predicate... predicates) {
         JPQLQuery<Projection> query = this.createQuery(predicates)
             .select(select)
             .from(Q)
-            .where(Q.parentId.eq(id));
+            .where(P.pathId.eq(id).and(P.id.ne(id)));
         JPQLQuery<Projection> res = querydsl.applyPagination(pageable, query);
         return PageableExecutionUtils.getPage(res.fetch(), pageable, query::fetchCount);
     }
@@ -250,7 +253,7 @@ class AdjacencyTreeExecutor<
             .from(Q)
             .innerJoin(Q)
             .innerJoin(Q.path, P)
-            .where(P.pathId.eq(id))
+            .where(P.pathId.eq(id).and(P.id.ne(id)))
             .orderBy(Q.depth.asc());
         this.prop(query, this.queryHint.withFetchGraphs(this.entityManager), predicates);
         query = this.metadata == null ? query : query.setLockMode(this.metadata.getLockModeType());
@@ -266,7 +269,7 @@ class AdjacencyTreeExecutor<
             .from(Q)
             .innerJoin(Q)
             .innerJoin(Q.path, P)
-            .where(P.pathId.eq(id));
+            .where(P.pathId.eq(id).and(P.id.ne(id)));
         JPQLQuery<Projection> res = querydsl.applyPagination(pageable, query);
         return PageableExecutionUtils.getPage(res.fetch(), pageable, query::fetchCount);
     }
@@ -443,7 +446,7 @@ class AdjacencyTreeExecutor<
 
             QueryHints hint = queryHint.withFetchGraphs(this.entityManager);
 
-            this.prop(query, hint, where, fun.apply(i));
+            this.prop(query, hint, where, Q.depth.eq(i), fun.apply(i));
 
             query = this.metadata == null ? query : query.setLockMode(this.metadata.getLockModeType());
 

@@ -1,75 +1,96 @@
 package cn.procsl.ping.boot.user.domain.rbac.service;
 
-import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository;
-import cn.procsl.ping.boot.domain.business.utils.PathUtils;
-import cn.procsl.ping.boot.user.domain.common.AbstractTreeService;
-import cn.procsl.ping.boot.user.domain.rbac.model.Node;
+import cn.procsl.ping.boot.domain.business.utils.CollectionUtils;
+import cn.procsl.ping.boot.user.domain.common.AbstractService;
 import cn.procsl.ping.boot.user.domain.rbac.model.Permission;
 import cn.procsl.ping.boot.user.domain.rbac.model.QPermission;
-import com.querydsl.core.types.Predicate;
+import cn.procsl.ping.boot.user.domain.rbac.model.Target;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.jpa.JPAExpressions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.NotBlank;
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import java.util.List;
-import java.util.function.Function;
-
-import static cn.procsl.ping.boot.user.domain.rbac.model.Permission.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 
 @Slf4j
 @Validated
 @Transactional(rollbackFor = Exception.class, readOnly = true)
-public class PermissionService
-    extends AbstractTreeService<Permission, Long, Node> {
+public class PermissionService extends AbstractService<Long, Permission> {
 
     public static final QPermission P = QPermission.permission;
 
-    public PermissionService(
-        JpaRepository<Permission, Long> jpaRepository,
-        QuerydslPredicateExecutor<Permission> querydslRepository,
-        AdjacencyTreeRepository<Permission, Long, Node> treeRepository) {
-        super(jpaRepository, querydslRepository, treeRepository);
-    }
+    final EntityManager entityManager;
 
-    @Transactional(readOnly = true)
-    @Override
-    public Permission searchOne(@NotBlank String path, Function<Integer, Predicate> predicate) throws IllegalArgumentException {
-        List<String> nodes = PathUtils.split(path, Permission.DELIMITER);
-        return treeRepository.searchOne(P, nodes, this.merge(predicate, nodes), true);
-    }
-
-    Function<Integer, Predicate> merge(Function<Integer, Predicate> predicate, List<String> nodes) {
-        if (predicate != null) {
-            return (index) -> P.name.eq(nodes.get(index)).and(predicate.apply(index));
-        } else {
-            return (index) -> P.name.eq(nodes.get(index));
-        }
+    @Inject
+    public PermissionService(JpaRepository<Permission, Long> jpaRepository,
+                             QuerydslPredicateExecutor<Permission> querydslRepository,
+                             EntityManager entityManager
+    ) {
+        super(jpaRepository, querydslRepository);
+        this.entityManager = entityManager;
     }
 
     /**
-     * 创建权限
+     * 通过target获取
      *
-     * @param parentId 父权限ID
-     * @param name     权限名称
-     * @param type     权限类型
-     * @param target   权限目标
-     * @param operator 权限支持的操作
-     * @return 创建成功返回权限ID
+     * @param targets target 值对象
+     * @return 返回实体
      */
-    @Transactional
-    public Long create(Long parentId,
-                       @NotBlank @Size(min = 1, max = PERM_NAME_LEN) String name,
-                       @NotBlank @Size(min = 1, max = PERM_TYPE_LEN) String type,
-                       @NotBlank @Size(min = 1, max = PERM_TARGET_LEN) String target,
-                       @NotNull String operator
-    ) {
-        Permission parent = this.findById(parentId);
-        Permission perm = this.jpaRepository.save(new Permission(name, type, target, operator, parent));
-        return perm.getId();
+    public Collection<Permission> getByTargets(Collection<? extends Target> targets) {
+        if (CollectionUtils.isEmpty(targets)) {
+            return Collections.emptyList();
+        }
+
+        TypedQuery<Permission> query = entityManager.createQuery(template(targets), Permission.class);
+        return parameter(targets, query).getResultList();
+    }
+
+    private TypedQuery<Permission> parameter(Collection<? extends Target> targets, TypedQuery<Permission> query) {
+
+        Iterator<? extends Target> iter = targets.iterator();
+        int i = 0;
+        while (iter.hasNext()) {
+            Target curr = iter.next();
+            query.setParameter(String.format("target_resource_%d", i), curr.getResource());
+            query.setParameter(String.format("target_operator_%d", i), curr.getOperator());
+            i++;
+        }
+
+        return query;
+    }
+
+    private String template(Collection<? extends Target> collection) {
+
+        ArrayList<String> list = new ArrayList<>(collection.size());
+
+        final String tmp = "(:target_resource_%d, :target_operator_%d)";
+        for (int i = 0; i < collection.size(); i++) {
+            list.add(String.format(tmp, i, i));
+        }
+        String params = String.join(",", list);
+
+        String jpql = JPAExpressions.select(P).from(P).where(ExpressionUtils.in(ExpressionUtils.list(Target.class, P.resource, P.operator), Collections.emptyList())).toString();
+        return jpql.replace("?1", "(" + params + ")");
+
+    }
+
+    public <T extends Target> Long create(@NotNull @Valid T target) {
+        return this.jpaRepository.save(new Permission(target)).getId();
+    }
+
+    public Long create(@NotEmpty String resource, @NotEmpty String operator) {
+        return this.jpaRepository.save(new Permission(resource, operator)).getId();
     }
 }

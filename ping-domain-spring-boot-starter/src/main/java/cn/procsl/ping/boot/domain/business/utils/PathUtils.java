@@ -14,31 +14,31 @@ public final class PathUtils {
     /**
      * 判断是否未子串
      *
-     * @param dec    分隔符
-     * @param path   路径
-     * @param prefix 字串
+     * @param dec  分隔符
+     * @param sub  路径
+     * @param root 子串
      * @return 如果为子串, 则返回1, 如果相等则返回0, 不为子串则返回-1
      */
-    public static int isSubPath(@NonNull String path, @NonNull String prefix, @NonNull String dec) {
+    public static int isSubPath(@NonNull String root, @NonNull String sub, @NonNull String dec) {
 
-        if (path.equals(prefix)) {
+        if (sub.equals(root)) {
             return 0;
         }
 
-        path = standardize(path, dec);
-        prefix = standardize(prefix, dec);
+        sub = standardize(sub, dec);
+        root = standardize(root, dec);
 
-        if (prefix.equals(path)) {
+        if (root.equals(sub)) {
             return 0;
         }
 
-        if (prefix.length() >= path.length()) {
+        if (root.length() >= sub.length()) {
             return -1;
         }
 
-        boolean tmp = path.startsWith(prefix);
+        boolean tmp = sub.startsWith(root);
         if (tmp) {
-            return path.charAt(prefix.length() - 1) == dec.charAt(0) ? 1 : -1;
+            return sub.charAt(root.length()) == dec.charAt(0) ? 1 : -1;
         }
         return -1;
     }
@@ -53,7 +53,7 @@ public final class PathUtils {
     public static List<String> split(String path, @NonNull String dec) {
         path = standardize(path, dec);
         return Arrays.
-            stream(path.split(dec + ""))
+            stream(path.split(dec))
             .filter(item -> !StringUtils.isEmpty(item))
             .collect(Collectors.toUnmodifiableList());
     }
@@ -79,7 +79,7 @@ public final class PathUtils {
 
         for (int i = 0; i < list.size(); i++) {
             String prefix = list.get(i);
-            list.removeIf(path -> isSubPath(path, prefix, dec) == 1);
+            list.removeIf(path -> isSubPath(prefix, path, dec) == 1);
         }
         return list;
     }
@@ -95,17 +95,44 @@ public final class PathUtils {
         if (isEmpty(path, dec)) {
             return dec;
         }
+        path = path.trim();
+
+        String more = dec + dec;
+        while (path.contains(more)) {
+            path = path.replace(more, dec);
+        }
+
+        if (isEmpty(path, dec)) {
+            return dec;
+        }
 
         boolean start = path.startsWith(dec);
-        if (start) {
+        if (!start) {
             path = dec.concat(path);
+        }
+
+        if (isEmpty(path, dec)) {
+            return dec;
         }
 
         boolean end = path.endsWith(dec);
         if (end) {
-            return path.substring(0, path.length() - 1);
+            path = path.substring(0, path.length() - 1);
         }
-        return path;
+
+        if (isEmpty(path, dec)) {
+            return dec;
+        }
+
+        while (path.contains(more)) {
+            path = path.replace(more, dec);
+        }
+
+        if (isEmpty(path, dec)) {
+            return dec;
+        }
+
+        return path.trim();
     }
 
     /**
@@ -141,7 +168,7 @@ public final class PathUtils {
             return true;
         }
 
-        path = path.trim();
+        path = path.replace(dec, "").trim();
         if (StringUtils.isEmpty(path)) {
             return true;
         }

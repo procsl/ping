@@ -25,6 +25,8 @@
         <logger name="org.springframework.web" level="info"/>
         <logger name="org.springframework.data.repository" level="trace"/>
         <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="trace"/>
+        <logger name="org.hibernate.engine.QueryParameters" level="debug"/>
+        <logger name="org.hibernate.engine.query.HQLQueryPlan" level="debug"/>
         <root level="info">
             <appender-ref ref="console"/>
         </root>

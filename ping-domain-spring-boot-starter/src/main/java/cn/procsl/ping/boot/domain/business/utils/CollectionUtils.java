@@ -166,6 +166,19 @@ public final class CollectionUtils {
     }
 
     /**
+     * 将迭代器转换为容器
+     *
+     * @param iterable 指定的迭代器
+     * @param <E>      泛型
+     */
+    public static <E> Collection<E> convertToCollection(@NonNull Iterable<E> iterable) {
+        if (iterable instanceof Collection) {
+            return (Collection<E>) iterable;
+        }
+        return convertToList(iterable);
+    }
+
+    /**
      * 将指定的迭代器转换为List
      *
      * @param iterable 指定的迭代器

@@ -14,9 +14,9 @@ import java.util.Set;
 
 @Setter(AccessLevel.PROTECTED)
 @Getter
-@EqualsAndHashCode(exclude = {"path", "users", "perms"})
-@ToString(exclude = {"path", "users", "perms"})
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"name"})})
+@EqualsAndHashCode(exclude = {"path", "subject", "permission"})
+@ToString(exclude = {"path", "subject", "permission"})
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "depth", "parentId"})})
 @Entity(name = "${User.Role}")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Slf4j
@@ -29,7 +29,8 @@ public class Role extends AbstractTree<Long, Node> implements BooleanStateful<Lo
     public final static String DELIMITER = "/";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "table_sequences")
+    @Access(AccessType.PROPERTY)
     protected Long id;
 
     @ManyToMany
@@ -64,6 +65,7 @@ public class Role extends AbstractTree<Long, Node> implements BooleanStateful<Lo
         this.name = name;
         this.changeParent(parent);
         this.permission = CollectionUtils.createAndAppend(this.permission, perms);
+        this.enable();
     }
 
     @Override
@@ -92,6 +94,42 @@ public class Role extends AbstractTree<Long, Node> implements BooleanStateful<Lo
     @Override
     public String findDelimiter() {
         return DELIMITER;
+    }
+
+    /**
+     * 判断是否存在权限
+     *
+     * @param target 指定的target
+     * @param <T>    target范型
+     * @return 如果存在, 则返回true
+     */
+    public <T extends Target> boolean hasPermission(T target) {
+        if (target == null) {
+            return false;
+        }
+
+        if (CollectionUtils.isEmpty(this.permission)) {
+            return false;
+        }
+
+        if (!(target instanceof Permission)) {
+            return equals(target);
+        }
+
+        if (((Permission) target).getId() != null) {
+            return this.permission.contains(target);
+        }
+
+        return equals(target);
+    }
+
+    private boolean equals(Target target) {
+        for (Permission p : this.permission) {
+            if (target.isEquals(p)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 

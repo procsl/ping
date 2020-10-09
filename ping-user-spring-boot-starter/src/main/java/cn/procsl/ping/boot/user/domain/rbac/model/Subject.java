@@ -13,8 +13,8 @@ import java.util.Set;
 
 @Setter(AccessLevel.PROTECTED) // for jpa
 @Getter
-@EqualsAndHashCode(exclude = "roles")
-@ToString
+@EqualsAndHashCode(exclude = "role")
+@ToString(exclude = "role")
 @Table
 @Entity(name = "${User.Subject}")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)// for jpa
@@ -24,7 +24,7 @@ import java.util.Set;
 public class Subject implements DomainEntity<Long> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "table_sequences")
     @Access(AccessType.PROPERTY)
     Long id;
 
