@@ -1,7 +1,5 @@
 package cn.procsl.ping.boot.user.domain.rbac.service;
 
-import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository;
-import cn.procsl.ping.boot.user.domain.rbac.model.Node;
 import cn.procsl.ping.boot.user.domain.rbac.model.Permission;
 import cn.procsl.ping.boot.user.domain.rbac.model.Role;
 import cn.procsl.ping.boot.user.domain.rbac.model.Target;
@@ -11,19 +9,17 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static cn.procsl.ping.boot.user.domain.rbac.service.RoleService.R;
 
 @Slf4j
 @RunWith(SpringRunner.class)
@@ -40,9 +36,6 @@ public class RoleServiceTest {
 
     @Inject
     EntityManager entityManager;
-
-    @Inject
-    AdjacencyTreeRepository<Role, Long, Node> treeRepository;
 
     private Long mainMenuId;
 
@@ -65,7 +58,8 @@ public class RoleServiceTest {
         permissionService.create("菜单管理权限", "读");
         permissionService.create("角色管理权限", "读");
 
-        root = roleService.create("超级管理员", null, Arrays.asList(mainMenuId, userMenuId, menuMenuId));
+        root = roleService.createByIds("超级管理员", Arrays.asList(mainMenuId, userMenuId, menuMenuId));
+        entityManager.flush();
         entityManager.clear();
     }
 
@@ -94,11 +88,12 @@ public class RoleServiceTest {
         Assert.assertFalse(role.getState());
     }
 
-    @Test(expected = DataIntegrityViolationException.class)
+    @Test(expected = PersistenceException.class)
     public void create() {
 
         {
-            Long roleId = roleService.create("运营角色", root, Arrays.asList(menuMenuId, userMenuId));
+            Long roleId = roleService.createByIds("运营角色", Arrays.asList(menuMenuId, userMenuId));
+            entityManager.flush();
             entityManager.clear();
             Assert.assertNotNull(roleId);
             Role role = this.roleService.getOne(roleId);
@@ -112,7 +107,8 @@ public class RoleServiceTest {
         }
 
         {
-            Long roleId = roleService.create("其他角色", root, Arrays.asList(menuMenuId, userMenuId, mainMenuId));
+            Long roleId = roleService.createByIds("其他角色", Arrays.asList(mainMenuId));
+            entityManager.flush();
             entityManager.clear();
             Assert.assertNotNull(roleId);
             Role role = this.roleService.getOne(roleId);
@@ -126,7 +122,8 @@ public class RoleServiceTest {
         }
 
         {
-            Long roleId = roleService.create("其他角色1", root, null);
+            Long roleId = roleService.createByIds("其他角色1", null);
+            entityManager.flush();
             entityManager.clear();
             Assert.assertNotNull(roleId);
             Role role = this.roleService.getOne(roleId);
@@ -135,33 +132,10 @@ public class RoleServiceTest {
         }
 
         {
-            roleService.create("其他角色", root, null);
+            roleService.create("其他角色", null);
+            entityManager.flush();
         }
 
-    }
-
-    @Test
-    public void testCreate() {
-        Long roleId = roleService.create("角色1", root, null);
-        {
-            List<Long> parents = this.treeRepository.getParents(R.id, roleId).collect(Collectors.toList());
-            Assert.assertTrue(parents.contains(roleId));
-            Assert.assertTrue(parents.contains(root));
-            Assert.assertEquals(2, parents.size());
-            entityManager.clear();
-        }
-
-        {
-            List<Long> children = this.treeRepository.getAllChildren(R.id, roleId).collect(Collectors.toList());
-            Assert.assertTrue(children.isEmpty());
-            entityManager.clear();
-        }
-
-        {
-            List<Long> rootChildren = this.treeRepository.getDirectChildren(R.id, root).collect(Collectors.toList());
-            boolean bool = rootChildren.contains(roleId);
-            Assert.assertTrue(bool);
-        }
     }
 
     @Test
@@ -221,15 +195,6 @@ public class RoleServiceTest {
 
             Assert.assertEquals(2, rooted.size());
         }
-    }
-
-    @Test
-    public void searchOne() {
-        roleService.create("管理员", root, Arrays.asList(mainMenuId, userMenuId));
-        entityManager.clear();
-        Role admin = this.roleService.searchOne("超级管理员/管理员");
-        Assert.assertEquals("管理员", admin.getName());
-        Assert.assertEquals(root, admin.getParentId());
     }
 
 

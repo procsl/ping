@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.domain.business.state.model;
 
+import javax.persistence.Transient;
 import java.io.Serializable;
 
 /**
@@ -21,5 +22,8 @@ public interface BooleanStateful<ID extends Serializable> extends Stateful<ID, B
     default void enable() {
         setState(ENABLE_STATE);
     }
+
+    @Transient
+    boolean isEnable();
 
 }

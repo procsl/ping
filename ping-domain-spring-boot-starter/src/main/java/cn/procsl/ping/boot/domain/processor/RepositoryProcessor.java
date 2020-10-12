@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.domain.processor;
 
-import cn.procsl.ping.boot.domain.annotation.CreateRepository;
+import cn.procsl.ping.boot.domain.annotation.RepositoryCreator;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
@@ -95,7 +95,7 @@ public class RepositoryProcessor extends AbstractProcessor {
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
-        return singleton(CreateRepository.class.getName());
+        return singleton(RepositoryCreator.class.getName());
     }
 
     @Override
@@ -299,7 +299,7 @@ public class RepositoryProcessor extends AbstractProcessor {
     private String createPackageName(TypeElement entity) {
 
         do {
-            CreateRepository repo = entity.getAnnotation(CreateRepository.class);
+            RepositoryCreator repo = entity.getAnnotation(RepositoryCreator.class);
             if (repo == null) {
                 break;
             }
@@ -412,7 +412,7 @@ public class RepositoryProcessor extends AbstractProcessor {
             return matcher;
         }
 
-        CreateRepository repo = entity.getAnnotation(CreateRepository.class);
+        RepositoryCreator repo = entity.getAnnotation(RepositoryCreator.class);
         if (repo == null) {
             return matcher;
         }

@@ -1,10 +1,10 @@
 package cn.procsl.ping.boot.user.domain.rbac.model;
 
-import cn.procsl.ping.boot.domain.annotation.CreateRepository;
+import cn.procsl.ping.boot.domain.annotation.RepositoryCreator;
 import cn.procsl.ping.boot.domain.business.state.model.BooleanStateful;
 import cn.procsl.ping.boot.domain.business.utils.CollectionUtils;
 import cn.procsl.ping.boot.domain.support.executor.DomainEventListener;
-import cn.procsl.ping.boot.user.domain.common.AbstractTree;
+import cn.procsl.ping.business.domain.DomainEntity;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,15 +14,15 @@ import java.util.Set;
 
 @Setter(AccessLevel.PROTECTED)
 @Getter
-@EqualsAndHashCode(exclude = {"path", "subject", "permission"})
-@ToString(exclude = {"path", "subject", "permission"})
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "depth", "parentId"})})
-@Entity(name = "${User.Role}")
+@EqualsAndHashCode(exclude = {"subject", "permission"})
+@ToString(exclude = {"subject", "permission"})
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"name"})})
+@Entity(name = "$user:role")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Slf4j
 @EntityListeners(DomainEventListener.class)
-@CreateRepository
-public class Role extends AbstractTree<Long, Node> implements BooleanStateful<Long> {
+@RepositoryCreator
+public class Role implements BooleanStateful<Long>, DomainEntity<Long> {
 
     public final static int ROLE_NAME_LEN = 20;
 
@@ -34,12 +34,11 @@ public class Role extends AbstractTree<Long, Node> implements BooleanStateful<Lo
     protected Long id;
 
     @ManyToMany
-    @JoinTable(name = "${User.subject_role}")
+    @JoinTable(name = "$user:subject_role")
     protected Set<Subject> subject;
 
-    @JoinTable(name = "${User.role_permission}")
+    @JoinTable(name = "$user:role_permission")
     @ManyToMany
-    @Setter(AccessLevel.PUBLIC)
     protected Set<Permission> permission;
 
     @Column(length = ROLE_NAME_LEN, nullable = false)
@@ -47,53 +46,18 @@ public class Role extends AbstractTree<Long, Node> implements BooleanStateful<Lo
     protected String name;
 
     @Column(nullable = false)
-    protected Long parentId;
-
-    @Column(nullable = false)
-    protected Integer depth;
-
-    @Column(nullable = false)
     @Setter(AccessLevel.PUBLIC)
     protected Boolean state;
 
-    @ElementCollection
-    @CollectionTable(joinColumns = @JoinColumn(name = "id"))
-    @Setter(AccessLevel.PUBLIC)
-    protected Set<Node> path;
-
-    public Role(@NonNull String name, Role parent, Collection<Permission> perms) {
+    public Role(@NonNull String name, Collection<Permission> perms) {
         this.name = name;
-        this.changeParent(parent);
         this.permission = CollectionUtils.createAndAppend(this.permission, perms);
         this.enable();
-    }
-
-    @Override
-    protected void setId(Long id) {
-        this.id = id;
-        if (parentId == null) {
-            this.parentId = id;
-        }
-    }
-
-    @Override
-    public Node currentPathNode() {
-        return new Node(this.id, this.depth);
     }
 
     public void changePermissions(Collection<Permission> permissions) {
         CollectionUtils.nullSafeClear(this.permission);
         this.permission = CollectionUtils.createAndAppend(this.permission, permissions);
-    }
-
-    /**
-     * 查找分隔符
-     *
-     * @return 分隔符
-     */
-    @Override
-    public String findDelimiter() {
-        return DELIMITER;
     }
 
     /**
@@ -131,5 +95,11 @@ public class Role extends AbstractTree<Long, Node> implements BooleanStateful<Lo
         }
         return false;
     }
+
+    @Override
+    public boolean isEnable() {
+        return state;
+    }
+
 }
 

@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @Getter
 @ToString(exclude = {"path"})
 @EqualsAndHashCode(exclude = {"path"})
-@Entity(name = "${Domain.Tree}")
+@Entity(name = "$domain:tree")
 @Table
 @EntityListeners(DomainEventListener.class)
 @DynamicUpdate

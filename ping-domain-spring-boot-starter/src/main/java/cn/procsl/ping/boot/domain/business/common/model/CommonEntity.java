@@ -15,7 +15,7 @@ import javax.persistence.*;
  */
 @EntityListeners(AuditingEntityListener.class)
 @MappedSuperclass
-public interface CommonEntity extends DomainEntity {
+public interface CommonEntity<ID> extends DomainEntity<ID> {
 
     @Version
     @ColumnDefault("0")

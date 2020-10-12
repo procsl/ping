@@ -9,12 +9,9 @@ import org.hibernate.boot.model.naming.Identifier;
 import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
 import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-
-import static cn.procsl.ping.boot.domain.business.utils.StringUtils.isEmpty;
 
 /**
  * @author procsl
@@ -27,6 +24,14 @@ public class LowCasePhysicalNamingStrategy implements PhysicalNamingStrategy {
     final DomainProperties dataProperties;
 
     private final Converter<String, String> converter = CaseFormat.LOWER_CAMEL.converterTo(CaseFormat.LOWER_UNDERSCORE);
+
+    private final static Set<String> WHITELIST = new HashSet<>();
+
+    {
+        WHITELIST.add("DTYPE");
+        WHITELIST.add("ID");
+        WHITELIST.add("id");
+    }
 
     @Override
     public Identifier toPhysicalCatalogName(Identifier name, JdbcEnvironment jdbcEnvironment) {
@@ -43,12 +48,28 @@ public class LowCasePhysicalNamingStrategy implements PhysicalNamingStrategy {
         if (name == null) {
             return null;
         }
-        boolean isModel = isModelPattern(name.getText());
-        String text = replace(isModel, name.getText());
-        String newName = getName(isModel, text);
-        String prefix = getPrefix(isModel, text, newName);
 
-        String conStr = convertTo(prefix, newName);
+        if (WHITELIST.contains(name.getText())) {
+            return name;
+        }
+
+        String tmp = name.getText();
+        Map<String, String> prefixs = this.dataProperties.getModulePrefix();
+        for (String key : prefixs.keySet()) {
+            String fmt = String.format("_$%s:", key);
+            tmp = tmp.replace(fmt, "_");
+
+            String fmtFirst = String.format("$%s:", key);
+            String vle = prefixs.get(key);
+            if (vle == null || vle.isEmpty()) {
+                vle = "";
+            } else {
+                vle = vle.concat(this.dataProperties.getDot());
+            }
+            tmp = tmp.replace(fmtFirst, vle);
+        }
+
+        String conStr = convertTo(tmp);
         log.debug("Entity:{} mapping table{}", name.getText(), conStr);
         return Identifier.toIdentifier(conStr);
     }
@@ -65,40 +86,6 @@ public class LowCasePhysicalNamingStrategy implements PhysicalNamingStrategy {
         return text;
     }
 
-    private String getPrefix(boolean isModel, String text, String name) {
-        String prefix = this.dataProperties.getTablePrefix();
-
-        if (!isModel) {
-            return isEmpty(prefix) ? "" : prefix;
-        }
-
-        String[] nameSeg = name.split("_");
-
-        for (int i = 0; i < nameSeg.length - 1; i++) {
-            String tmp = nameSeg[i] + "_";
-            text = text.replaceAll(tmp, "");
-        }
-        text = text.replaceAll(nameSeg[nameSeg.length - 1], "");
-
-        Map<String, Long> counts = Arrays.stream(text.split("\\."))
-            .collect(Collectors.groupingBy(i -> i, Collectors.counting()));
-
-        long max = counts.values().stream().mapToLong(item -> item).max().orElse(0L);
-        if (max == 0L) {
-            return "";
-        }
-
-        for (Map.Entry<String, Long> entry : counts.entrySet()) {
-            if (entry.getValue().equals(max)) {
-                String key = entry.getKey();
-                Map<String, String> map = this.dataProperties.getModulePrefix();
-                prefix = map.getOrDefault(key, prefix);
-                continue;
-            }
-        }
-
-        return isEmpty(prefix) ? "" : prefix;
-    }
 
     @Override
     public Identifier toPhysicalSequenceName(Identifier name, JdbcEnvironment jdbcEnvironment) {
@@ -110,31 +97,24 @@ public class LowCasePhysicalNamingStrategy implements PhysicalNamingStrategy {
         if (name == null) {
             return null;
         }
-        boolean isModel = isModelPattern(name.getText());
-        String text = replace(isModel, name.getText());
-        String newName = getName(isModel, text);
-        String conStr = convertTo("", newName);
+
+        if (WHITELIST.contains(name.getText())) {
+            return name;
+        }
+
+        String tmp = name.getText();
+        Map<String, String> prefixs = this.dataProperties.getModulePrefix();
+        for (String key : prefixs.keySet()) {
+            String fmt = String.format("$%s:", key);
+            tmp = tmp.replace(fmt, "");
+        }
+
+        String conStr = convertTo(tmp);
         return Identifier.toIdentifier(conStr);
     }
 
-    public String replace(boolean isModel, String text) {
-        if (isModel) {
-            text = text.replaceAll("\\$|\\{|\\}", "");
-        }
-        return text;
-    }
-
-    public boolean isModelPattern(String name) {
-        return name.contains("$") || name.contains("{") || name.contains("}");
-    }
-
-    public String convertTo(String prefix, String text) {
-
-        if (!prefix.isEmpty()) {
-            prefix = prefix.concat(this.dataProperties.getDot());
-        }
-
-        String conStr = converter.convert(prefix.concat(text));
+    public String convertTo(String text) {
+        String conStr = converter.convert(text);
         do {
             conStr = conStr.replace("__", "_");
         } while (conStr.contains("__"));

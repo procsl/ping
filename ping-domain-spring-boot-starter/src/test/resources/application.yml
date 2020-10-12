@@ -22,5 +22,5 @@ spring:
 ping:
   domain:
     module-prefix: # 用于测试
-      Domain: dt
-      User: u
+      domain: dt
+      user: u

@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.user.domain.rbac.model;
 
-import cn.procsl.ping.boot.domain.annotation.CreateRepository;
+import cn.procsl.ping.boot.domain.annotation.RepositoryCreator;
 import cn.procsl.ping.boot.domain.support.executor.DomainEventListener;
 import cn.procsl.ping.business.domain.DomainEntity;
 import lombok.*;
@@ -15,15 +15,13 @@ import java.util.Set;
 @EqualsAndHashCode(exclude = {"role"})
 @ToString(exclude = {"role"})
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"operator", "resource"})})
-@Entity(name = "${User.Permission}")
+@Entity(name = "$user:permission")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Slf4j
 @EntityListeners(DomainEventListener.class)
-@CreateRepository
+@RepositoryCreator
 @Immutable
 public class Permission implements Target, DomainEntity<Long> {
-
-    public final static QPermission Q = QPermission.permission;
 
     final public static int OPS_LEN = 5;
 
@@ -42,7 +40,7 @@ public class Permission implements Target, DomainEntity<Long> {
     String resource;
 
     @ManyToMany
-    @JoinTable(name = "${User.role_permission}")
+    @JoinTable(name = "$user:role_permission")
     Set<Role> role;
 
     public Permission(@NonNull String resource,

@@ -9,13 +9,15 @@ import cn.procsl.ping.boot.user.domain.dictionary.model.Dictionary;
 import cn.procsl.ping.boot.user.domain.dictionary.repository.CustomDictionaryRepository;
 import cn.procsl.ping.boot.user.domain.dictionary.repository.CustomDictionaryRepositoryImpl;
 import cn.procsl.ping.boot.user.domain.dictionary.service.DictionaryService;
-import cn.procsl.ping.boot.user.domain.rbac.model.Node;
 import cn.procsl.ping.boot.user.domain.rbac.model.Permission;
 import cn.procsl.ping.boot.user.domain.rbac.model.Role;
 import cn.procsl.ping.boot.user.domain.rbac.model.Subject;
 import cn.procsl.ping.boot.user.domain.rbac.service.PermissionService;
 import cn.procsl.ping.boot.user.domain.rbac.service.RoleService;
 import cn.procsl.ping.boot.user.domain.rbac.service.SubjectService;
+import cn.procsl.ping.boot.user.domain.user.model.Account;
+import cn.procsl.ping.boot.user.domain.user.model.User;
+import cn.procsl.ping.boot.user.domain.user.service.UserService;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,13 +46,16 @@ import javax.persistence.EntityManager;
 @EnableJpaRepositories(basePackages = {
     "cn.procsl.ping.boot.user.domain.dictionary.repository",
     "cn.procsl.ping.boot.user.domain.rbac.repository",
+    "cn.procsl.ping.boot.user.domain.user.repository",
 },
     repositoryFactoryBeanClass = DomainRepositoryFactoryBean.class,
     bootstrapMode = BootstrapMode.LAZY
 )
 @EntityScan(basePackages = {
     "cn.procsl.ping.boot.user.domain.dictionary.model",
-    "cn.procsl.ping.boot.user.domain.rbac.model"
+    "cn.procsl.ping.boot.user.domain.rbac.model",
+    "cn.procsl.ping.boot.user.domain.user.model",
+    "cn.procsl.ping.boot.user.domain.common.model",
 })
 @RequiredArgsConstructor
 public class UserAutoConfiguration {
@@ -105,14 +110,12 @@ public class UserAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public RoleService RoleService(AdjacencyTreeRepository<Role, Long, Node> currentTreeRepository,
-                                   QuerydslPredicateExecutor<Role> querydslRepository,
+    public RoleService RoleService(QuerydslPredicateExecutor<Role> querydslRepository,
                                    PermissionService permissionService,
                                    JpaRepository<Role, Long> jpaRepository,
                                    BooleanStatefulRepository<Role, Long> booleanStatefulRepository
     ) {
-        return new RoleService(currentTreeRepository,
-            querydslRepository,
+        return new RoleService(querydslRepository,
             permissionService,
             jpaRepository,
             booleanStatefulRepository);
@@ -125,6 +128,18 @@ public class UserAutoConfiguration {
                                          QuerydslPredicateExecutor<Subject> querydslRepository,
                                          RoleService roleService) {
         return new SubjectService(jpaRepository, querydslRepository, roleService);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public UserService userService(
+        JpaRepository<User, String> jpaRepository,
+        QuerydslPredicateExecutor<User> querydslRepository,
+        QuerydslPredicateExecutor<Account> accountRepo,
+        JpaRepository<Account, Long> jpaAccountRepository,
+        BooleanStatefulRepository<User, String> booleanStatefulRepository
+    ) {
+        return new UserService(jpaRepository, querydslRepository, jpaAccountRepository, accountRepo, booleanStatefulRepository);
     }
 
 }

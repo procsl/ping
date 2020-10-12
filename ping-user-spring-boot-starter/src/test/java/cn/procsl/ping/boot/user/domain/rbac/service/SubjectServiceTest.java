@@ -1,9 +1,7 @@
 package cn.procsl.ping.boot.user.domain.rbac.service;
 
-import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository;
-import cn.procsl.ping.boot.user.domain.rbac.model.Node;
 import cn.procsl.ping.boot.user.domain.rbac.model.Permission;
-import cn.procsl.ping.boot.user.domain.rbac.model.Role;
+import cn.procsl.ping.boot.user.domain.rbac.model.Subject;
 import cn.procsl.ping.boot.user.domain.rbac.model.Target;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
@@ -18,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,17 +39,7 @@ public class SubjectServiceTest {
     @Inject
     RoleService roleService;
 
-    @Inject
-    AdjacencyTreeRepository<Role, Long, Node> treeRepository;
-    private Long admin;
-    private Long admin1;
-    private Long admin2;
-
     private List<Target> list;
-
-    private Long id;
-
-    private List<Long> perms;
 
     @Before
     public void setUp() throws Exception {
@@ -63,66 +51,39 @@ public class SubjectServiceTest {
         for (Target target : list) {
             this.permissionService.create(target);
         }
-        perms = this.permissionService
+        this.permissionService
             .getByTargets(list)
             .stream()
             .map(Permission::getId)
             .collect(Collectors.toList());
-        id = roleService.create("超级管理员", (Long) null, null);
+        roleService.create("超级管理员", null);
+        roleService.create("管理员", list);
+        roleService.create("管理员1", list);
+        roleService.create("管理", list);
+        entityManager.flush();
         entityManager.clear();
     }
 
     @Test
-    public void create() {
-        admin = roleService.create("管理员", "超级管理员", list);
-        admin1 = roleService.create("管理员1", "超级管理员", list);
-        admin2 = roleService.create("管理", "超级管理员/管理员", list);
+    public void bind() {
+        Long subjectId = this.subjectService.bind("xxx", Collections.singleton("超级管理员"));
+        entityManager.flush();
+        entityManager.clear();
+        Subject sub = this.subjectService.findById(subjectId);
+        Assert.assertNotNull(sub);
+        Assert.assertNotNull(sub.getRole());
+        Assert.assertEquals(1, sub.getRole().size());
     }
 
     @Test
-    public void createByRoleId() {
-        Long i = roleService.create("这这这", id, perms);
-        Assert.assertNotNull(i);
-        Role role = roleService.getOne(i);
-        Assert.assertEquals(role.getName(), "这这这");
-        Assert.assertEquals(role.getParentId(), id);
+    public void bind1() {
+        Long subjectId = this.subjectService.bind("xxx", Arrays.asList("超级管理员"));
+        entityManager.flush();
+        entityManager.clear();
+        Subject sub = this.subjectService.findById(subjectId);
+        Assert.assertNotNull(sub);
+        Assert.assertNotNull(sub.getRole());
+        Assert.assertEquals(1, sub.getRole().size());
     }
 
-    @Test
-    public void changeRole() {
-        roleService.changePermission(id, list);
-        Role role = roleService.getOne(id);
-
-        Collection<Permission> ls = permissionService.getByTargets(list);
-
-        Assert.assertEquals(role.getPermission().size(), ls.size());
-        for (Permission l : ls) {
-            boolean bool = role.getPermission().contains(l);
-            Assert.assertTrue(bool);
-        }
-
-        for (Permission permission : role.getPermission()) {
-            boolean bool = ls.contains(permission);
-            Assert.assertTrue(bool);
-        }
-    }
-
-    @Test
-    public void changeRoleById() {
-        this.roleService.changePermissionById(id, perms);
-        Role role = roleService.getOne(id);
-
-        Collection<Permission> ls = permissionService.getByTargets(list);
-
-        Assert.assertEquals(role.getPermission().size(), ls.size());
-        for (Permission l : ls) {
-            boolean bool = role.getPermission().contains(l);
-            Assert.assertTrue(bool);
-        }
-
-        for (Permission permission : role.getPermission()) {
-            boolean bool = ls.contains(permission);
-            Assert.assertTrue(bool);
-        }
-    }
 }

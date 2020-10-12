@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.user.domain.common;
+package cn.procsl.ping.boot.user.domain.common.service;
 
 import cn.procsl.ping.boot.domain.business.utils.CollectionUtils;
 import cn.procsl.ping.business.domain.DomainEntity;

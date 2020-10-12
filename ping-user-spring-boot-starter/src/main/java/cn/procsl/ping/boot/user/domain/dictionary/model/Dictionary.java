@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.user.domain.dictionary.model;
 
-import cn.procsl.ping.boot.domain.annotation.CreateRepository;
+import cn.procsl.ping.boot.domain.annotation.RepositoryCreator;
 import cn.procsl.ping.boot.domain.business.state.model.BooleanStateful;
 import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyNode;
 import cn.procsl.ping.boot.domain.support.executor.DomainEventListener;
@@ -27,11 +27,11 @@ import java.util.function.Supplier;
 @EqualsAndHashCode
 @ToString(exclude = {"path", "payload"})
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"space", "parentId"})})
-@Entity(name = "${User.Dictionary}")
+@Entity(name = "$user:dictionary")
 @NoArgsConstructor
 @Slf4j
 @EntityListeners(DomainEventListener.class)
-@CreateRepository
+@RepositoryCreator
 public class Dictionary implements AdjacencyNode<Long, DictPath>, BooleanStateful<Long> {
 
     @Id
@@ -187,6 +187,11 @@ public class Dictionary implements AdjacencyNode<Long, DictPath>, BooleanStatefu
             throw new IllegalArgumentException("space存在非法字符(用于分隔符):" + delimiter.get());
         }
         this.setSpace(spaceName);
+    }
+
+    @Override
+    public boolean isEnable() {
+        return state;
     }
 
     /**

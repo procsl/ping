@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.user.domain.common;
+package cn.procsl.ping.boot.user.domain.common.service;
 
 import cn.procsl.ping.boot.domain.business.state.model.BooleanStateful;
 import cn.procsl.ping.boot.domain.business.state.repository.BooleanStatefulRepository;

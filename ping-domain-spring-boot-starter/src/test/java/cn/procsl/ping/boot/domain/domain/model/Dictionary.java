@@ -12,7 +12,7 @@ import javax.persistence.*;
  * querydsl冲突测试
  */
 @Data
-@Entity(name = "${Domain.Dictionary}")
+@Entity(name = "$domain:Dictionary")
 @Table
 @EntityListeners(DomainEventListener.class)
 @DynamicUpdate

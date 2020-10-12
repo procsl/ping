@@ -18,4 +18,7 @@ public final class StringUtils {
         return (str == null || str.isEmpty());
     }
 
+    public static boolean isNotEmpty(@Nullable String str) {
+        return !isEmpty(str);
+    }
 }

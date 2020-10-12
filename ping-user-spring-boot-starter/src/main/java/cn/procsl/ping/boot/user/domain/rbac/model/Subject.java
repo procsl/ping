@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.user.domain.rbac.model;
 
-import cn.procsl.ping.boot.domain.annotation.CreateRepository;
+import cn.procsl.ping.boot.domain.annotation.RepositoryCreator;
 import cn.procsl.ping.boot.domain.business.utils.CollectionUtils;
 import cn.procsl.ping.boot.domain.support.executor.DomainEventListener;
 import cn.procsl.ping.business.domain.DomainEntity;
@@ -15,12 +15,12 @@ import java.util.Set;
 @Getter
 @EqualsAndHashCode(exclude = "role")
 @ToString(exclude = "role")
-@Table
-@Entity(name = "${User.Subject}")
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = "userId"))
+@Entity(name = "$user:subject")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)// for jpa
 @Slf4j
 @EntityListeners(DomainEventListener.class)
-@CreateRepository
+@RepositoryCreator
 public class Subject implements DomainEntity<Long> {
 
     @Id
@@ -28,12 +28,16 @@ public class Subject implements DomainEntity<Long> {
     @Access(AccessType.PROPERTY)
     Long id;
 
-    @JoinTable(name = "${User.subject_role}")
+    @Column(length = UUID_LENGTH, updatable = false, nullable = false)
+    String userId;
+
+    @JoinTable(name = "$user:subject_role")
     @ManyToMany
     Set<Role> role;
 
-    public Subject(Collection<Role> roles) {
+    public Subject(String userId, Collection<Role> roles) {
         this.role = CollectionUtils.createAndAppend(this.role, roles);
+        this.userId = userId;
     }
 
     public void changeRoles(Collection<Role> roles) {

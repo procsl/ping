@@ -1,6 +1,6 @@
 package cn.procsl.ping.demo.domain.entity;
 
-import cn.procsl.ping.boot.domain.annotation.CreateRepository;
+import cn.procsl.ping.boot.domain.annotation.RepositoryCreator;
 import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyNode;
 
 import javax.persistence.*;
@@ -10,7 +10,7 @@ import java.util.Set;
 
 @Entity
 @Table
-@CreateRepository
+@RepositoryCreator
 public class Tree implements AdjacencyNode<String, PathNode>, Serializable {
 
     @Id

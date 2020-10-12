@@ -16,13 +16,13 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 @Documented
 @Target(TYPE)
 @Retention(SOURCE)
-public @interface CreateRepository {
+public @interface RepositoryCreator {
 
     /**
      * 可以手动指定当前实体生成的 builder
      * 如果未手动指定,则使用全局的builder
      *
-     * @return
+     * @return 代码生成器实现
      */
     String[] builders() default {};
 
@@ -36,14 +36,14 @@ public @interface CreateRepository {
      * 则包名为: cn.procsl.ping.boot.repository
      * 可以设置全局 配置
      *
-     * @return package name
+     * @return 点分包名位置
      */
     int indexOf() default -1;
 
     /**
      * 固定包名, 若指定, 则直接使用此包名
      *
-     * @return
+     * @return 默认固定的包名
      */
     String packageName() default "";
 

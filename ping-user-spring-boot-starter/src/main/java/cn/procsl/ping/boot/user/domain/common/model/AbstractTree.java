@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.user.domain.common;
+package cn.procsl.ping.boot.user.domain.common.model;
 
 import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyNode;
 import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyPathNode;

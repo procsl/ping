@@ -1,7 +1,7 @@
 package cn.procsl.ping.boot.user.domain.rbac.service;
 
 import cn.procsl.ping.boot.domain.business.utils.CollectionUtils;
-import cn.procsl.ping.boot.user.domain.common.AbstractService;
+import cn.procsl.ping.boot.user.domain.common.service.AbstractService;
 import cn.procsl.ping.boot.user.domain.rbac.model.Permission;
 import cn.procsl.ping.boot.user.domain.rbac.model.QPermission;
 import cn.procsl.ping.boot.user.domain.rbac.model.Target;

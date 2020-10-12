@@ -19,7 +19,7 @@ import static cn.procsl.ping.business.domain.DomainEntity.UUID_LENGTH;
  * @author procsl
  * @date 2019/12/14
  */
-@Entity(name = "${Domain.User}")
+@Entity(name = "$domain.user")
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = "name")})
 @Getter
 @Setter

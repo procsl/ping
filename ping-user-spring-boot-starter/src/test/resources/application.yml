@@ -28,4 +28,5 @@ debug: false
 ping:
   domain:
     module-prefix:
-      "User": u
+      user: u
+      domain: d
