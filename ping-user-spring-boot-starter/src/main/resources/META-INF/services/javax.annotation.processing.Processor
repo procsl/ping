@@ -1,2 +1,2 @@
 com.querydsl.apt.jpa.JPAAnnotationProcessor
-cn.procsl.ping.boot.domain.processor.RepositoryProcessor
+cn.procsl.ping.apt.processor.RepositoryProcessor

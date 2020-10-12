@@ -47,6 +47,13 @@
             <scope>compile</scope>
         </dependency>
 
+        <dependency>
+            <groupId>cn.procsl</groupId>
+            <artifactId>ping-apt-processor</artifactId>
+            <version>0.0.2-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
         <dependency>
             <groupId>com.zaxxer</groupId>

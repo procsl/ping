@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.user.domain.rbac.model;
 
-import cn.procsl.ping.boot.domain.annotation.RepositoryCreator;
+import cn.procsl.ping.apt.annotation.RepositoryCreator;
 import cn.procsl.ping.boot.domain.business.state.model.BooleanStateful;
 import cn.procsl.ping.boot.domain.business.utils.CollectionUtils;
 import cn.procsl.ping.boot.domain.support.executor.DomainEventListener;

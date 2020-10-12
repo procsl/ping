@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.user.domain.user.model;
 
-import cn.procsl.ping.boot.domain.annotation.RepositoryCreator;
+import cn.procsl.ping.apt.annotation.RepositoryCreator;
 import cn.procsl.ping.business.domain.DomainId;
 import cn.procsl.ping.business.exception.BusinessException;
 import com.google.common.hash.Hashing;
