@@ -1,8 +1,6 @@
-package cn.procsl.ping.boot.domain.processor.builder;
+package cn.procsl.ping.apt.processor.builder;
 
-import cn.procsl.ping.boot.domain.business.state.model.BooleanStateful;
-import cn.procsl.ping.boot.domain.business.state.repository.BooleanStatefulRepository;
-import cn.procsl.ping.boot.domain.processor.EntityAndIdRepositoryBuilder;
+import cn.procsl.ping.apt.processor.EntityAndIdRepositoryBuilder;
 import com.squareup.javapoet.TypeName;
 
 import javax.annotation.processing.RoundEnvironment;
@@ -10,17 +8,20 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 
+
 public class BooleanStatefulRepositoryBuilder extends EntityAndIdRepositoryBuilder {
 
 
     private TypeMirror booleanStatefulType;
+
 
     /**
      * 内部初始化
      */
     @Override
     protected void innerInit() {
-        TypeMirror tmp = processingEnvironment.getElementUtils().getTypeElement(BooleanStateful.class.getName()).asType();
+        CharSequence name = "cn.procsl.ping.boot.domain.business.state.model.BooleanStateful";
+        TypeMirror tmp = processingEnvironment.getElementUtils().getTypeElement(name).asType();
         booleanStatefulType = processingEnvironment.getTypeUtils().erasure(tmp);
     }
 
@@ -30,12 +31,12 @@ public class BooleanStatefulRepositoryBuilder extends EntityAndIdRepositoryBuild
      * @return 返回支持的Repository 对象
      */
     @Override
-    protected Class<?> getSupportRepositoryClass() {
-        return BooleanStatefulRepository.class;
+    protected Class<?> getSupportRepositoryClass() throws ClassNotFoundException {
+        return Class.forName("cn.procsl.ping.boot.domain.business.state.repository.BooleanStatefulRepository");
     }
 
     @Override
-    public TypeName build(TypeElement entity, RoundEnvironment roundEnv) {
+    public TypeName build(TypeElement entity, RoundEnvironment roundEnv) throws ClassNotFoundException {
         Types typeUtils = this.processingEnvironment.getTypeUtils();
 
         TypeMirror tmp = typeUtils.erasure(entity.asType());

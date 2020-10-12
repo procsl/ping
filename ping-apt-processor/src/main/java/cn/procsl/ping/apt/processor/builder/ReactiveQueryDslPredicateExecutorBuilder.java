@@ -1,7 +1,6 @@
-package cn.procsl.ping.boot.domain.processor.builder;
+package cn.procsl.ping.apt.processor.builder;
 
-import cn.procsl.ping.boot.domain.processor.EntityRepositoryBuilder;
-import org.springframework.data.querydsl.ReactiveQuerydslPredicateExecutor;
+import cn.procsl.ping.apt.processor.EntityRepositoryBuilder;
 
 /**
  * @author procsl
@@ -9,8 +8,8 @@ import org.springframework.data.querydsl.ReactiveQuerydslPredicateExecutor;
  */
 public class ReactiveQueryDslPredicateExecutorBuilder extends EntityRepositoryBuilder {
     @Override
-    protected Class<ReactiveQuerydslPredicateExecutor> getSupportRepositoryClass() {
-        return ReactiveQuerydslPredicateExecutor.class;
+    protected Class<?> getSupportRepositoryClass() throws ClassNotFoundException {
+        return Class.forName("org.springframework.data.querydsl.ReactiveQuerydslPredicateExecutor");
     }
 
     @Override

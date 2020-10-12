@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.domain.annotation;
+package cn.procsl.ping.apt.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

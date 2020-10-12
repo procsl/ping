@@ -1,0 +1,8 @@
+cn.procsl.ping.apt.processor.builder.JpaRepositoryBuilder
+cn.procsl.ping.apt.processor.builder.CrudRepositoryBuilder
+cn.procsl.ping.apt.processor.builder.JpaSpecificationExecutorBuilder
+cn.procsl.ping.apt.processor.builder.PagingAndSortingRepositoryBuilder
+cn.procsl.ping.apt.processor.builder.QueryDslPredicateExecutorBuilder
+cn.procsl.ping.apt.processor.builder.ReactiveQueryDslPredicateExecutorBuilder
+cn.procsl.ping.apt.processor.builder.AdjacencyTreeRepositoryBuilder
+cn.procsl.ping.apt.processor.builder.BooleanStatefulRepositoryBuilder

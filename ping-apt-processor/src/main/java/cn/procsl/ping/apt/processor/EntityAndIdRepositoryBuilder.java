@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.domain.processor;
+package cn.procsl.ping.apt.processor;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
@@ -14,7 +14,7 @@ import javax.lang.model.element.TypeElement;
 public abstract class EntityAndIdRepositoryBuilder extends AbstractRepositoryBuilder {
 
     @Override
-    public TypeName build(TypeElement entity, RoundEnvironment roundEnv) {
+    public TypeName build(TypeElement entity, RoundEnvironment roundEnv) throws ClassNotFoundException {
         ClassName repositoryType = ClassName.get(this.getSupportRepositoryClass());
 
         TypeName idType = createIdType(entity);

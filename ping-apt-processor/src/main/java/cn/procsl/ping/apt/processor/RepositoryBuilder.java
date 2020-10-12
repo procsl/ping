@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.domain.processor;
+package cn.procsl.ping.apt.processor;
 
 import com.squareup.javapoet.TypeName;
 
@@ -39,7 +39,7 @@ public interface RepositoryBuilder {
      * @param className 待测试的Repository类型名称
      * @return 返回是否支持该Repository
      */
-    boolean support(String className);
+    boolean support(String className) throws ClassNotFoundException;
 
     /**
      * 构建接口元素
@@ -48,7 +48,7 @@ public interface RepositoryBuilder {
      * @param roundEnv 当前编译器上下文
      * @return 返回接口标识
      */
-    TypeName build(TypeElement entity, RoundEnvironment roundEnv);
+    TypeName build(TypeElement entity, RoundEnvironment roundEnv) throws ClassNotFoundException;
 
     /**
      * 是否独立实现, 不同时继承多个(某些接口有冲突的情况下)

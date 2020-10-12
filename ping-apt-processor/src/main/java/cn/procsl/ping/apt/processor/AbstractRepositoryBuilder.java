@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.domain.processor;
+package cn.procsl.ping.apt.processor;
 
 import com.squareup.javapoet.TypeName;
 import lombok.NonNull;
@@ -34,7 +34,7 @@ public abstract class AbstractRepositoryBuilder implements RepositoryBuilder {
     /**
      * 初始化接口
      *
-     * @param processingEnv
+     * @param processingEnv 编译器环境
      */
     @Override
     public final void init(ProcessingEnvironment processingEnv, Function<String, String> configFinder) {
@@ -55,10 +55,10 @@ public abstract class AbstractRepositoryBuilder implements RepositoryBuilder {
      *
      * @return 返回支持的Repository 对象
      */
-    protected abstract Class<?> getSupportRepositoryClass();
+    protected abstract Class<?> getSupportRepositoryClass() throws ClassNotFoundException;
 
     @Override
-    public boolean support(@NonNull String className) {
+    public boolean support(@NonNull String className) throws ClassNotFoundException {
         return this.getSupportRepositoryClass().getName().equals(className);
     }
 

@@ -1,13 +1,6 @@
-package cn.procsl.ping.boot.domain.processor.builder;
+package cn.procsl.ping.apt.processor.builder;
 
-import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyNode;
-import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyPathNode;
-import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository;
-import cn.procsl.ping.boot.domain.business.utils.CollectionUtils;
-import cn.procsl.ping.boot.domain.processor.AbstractRepositoryBuilder;
-import cn.procsl.ping.business.domain.DomainEntity;
-import cn.procsl.ping.business.domain.DomainEvents;
-import cn.procsl.ping.business.domain.DomainId;
+import cn.procsl.ping.apt.processor.AbstractRepositoryBuilder;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
@@ -25,14 +18,11 @@ import java.util.List;
 
 import static com.squareup.javapoet.TypeName.get;
 
+
 @Slf4j
 public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
 
     private Types type;
-
-    private Elements ele;
-
-    private TypeElement adjacencyType;
 
     private TypeMirror node;
 
@@ -44,6 +34,11 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
 
     private TypeMirror domainEvents;
 
+    final static String adjacencyNodeName = "cn.procsl.ping.boot.domain.business.tree.model.AdjacencyNode";
+    final static String adjacencyPathNodeName = "cn.procsl.ping.boot.domain.business.tree.model.AdjacencyPathNode";
+    final static String domainEntityName = "cn.procsl.ping.business.domain.DomainEntity";
+    final static String domainIdName = "cn.procsl.ping.business.domain.DomainId";
+    final static String domainEventsName = "cn.procsl.ping.business.domain.DomainEvents";
 
     /**
      * 内部初始化
@@ -51,15 +46,15 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
     @Override
     protected void innerInit() {
         type = this.processingEnvironment.getTypeUtils();
-        ele = this.processingEnvironment.getElementUtils();
-        adjacencyType = ele.getTypeElement(AdjacencyNode.class.getName());
+        Elements ele = this.processingEnvironment.getElementUtils();
+        TypeElement adjacencyType = ele.getTypeElement(adjacencyNodeName);
         // 删除泛型
         node = this.type.erasure(adjacencyType.asType());
-        path = this.type.erasure(this.ele.getTypeElement(AdjacencyPathNode.class.getName()).asType());
+        path = this.type.erasure(ele.getTypeElement(adjacencyPathNodeName).asType());
 
-        domainEntity = this.type.erasure(this.ele.getTypeElement(DomainEntity.class.getName()).asType());
-        domainId = this.type.erasure(this.ele.getTypeElement(DomainId.class.getName()).asType());
-        domainEvents = this.type.erasure(this.ele.getTypeElement(DomainEvents.class.getName()).asType());
+        domainEntity = this.type.erasure(ele.getTypeElement(domainEntityName).asType());
+        domainId = this.type.erasure(ele.getTypeElement(domainIdName).asType());
+        domainEvents = this.type.erasure(ele.getTypeElement(domainEventsName).asType());
     }
 
     protected DeclaredType getSubType(TypeElement entity) {
@@ -69,7 +64,7 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
 
         List<TypeElement> elementsInf = new LinkedList<>();
         List<TypeMirror> mirrorsInf = new LinkedList<>();
-        this.findSuperClass(entity, entity.asType(), elementsClass, mirrorsClass);
+        this.findSuperClass(entity.asType(), elementsClass, mirrorsClass);
 
         // 查找所有的接口
         for (TypeElement element : elementsClass) {
@@ -111,7 +106,7 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
      * @param element  指定的元素
      * @param elements 容器
      */
-    protected void findSuperClass(TypeElement entity, @NonNull TypeMirror element,
+    protected void findSuperClass(@NonNull TypeMirror element,
                                   @NonNull List<TypeElement> elements,
                                   @NonNull List<TypeMirror> mirrors) {
         TypeElement tmp = this.convert(element);
@@ -131,7 +126,7 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
 
         mirrors.add(element);
         elements.add(tmp);
-        this.findSuperClass(entity, tmp.getSuperclass(), elements, mirrors);
+        this.findSuperClass(tmp.getSuperclass(), elements, mirrors);
 
     }
 
@@ -142,7 +137,7 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
         if (mirro == null) {
             return;
         }
-        if (CollectionUtils.isEmpty(tmp.getInterfaces())) {
+        if (tmp.getInterfaces() == null || tmp.getInterfaces().isEmpty()) {
             return;
         }
 
@@ -160,21 +155,21 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
      * @return 返回支持的Repository 对象
      */
     @Override
-    protected Class<AdjacencyTreeRepository> getSupportRepositoryClass() {
-        return AdjacencyTreeRepository.class;
+    protected Class getSupportRepositoryClass() throws ClassNotFoundException {
+        return Class.forName("cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository");
     }
 
     /**
      * 构建接口元素
      * 则直接返回空,表示不支持
-     * 如果实体中没有找到 NodePath 或者实体不是继承于 {@link cn.procsl.ping.boot.domain.business.tree.model.AdjacencyNode}
+     * 如果实体中没有找到 NodePath 或者实体不是继承于  cn.procsl.ping.boot.domain.business.tree.model.AdjacencyNode
      *
      * @param entity   当前的实体
      * @param roundEnv 当前编译器上下文
      * @return 返回接口标识
      */
     @Override
-    public TypeName build(TypeElement entity, RoundEnvironment roundEnv) {
+    public TypeName build(TypeElement entity, RoundEnvironment roundEnv) throws ClassNotFoundException {
 
         TypeName idType = createIdType(entity);
         if (idType == null) {
@@ -183,7 +178,7 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
 
         DeclaredType tmp = this.getSubType(entity);
         if (tmp == null) {
-            log.info("Not implement {} interface, skip!", AdjacencyNode.class.getName());
+            log.info("Not implement {} interface, skip!", adjacencyNodeName);
             return null;
         }
 
@@ -197,7 +192,7 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
         }
 
         if (pathType == null) {
-            log.warn("Not find: {} subType", AdjacencyPathNode.class.getName());
+            log.warn("Not find: {} subType", adjacencyNodeName);
             return null;
         }
 
@@ -205,7 +200,7 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
             pathType = ((TypeVariable) pathType).getUpperBound();
         }
 
-        TypeName pathNode = createPathNodeType(entity, pathType);
+        TypeName pathNode = createPathNodeType(pathType);
 
         TypeName entityType = createEntityType(entity);
 
@@ -217,10 +212,9 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
     /**
      * 需要查找当前实体上的PathNode范型对应的类
      *
-     * @param element
-     * @return
+     * @return TypeName
      */
-    protected TypeName createPathNodeType(TypeElement element, TypeMirror mirror) {
+    protected TypeName createPathNodeType(TypeMirror mirror) {
         return get(mirror);
     }
 
@@ -242,7 +236,7 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
     /**
      * 转化节点
      *
-     * @param mirror
+     * @param mirror TypeMirror
      * @return 如果可以转换为TypeElement则返回, 否则返回null
      */
     public TypeElement convert(TypeMirror mirror) {

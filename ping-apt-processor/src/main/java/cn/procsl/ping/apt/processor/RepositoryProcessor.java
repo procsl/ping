@@ -1,16 +1,11 @@
-package cn.procsl.ping.boot.domain.processor;
+package cn.procsl.ping.apt.processor;
 
-import cn.procsl.ping.boot.domain.annotation.RepositoryCreator;
+import cn.procsl.ping.apt.annotation.RepositoryCreator;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Indexed;
-import org.springframework.stereotype.Repository;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -27,11 +22,12 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static cn.procsl.ping.boot.domain.processor.RepositoryBuilder.*;
+import static cn.procsl.ping.apt.processor.RepositoryBuilder.*;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
 import static javax.tools.Diagnostic.Kind.ERROR;
 import static javax.tools.Diagnostic.Kind.WARNING;
+
 
 /**
  * 1. 扫描所有的实体引用
@@ -145,7 +141,7 @@ public class RepositoryProcessor extends AbstractProcessor {
      * @param packageName 包名
      * @throws IOException 当文件写入失败时发生
      */
-    private void generateSingletonSourceCode(TypeElement entity, String packageName, RoundEnvironment roundEnv) throws IOException {
+    private void generateSingletonSourceCode(TypeElement entity, String packageName, RoundEnvironment roundEnv) throws IOException, ClassNotFoundException {
 
         List<RepositoryBuilder> matcher = this.matcher(this.singletonBuilders, entity);
         if (matcher.isEmpty()) {
@@ -187,13 +183,14 @@ public class RepositoryProcessor extends AbstractProcessor {
 
         String tmp = this.getConfig(include);
 
-        if (StringUtils.isEmpty(tmp)) {
+        if (tmp == null || tmp.isEmpty()) {
             messager.printMessage(WARNING, "Create default repositories");
             log.warn("Create default repositories");
             includes = Collections.singletonList("org.springframework.data.jpa.repository.JpaRepository");
         } else {
             includes = Arrays.stream(tmp.split(","))
-                .filter(item -> !StringUtils.isEmpty(item))
+                .filter(Objects::nonNull)
+                .filter(item -> !item.isEmpty())
                 .map(String::trim)
                 .distinct()
                 .filter(this::isAvailable)
@@ -233,7 +230,7 @@ public class RepositoryProcessor extends AbstractProcessor {
     protected String getConfig(String key) {
         // 首先从config加载
         Object prop = this.config.get(key);
-        if (ObjectUtils.isEmpty(prop)) {
+        if (prop == null) {
             return this.processingEnv.getOptions().get(key);
         }
 
@@ -257,7 +254,7 @@ public class RepositoryProcessor extends AbstractProcessor {
      * @param roundEnv    上下文
      * @param packageName 包名
      */
-    private void generateSourceCode(TypeElement entity, String packageName, RoundEnvironment roundEnv) throws IOException {
+    private void generateSourceCode(TypeElement entity, String packageName, RoundEnvironment roundEnv) throws IOException, ClassNotFoundException {
 
         // 类名
         String className = this.createClassName(entity, "");
@@ -284,7 +281,7 @@ public class RepositoryProcessor extends AbstractProcessor {
      */
     private String createClassName(Element entity, String sign) {
         String tmp = this.getConfig(prefix);
-        if (StringUtils.isEmpty(tmp)) {
+        if (tmp == null || tmp.isEmpty()) {
             tmp = "";
         }
         return tmp + entity.getSimpleName() + sign + "Repository";
@@ -305,7 +302,7 @@ public class RepositoryProcessor extends AbstractProcessor {
             }
             // 绝对包名
             String pgName = repo.packageName();
-            if (StringUtils.hasText(pgName)) {
+            if (!pgName.isEmpty()) {
                 return pgName;
             }
 
@@ -328,7 +325,7 @@ public class RepositoryProcessor extends AbstractProcessor {
                 name = String.join(".", join);
             }
 
-            if (StringUtils.hasText(name)) {
+            if (!name.isEmpty()) {
                 return name.concat(".repository");
             }
         }
@@ -336,7 +333,7 @@ public class RepositoryProcessor extends AbstractProcessor {
 
         // 全局配置包名
         String packageName = this.getConfig(pageName);
-        if (StringUtils.hasText(packageName)) {
+        if (packageName != null && (!packageName.isEmpty())) {
             return packageName;
         }
 
@@ -351,11 +348,11 @@ public class RepositoryProcessor extends AbstractProcessor {
      * @param className 类名称
      * @return 返回repository对象
      */
-    private TypeSpec.Builder buildRepository(String className) {
+    private TypeSpec.Builder buildRepository(String className) throws ClassNotFoundException {
+        Class<?> clazz = Class.forName("org.springframework.stereotype.Repository");
         return TypeSpec
             .interfaceBuilder(className)
-            .addAnnotation(Repository.class)
-            .addAnnotation(Indexed.class)
+            .addAnnotation(clazz)
             .addModifiers(Modifier.PUBLIC);
     }
 
@@ -377,7 +374,12 @@ public class RepositoryProcessor extends AbstractProcessor {
 
         HashSet<TypeName> types = new HashSet<>();
         for (RepositoryBuilder builder : matcher) {
-            TypeName type = builder.build(entity, environment);
+            TypeName type = null;
+            try {
+                type = builder.build(entity, environment);
+            } catch (ClassNotFoundException e) {
+                log.error("ClassNotFount:", e);
+            }
             if (type != null) {
                 types.add(type);
             }
@@ -394,15 +396,19 @@ public class RepositoryProcessor extends AbstractProcessor {
      * @return 返回匹配成功的构建器
      */
     private List<RepositoryBuilder> matcher(List<RepositoryBuilder> builders, Element entity) {
-        if (CollectionUtils.isEmpty(builders)) {
+        if (builders == null || builders.isEmpty()) {
             return Collections.emptyList();
         }
 
         List<RepositoryBuilder> matcher = new LinkedList<>();
         for (RepositoryBuilder builder : builders) {
             for (String include : this.includes) {
-                if (builder.support(include)) {
-                    matcher.add(builder);
+                try {
+                    if (builder.support(include)) {
+                        matcher.add(builder);
+                    }
+                } catch (ClassNotFoundException e) {
+                    log.error("ClassNotFount:", e);
                 }
             }
         }
@@ -426,8 +432,12 @@ public class RepositoryProcessor extends AbstractProcessor {
         List<RepositoryBuilder> tmp = new LinkedList<>();
         for (String builder : currentBuilders) {
             for (RepositoryBuilder repositoryBuilder : matcher) {
-                if (repositoryBuilder.support(builder)) {
-                    tmp.add(repositoryBuilder);
+                try {
+                    if (repositoryBuilder.support(builder)) {
+                        tmp.add(repositoryBuilder);
+                    }
+                } catch (ClassNotFoundException e) {
+                    log.error("ClassNotFount:", e);
                 }
             }
         }
