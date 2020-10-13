@@ -4,8 +4,8 @@ import cn.procsl.ping.apt.processor.AbstractRepositoryBuilder;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
@@ -19,8 +19,9 @@ import java.util.List;
 import static com.squareup.javapoet.TypeName.get;
 
 
-@Slf4j
 public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
+
+    private static final Logger log = LoggerFactory.getLogger(AdjacencyTreeRepositoryBuilder.class);
 
     private Types type;
 
@@ -106,9 +107,9 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
      * @param element  指定的元素
      * @param elements 容器
      */
-    protected void findSuperClass(@NonNull TypeMirror element,
-                                  @NonNull List<TypeElement> elements,
-                                  @NonNull List<TypeMirror> mirrors) {
+    protected void findSuperClass(TypeMirror element,
+                                  List<TypeElement> elements,
+                                  List<TypeMirror> mirrors) {
         TypeElement tmp = this.convert(element);
         if (element == null) {
             return;
@@ -130,9 +131,9 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
 
     }
 
-    protected void findInterfaces(@NonNull TypeMirror mirro,
-                                  @NonNull List<TypeElement> elements,
-                                  @NonNull List<TypeMirror> mirrors) {
+    protected void findInterfaces(TypeMirror mirro,
+                                  List<TypeElement> elements,
+                                  List<TypeMirror> mirrors) {
         TypeElement tmp = this.convert(mirro);
         if (mirro == null) {
             return;

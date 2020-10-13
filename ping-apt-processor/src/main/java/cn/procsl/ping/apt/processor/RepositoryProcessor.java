@@ -4,8 +4,8 @@ import cn.procsl.ping.apt.annotation.RepositoryCreator;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-import lombok.Cleanup;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -37,8 +37,9 @@ import static javax.tools.Diagnostic.Kind.WARNING;
  * @author procsl
  * @date 2020/05/18
  */
-@Slf4j
 public class RepositoryProcessor extends AbstractProcessor {
+
+    private static final Logger log = LoggerFactory.getLogger(RepositoryProcessor.class);
 
     private Messager messager;
 
@@ -71,11 +72,11 @@ public class RepositoryProcessor extends AbstractProcessor {
      * 加载基础配置
      */
     private void initConfig() {
-        try {
-            @Cleanup
+        try (
             InputStream is = filer
                 .getResource(StandardLocation.CLASS_PATH, "", factory)
-                .openInputStream();
+                .openInputStream()
+        ) {
 
             Properties properties = new Properties();
             properties.load(is);

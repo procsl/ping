@@ -1,6 +1,6 @@
 #服务端口
 server:
-  port: 8080
+  port: 10000
 
 #服务名称
 spring:
@@ -19,9 +19,6 @@ spring:
 
     #hibernate配
     hibernate:
-      naming:
-        physical-strategy: cn.procsl.ping.boot.domain.naming.LowCasePhysicalNamingStrategy
-        implicit-strategy: cn.procsl.ping.boot.domain.naming.NameImplicitNamingStrategy
       use-new-id-generator-mappings: true
       ddl-auto: update
 
@@ -48,7 +45,14 @@ spring:
     database-change-log-table: admin_app_changeme_log
     enabled: false
 
+ping:
+  domain:
+    module-prefix:
+      user: u
+
+
+
 #      开启debug模式
-#debug: true
+debug: false
 
 

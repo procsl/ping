@@ -1,8 +1,8 @@
 package cn.procsl.ping.apt.processor;
 
 import com.squareup.javapoet.TypeName;
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
@@ -18,8 +18,9 @@ import static com.squareup.javapoet.TypeName.get;
  * @author procsl
  * @date 2020/06/21
  */
-@Slf4j
 public abstract class AbstractRepositoryBuilder implements RepositoryBuilder {
+
+    private static final Logger log = LoggerFactory.getLogger(AbstractRepositoryBuilder.class);
 
     /**
      * 获取编译器工具
@@ -58,7 +59,7 @@ public abstract class AbstractRepositoryBuilder implements RepositoryBuilder {
     protected abstract Class<?> getSupportRepositoryClass() throws ClassNotFoundException;
 
     @Override
-    public boolean support(@NonNull String className) throws ClassNotFoundException {
+    public boolean support(String className) throws ClassNotFoundException {
         return this.getSupportRepositoryClass().getName().equals(className);
     }
 
@@ -68,7 +69,7 @@ public abstract class AbstractRepositoryBuilder implements RepositoryBuilder {
      * @param entity 对应的实体
      * @return 实体中ID对应的类型, 如果id未被标记, 则返回null
      */
-    public TypeName createIdType(@NonNull TypeElement entity) {
+    public TypeName createIdType(TypeElement entity) {
         List<? extends Element> elements = entity.getEnclosedElements();
         for (Element element : elements) {
             Id id = element.getAnnotation(Id.class);
@@ -87,7 +88,7 @@ public abstract class AbstractRepositoryBuilder implements RepositoryBuilder {
      * @param entity 实体
      * @return 实体对应的类型描述
      */
-    public TypeName createEntityType(@NonNull TypeElement entity) {
+    public TypeName createEntityType( TypeElement entity) {
         return get(entity.asType());
     }
 
@@ -112,7 +113,7 @@ public abstract class AbstractRepositoryBuilder implements RepositoryBuilder {
      * @param prop 配置名称
      * @return 返回配置
      */
-    protected String getConfig(@NonNull String prop) {
+    protected String getConfig( String prop) {
         return configFinder.apply(prop);
     }
 }

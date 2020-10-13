@@ -57,7 +57,7 @@
                             com.querydsl.apt.jpa.JPAAnnotationProcessor
                         </annotationProcessor>
                         <annotationProcessor>
-                            cn.procsl.ping.boot.domain.processor.RepositoryProcessor
+                            cn.procsl.ping.apt.processor.RepositoryProcessor
                         </annotationProcessor>
                     </annotationProcessors>
 
