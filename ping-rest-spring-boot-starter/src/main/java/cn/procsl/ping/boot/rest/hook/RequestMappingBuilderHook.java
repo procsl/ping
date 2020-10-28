@@ -1,14 +1,17 @@
 package cn.procsl.ping.boot.rest.hook;
 
 import cn.procsl.ping.boot.rest.annotation.ApiVersion;
+import cn.procsl.ping.boot.rest.annotation.Hypermedia;
 import cn.procsl.ping.boot.rest.annotation.NotApiVersion;
+import cn.procsl.ping.boot.rest.annotation.Ok;
 import cn.procsl.ping.boot.rest.config.RestWebProperties;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.MimeType;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -18,7 +21,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static cn.procsl.ping.boot.rest.config.RestWebProperties.MetaMediaType.*;
-import static java.util.Arrays.binarySearch;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 
@@ -29,6 +31,8 @@ import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 public class RequestMappingBuilderHook implements RegisterMappingHook {
 
     private final RestWebProperties properties;
+
+    private final String[] text = new String[]{MediaType.TEXT_HTML_VALUE, MediaType.TEXT_PLAIN_VALUE};
 
     private final String[] consumer;
 
@@ -48,29 +52,20 @@ public class RequestMappingBuilderHook implements RegisterMappingHook {
         if (mediaTypes.containsKey(yaml)) {
             link.push("application/yaml");
         }
-        this.consumer = link.toArray(new String[link.size()]);
+        this.consumer = link.toArray(new String[0]);
 
         if (properties.getRepresentationStrategy() == RestWebProperties.RepresentationStrategy.system_mime) {
             this.product = consumer;
         } else {
             link.clear();
-            mediaTypes.forEach((k, v) -> link.addAll(v.stream().map(item -> item.toString()).collect(Collectors.toList())));
-            this.product = link.toArray(new String[link.size()]);
+            mediaTypes.forEach((k, v) -> link.addAll(v.stream().map(MimeType::toString).collect(Collectors.toList())));
+            this.product = link.toArray(new String[0]);
         }
     }
 
-    /**
-     * 构建路径
-     *
-     * @param mapping
-     * @param clazz
-     * @param method
-     * @param isClass
-     * @param paths
-     * @return
-     */
+
     @Override
-    public String[] paths(RequestMapping mapping, Class clazz, Method method, boolean isClass, String[] paths) {
+    public String[] paths(RequestMapping mapping, Class<?> clazz, Method method, boolean isClass, String[] paths) {
         if (!isClass) {
             return paths;
         }
@@ -87,51 +82,26 @@ public class RequestMappingBuilderHook implements RegisterMappingHook {
     }
 
     @Override
-    public String[] consumer(RequestMapping requestMapping, Class clazz, Method method, boolean isClass, String[] consumer) {
-        if (!ObjectUtils.isEmpty(consumer)) {
-            return consumer;
+    public String[] products(RequestMapping requestMapping, Class<?> clazz, Method method, boolean isClass, String[] products) {
+
+        Ok ok = AnnotatedElementUtils.getMergedAnnotation(method, Ok.class);
+        if (ok == null || ok.status().equals(HttpStatus.NO_CONTENT)) {
+            return new String[]{};
         }
 
-        boolean isApi = AnnotatedElementUtils.hasAnnotation(method, ResponseBody.class) || AnnotatedElementUtils.hasAnnotation(clazz, ResponseBody.class);
-        if (!isApi) {
-            return consumer;
+        boolean hypermedia = AnnotatedElementUtils.hasAnnotation(method, Hypermedia.class);
+        if (hypermedia) {
+            return this.product;
         }
 
-        RequestMethod[] methods = requestMapping.method();
-        // TODO 这里有问题, 傻逼了
-        boolean bool =
-                methods == null
-                        ||
-                        methods.length == 0
-                        ||
-                        binarySearch(methods, RequestMethod.GET) >= 0
-                        ||
-                        binarySearch(methods, RequestMethod.DELETE) >= 0
-                        ||
-                        binarySearch(methods, RequestMethod.OPTIONS) >= 0
-                        ||
-                        binarySearch(methods, RequestMethod.TRACE) >= 0
-                        ||
-                        binarySearch(methods, RequestMethod.HEAD) >= 0;
-
-        // 没有请求体的方法 不设置
-        if (bool) {
-            return consumer;
-        }
-
-        return this.consumer;
-    }
-
-    @Override
-    public String[] products(RequestMapping requestMapping, Class clazz, Method method, boolean isClass, String[] products) {
         if (!ObjectUtils.isEmpty(products)) {
             return products;
-        } boolean isApi = AnnotatedElementUtils.hasAnnotation(method, ResponseBody.class) ||
+        }
 
-
-                AnnotatedElementUtils.hasAnnotation(clazz, ResponseBody.class);
-        if (!isApi) {
-            return products;
+        Class<?> returnType = method.getReturnType();
+        boolean isPrimitive = ClassUtils.isPrimitiveOrWrapper(returnType) || CharSequence.class.isAssignableFrom(returnType);
+        if (isPrimitive) {
+            return text;
         }
 
         return this.product;
@@ -145,7 +115,7 @@ public class RequestMappingBuilderHook implements RegisterMappingHook {
         }
 
         ApiVersion apiVersionAnnotation = AnnotatedElementUtils.findMergedAnnotation(method, ApiVersion.class);
-        Integer version = 1;
+        int version = 1;
         if (apiVersionAnnotation != null) {
             version = apiVersionAnnotation.value();
         }
@@ -157,8 +127,7 @@ public class RequestMappingBuilderHook implements RegisterMappingHook {
             return new String[]{createPath(null, apiVersion)};
         }
 
-        List<String> result = Arrays.stream(paths).map(path -> createPath(path, apiVersion)).collect(Collectors.toList());
-        return result.toArray(new String[result.size()]);
+        return Arrays.stream(paths).map(path -> createPath(path, apiVersion)).toArray(String[]::new);
     }
 
     protected String createPath(String path, Integer apiVersion) {

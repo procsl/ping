@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.rest.resolver;
+package cn.procsl.ping.boot.rest.exception.resolver;
 
 import cn.procsl.ping.boot.rest.config.RestWebProperties;
 import cn.procsl.ping.boot.rest.view.JsonView;
@@ -11,6 +11,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import javax.servlet.ServletContext;
 import java.util.EnumMap;
@@ -36,7 +37,7 @@ public class RestViewResolver extends ContentNegotiatingViewResolver {
 
     private List<View> defaultViews;
 
-    final private RestWebProperties properties;
+    final private InternalResourceViewResolver internalResourceViewResolver;
 
     HashMap<String, MediaType> cache = new HashMap<>(10);
 
@@ -45,6 +46,9 @@ public class RestViewResolver extends ContentNegotiatingViewResolver {
 
         RequestAttributes attrs = RequestContextHolder.getRequestAttributes();
         List<MediaType> requestedMediaTypes = this.getMediaTypes(((ServletRequestAttributes) attrs).getRequest());
+        if (viewName.startsWith("redirect:") || viewName.startsWith("forward:")) {
+            return internalResourceViewResolver.resolveViewName(viewName, locale);
+        }
 
         if (requestedMediaTypes == null) {
             return this.defaultView;
@@ -104,7 +108,7 @@ public class RestViewResolver extends ContentNegotiatingViewResolver {
         }
 
         if (defaultViews.isEmpty()) {
-            this.defaultView = new JsonView(new JsonMapper(), this.properties.getModelKey());
+            this.defaultView = new JsonView(new JsonMapper(), RestWebProperties.modelKey);
             return;
         }
 

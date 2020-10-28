@@ -50,9 +50,8 @@ ping:
     module-prefix:
       user: u
 
-
-
 #      开启debug模式
 debug: false
-
-
+springdoc:
+  swagger-ui:
+    path: index.html

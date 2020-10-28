@@ -1,6 +1,7 @@
 package cn.procsl.ping.boot.rest.annotation;
 
 import org.springframework.core.annotation.AliasFor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -18,6 +19,7 @@ import java.lang.annotation.*;
 @Component
 @RequestMapping
 @ResponseBody
+@Ok(status = HttpStatus.CREATED, message = "创建成功")
 public @interface RestEndpoint {
 
     /**

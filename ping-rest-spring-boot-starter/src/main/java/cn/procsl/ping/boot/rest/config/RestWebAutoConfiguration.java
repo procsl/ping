@@ -1,9 +1,10 @@
 package cn.procsl.ping.boot.rest.config;
 
+import cn.procsl.ping.boot.rest.doc.SpringDocHook;
+import cn.procsl.ping.boot.rest.exception.resolver.RestViewResolver;
 import cn.procsl.ping.boot.rest.hook.RegisterMappingHook;
 import cn.procsl.ping.boot.rest.hook.RequestMappingBuilderHook;
 import cn.procsl.ping.boot.rest.mapping.RestRequestMappingHandlerMapping;
-import cn.procsl.ping.boot.rest.resolver.RestViewResolver;
 import cn.procsl.ping.boot.rest.serial.PropertyFilterMixin;
 import cn.procsl.ping.boot.rest.serial.SerializableFilter;
 import cn.procsl.ping.boot.rest.view.JsonView;
@@ -24,6 +25,7 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration;
@@ -41,6 +43,7 @@ import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
+import org.springframework.lang.NonNull;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.accept.ContentNegotiationManager;
@@ -48,6 +51,7 @@ import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.xml.MappingJackson2XmlView;
 
 import javax.servlet.Servlet;
@@ -150,25 +154,25 @@ public class RestWebAutoConfiguration implements ApplicationContextAware {
         this.objectMappers = new EnumMap<>(RestWebProperties.MetaMediaType.class);
         this.objectMappers.put(json, createJsonMapper(serializableFilter));
         this.objectMappers.put(xml, createXmlMapper(serializableFilter));
-        this.objectMappers.put(yaml, createYamlMapper(serializableFilter));
+        this.objectMappers.put(yaml, createYamlMapper());
     }
 
-    protected ObjectMapper createYamlMapper(SerializableFilter serializableFilter) {
+    protected ObjectMapper createYamlMapper() {
         return new ObjectMapper();
     }
 
     protected void createMediaTypes() {
         mediaTypes = new EnumMap<>(RestWebProperties.MetaMediaType.class);
-        Set<RestWebProperties.MetaMediaType> mediatypes =
-                this.properties.getMetaMediaTypes() == null || this.properties.getMetaMediaTypes().isEmpty()
-                        ? Collections.singleton(json) : this.properties.getMetaMediaTypes();
+        Set<RestWebProperties.MetaMediaType> mediaTypes =
+            this.properties.getMetaMediaTypes() == null || this.properties.getMetaMediaTypes().isEmpty()
+                ? Collections.singleton(json) : this.properties.getMetaMediaTypes();
 
         switch (this.properties.getRepresentationStrategy()) {
             case system_mime:
-                pushSystemMime(mediatypes);
+                pushSystemMime(mediaTypes);
                 break;
             case custom_mime:
-                pushCustomMime(mediatypes);
+                pushCustomMime(mediaTypes);
                 break;
         }
     }
@@ -193,15 +197,15 @@ public class RestWebAutoConfiguration implements ApplicationContextAware {
     private void pushCustomMime(Set<RestWebProperties.MetaMediaType> mediaTypes) {
         String mime = this.properties.getMimeSubtype() == null || this.properties.getMimeSubtype().isEmpty() ? "vnd.api" : this.properties.getMimeSubtype();
         mediaTypes.forEach(
-                type -> setMediaTypes(
-                        type,
-                        new MediaType("application", mime + "+" + type.name(), Charset.defaultCharset())
-                )
+            type -> setMediaTypes(
+                type,
+                new MediaType("application", mime + "+" + type.name(), Charset.defaultCharset())
+            )
         );
     }
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
 
@@ -214,9 +218,15 @@ public class RestWebAutoConfiguration implements ApplicationContextAware {
 
     @Bean
     @ConditionalOnMissingBean
-    public RestViewResolver viewResolver(BeanFactory beanFactory) {
+    public InternalResourceViewResolver internalResourceViewResolver() {
+        return new InternalResourceViewResolver();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public RestViewResolver viewResolver(BeanFactory beanFactory, InternalResourceViewResolver resolver) {
         ContentNegotiationManager bean = beanFactory.getBean(ContentNegotiationManager.class);
-        RestViewResolver tmp = new RestViewResolver(this.mediaTypes, this.properties);
+        RestViewResolver tmp = new RestViewResolver(this.mediaTypes, resolver);
         tmp.setOrder(Integer.MIN_VALUE);
         tmp.setUseNotAcceptableStatusCode(true);
         tmp.setContentNegotiationManager(bean);
@@ -262,7 +272,7 @@ public class RestWebAutoConfiguration implements ApplicationContextAware {
             return (JsonView) contentTypeMap.get(contentType);
         }
 
-        JsonView view = new JsonView(this.objectMappers.get(json), this.properties.getModelKey());
+        JsonView view = new JsonView(this.objectMappers.get(json), RestWebProperties.modelKey);
         view.setContentType(contentType);
         view.setUpdateContentLength(true);
 
@@ -276,7 +286,7 @@ public class RestWebAutoConfiguration implements ApplicationContextAware {
         }
 
         MappingJackson2XmlView view = new MappingJackson2XmlView((XmlMapper) this.objectMappers.get(xml));
-        view.setModelKey(this.properties.getModelKey());
+        view.setModelKey(RestWebProperties.modelKey);
         view.setContentType(contentType);
         view.setUpdateContentLength(true);
 
@@ -293,21 +303,34 @@ public class RestWebAutoConfiguration implements ApplicationContextAware {
 
     @Bean
     @ConditionalOnMissingBean
+    @ConditionalOnProperty(prefix = "springdoc.api-docs", value = "enabled", matchIfMissing = true)
+    public SpringDocHook springDocHook() {
+        return new SpringDocHook();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     public RestWebMvcConfigurer restWebMvcConfigurer() {
-        return new RestWebMvcConfigurer(this.mediaTypes, this.objectMappers, this.applicationContext, this.properties);
+        return new RestWebMvcConfigurer(this.mediaTypes, this.objectMappers, this.applicationContext);
     }
 
 
     @Bean
     public HttpMessageConverters httpMessageConverters() {
-        HttpMessageConverter[] converters = new HttpMessageConverter[]{
-                new StringHttpMessageConverter(),
-                new MappingJackson2HttpMessageConverter(),
-                new MappingJackson2XmlHttpMessageConverter(),
-                new ByteArrayHttpMessageConverter(),
-                new ResourceHttpMessageConverter()
+        HttpMessageConverter<?>[] converters = new HttpMessageConverter[]{
+            new StringHttpMessageConverter(),
+            new MappingJackson2HttpMessageConverter(),
+            new MappingJackson2XmlHttpMessageConverter(),
+            new ByteArrayHttpMessageConverter(),
+            new ResourceHttpMessageConverter()
         };
         return new HttpMessageConverters(false, Arrays.asList(converters));
     }
+
+//    @Bean
+//    @ConditionalOnMissingBean
+//    public AnnotationBodyAdvice annotationBodyAdvice() {
+//        return new AnnotationBodyAdvice();
+//    }
 
 }

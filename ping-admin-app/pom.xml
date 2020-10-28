@@ -31,13 +31,39 @@
             <groupId>cn.procsl</groupId>
             <artifactId>ping-rest-spring-boot-starter</artifactId>
             <version>0.0.2-SNAPSHOT</version>
-            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-webmvc-core</artifactId>
+            <version>1.4.8</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>1.4.8</version>
         </dependency>
 
         <dependency>
             <groupId>cn.procsl</groupId>
             <artifactId>ping-user-spring-boot-starter</artifactId>
             <version>0.0.2-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>logback-classic</artifactId>
+                    <groupId>ch.qos.logback</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                    <groupId>org.springframework.boot</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -100,19 +126,19 @@
     </dependencies>
 
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <!-- 从 Spring Boot 导入依赖管理 -->
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>2.3.3.RELEASE</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
+    <!--    <dependencyManagement>-->
+    <!--        <dependencies>-->
+    <!--            <dependency>-->
+    <!--                &lt;!&ndash; 从 Spring Boot 导入依赖管理 &ndash;&gt;-->
+    <!--                <groupId>org.springframework.boot</groupId>-->
+    <!--                <artifactId>spring-boot-dependencies</artifactId>-->
+    <!--                <version>2.3.3.RELEASE</version>-->
+    <!--                <type>pom</type>-->
+    <!--                <scope>import</scope>-->
+    <!--            </dependency>-->
+    <!--        </dependencies>-->
 
-    </dependencyManagement>
+    <!--    </dependencyManagement>-->
 
     <build>
         <finalName>${project.artifactId}-${project.version}</finalName>

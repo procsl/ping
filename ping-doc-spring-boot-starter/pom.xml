@@ -28,17 +28,19 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-ui</artifactId>
-            <version>1.2.32</version>
+            <version>1.4.8</version>
         </dependency>
 
 
@@ -46,13 +48,13 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-webmvc-core</artifactId>
-            <version>1.2.32</version>
+            <version>1.4.8</version>
             <exclusions>
                 <exclusion>
                     <groupId>io.github.classgraph</groupId>
@@ -67,11 +69,11 @@
             <version>4.8.44</version>
         </dependency>
 
-
         <dependency>
             <groupId>cn.procsl</groupId>
             <artifactId>ping-rest-spring-boot-starter</artifactId>
             <version>0.0.2-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

@@ -1,24 +1,21 @@
 package cn.procsl.ping.boot.rest.config;
 
-import cn.procsl.ping.boot.rest.resolver.RestHandlerExceptionResolver;
-import cn.procsl.ping.boot.rest.web.RestExtensionContentNegotiationStrategy;
+import cn.procsl.ping.boot.rest.exception.resolver.AnnotationHandlerExceptionResolver;
+import cn.procsl.ping.boot.rest.exception.resolver.ConfigureHandlerExceptionResolver;
+import cn.procsl.ping.boot.rest.exception.resolver.MethodArgumentNotValidExceptionResolver;
+import cn.procsl.ping.boot.rest.exception.resolver.RestHandlerExceptionResolver;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.InitializingBean;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
-import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.servlet.HandlerExceptionResolver;
-import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
-import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import javax.servlet.ServletContext;
 import java.util.EnumMap;
-import java.util.LinkedList;
 import java.util.List;
 
 import static cn.procsl.ping.boot.rest.config.RestWebProperties.MetaMediaType.json;
@@ -30,7 +27,8 @@ import static cn.procsl.ping.boot.rest.config.RestWebProperties.MetaMediaType.xm
  * @author procsl
  * @date 2020/03/13
  */
-public class RestWebMvcConfigurer implements WebMvcConfigurer, ServletContextAware, InitializingBean {
+@Slf4j
+public class RestWebMvcConfigurer implements WebMvcConfigurer {
 
 
     final EnumMap<RestWebProperties.MetaMediaType, List<MediaType>> mediaTypes;
@@ -39,43 +37,22 @@ public class RestWebMvcConfigurer implements WebMvcConfigurer, ServletContextAwa
 
     final ApplicationContext applicationContext;
 
-    final RestWebProperties properties;
-
-    RestExtensionContentNegotiationStrategy customerContextNegotiationStrategy;
-
-
     public RestWebMvcConfigurer(EnumMap<RestWebProperties.MetaMediaType, List<MediaType>> mediaTypes,
                                 EnumMap<RestWebProperties.MetaMediaType, ObjectMapper> objectMappers,
-                                ApplicationContext applicationContext, RestWebProperties properties) {
+                                ApplicationContext applicationContext) {
         this.mediaTypes = mediaTypes;
         this.objectMappers = objectMappers;
         this.applicationContext = applicationContext;
-        this.customerContextNegotiationStrategy = new RestExtensionContentNegotiationStrategy(mediaTypes);
-        this.properties = properties;
     }
 
-    @Override
-    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
-        configurer.favorPathExtension(false)
-                .favorParameter(false)
-                .defaultContentTypeStrategy(customerContextNegotiationStrategy)
-                .ignoreUnknownPathExtensions(true)
-                .useRegisteredExtensionsOnly(true);
-    }
-
-    @Override
-    public void configurePathMatch(PathMatchConfigurer configurer) {
-        configurer.setUseRegisteredSuffixPatternMatch(true)
-                .setUseSuffixPatternMatch(false)
-                .setUseTrailingSlashMatch(true);
-    }
 
     @Override
     public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
         resolvers.clear();
-        List<String> accepts = new LinkedList<>();
-        this.mediaTypes.forEach((k, v) -> v.forEach(item -> accepts.add(item.toString())));
-        resolvers.add(new RestHandlerExceptionResolver(this.properties, accepts));
+        resolvers.add(new MethodArgumentNotValidExceptionResolver());
+        resolvers.add(new AnnotationHandlerExceptionResolver());
+        resolvers.add(new ConfigureHandlerExceptionResolver());
+        resolvers.add(new RestHandlerExceptionResolver());
     }
 
 
@@ -94,7 +71,7 @@ public class RestWebMvcConfigurer implements WebMvcConfigurer, ServletContextAwa
             }
         }
 
-        {
+        if (jsonConvert != null) {
             ObjectMapper jsonMapper = this.objectMappers.get(json);
             Jackson2ObjectMapperBuilder builder = Jackson2ObjectMapperBuilder.json();
             builder.applicationContext(this.applicationContext);
@@ -102,7 +79,7 @@ public class RestWebMvcConfigurer implements WebMvcConfigurer, ServletContextAwa
             jsonConvert.setObjectMapper(jsonMapper);
         }
 
-        {
+        if (xmlConvert != null) {
             ObjectMapper xmlMapper = this.objectMappers.get(xml);
             Jackson2ObjectMapperBuilder builder = Jackson2ObjectMapperBuilder.json();
             builder.applicationContext(this.applicationContext);
@@ -133,16 +110,6 @@ public class RestWebMvcConfigurer implements WebMvcConfigurer, ServletContextAwa
         xmlConverter.setObjectMapper(xmlMapper);
         xmlConverter.setSupportedMediaTypes(this.mediaTypes.get(xml));
         return xmlConverter;
-    }
-
-    @Override
-    public void setServletContext(ServletContext servletContext) {
-        this.customerContextNegotiationStrategy.setServletContext(servletContext);
-    }
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        this.customerContextNegotiationStrategy.afterPropertiesSet();
     }
 
 

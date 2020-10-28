@@ -1,33 +1,19 @@
 package cn.procsl.ping.boot.rest.annotation;
 
+import org.springframework.core.annotation.AliasFor;
+import org.springframework.http.HttpStatus;
+
 import java.lang.annotation.*;
 
-/**
- * 表示已经成功创建资源,并且返回新资源的表示
- * 如果配置了资源的位置,将会使用返回值替换占位符
- * 将会返回201
- * location:https://api.procsl.cn/product/xxxx
- *
- * @author procsl
- * @date 2020/01/03
- */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
+@Ok(status = HttpStatus.CREATED, message = "创建成功")
 public @interface Created {
 
-    /**
-     * https://api.procsl.cn/product/{id}
-     *
-     * @return
-     */
-    String location() default "";
+    @AliasFor(annotation = Ok.class, attribute = "status")
+    HttpStatus status() default HttpStatus.CREATED;
 
-    /**
-     * 占位符的名称
-     *
-     * @return
-     */
-    String name() default "id";
-
+    @AliasFor(annotation = Ok.class, attribute = "message")
+    String message() default "创建成功";
 }

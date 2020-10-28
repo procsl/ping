@@ -25,7 +25,7 @@ public class RestWebProperties {
 
     private boolean indentOutput = true;
 
-    private String modelKey = "modelKey";
+    public final static String modelKey = RestWebProperties.class.getName() + "Key";
 
     /**
      * 支持的元媒体类型
