@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
-import static javax.tools.Diagnostic.Kind.ERROR;
 import static javax.tools.Diagnostic.Kind.WARNING;
 
 
@@ -53,6 +52,8 @@ public class RepositoryProcessor extends AbstractProcessor {
 
     private Map<Object, Object> config;
 
+    private boolean init = true;
+
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
@@ -64,8 +65,9 @@ public class RepositoryProcessor extends AbstractProcessor {
 
             initIncludes();
         } catch (Exception e) {
-            messager.printMessage(ERROR, "Initializing the annotation processor failed for a number of reasons: " + e.getMessage());
-            log.error("Initializing the annotation processor failed for a number of reasons: ", e);
+            messager.printMessage(WARNING, "Initializing the annotation processor failed for a number of reasons: " + e.getMessage());
+            log.warn("Initializing the annotation processor failed for a number of reasons: ", e);
+            init = false;
         }
     }
 
@@ -103,7 +105,7 @@ public class RepositoryProcessor extends AbstractProcessor {
 
     @Override
     public synchronized boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        if (roundEnv.processingOver()) {
+        if (init && roundEnv.processingOver()) {
             return false;
         }
 
@@ -127,7 +129,7 @@ public class RepositoryProcessor extends AbstractProcessor {
             }
 
         } catch (Exception e) {
-            messager.printMessage(ERROR, "The build of the source code failed:" + e.getMessage());
+            messager.printMessage(WARNING, "The build of the source code failed:" + e.getClass().getName() + ":" + e.getMessage());
             log.error("The build of the source code failed:", e);
             return false;
         }
@@ -154,6 +156,11 @@ public class RepositoryProcessor extends AbstractProcessor {
             String className = this.createClassName(entity, builder.getName());
 
             TypeMirror superInf = builder.generator(entity, roundEnv);
+            if (superInf == null) {
+                log.warn("This interface generation failed because the generator returned null:{}", builder.getClass().getName());
+                messager.printMessage(WARNING, "This interface generation failed because the generator returned null:" + builder.getClass().getName());
+                continue;
+            }
 
             TypeSpec typeSpec = this.buildRepository(className)
                 .addSuperinterface(TypeName.get(superInf))
@@ -372,9 +379,13 @@ public class RepositoryProcessor extends AbstractProcessor {
         HashSet<TypeName> types = new HashSet<>();
         for (RepositoryBuilder builder : matcher) {
             TypeMirror type = builder.generator(entity, environment);
-            if (type != null) {
-                types.add(TypeName.get(type));
+            if (type == null) {
+                log.warn("This interface generation failed because the generator returned null:{}", builder.getClass().getName());
+                messager.printMessage(WARNING, "This interface generation failed because the generator returned null:" + builders.getClass().getName());
+                continue;
             }
+
+            types.add(TypeName.get(type));
         }
         return types;
     }

@@ -48,15 +48,6 @@
                         <arg>-parameters</arg>
                         <arg>-Aquerydsl.useGetters=true</arg>
                     </compilerArgs>
-                    <annotationProcessors>
-                        <annotationProcessor>
-                            com.querydsl.apt.jpa.JPAAnnotationProcessor
-                        </annotationProcessor>
-                        <annotationProcessor>
-                            cn.procsl.ping.processor.repository.processor.RepositoryProcessor
-                        </annotationProcessor>
-                    </annotationProcessors>
-
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>
                 </configuration>

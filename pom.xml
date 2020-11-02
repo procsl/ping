@@ -20,6 +20,13 @@
     <modules>
         <module>ping-domain-spring-boot-starter</module>
         <module>ping-business-model</module>
+        <module>ping-domain-processor</module>
+        <module>ping-user-spring-boot-starter</module>
+        <module>ping-doc-spring-boot-starter</module>
+        <module>ping-admin-app</module>
+        <module>ping-demo</module>
+        <module>ping-rest-spring-boot-starter</module>
+        <module>ping-producer-spring-boot-starter</module>
     </modules>
     <name>ping</name>
 
