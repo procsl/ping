@@ -1,9 +1,11 @@
-package cn.procsl.ping.processor.repository.processor;
+package cn.procsl.ping.processor.repository;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -38,7 +40,7 @@ public interface RepositoryBuilder {
      * @param className 待测试的Repository类型名称
      * @return 返回是否支持该Repository
      */
-    boolean support(String className) throws ClassNotFoundException;
+    boolean support(String className);
 
     /**
      * 构建接口元素
@@ -47,7 +49,7 @@ public interface RepositoryBuilder {
      * @param roundEnv 当前编译器上下文
      * @return 返回接口标识
      */
-    TypeMirror generator(TypeElement entity, RoundEnvironment roundEnv);
+    Map<String, List<TypeMirror>> generator(TypeElement entity, RoundEnvironment roundEnv);
 
     /**
      * 是否独立实现, 不同时继承多个(某些接口有冲突的情况下)

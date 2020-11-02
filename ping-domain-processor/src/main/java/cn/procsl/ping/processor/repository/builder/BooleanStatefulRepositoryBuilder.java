@@ -1,13 +1,16 @@
 package cn.procsl.ping.processor.repository.builder;
 
-import cn.procsl.ping.processor.repository.processor.EntityAndIdRepositoryBuilder;
-import cn.procsl.ping.processor.repository.processor.RepositoryBuilder;
+import cn.procsl.ping.processor.repository.EntityAndIdRepositoryBuilder;
+import cn.procsl.ping.processor.repository.RepositoryBuilder;
 import com.google.auto.service.AutoService;
 
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 
 @AutoService(RepositoryBuilder.class)
@@ -36,7 +39,7 @@ public class BooleanStatefulRepositoryBuilder extends EntityAndIdRepositoryBuild
     }
 
     @Override
-    public TypeMirror generator(TypeElement entity, RoundEnvironment roundEnv) {
+    public Map<String, List<TypeMirror>> generator(TypeElement entity, RoundEnvironment roundEnv) {
         Types typeUtils = this.processingEnvironment.getTypeUtils();
 
         TypeMirror tmp = typeUtils.erasure(entity.asType());
@@ -44,6 +47,6 @@ public class BooleanStatefulRepositoryBuilder extends EntityAndIdRepositoryBuild
         if (bool) {
             return super.generator(entity, roundEnv);
         }
-        return null;
+        return Collections.emptyMap();
     }
 }

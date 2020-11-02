@@ -1,7 +1,7 @@
 package cn.procsl.ping.processor.repository.builder;
 
-import cn.procsl.ping.processor.repository.processor.AbstractRepositoryBuilder;
-import cn.procsl.ping.processor.repository.processor.RepositoryBuilder;
+import cn.procsl.ping.processor.repository.AbstractRepositoryBuilder;
+import cn.procsl.ping.processor.repository.RepositoryBuilder;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.TypeName;
 import lombok.extern.slf4j.Slf4j;
@@ -12,8 +12,10 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.*;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import static com.squareup.javapoet.TypeName.get;
 
@@ -165,9 +167,9 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
      * @return 返回接口标识
      */
     @Override
-    public TypeMirror generator(TypeElement entity, RoundEnvironment roundEnv) {
+    public Map<String, List<TypeMirror>> generator(TypeElement entity, RoundEnvironment roundEnv) {
 
-        TypeName idType = createIdType(entity);
+        TypeMirror idType = findIdType(entity);
         if (idType == null) {
             return null;
         }
@@ -196,16 +198,7 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
             pathType = ((TypeVariable) pathType).getUpperBound();
         }
 
-        TypeName pathNode = createPathNodeType(pathType);
-
-        TypeName entityType = createEntityType(entity);
-
-//        ClassName repositoryType = ClassName.get(this.getSupportRepositoryClass());
-//        ParameterizedTypeName typeName = ParameterizedTypeName.get(repositoryType, entityType, idType, pathNode);
-
-//        ParameterizedTypeName
-//        return elementUtils.getTypeElement(supportName + "<>");
-        return null;
+        return Map.of(this.getSupportRepositoryClass(), Arrays.asList(entity.asType(), idType, pathType));
     }
 
 

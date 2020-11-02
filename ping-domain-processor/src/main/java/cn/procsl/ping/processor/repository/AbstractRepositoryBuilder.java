@@ -1,17 +1,15 @@
-package cn.procsl.ping.processor.repository.processor;
+package cn.procsl.ping.processor.repository;
 
-import com.squareup.javapoet.TypeName;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeMirror;
 import javax.persistence.Id;
 import javax.tools.Diagnostic;
 import java.util.List;
 import java.util.function.Function;
-
-import static com.squareup.javapoet.TypeName.get;
 
 /**
  * @author procsl
@@ -67,12 +65,12 @@ public abstract class AbstractRepositoryBuilder implements RepositoryBuilder {
      * @param entity 对应的实体
      * @return 实体中ID对应的类型, 如果id未被标记, 则返回null
      */
-    public TypeName createIdType(TypeElement entity) {
+    public TypeMirror findIdType(TypeElement entity) {
         List<? extends Element> elements = entity.getEnclosedElements();
         for (Element element : elements) {
             Id id = element.getAnnotation(Id.class);
             if (id != null) {
-                return TypeName.get(element.asType());
+                return element.asType();
             }
         }
         this.processingEnvironment.getMessager().printMessage(Diagnostic.Kind.WARNING, "Not fount @Id annotation", entity);
@@ -80,15 +78,6 @@ public abstract class AbstractRepositoryBuilder implements RepositoryBuilder {
         return null;
     }
 
-    /**
-     * 创建实体对应的类型
-     *
-     * @param entity 实体
-     * @return 实体对应的类型描述
-     */
-    public TypeName createEntityType(TypeElement entity) {
-        return get(entity.asType());
-    }
 
     /**
      * 是否独立实现, 不同时继承多个(某些接口有冲突的情况下)

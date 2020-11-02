@@ -1,10 +1,8 @@
-package cn.procsl.ping.processor.repository.processor;
+package cn.procsl.ping.processor.repository;
 
 import cn.procsl.ping.processor.repository.annotation.RepositoryCreator;
 import com.google.auto.service.AutoService;
-import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.TypeName;
-import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.*;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.processing.*;
@@ -16,7 +14,6 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.persistence.Entity;
-import javax.tools.Diagnostic;
 import javax.tools.StandardLocation;
 import java.io.IOException;
 import java.io.InputStream;
@@ -155,17 +152,21 @@ public class RepositoryProcessor extends AbstractProcessor {
         for (RepositoryBuilder builder : matcher) {
             String className = this.createClassName(entity, builder.getName());
 
-            TypeMirror superInf = builder.generator(entity, roundEnv);
-            if (superInf == null) {
+            Map<String, List<TypeMirror>> type = builder.generator(entity, roundEnv);
+            if (type == null) {
                 log.warn("This interface generation failed because the generator returned null:{}", builder.getClass().getName());
                 messager.printMessage(WARNING, "This interface generation failed because the generator returned null:" + builder.getClass().getName());
                 continue;
             }
 
-            TypeSpec typeSpec = this.buildRepository(className)
-                .addSuperinterface(TypeName.get(superInf))
-                .build();
-            writer(packageName, typeSpec);
+            TypeSpec.Builder typeSpecBuilder = this.buildRepository(className);
+            type.forEach((k, v) -> {
+                TypeName[] mirrors = v.stream().map(TypeName::get).toArray(value -> new TypeName[v.size()]);
+                ClassName repositoryType = ClassName.get(this.processingEnv.getElementUtils().getTypeElement(k));
+                ParameterizedTypeName interfaceType = ParameterizedTypeName.get(repositoryType, mirrors);
+                typeSpecBuilder.addSuperinterface(interfaceType);
+            });
+            writer(packageName, typeSpecBuilder.build());
         }
     }
 
@@ -263,16 +264,15 @@ public class RepositoryProcessor extends AbstractProcessor {
         // 类名
         String className = this.createClassName(entity, "");
 
-        Iterable<? extends TypeName> inter = this.getMultipleInterfaceType(entity, roundEnv);
-        if (inter == null || !inter.iterator().hasNext()) {
-            messager.printMessage(Diagnostic.Kind.NOTE, "Not matched to repository:" + className + ":" + entity.getSimpleName(), entity);
-            log.info("Not matched to repository:{}:{}", className, entity.getSimpleName());
+        Set<? extends TypeName> inter = this.getMultipleInterfaceType(entity, roundEnv);
+        if (inter.isEmpty()) {
+            messager.printMessage(WARNING, "Not matched to repository:" + className + ":" + entity.getSimpleName(), entity);
+            log.warn("Not matched to repository:{}:{}", className, entity.getSimpleName());
             return;
         }
 
         // 获取待生成的Repository
-        TypeSpec repository = this.buildRepository(className)
-            .addSuperinterfaces(inter).build();
+        TypeSpec repository = this.buildRepository(className).addSuperinterfaces(inter).build();
 
         this.writer(packageName, repository);
     }
@@ -367,25 +367,30 @@ public class RepositoryProcessor extends AbstractProcessor {
      * @param environment 编译器上下文
      * @return 返回创建的TypeNames
      */
-    private Iterable<? extends TypeName> getMultipleInterfaceType(TypeElement entity, RoundEnvironment environment) {
+    Set<? extends TypeName> getMultipleInterfaceType(TypeElement entity, RoundEnvironment environment) {
 
         List<RepositoryBuilder> matcher = this.matcher(this.builders, entity);
 
         // 如果没有匹配到, 直接退出
         if (matcher.isEmpty()) {
-            return null;
+            return Collections.emptySet();
         }
 
         HashSet<TypeName> types = new HashSet<>();
         for (RepositoryBuilder builder : matcher) {
-            TypeMirror type = builder.generator(entity, environment);
-            if (type == null) {
+            Map<String, List<TypeMirror>> type = builder.generator(entity, environment);
+            if (type == null || type.isEmpty()) {
                 log.warn("This interface generation failed because the generator returned null:{}", builder.getClass().getName());
                 messager.printMessage(WARNING, "This interface generation failed because the generator returned null:" + builders.getClass().getName());
                 continue;
             }
 
-            types.add(TypeName.get(type));
+            type.forEach((k, v) -> {
+                TypeName[] mirrors = v.stream().map(TypeName::get).toArray(value -> new TypeName[v.size()]);
+                ClassName repositoryType = ClassName.get(this.processingEnv.getElementUtils().getTypeElement(k));
+                ParameterizedTypeName interfaceType = ParameterizedTypeName.get(repositoryType, mirrors);
+                types.add(interfaceType);
+            });
         }
         return types;
     }
@@ -406,12 +411,8 @@ public class RepositoryProcessor extends AbstractProcessor {
         List<RepositoryBuilder> matcher = new LinkedList<>();
         for (RepositoryBuilder builder : builders) {
             for (String include : this.includes) {
-                try {
-                    if (builder.support(include)) {
-                        matcher.add(builder);
-                    }
-                } catch (ClassNotFoundException e) {
-                    log.error("Class not fount:", e);
+                if (builder.support(include)) {
+                    matcher.add(builder);
                 }
             }
         }
@@ -435,12 +436,8 @@ public class RepositoryProcessor extends AbstractProcessor {
         List<RepositoryBuilder> tmp = new LinkedList<>();
         for (String builder : currentBuilders) {
             for (RepositoryBuilder repositoryBuilder : matcher) {
-                try {
-                    if (repositoryBuilder.support(builder)) {
-                        tmp.add(repositoryBuilder);
-                    }
-                } catch (ClassNotFoundException e) {
-                    log.error("Class not fount:", e);
+                if (repositoryBuilder.support(builder)) {
+                    tmp.add(repositoryBuilder);
                 }
             }
         }
