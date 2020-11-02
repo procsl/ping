@@ -1,8 +1,8 @@
 package cn.procsl.ping.boot.user.domain.user.model;
 
-import cn.procsl.ping.apt.annotation.RepositoryCreator;
 import cn.procsl.ping.business.domain.DomainId;
 import cn.procsl.ping.business.exception.BusinessException;
+import cn.procsl.ping.processor.repository.annotation.RepositoryCreator;
 import com.google.common.hash.Hashing;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;

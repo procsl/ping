@@ -1,8 +1,8 @@
 package cn.procsl.ping.boot.user.domain.rbac.model;
 
-import cn.procsl.ping.apt.annotation.RepositoryCreator;
 import cn.procsl.ping.boot.domain.support.executor.DomainEventListener;
 import cn.procsl.ping.business.domain.DomainEntity;
+import cn.procsl.ping.processor.repository.annotation.RepositoryCreator;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.Immutable;

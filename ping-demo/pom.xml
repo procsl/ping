@@ -17,7 +17,7 @@
     <dependencies>
         <dependency>
             <groupId>cn.procsl</groupId>
-            <artifactId>ping-apt-processor</artifactId>
+            <artifactId>ping-domain-processor</artifactId>
             <version>0.0.2-SNAPSHOT</version>
         </dependency>
 
@@ -47,17 +47,13 @@
                         <arg>-Xlint</arg>
                         <arg>-parameters</arg>
                         <arg>-Aquerydsl.useGetters=true</arg>
-                        <!--包名-->
-                        <!--<arg>-Afactory.repository.package.name=cn.procsl.ping.demo.repository</arg>-->
-                        <!--生成的repo列表-->
-                        <!--<arg>-Afactory.repository.includes=org.springframework.data.jpa.repository.JpaRepository</arg>-->
                     </compilerArgs>
                     <annotationProcessors>
                         <annotationProcessor>
                             com.querydsl.apt.jpa.JPAAnnotationProcessor
                         </annotationProcessor>
                         <annotationProcessor>
-                            cn.procsl.ping.apt.processor.RepositoryProcessor
+                            cn.procsl.ping.processor.repository.processor.RepositoryProcessor
                         </annotationProcessor>
                     </annotationProcessors>
 

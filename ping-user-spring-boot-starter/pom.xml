@@ -43,9 +43,9 @@
 
         <dependency>
             <groupId>cn.procsl</groupId>
-            <artifactId>ping-apt-processor</artifactId>
+            <artifactId>ping-domain-processor</artifactId>
             <version>0.0.2-SNAPSHOT</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->

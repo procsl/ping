@@ -1,9 +1,9 @@
 package cn.procsl.ping.boot.user.domain.dictionary.model;
 
-import cn.procsl.ping.apt.annotation.RepositoryCreator;
 import cn.procsl.ping.boot.domain.business.state.model.BooleanStateful;
 import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyNode;
 import cn.procsl.ping.boot.domain.support.executor.DomainEventListener;
+import cn.procsl.ping.processor.repository.annotation.RepositoryCreator;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 

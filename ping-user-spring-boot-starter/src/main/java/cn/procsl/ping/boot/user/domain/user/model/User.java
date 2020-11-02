@@ -1,10 +1,10 @@
 package cn.procsl.ping.boot.user.domain.user.model;
 
-import cn.procsl.ping.apt.annotation.RepositoryCreator;
 import cn.procsl.ping.boot.domain.business.common.model.CommonEntity;
 import cn.procsl.ping.boot.domain.business.state.model.BooleanStateful;
 import cn.procsl.ping.boot.domain.support.executor.DomainEventListener;
 import cn.procsl.ping.business.exception.BusinessException;
+import cn.procsl.ping.processor.repository.annotation.RepositoryCreator;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicUpdate;
