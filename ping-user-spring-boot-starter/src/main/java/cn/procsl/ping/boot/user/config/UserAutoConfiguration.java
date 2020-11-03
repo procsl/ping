@@ -1,9 +1,9 @@
 package cn.procsl.ping.boot.user.config;
 
+import cn.procsl.ping.boot.domain.annotation.EnableDomainRepositories;
 import cn.procsl.ping.boot.domain.business.state.repository.BooleanStatefulRepository;
 import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository;
 import cn.procsl.ping.boot.domain.config.DomainProperties;
-import cn.procsl.ping.boot.domain.support.executor.DomainRepositoryFactoryBean;
 import cn.procsl.ping.boot.user.domain.dictionary.model.DictPath;
 import cn.procsl.ping.boot.user.domain.dictionary.model.Dictionary;
 import cn.procsl.ping.boot.user.domain.dictionary.repository.CustomDictionaryRepository;
@@ -22,14 +22,11 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
-import org.springframework.data.repository.config.BootstrapMode;
 
 import javax.persistence.EntityManager;
 
@@ -43,15 +40,25 @@ import javax.persistence.EntityManager;
 @Configuration
 @EnableConfigurationProperties({UserProperties.class, DomainProperties.class})
 @ConditionalOnMissingBean({UserAutoConfiguration.class})
-@EnableJpaRepositories(basePackages = {
+//@EnableJpaRepositories(basePackages = {
+//    "cn.procsl.ping.boot.user.domain.dictionary.repository",
+//    "cn.procsl.ping.boot.user.domain.rbac.repository",
+//    "cn.procsl.ping.boot.user.domain.user.repository",
+//},
+//    repositoryFactoryBeanClass = DomainRepositoryFactoryBean.class,
+//    bootstrapMode = BootstrapMode.LAZY
+//)
+//@EntityScan(basePackages = {
+//    "cn.procsl.ping.boot.user.domain.dictionary.model",
+//    "cn.procsl.ping.boot.user.domain.rbac.model",
+//    "cn.procsl.ping.boot.user.domain.user.model",
+//    "cn.procsl.ping.boot.user.domain.common.model",
+//})
+@EnableDomainRepositories(repositories = {
     "cn.procsl.ping.boot.user.domain.dictionary.repository",
     "cn.procsl.ping.boot.user.domain.rbac.repository",
     "cn.procsl.ping.boot.user.domain.user.repository",
-},
-    repositoryFactoryBeanClass = DomainRepositoryFactoryBean.class,
-    bootstrapMode = BootstrapMode.LAZY
-)
-@EntityScan(basePackages = {
+}, entities = {
     "cn.procsl.ping.boot.user.domain.dictionary.model",
     "cn.procsl.ping.boot.user.domain.rbac.model",
     "cn.procsl.ping.boot.user.domain.user.model",

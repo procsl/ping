@@ -4,6 +4,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -19,8 +20,6 @@ public interface RepositoryBuilder {
     String processor = "META-INF/processor.config";
 
     String prefix = "processor.repository.prefix";
-
-    String index = "processor.repository.package.index";
 
     String pageName = "processor.repository.package.name";
 
@@ -59,9 +58,9 @@ public interface RepositoryBuilder {
     boolean isSingleton();
 
     /**
-     * 储存库名称
+     * 可创建的储存库名称
      *
      * @return 名称
      */
-    String getName();
+    Collection<String> getName();
 }

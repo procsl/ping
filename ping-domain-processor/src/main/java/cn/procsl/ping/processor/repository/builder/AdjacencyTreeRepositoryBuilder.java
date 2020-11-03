@@ -3,7 +3,6 @@ package cn.procsl.ping.processor.repository.builder;
 import cn.procsl.ping.processor.repository.AbstractRepositoryBuilder;
 import cn.procsl.ping.processor.repository.RepositoryBuilder;
 import com.google.auto.service.AutoService;
-import com.squareup.javapoet.TypeName;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.processing.RoundEnvironment;
@@ -12,12 +11,7 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.*;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import static com.squareup.javapoet.TypeName.get;
+import java.util.*;
 
 
 @AutoService(RepositoryBuilder.class)
@@ -203,15 +197,6 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
 
 
     /**
-     * 需要查找当前实体上的PathNode范型对应的类
-     *
-     * @return TypeName
-     */
-    protected TypeName createPathNodeType(TypeMirror mirror) {
-        return get(mirror);
-    }
-
-    /**
      * 是否独立实现, 不同时继承多个(某些接口有冲突的情况下)
      *
      * @return 如果独立创建, 则返回true
@@ -222,8 +207,8 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
     }
 
     @Override
-    public String getName() {
-        return "AdjacencyTree";
+    public Collection<String> getName() {
+        return Collections.singletonList("AdjacencyTreeRepository");
     }
 
     /**

@@ -4,6 +4,9 @@ import cn.procsl.ping.processor.repository.EntityRepositoryBuilder;
 import cn.procsl.ping.processor.repository.RepositoryBuilder;
 import com.google.auto.service.AutoService;
 
+import java.util.Collection;
+import java.util.Collections;
+
 /**
  * @author procsl
  * @date 2020/06/21
@@ -17,8 +20,8 @@ public class ReactiveQueryDslPredicateExecutorBuilder extends EntityRepositoryBu
     }
 
     @Override
-    public String getName() {
-        return "ReactiveQueryDslPredicate";
+    public Collection<String> getName() {
+        return Collections.singletonList("ReactiveQueryDslPredicateRepository");
     }
 
     /**

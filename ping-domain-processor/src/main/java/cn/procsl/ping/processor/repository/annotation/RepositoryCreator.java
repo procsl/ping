@@ -27,24 +27,10 @@ public @interface RepositoryCreator {
     String[] builders() default {};
 
     /**
-     * 动态包名, repository与当前包的相对位置
-     * 例如 当前包名为 cn.procsl.ping.boot.business.model
-     * 若设置值为: 5
-     * 则包名为: cn.procsl.ping.boot.business.repository
-     * <p>
-     * 若设置值为: 4
-     * 则包名为: cn.procsl.ping.boot.repository
-     * 可以设置全局 配置
+     * 指定的命名策略
      *
-     * @return 点分包名位置
+     * @return 返回指定的命名策略
      */
-    int indexOf() default -1;
-
-    /**
-     * 固定包名, 若指定, 则直接使用此包名
-     *
-     * @return 默认固定的包名
-     */
-    String packageName() default "";
+    String strategy() default "cn.procsl.ping.processor.repository.DefaultNamingStrategy";
 
 }

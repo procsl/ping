@@ -8,6 +8,8 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import javax.persistence.Id;
 import javax.tools.Diagnostic;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
@@ -90,8 +92,8 @@ public abstract class AbstractRepositoryBuilder implements RepositoryBuilder {
     }
 
     @Override
-    public String getName() {
-        return "";
+    public Collection<String> getName() {
+        return Collections.emptyList();
     }
 
     /**

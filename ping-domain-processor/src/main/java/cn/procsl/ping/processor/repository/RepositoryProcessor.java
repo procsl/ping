@@ -9,10 +9,8 @@ import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
-import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.Elements;
 import javax.persistence.Entity;
 import javax.tools.StandardLocation;
 import java.io.IOException;
@@ -33,8 +31,8 @@ import static javax.tools.Diagnostic.Kind.WARNING;
  * @author procsl
  * @date 2020/05/18
  */
-@AutoService(Processor.class)
 @Slf4j
+@AutoService(Processor.class)
 public class RepositoryProcessor extends AbstractProcessor {
 
     private Messager messager;
@@ -49,6 +47,8 @@ public class RepositoryProcessor extends AbstractProcessor {
 
     private Map<Object, Object> config;
 
+    private Map<String, RepositoryNamingStrategy> namingStrategy;
+
     private boolean init = true;
 
     @Override
@@ -61,6 +61,9 @@ public class RepositoryProcessor extends AbstractProcessor {
             initConfig();
 
             initIncludes();
+
+            initNamingStrategy();
+
         } catch (Exception e) {
             messager.printMessage(WARNING, "Initializing the annotation processor failed for a number of reasons: " + e.getMessage());
             log.warn("Initializing the annotation processor failed for a number of reasons: ", e);
@@ -68,9 +71,13 @@ public class RepositoryProcessor extends AbstractProcessor {
         }
     }
 
-    /**
-     * 加载基础配置
-     */
+    void initNamingStrategy() {
+        ClassLoader currentClassLoad = this.getClass().getClassLoader();
+        ServiceLoader<RepositoryNamingStrategy> services = ServiceLoader.load(RepositoryNamingStrategy.class, currentClassLoad);
+        this.namingStrategy = new HashMap<>();
+        services.forEach(item -> this.namingStrategy.put(item.getClass().getName(), item));
+    }
+
     private void initConfig() {
         try (
             InputStream is = filer
@@ -261,15 +268,25 @@ public class RepositoryProcessor extends AbstractProcessor {
      */
     private void generateSourceCode(TypeElement entity, String packageName, RoundEnvironment roundEnv) throws IOException, ClassNotFoundException {
 
-        // 类名
-        String className = this.createClassName(entity, "");
-
-        Set<? extends TypeName> inter = this.getMultipleInterfaceType(entity, roundEnv);
-        if (inter.isEmpty()) {
-            messager.printMessage(WARNING, "Not matched to repository:" + className + ":" + entity.getSimpleName(), entity);
-            log.warn("Not matched to repository:{}:{}", className, entity.getSimpleName());
+        List<RepositoryBuilder> matcher = this.matcher(this.builders, entity);
+        // 如果没有匹配到, 直接退出
+        if (matcher.isEmpty()) {
+            messager.printMessage(WARNING, "Not matched to repository:" + entity.getSimpleName(), entity);
+            log.warn("Not matched to repository:{}", entity.getSimpleName());
             return;
         }
+
+        Set<? extends TypeName> inter = this.getMultipleInterfaceType(entity, roundEnv, matcher);
+
+        if (inter.isEmpty()) {
+            messager.printMessage(WARNING, "Not matched to repository:" + entity.getSimpleName(), entity);
+            log.warn("Not matched to repository:{}", entity.getSimpleName());
+            return;
+        }
+        Collection<String> repositories = new HashSet<>();
+        matcher.forEach(item -> repositories.addAll(item.getName()));
+        // 类名
+        String className = this.createClassName(entity, repositories);
 
         // 获取待生成的Repository
         TypeSpec repository = this.buildRepository(className).addSuperinterfaces(inter).build();
@@ -283,12 +300,22 @@ public class RepositoryProcessor extends AbstractProcessor {
      * @param entity 对应的实体
      * @return 类名
      */
-    private String createClassName(Element entity, String sign) {
+    private String createClassName(TypeElement entity, Collection<String> repository) {
         String tmp = this.getConfig(RepositoryBuilder.prefix);
         if (tmp == null || tmp.isEmpty()) {
             tmp = "";
         }
-        return tmp + entity.getSimpleName() + sign + "Repository";
+
+        RepositoryCreator repositoryCreator = entity.getAnnotation(RepositoryCreator.class);
+        RepositoryNamingStrategy strategy = this.namingStrategy.get(repositoryCreator.strategy());
+        if (strategy != null) {
+            String name = strategy.repositoryName(entity, tmp, repository);
+            if (name != null && (!name.isEmpty())) {
+                return name;
+            }
+        }
+
+        return tmp + entity.getSimpleName() + repository + "Repository";
     }
 
     /**
@@ -299,41 +326,15 @@ public class RepositoryProcessor extends AbstractProcessor {
      */
     private String createPackageName(TypeElement entity) {
 
-        do {
-            RepositoryCreator repo = entity.getAnnotation(RepositoryCreator.class);
-            if (repo == null) {
-                break;
-            }
-            // 绝对包名
-            String pgName = repo.packageName();
-            if (!pgName.isEmpty()) {
-                return pgName;
-            }
+        RepositoryCreator repo = entity.getAnnotation(RepositoryCreator.class);
 
-            // 相对位置包名
-            int indexOf = repo.indexOf();
-            if (indexOf <= -1) {
-                String tmp = this.getConfig(RepositoryBuilder.index);
-                try {
-                    indexOf = Integer.parseInt(tmp);
-                } catch (NumberFormatException e) {
-                    log.warn("This property cannot be formatted as a number:{}", tmp);
-                }
-            }
-            Elements utils = this.processingEnv.getElementUtils();
-            PackageElement packName = utils.getPackageOf(entity);
-            String name = packName.asType().toString();
-            String[] seg = name.split("\\.");
-            if (indexOf > -1 && indexOf < seg.length) {
-                List<String> join = Arrays.stream(seg).limit(indexOf).collect(Collectors.toList());
-                name = String.join(".", join);
-            }
-
-            if (!name.isEmpty()) {
-                return name.concat(".repository");
+        RepositoryNamingStrategy strategy = this.namingStrategy.get(repo.strategy());
+        if (strategy != null) {
+            String packageName = strategy.repositoryPackageName(entity);
+            if (packageName != null && (!packageName.isEmpty())) {
+                return packageName;
             }
         }
-        while (false);
 
         // 全局配置包名
         String packageName = this.getConfig(RepositoryBuilder.pageName);
@@ -367,15 +368,7 @@ public class RepositoryProcessor extends AbstractProcessor {
      * @param environment 编译器上下文
      * @return 返回创建的TypeNames
      */
-    Set<? extends TypeName> getMultipleInterfaceType(TypeElement entity, RoundEnvironment environment) {
-
-        List<RepositoryBuilder> matcher = this.matcher(this.builders, entity);
-
-        // 如果没有匹配到, 直接退出
-        if (matcher.isEmpty()) {
-            return Collections.emptySet();
-        }
-
+    Set<? extends TypeName> getMultipleInterfaceType(TypeElement entity, RoundEnvironment environment, List<RepositoryBuilder> matcher) {
         HashSet<TypeName> types = new HashSet<>();
         for (RepositoryBuilder builder : matcher) {
             Map<String, List<TypeMirror>> type = builder.generator(entity, environment);
