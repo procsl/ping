@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.domain.support.executor;
 
+import cn.procsl.ping.boot.domain.annotation.EnableDomainRepositories;
 import cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository;
 import cn.procsl.ping.boot.domain.business.utils.PathUtils;
 import cn.procsl.ping.boot.domain.domain.model.Path;
@@ -22,16 +23,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.querydsl.QSort;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
-import org.springframework.data.repository.config.BootstrapMode;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,12 +48,7 @@ import static cn.procsl.ping.boot.domain.business.tree.model.AdjacencyNode.ROOT_
 @RunWith(SpringRunner.class)
 @Transactional
 @SpringBootApplication
-@EnableJpaRepositories(
-    basePackages = "cn.procsl.ping.boot.domain.domain.repository",
-    repositoryFactoryBeanClass = DomainRepositoryFactoryBean.class,
-    bootstrapMode = BootstrapMode.LAZY
-)
-@EntityScan(basePackages = "cn.procsl.ping.boot.domain.domain.model")
+@EnableDomainRepositories(repositories = "cn.procsl.ping.boot.domain.domain.repository", entities = "cn.procsl.ping.boot.domain.domain.model")
 @ComponentScan("cn.procsl.ping.boot.domain.test")
 @Rollback(value = false)
 public class AdjacencyTreeExecutorTest {

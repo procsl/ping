@@ -40,20 +40,6 @@ import javax.persistence.EntityManager;
 @Configuration
 @EnableConfigurationProperties({UserProperties.class, DomainProperties.class})
 @ConditionalOnMissingBean({UserAutoConfiguration.class})
-//@EnableJpaRepositories(basePackages = {
-//    "cn.procsl.ping.boot.user.domain.dictionary.repository",
-//    "cn.procsl.ping.boot.user.domain.rbac.repository",
-//    "cn.procsl.ping.boot.user.domain.user.repository",
-//},
-//    repositoryFactoryBeanClass = DomainRepositoryFactoryBean.class,
-//    bootstrapMode = BootstrapMode.LAZY
-//)
-//@EntityScan(basePackages = {
-//    "cn.procsl.ping.boot.user.domain.dictionary.model",
-//    "cn.procsl.ping.boot.user.domain.rbac.model",
-//    "cn.procsl.ping.boot.user.domain.user.model",
-//    "cn.procsl.ping.boot.user.domain.common.model",
-//})
 @EnableDomainRepositories(repositories = {
     "cn.procsl.ping.boot.user.domain.dictionary.repository",
     "cn.procsl.ping.boot.user.domain.rbac.repository",
