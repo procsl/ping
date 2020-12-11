@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-    <configuration default="false" name="dubugger" type="ShConfigurationType">
+    <configuration default="false" name="user-debugger" type="ShConfigurationType">
         <option name="INDEPENDENT_SCRIPT_PATH" value="false"/>
         <option name="SCRIPT_PATH" value="$PROJECT_DIR$/scripts/idea/debug/maven-apt-debug.cmd"/>
         <option name="SCRIPT_OPTIONS" value=""/>

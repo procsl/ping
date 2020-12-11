@@ -1,7 +1,6 @@
 package cn.procsl.ping.demo.domain.entity;
 
 import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyNode;
-import cn.procsl.ping.processor.repository.annotation.RepositoryCreator;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -10,7 +9,7 @@ import java.util.Set;
 
 @Entity
 @Table
-@RepositoryCreator
+//@RepositoryCreator
 public class Node extends User<PathNode> {
 
     @Id
