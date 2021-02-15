@@ -21,6 +21,12 @@ public class NamingUtils {
         return first + name.substring(1);
     }
 
+    /**
+     * 返回大驼峰命名法的字符串
+     *
+     * @param name 名称
+     * @return 大驼峰字符串
+     */
     public static String upperCamelCase(@NonNull String name) {
         if (name.isEmpty()) {
             return name;

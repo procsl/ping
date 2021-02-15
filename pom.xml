@@ -28,6 +28,7 @@
         <module>ping-rest-spring-boot-starter</module>
         <module>ping-producer-spring-boot-starter</module>
         <module>ping-api-processor</module>
+<!--        <module>ping-graalvm-demo</module>-->
     </modules>
     <name>ping</name>
 

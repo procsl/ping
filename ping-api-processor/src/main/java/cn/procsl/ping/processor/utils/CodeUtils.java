@@ -1,5 +1,7 @@
 package cn.procsl.ping.processor.utils;
 
+//import cn.procsl.ping.processor.model.AnnotationCodeBlackModel;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -34,5 +36,17 @@ public final class CodeUtils {
         Object[] tmp = new Object[times];
         return convertToTemplate(tmp, item);
     }
+
+//
+//    public static AnnotationSpec convertTo(AnnotationModel annotation) {
+//        ClassName annotationType = ClassName.get(annotation.getPackageName(), annotation.getName());
+//        AnnotationSpec.Builder annotationBuilder = AnnotationSpec.builder(annotationType);
+////        for (AnnotationCodeBlackModel annotationCodeBlackModel : annotation.getCodeBlack()) {
+////            List<String> args = annotationCodeBlackModel.getArguments();
+////            annotationBuilder.addMember(annotationCodeBlackModel.getName(), annotationCodeBlackModel.sourceTemplate(), args.toArray());
+////        }
+//        return annotationBuilder.build();
+//    }
+
 
 }

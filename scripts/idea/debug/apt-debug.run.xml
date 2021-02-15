@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="apt-debug" type="Remote" show_console_on_std_err="true" show_console_on_std_out="true">
-    <module name="ping-user-spring-boot-starter"/>
+    <module name="ping-api-processor"/>
     <option name="USE_SOCKET_TRANSPORT" value="true" />
     <option name="SERVER_MODE" value="false" />
     <option name="SHMEM_ADDRESS" />
