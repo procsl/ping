@@ -20,16 +20,14 @@
     <modules>
         <module>ping-domain-spring-boot-starter</module>
         <module>ping-business-model</module>
-        <module>ping-domain-processor</module>
+        <module>ping-processor-domain</module>
         <module>ping-user-spring-boot-starter</module>
-<!--        <module>ping-doc-spring-boot-starter</module>-->
         <module>ping-admin-app</module>
-        <!--        <module>ping-demo</module>-->
         <module>ping-rest-spring-boot-starter</module>
         <module>ping-producer-spring-boot-starter</module>
-        <module>ping-api-processor</module>
-<!--        <module>ping-graalvm-demo</module>-->
+        <module>ping-processor-api</module>
     </modules>
+
     <name>ping</name>
 
 </project>
