@@ -1,0 +1,46 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="ping-quarkus-demo" type="QuarkusRunConfigurationType" factoryName="Quarkus">
+        <module name="ping-demo-quarkus"/>
+        <QsMavenRunConfiguration>
+            <MavenSettings>
+                <option name="myGeneralSettings"/>
+                <option name="myRunnerSettings">
+                    <MavenRunnerSettings>
+                        <option name="delegateBuildToMaven" value="false"/>
+                        <option name="environmentProperties">
+                            <map/>
+                        </option>
+                        <option name="jreName" value="graalvm-ce-java11-21.1.0"/>
+                        <option name="mavenProperties">
+                            <map/>
+                        </option>
+                        <option name="passParentEnv" value="true"/>
+                        <option name="runMavenInBackground" value="true"/>
+                        <option name="skipTests" value="true"/>
+                        <option name="vmOptions" value=""/>
+                    </MavenRunnerSettings>
+                </option>
+                <option name="myRunnerParameters">
+                    <MavenRunnerParameters>
+                        <option name="profiles">
+                            <set/>
+                        </option>
+                        <option name="goals">
+                            <list/>
+                        </option>
+                        <option name="pomFileName" value="pom.xml"/>
+                        <option name="profilesMap">
+                            <map/>
+                        </option>
+                        <option name="resolveToWorkspace" value="false"/>
+                        <option name="workingDirPath" value="$PROJECT_DIR$/ping-demo-quarkus"/>
+                    </MavenRunnerParameters>
+                </option>
+            </MavenSettings>
+            <targetMavenLocalRepo/>
+        </QsMavenRunConfiguration>
+        <method v="2">
+            <option name="Make" enabled="true"/>
+        </method>
+    </configuration>
+</component>
