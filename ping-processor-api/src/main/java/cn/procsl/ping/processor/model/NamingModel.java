@@ -1,9 +1,12 @@
 package cn.procsl.ping.processor.model;
 
-public interface NamingModel extends Model {
+import lombok.Data;
 
-    String getPackageName();
+@Data
+public class NamingModel {
 
-    String getName();
+    String typeName;
+
+    String packageName;
 
 }

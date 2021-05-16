@@ -1,24 +1,27 @@
 package cn.procsl.ping.processor.model;
 
+import lombok.Data;
+
 import javax.lang.model.element.Modifier;
 import java.util.Collection;
+import java.util.List;
 
-public interface MethodModel extends Model {
+@Data
+public class MethodModel {
 
-    String getMethodName();
+    TypeModel parent;
 
-    Collection<AnnotationModel> getAnnotations();
+    String name;
 
-    Collection<Modifier> getModifiers();
+    Collection<AnnotationModel> annotations;
 
-    Collection<FieldModel> getArguments();
+    List<ParameterModel> parameters;
 
-    Collection<NamingModel> getThrowable();
+    Collection<NamingModel> throwable;
 
-    NamingModel getReturn();
+    Collection<Modifier> modifiers;
 
-    CodeModel getBody();
+    String body;
 
-    String getSignature();
-
+    NamingModel returned;
 }

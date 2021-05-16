@@ -2,17 +2,17 @@ package cn.procsl.ping.processor.model;
 
 import lombok.Data;
 
-import javax.lang.model.element.Modifier;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 
 @Data
-public class FieldModel {
+public class ParameterModel {
 
     NamingModel type;
 
     String name;
 
-    TypeModel parent;
+    MethodModel parent;
 
     Collection<Modifier> modifiers;
 

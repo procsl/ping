@@ -1,13 +1,25 @@
 package cn.procsl.ping.processor.model;
 
-import java.util.Collection;
+import lombok.Data;
 
-public interface AnnotationModel extends Model {
+import java.util.Map;
 
-    NamingModel getName();
+@Data
+public class AnnotationModel {
 
-    CodeModel getCode(String fieldName);
+    NamingModel type;
 
-    Collection<String> getFieldNames();
+    String name;
 
+    Map<String, Value> valueMap;
+
+    static class Value {
+        Type type;
+
+        String value;
+    }
+
+    enum Type {
+        STRING, ENUM, TYPE
+    }
 }

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @SuperBuilder
-public class MethodConverter extends AbstractAwareConvertor<MethodModel, MethodSpec> {
+class MethodConverter implements ModelConverter<MethodModel, MethodSpec> {
 
     @NonNull
     private final ModelConverter<AnnotationModel, AnnotationSpec> annotationModelToAnnotationSpecConverter;
@@ -20,42 +20,42 @@ public class MethodConverter extends AbstractAwareConvertor<MethodModel, MethodS
     private final ModelConverter<NamingModel, TypeName> namingModelTypeNameConverter;
 
     @NonNull
-    private final ModelConverter<FieldModel, ParameterSpec> fieldModelParameterSpecConverter;
+    private final ModelConverter<ParameterModel, ParameterSpec> parameterSpecModelConverter;
 
     @NonNull
-    private final ModelConverter<CodeModel, CodeBlock> codeBlockModelConverter;
+    private final ModelConverter<String, CodeBlock> codeBlockModelConverter;
 
 
     @Override
-    protected MethodSpec convertTo(MethodModel source) {
+    public MethodSpec convertTo(MethodModel source) {
 
-        MethodSpec.Builder builder = MethodSpec.methodBuilder(source.getMethodName());
+        MethodSpec.Builder builder = MethodSpec.methodBuilder(source.getName());
 
         Collection<AnnotationModel> annotation = source.getAnnotations();
         if (annotation != null) {
-            builder.addAnnotations(annotation.stream().map(this.annotationModelToAnnotationSpecConverter::to).collect(Collectors.toList()));
+            builder.addAnnotations(annotation.stream().map(this.annotationModelToAnnotationSpecConverter::convertTo).collect(Collectors.toList()));
         }
 
-        NamingModel returned = source.getReturn();
+        NamingModel returned = source.getReturned();
         if (returned != null) {
-            builder.returns(namingModelTypeNameConverter.to(returned));
+            builder.returns(namingModelTypeNameConverter.convertTo(returned));
         }
 
         Collection<NamingModel> throwAbles = source.getThrowable();
         if (throwAbles != null) {
-            List<TypeName> list = throwAbles.stream().map(this.namingModelTypeNameConverter::to).collect(Collectors.toList());
+            List<TypeName> list = throwAbles.stream().map(this.namingModelTypeNameConverter::convertTo).collect(Collectors.toList());
             builder.addExceptions(list);
         }
 
         builder.addModifiers(source.getModifiers().toArray(new Modifier[0]));
-        Collection<FieldModel> parameters = source.getArguments();
+        List<ParameterModel> parameters = source.getParameters();
         if (parameters != null) {
-            builder.addParameters(parameters.stream().map(this.fieldModelParameterSpecConverter::to).collect(Collectors.toList()));
+            builder.addParameters(parameters.stream().map(this.parameterSpecModelConverter::convertTo).collect(Collectors.toList()));
         }
 
-        CodeModel code = source.getBody();
+        String code = source.getBody();
         if (code != null) {
-            CodeBlock black = this.codeBlockModelConverter.to(code);
+            CodeBlock black = this.codeBlockModelConverter.convertTo(code);
             builder.addCode(black);
         }
 

@@ -1,39 +1,25 @@
 package cn.procsl.ping.processor.model;
 
+import lombok.Data;
+
 import javax.lang.model.element.Modifier;
 import java.util.Collection;
 
-public interface TypeModel extends Model {
+@Data
+public class TypeModel {
 
-    NamingModel getName();
+    NamingModel type;
 
-    Type getType();
+    Collection<Modifier> modifiers;
 
-    Collection<Modifier> getModifiers();
+    Collection<NamingModel> interfaces;
 
-    Collection<NamingModel> getImported();
+    NamingModel superClass;
 
-    Collection<NamingModel> getStaticImported();
+    Collection<FieldModel> fields;
 
-    CodeModel getInitCode();
+    Collection<AnnotationModel> annotations;
 
-    CodeModel getStaticInitCode();
+    Collection<MethodModel> methods;
 
-    Collection<FieldModel> getFields();
-
-    Collection<MethodModel> getMethods();
-
-    Collection<AnnotationModel> getAnnotations();
-
-    Collection<VariableNamingModel> getInterfaces();
-
-    VariableNamingModel getSuperClass();
-
-    Collection<VariableNamingModel> getTypeVariables();
-
-
-    enum Type {
-        CLASS, INTERFACE, ENUM, ANONYMOUS_CLASS
-
-    }
 }

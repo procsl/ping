@@ -1,8 +1,6 @@
 package cn.procsl.ping.processor;
 
-import cn.procsl.ping.processor.expr.JavaFilerExpression;
 import com.google.auto.service.AutoService;
-import com.squareup.javapoet.TypeSpec;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.processing.Processor;
@@ -34,19 +32,6 @@ public class SpringMVCProcessor extends AbstractConfigurableProcessor {
     }
 
     void builder(TypeElement item, RoundEnvironment roundEnv) {
-        try {
-            JavaFilerExpression.createJavaFiler(item,
-                create(item, roundEnv))
-                .interpret(processingEnv, roundEnv, item)
-                .writeTo(filer);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
-
-    Expression<TypeSpec> create(TypeElement item, RoundEnvironment roundEnv) {
-        return null;
-    }
-
 
 }

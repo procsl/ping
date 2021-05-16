@@ -1,36 +1,35 @@
 package cn.procsl.ping.processor.converter;
 
 import cn.procsl.ping.processor.model.AnnotationModel;
-import cn.procsl.ping.processor.model.CodeModel;
 import cn.procsl.ping.processor.model.NamingModel;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
+import com.squareup.javapoet.TypeName;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 
-import java.util.Collection;
-
 @SuperBuilder
-public class AnnotationConverter extends AbstractAwareConvertor<AnnotationModel, AnnotationSpec> {
+class AnnotationConverter implements ModelConverter<AnnotationModel, AnnotationSpec> {
 
     @NonNull
-    private final ModelConverter<NamingModel, ClassName> namingModelClassNameConverter;
+    private final ModelConverter<NamingModel, TypeName> namingModelClassNameConverter;
 
     @NonNull
-    private final ModelConverter<CodeModel, CodeBlock> codeBlockModelConverter;
+    private final ModelConverter<String, CodeBlock> codeBlockModelConverter;
 
     @Override
-    protected AnnotationSpec convertTo(AnnotationModel source) {
-        AnnotationSpec.Builder builder = AnnotationSpec.builder(this.namingModelClassNameConverter.to(source.getName()));
+    public AnnotationSpec convertTo(AnnotationModel source) {
+//        AnnotationSpec.Builder builder = AnnotationSpec.builder(this.namingModelClassNameConverter.convertTo(source.getName()));
 
-        Collection<String> fields = source.getFieldNames();
-
-        for (String field : fields) {
-            CodeModel code = source.getCode(field);
-            builder.addMember(field, code.getFormat(), code.getSource());
-        }
-        return builder.build();
+//        Collection<String> fields = source.getType();
+//
+//        for (String field : fields) {
+//            CodeModel code = source.getCode(field);
+//            builder.addMember(field, code.getFormat(), code.getSource());
+//        }
+//        return builder.build();
+        return null;
     }
 
 }

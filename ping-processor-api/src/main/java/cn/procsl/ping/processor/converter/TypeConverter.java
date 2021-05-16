@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 @SuperBuilder
-public class TypeConverter extends AbstractAwareConvertor<TypeModel, TypeSpec> {
+class TypeConverter implements ModelConverter<TypeModel, TypeSpec> {
 
     @NonNull
     private final ModelConverter<FieldModel, FieldSpec> fieldModelToFieldSpecConverter;
@@ -22,13 +22,13 @@ public class TypeConverter extends AbstractAwareConvertor<TypeModel, TypeSpec> {
     private final ModelConverter<MethodModel, MethodSpec> methodModelToMethodSpecConverter;
 
     @NonNull
-    private final ModelConverter<VariableNamingModel, TypeVariableName> variableNamingModelTypeNameConverter;
+    private final ModelConverter<NamingModel, TypeName> nameModelConverter;
 
     @NonNull
-    private final ModelConverter<CodeModel, CodeBlock> codeBlockModelConverter;
+    private final ModelConverter<String, CodeBlock> codeBlockModelConverter;
 
     @Override
-    protected TypeSpec convertTo(TypeModel source) {
+    public TypeSpec convertTo(TypeModel source) {
 
 
         TypeSpec.Builder typeSpec = this.getBuilder(source);
@@ -38,62 +38,35 @@ public class TypeConverter extends AbstractAwareConvertor<TypeModel, TypeSpec> {
             typeSpec.addModifiers(modifiers.toArray(new Modifier[0]));
         }
 
-        Collection<VariableNamingModel> inters = source.getInterfaces();
+        Collection<NamingModel> inters = source.getInterfaces();
         if (inters != null) {
-            typeSpec.addSuperinterfaces(inters.stream().map(this.variableNamingModelTypeNameConverter::to).collect(Collectors.toList()));
+            typeSpec.addSuperinterfaces(inters.stream().map(this.nameModelConverter::convertTo).collect(Collectors.toList()));
         }
 
-        VariableNamingModel clazz = source.getSuperClass();
+        NamingModel clazz = source.getSuperClass();
         if (clazz != null) {
-            typeSpec.superclass(this.variableNamingModelTypeNameConverter.to(clazz));
-        }
-
-        Collection<VariableNamingModel> variable = source.getTypeVariables();
-        if (variable != null) {
-            typeSpec.addTypeVariables(variable.stream().map(this.variableNamingModelTypeNameConverter::to).collect(Collectors.toList()));
-        }
-
-
-        CodeModel staticCode = source.getInitCode();
-        if (staticCode != null) {
-            typeSpec.addStaticBlock(this.codeBlockModelConverter.to(staticCode));
-        }
-
-        CodeModel initCode = source.getInitCode();
-        if (initCode != null) {
-            typeSpec.addInitializerBlock(this.codeBlockModelConverter.to(initCode));
+            typeSpec.superclass(this.nameModelConverter.convertTo(clazz));
         }
 
         Collection<AnnotationModel> annotation = source.getAnnotations();
         if (annotation != null) {
-            typeSpec.addAnnotations(annotation.stream().map(this.annotationModelToAnnotationSpecConverter::to).collect(Collectors.toList()));
+            typeSpec.addAnnotations(annotation.stream().map(this.annotationModelToAnnotationSpecConverter::convertTo).collect(Collectors.toList()));
         }
 
         Collection<FieldModel> fields = source.getFields();
         if (fields != null) {
-            typeSpec.addFields(fields.stream().map(this.fieldModelToFieldSpecConverter::to).collect(Collectors.toList()));
+            typeSpec.addFields(fields.stream().map(this.fieldModelToFieldSpecConverter::convertTo).collect(Collectors.toList()));
         }
 
         Collection<MethodModel> methods = source.getMethods();
         if (methods != null) {
-            typeSpec.addMethods(methods.stream().map(this.methodModelToMethodSpecConverter::to).collect(Collectors.toList()));
+            typeSpec.addMethods(methods.stream().map(this.methodModelToMethodSpecConverter::convertTo).collect(Collectors.toList()));
         }
         return typeSpec.build();
     }
 
     TypeSpec.Builder getBuilder(TypeModel source) {
-        NamingModel name = source.getName();
-        switch (source.getType()) {
-            case CLASS:
-                return TypeSpec.classBuilder(name.getName());
-            case ENUM:
-                return TypeSpec.enumBuilder(name.getName());
-            case INTERFACE:
-                return TypeSpec.interfaceBuilder(name.getName());
-            case ANONYMOUS_CLASS:
-                return TypeSpec.anonymousClassBuilder(name.getName());
-        }
-        throw new UnsupportedOperationException("不支持的转换");
+        return TypeSpec.classBuilder(source.getType().getTypeName());
     }
 
 

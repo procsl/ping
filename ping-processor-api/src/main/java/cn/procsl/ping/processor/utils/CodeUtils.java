@@ -1,19 +1,12 @@
 package cn.procsl.ping.processor.utils;
 
 
-import cn.procsl.ping.processor.Expression;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import javax.annotation.Nonnull;
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.annotation.processing.RoundEnvironment;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,11 +53,5 @@ public final class CodeUtils {
         return false;
     }
 
-    public static <T> Collection<T> foreach(Collection<Expression<T>> expressions, @Nonnull ProcessingEnvironment environment, @Nonnull RoundEnvironment roundEnvironment, @Nonnull Element root) {
-        if (expressions == null) {
-            return Collections.emptyList();
-        }
-        return expressions.stream().map(item -> item.interpret(environment, roundEnvironment, root)).collect(Collectors.toList());
-    }
 
 }

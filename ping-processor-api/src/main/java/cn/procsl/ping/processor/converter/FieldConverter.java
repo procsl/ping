@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 @SuperBuilder
-public class FieldConverter extends AbstractAwareConvertor<FieldModel, FieldSpec> {
+class FieldConverter implements ModelConverter<FieldModel, FieldSpec> {
 
     @NonNull
     private final ModelConverter<NamingModel, TypeName> namingModelTypeNameConverter;
@@ -23,14 +23,14 @@ public class FieldConverter extends AbstractAwareConvertor<FieldModel, FieldSpec
     private final ModelConverter<AnnotationModel, AnnotationSpec> annotationModelToAnnotationSpecConverter;
 
     @Override
-    protected FieldSpec convertTo(FieldModel source) {
+    public FieldSpec convertTo(FieldModel source) {
         FieldSpec.Builder fieldBuilder = FieldSpec
-            .builder(this.namingModelTypeNameConverter.to(source.getType()),
-                source.getFieldName(),
+            .builder(this.namingModelTypeNameConverter.convertTo(source.getType()),
+                source.getName(),
                 source.getModifiers().toArray(new Modifier[0]));
         Collection<AnnotationModel> annotation = source.getAnnotations();
         if (annotation != null) {
-            fieldBuilder.addAnnotations(annotation.stream().map(this.annotationModelToAnnotationSpecConverter::to).collect(Collectors.toList()));
+            fieldBuilder.addAnnotations(annotation.stream().map(this.annotationModelToAnnotationSpecConverter::convertTo).collect(Collectors.toList()));
         }
         return fieldBuilder.build();
     }

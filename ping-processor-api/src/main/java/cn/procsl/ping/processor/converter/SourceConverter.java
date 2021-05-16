@@ -3,18 +3,40 @@ package cn.procsl.ping.processor.converter;
 import cn.procsl.ping.processor.model.TypeModel;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
-import lombok.Builder;
 import lombok.NonNull;
 
-@Builder
 public class SourceConverter implements ModelConverter<TypeModel, JavaFile> {
 
-    ModelConverter<TypeModel, TypeSpec> typeModelTypeSpecModelConverter;
+    final AnnotationConverter annotationConverter = AnnotationConverter.builder()
+        .codeBlockModelConverter(CodeBlockModelConverter.INSTANCE)
+        .namingModelClassNameConverter(NamingModeConverter.INSTANCE)
+        .build();
+
+    final FieldConverter fieldConverter = FieldConverter.builder()
+        .annotationModelToAnnotationSpecConverter(annotationConverter)
+        .namingModelTypeNameConverter(NamingModeConverter.INSTANCE)
+        .build();
+
+    final MethodConverter methodConverter = MethodConverter.builder()
+        .annotationModelToAnnotationSpecConverter(annotationConverter)
+        .codeBlockModelConverter(CodeBlockModelConverter.INSTANCE)
+        .parameterSpecModelConverter(ParameterConverter.builder()
+            .annotationModelToAnnotationSpecConverter(annotationConverter)
+            .namingModelTypeNameConverter(NamingModeConverter.INSTANCE)
+            .build())
+        .namingModelTypeNameConverter(NamingModeConverter.INSTANCE)
+        .build();
+
+    final ModelConverter<TypeModel, TypeSpec> typeModelTypeSpecModelConverter = TypeConverter.builder()
+        .annotationModelToAnnotationSpecConverter(annotationConverter)
+        .nameModelConverter(NamingModeConverter.INSTANCE)
+        .codeBlockModelConverter(CodeBlockModelConverter.INSTANCE)
+        .fieldModelToFieldSpecConverter(fieldConverter)
+        .methodModelToMethodSpecConverter(methodConverter)
+        .build();
 
     @Override
-    public JavaFile to(@NonNull TypeModel source) {
-        return JavaFile.builder(source.getName().getPackageName(),
-            typeModelTypeSpecModelConverter.to(source))
-            .build();
+    public JavaFile convertTo(@NonNull TypeModel source) {
+        return JavaFile.builder(source.getType().getPackageName(), typeModelTypeSpecModelConverter.convertTo(source)).build();
     }
 }
