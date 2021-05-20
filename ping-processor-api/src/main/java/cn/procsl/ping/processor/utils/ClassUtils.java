@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class ClassUtils {
+public final class ClassUtils {
 
 
     public static boolean exists(@NonNull String name) {

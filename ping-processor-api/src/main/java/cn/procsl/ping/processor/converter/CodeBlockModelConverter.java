@@ -9,6 +9,6 @@ public enum CodeBlockModelConverter implements ModelConverter<String, CodeBlock>
 
     @Override
     public CodeBlock convertTo(@NonNull String source) {
-        return null;
+        return CodeBlock.of(source);
     }
 }
