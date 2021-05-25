@@ -1,7 +1,6 @@
 package cn.procsl.ping.processor.converter;
 
 import cn.procsl.ping.processor.model.AnnotationModel;
-import cn.procsl.ping.processor.model.FieldModel;
 import cn.procsl.ping.processor.model.NamingModel;
 import cn.procsl.ping.processor.model.ParameterModel;
 import com.squareup.javapoet.AnnotationSpec;

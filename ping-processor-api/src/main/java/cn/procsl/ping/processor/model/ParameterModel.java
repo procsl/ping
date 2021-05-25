@@ -2,7 +2,7 @@ package cn.procsl.ping.processor.model;
 
 import lombok.Data;
 
-import java.lang.reflect.Modifier;
+import javax.lang.model.element.Modifier;
 import java.util.Collection;
 
 @Data

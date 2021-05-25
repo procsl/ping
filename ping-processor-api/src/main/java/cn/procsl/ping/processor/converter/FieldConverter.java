@@ -4,6 +4,7 @@ import cn.procsl.ping.processor.model.AnnotationModel;
 import cn.procsl.ping.processor.model.FieldModel;
 import cn.procsl.ping.processor.model.NamingModel;
 import com.squareup.javapoet.AnnotationSpec;
+import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.TypeName;
 import lombok.NonNull;
@@ -17,15 +18,14 @@ import java.util.stream.Collectors;
 class FieldConverter implements ModelConverter<FieldModel, FieldSpec> {
 
     @NonNull
-    private final ModelConverter<NamingModel, TypeName> namingModelTypeNameConverter;
-
-    @NonNull
     private final ModelConverter<AnnotationModel, AnnotationSpec> annotationModelToAnnotationSpecConverter;
 
     @Override
     public FieldSpec convertTo(FieldModel source) {
+        TypeName typeName = ClassName.get(source.getType().getPackageName(), source.getType().getTypeName());
+
         FieldSpec.Builder fieldBuilder = FieldSpec
-            .builder(this.namingModelTypeNameConverter.convertTo(source.getType()),
+            .builder(typeName,
                 source.getName(),
                 source.getModifiers().toArray(new Modifier[0]));
         Collection<AnnotationModel> annotation = source.getAnnotations();

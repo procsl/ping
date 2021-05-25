@@ -1,25 +1,21 @@
 package cn.procsl.ping.processor.model;
 
 import lombok.Data;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 
 @Data
+@RequiredArgsConstructor
 public class AnnotationModel {
 
-    NamingModel type;
+    @NonNull NamingModel type;
 
-    String name;
+    Map<String, String> valueMap;
 
-    Map<String, Value> valueMap;
-
-    static class Value {
-        Type type;
-
-        String value;
-    }
-
-    enum Type {
-        STRING, ENUM, TYPE
+    public AnnotationModel(@NonNull NamingModel type, Map<String, String> valueMap) {
+        this.type = type;
+        this.valueMap = valueMap;
     }
 }
