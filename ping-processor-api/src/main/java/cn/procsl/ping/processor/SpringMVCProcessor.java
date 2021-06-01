@@ -1,5 +1,6 @@
 package cn.procsl.ping.processor;
 
+import cn.procsl.ping.processor.builder.ControllerTypeBuilder;
 import cn.procsl.ping.processor.model.TypeModel;
 import com.google.auto.service.AutoService;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,7 @@ public class SpringMVCProcessor extends AbstractConfigurableProcessor {
             .map(item -> (TypeElement) item)
             .distinct()
             .forEach(item -> {
-                TypeModel type = new TypeModel();
+                TypeModel type = new ControllerTypeBuilder(item, "api", this.processingEnv);
             });
     }
 }

@@ -6,9 +6,12 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeMirror;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -22,6 +25,9 @@ public class ControllerTypeBuilder extends TypeModel {
     @NonNull TypeElement typeElement;
 
     @NonNull String prefix;
+
+    @NonNull ProcessingEnvironment processingEnv;
+
 
     @Override
     public NamingModel getType() {
@@ -69,7 +75,12 @@ public class ControllerTypeBuilder extends TypeModel {
                 method.setModifiers(Collections.singleton(Modifier.PUBLIC));
                 method.setName(item.getSimpleName().toString());
                 method.setParent(ControllerTypeBuilder.this);
-//                method.setReturned(new NamingModel(item.getReturnType()));
+                TypeMirror type = item.getReturnType();
+                Element element = processingEnv.getTypeUtils().asElement(type);
+                method.setReturned(new NamingModel(element.getEnclosingElement().toString(), element.getSimpleName().toString()));
+                method.setAnnotations(Arrays.asList(
+                    new RequestMappingAnnotationBuilder(item)
+                ));
                 return method;
             })
             .collect(Collectors.toList());
