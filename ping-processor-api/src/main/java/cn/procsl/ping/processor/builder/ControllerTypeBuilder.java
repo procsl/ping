@@ -7,14 +7,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.*;
 import javax.lang.model.type.TypeMirror;
+import javax.ws.rs.*;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 
@@ -27,6 +26,12 @@ public class ControllerTypeBuilder extends TypeModel {
     @NonNull String prefix;
 
     @NonNull ProcessingEnvironment processingEnv;
+
+    final String fieldName;
+
+    {
+        fieldName = NamingUtils.lowerCamelCase(typeElement.getSimpleName().toString());
+    }
 
 
     @Override
@@ -56,7 +61,7 @@ public class ControllerTypeBuilder extends TypeModel {
         field.setType(new NamingModel(typeElement.getEnclosingElement().toString(), typeElement.getSimpleName().toString()));
         field.setModifiers(Collections.singleton(Modifier.PUBLIC));
         field.setParent(this);
-        field.setName(NamingUtils.lowerCamelCase(typeElement.getSimpleName().toString()));
+        field.setName(this.fieldName);
         field.setAnnotations(Collections.singletonList(
             new AnnotationModel(new NamingModel("org.springframework.beans.factory.annotation", "Autowired"))
         ));
@@ -78,11 +83,77 @@ public class ControllerTypeBuilder extends TypeModel {
                 TypeMirror type = item.getReturnType();
                 Element element = processingEnv.getTypeUtils().asElement(type);
                 method.setReturned(new NamingModel(element.getEnclosingElement().toString(), element.getSimpleName().toString()));
-                method.setAnnotations(Arrays.asList(
-                    new RequestMappingAnnotationBuilder(item)
-                ));
+
+                ParameterResolver resolver = new ParameterResolver(this.fieldName, item, method);
+                method.setParameters(resolver.resolver());
+                method.setAnnotations(Arrays.asList(new RequestMappingAnnotationBuilder(item)));
+                method.setBody(
+                    String.format("return %s; ", resolver.getCaller())
+                );
                 return method;
             })
             .collect(Collectors.toList());
     }
+
+    @RequiredArgsConstructor
+    static final class ParameterResolver {
+
+        @NonNull String fieldName;
+
+        @NonNull ExecutableElement item;
+
+        @NonNull MethodModel methodModel;
+
+        public List<ParameterModel> resolver() {
+            POST post = this.item.getAnnotation(POST.class);
+            PATCH patch = this.item.getAnnotation(PATCH.class);
+            PUT put = this.item.getAnnotation(PUT.class);
+            if (post == null || patch == null || put == null) {
+                return item.getParameters().stream().map(
+                    param -> {
+                        ParameterModel parameter = new ParameterModel();
+                        parameter.setParent(methodModel);
+                        parameter.setType(new NamingModel(param.getEnclosingElement().toString(), param.getSimpleName().toString()));
+                        parameter.setName(param.getSimpleName().toString());
+                        parameter.setModifiers(Collections.singleton(Modifier.FINAL));
+                        AnnotationResolver resolver = new AnnotationResolver(item);
+                        parameter.setAnnotations(resolver.resolve());
+                        return parameter;
+                    }
+                ).collect(Collectors.toList());
+            }
+            return null;
+        }
+
+        public String getCaller() {
+            return null;
+        }
+
+    }
+
+    @RequiredArgsConstructor
+    static final class AnnotationResolver {
+
+        @NonNull ExecutableElement item;
+
+        public Collection<AnnotationModel> resolve() {
+            if (isSimpleRequest()) {
+
+            } else {
+
+            }
+            return null;
+        }
+
+        boolean hasQueryParam(Element element) {
+            return element.getAnnotation(QueryParam.class) != null;
+        }
+
+        boolean isSimpleRequest() {
+            return (item.getAnnotation(GET.class) == null || item.getAnnotation(DELETE.class) == null);
+        }
+
+
+    }
+
 }
