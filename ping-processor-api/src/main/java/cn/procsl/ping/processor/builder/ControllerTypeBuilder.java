@@ -96,7 +96,7 @@ public class ControllerTypeBuilder extends TypeModel {
     }
 
     @RequiredArgsConstructor
-    static final class ParameterResolver {
+    private static final class ParameterResolver {
 
         @NonNull String fieldName;
 
@@ -132,7 +132,7 @@ public class ControllerTypeBuilder extends TypeModel {
     }
 
     @RequiredArgsConstructor
-    static final class AnnotationResolver {
+    private static final class AnnotationResolver {
 
         @NonNull ExecutableElement item;
 
