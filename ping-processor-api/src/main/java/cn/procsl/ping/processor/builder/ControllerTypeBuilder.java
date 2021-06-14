@@ -10,10 +10,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.*;
 import javax.lang.model.type.TypeMirror;
 import javax.ws.rs.*;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -117,7 +114,7 @@ public class ControllerTypeBuilder extends TypeModel {
                         parameter.setName(param.getSimpleName().toString());
                         parameter.setModifiers(Collections.singleton(Modifier.FINAL));
                         AnnotationResolver resolver = new AnnotationResolver(item);
-                        parameter.setAnnotations(resolver.resolve());
+                        parameter.setAnnotations(resolver.resolve(param));
                         return parameter;
                     }
                 ).collect(Collectors.toList());
@@ -135,25 +132,18 @@ public class ControllerTypeBuilder extends TypeModel {
     private static final class AnnotationResolver {
 
         @NonNull ExecutableElement item;
+        boolean simple = (item.getAnnotation(GET.class) == null || item.getAnnotation(DELETE.class) == null);
 
-        public Collection<AnnotationModel> resolve() {
-            if (isSimpleRequest()) {
 
+        public Collection<AnnotationModel> resolve(VariableElement param) {
+            List<AnnotationModel> models;
+            if (simple) {
+                models = Arrays.asList(new RequestParamAnnotationModel(param));
             } else {
-
+                models = Arrays.asList();
             }
-            return null;
+            return models;
         }
-
-        boolean hasQueryParam(Element element) {
-            return element.getAnnotation(QueryParam.class) != null;
-        }
-
-        boolean isSimpleRequest() {
-            return (item.getAnnotation(GET.class) == null || item.getAnnotation(DELETE.class) == null);
-        }
-
-
     }
 
 }
