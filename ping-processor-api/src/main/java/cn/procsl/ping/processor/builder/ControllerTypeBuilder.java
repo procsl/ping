@@ -7,10 +7,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.*;
-import javax.lang.model.type.TypeMirror;
-import javax.ws.rs.*;
-import java.util.*;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 
@@ -24,11 +26,8 @@ public class ControllerTypeBuilder extends TypeModel {
 
     @NonNull ProcessingEnvironment processingEnv;
 
-    final String fieldName;
 
-    {
-        fieldName = NamingUtils.lowerCamelCase(typeElement.getSimpleName().toString());
-    }
+    final String fieldName = NamingUtils.lowerCamelCase(typeElement.getSimpleName().toString());
 
 
     @Override
@@ -72,78 +71,9 @@ public class ControllerTypeBuilder extends TypeModel {
             .filter(item -> item instanceof ExecutableElement)
             .map(item -> (ExecutableElement) item)
             .filter(item -> item.getModifiers().contains(Modifier.PUBLIC))
-            .map(item -> {
-                MethodModel method = new MethodModel();
-                method.setModifiers(Collections.singleton(Modifier.PUBLIC));
-                method.setName(item.getSimpleName().toString());
-                method.setParent(ControllerTypeBuilder.this);
-                TypeMirror type = item.getReturnType();
-                Element element = processingEnv.getTypeUtils().asElement(type);
-                method.setReturned(new NamingModel(element.getEnclosingElement().toString(), element.getSimpleName().toString()));
-
-                ParameterResolver resolver = new ParameterResolver(this.fieldName, item, method);
-                method.setParameters(resolver.resolver());
-                method.setAnnotations(Arrays.asList(new RequestMappingAnnotationBuilder(item)));
-                method.setBody(
-                    String.format("return %s; ", resolver.getCaller())
-                );
-                return method;
-            })
+            .map(item -> new SpringMethodModelBuilder(item, fieldName, processingEnv, this))
             .collect(Collectors.toList());
     }
 
-    @RequiredArgsConstructor
-    private static final class ParameterResolver {
-
-        @NonNull String fieldName;
-
-        @NonNull ExecutableElement item;
-
-        @NonNull MethodModel methodModel;
-
-        public List<ParameterModel> resolver() {
-            POST post = this.item.getAnnotation(POST.class);
-            PATCH patch = this.item.getAnnotation(PATCH.class);
-            PUT put = this.item.getAnnotation(PUT.class);
-            if (post == null || patch == null || put == null) {
-                return item.getParameters().stream().map(
-                    param -> {
-                        ParameterModel parameter = new ParameterModel();
-                        parameter.setParent(methodModel);
-                        parameter.setType(new NamingModel(param.getEnclosingElement().toString(), param.getSimpleName().toString()));
-                        parameter.setName(param.getSimpleName().toString());
-                        parameter.setModifiers(Collections.singleton(Modifier.FINAL));
-                        AnnotationResolver resolver = new AnnotationResolver(item);
-                        parameter.setAnnotations(resolver.resolve(param));
-                        return parameter;
-                    }
-                ).collect(Collectors.toList());
-            }
-            return null;
-        }
-
-        public String getCaller() {
-            return null;
-        }
-
-    }
-
-    @RequiredArgsConstructor
-    private static final class AnnotationResolver {
-
-        @NonNull ExecutableElement item;
-        boolean simple = (item.getAnnotation(GET.class) == null || item.getAnnotation(DELETE.class) == null);
-
-
-        public Collection<AnnotationModel> resolve(VariableElement param) {
-            List<AnnotationModel> models;
-            if (simple) {
-                models = Arrays.asList(new RequestParamAnnotationModel(param));
-            } else {
-                models = Arrays.asList();
-            }
-            return models;
-        }
-    }
 
 }
