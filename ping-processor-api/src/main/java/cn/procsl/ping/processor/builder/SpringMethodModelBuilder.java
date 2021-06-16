@@ -10,9 +10,8 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
-import javax.ws.rs.PATCH;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
+import javax.ws.rs.*;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -67,6 +66,8 @@ public class SpringMethodModelBuilder<resolver> extends MethodModel {
 
         ArrayList<ParameterModel> parameters = new ArrayList<>(method.executableElement.getParameters().size());
 
+        ArrayList<String> template = new ArrayList<>();
+
         {
             List<? extends VariableElement> params = method.executableElement.getParameters();
             if (methodSimple) {
@@ -79,8 +80,41 @@ public class SpringMethodModelBuilder<resolver> extends MethodModel {
                     variable.setTypeName(param.getSimpleName().toString());
                     model.setType(variable);
                     parameters.add(model);
+                    template.add(param.getSimpleName().toString());
+                }
+            } else {
+                DTOParameterModelBuilder dto = new DTOParameterModelBuilder();
+                for (int i = 0; i < params.size(); i++) {
+                    VariableElement param = params.get(i);
+                    QueryParam queryParam = param.getAnnotation(QueryParam.class);
+                    if (queryParam != null) {
+                        ParameterModel model = new ParameterModel();
+                        model.setAnnotations(this.directConvert(param));
+                        model.setModifiers(Collections.singleton(Modifier.PUBLIC));
+                        VariableNamingModel variable = new VariableNamingModel();
+                        variable.setPackageName(param.getEnclosingElement().toString());
+                        variable.setTypeName(param.getSimpleName().toString());
+                        model.setType(variable);
+                        parameters.add(model);
+                        template.add(param.getSimpleName().toString());
+                    } else {
+                        dto.add(i, param);
+                        template.add("dto.get"+param.getSimpleName().toString());
+                    }
                 }
             }
+        }
+
+        String getSimpleParam(VariableElement param) {
+            {
+                QueryParam queryParam = param.getAnnotation(QueryParam.class);
+                if (queryParam != null) {
+                    return queryParam.value();
+                }
+            }
+
+
+            return null;
         }
 
         Collection<AnnotationModel> directConvert(VariableElement param) {
