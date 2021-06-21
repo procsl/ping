@@ -89,7 +89,10 @@ public class SpringMethodModelBuilder<resolver> extends MethodModel {
                     QueryParam queryParam = param.getAnnotation(QueryParam.class);
                     if (queryParam != null) {
                         ParameterModel model = new ParameterModel();
-                        model.setAnnotations(this.directConvert(param));
+                        RequestParamAnnotationModel requestParam = new RequestParamAnnotationModel(param);
+                        ArrayList<AnnotationModel> array = new ArrayList<>(this.directConvert(param));
+                        array.add(requestParam);
+                        model.setAnnotations(array);
                         model.setModifiers(Collections.singleton(Modifier.PUBLIC));
                         VariableNamingModel variable = new VariableNamingModel();
                         variable.setPackageName(param.getEnclosingElement().toString());
@@ -99,7 +102,7 @@ public class SpringMethodModelBuilder<resolver> extends MethodModel {
                         template.add(param.getSimpleName().toString());
                     } else {
                         dto.add(i, param);
-                        template.add("dto.get"+param.getSimpleName().toString());
+                        template.add("dto.get" + param.getSimpleName().toString());
                     }
                 }
             }
@@ -113,12 +116,11 @@ public class SpringMethodModelBuilder<resolver> extends MethodModel {
                 }
             }
 
-
             return null;
         }
 
-        Collection<AnnotationModel> directConvert(VariableElement param) {
-            return null;
+        @NonNull Collection<AnnotationModel> directConvert(VariableElement param) {
+            return Collections.singleton(null);
         }
 
         boolean isSimpleRequest() {

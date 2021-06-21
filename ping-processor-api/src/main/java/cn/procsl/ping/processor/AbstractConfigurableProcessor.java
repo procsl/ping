@@ -78,7 +78,7 @@ public abstract class AbstractConfigurableProcessor extends AbstractProcessor {
      * @param key 系统配置key
      * @return 返回找到的系统配置
      */
-    protected String getConfig(String key) {
+    public String getConfig(String key) {
         // 首先从config加载
         Object prop = this.config.get(key);
         if (prop == null) {
