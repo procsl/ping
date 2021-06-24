@@ -32,7 +32,7 @@
 
         <dependency>
             <groupId>cn.procsl</groupId>
-            <artifactId>ping-api-processor</artifactId>
+            <artifactId>ping-processor-api</artifactId>
             <version>0.0.2-SNAPSHOT</version>
         </dependency>
 

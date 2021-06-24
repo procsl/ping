@@ -17,7 +17,7 @@ import java.util.Set;
 
 @SupportedAnnotationTypes({"javax.ws.rs.Path"})
 @Slf4j
-@AutoService(Processor.class)
+//@AutoService(Processor.class)
 public class SpringMVCProcessor extends AbstractConfigurableProcessor {
 
     @Override

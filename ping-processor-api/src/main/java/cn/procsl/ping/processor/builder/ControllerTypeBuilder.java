@@ -44,9 +44,9 @@ public class ControllerTypeBuilder extends TypeModel {
 
     public Collection<AnnotationModel> getAnnotations() {
         return Arrays.asList(
-            new GeneratedAnnotationBuilder(),
-            new AnnotationModel(new NamingModel("org.springframework.web.bind.annotation", "RestController")),
-            new RequestMappingAnnotationBuilder(prefix, typeElement)
+//            new GeneratedAnnotationBuilder(),
+//            new AnnotationModel(new NamingModel("org.springframework.web.bind.annotation", "RestController"))
+//            new RequestMappingAnnotationBuilder(prefix, typeElement)
         );
     }
 
