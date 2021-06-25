@@ -25,7 +25,7 @@
         <module>ping-admin-app</module>
         <module>ping-rest-spring-boot-starter</module>
         <module>ping-producer-spring-boot-starter</module>
-        <module>ping-processor-api</module>
+<!--        <module>ping-processor-api</module>-->
     </modules>
 
     <name>ping</name>

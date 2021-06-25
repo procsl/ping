@@ -10,7 +10,7 @@ import javax.lang.model.element.TypeElement;
 import java.util.Set;
 
 
-public interface GeneratorContext {
+public interface ProcessorContext {
 
     RoundEnvironment getRoundEnvironment();
 

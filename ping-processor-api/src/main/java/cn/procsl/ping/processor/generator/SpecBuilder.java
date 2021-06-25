@@ -1,9 +1,9 @@
 package cn.procsl.ping.processor.generator;
 
-import cn.procsl.ping.processor.GeneratorContext;
+import cn.procsl.ping.processor.ProcessorContext;
 
 public interface SpecBuilder<S, T> {
 
-    T build(GeneratorContext context, S source);
+    T build(ProcessorContext context, S source);
 
 }

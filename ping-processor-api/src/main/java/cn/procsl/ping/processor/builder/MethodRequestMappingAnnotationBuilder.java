@@ -1,6 +1,6 @@
 package cn.procsl.ping.processor.builder;
 
-import cn.procsl.ping.processor.GeneratorContext;
+import cn.procsl.ping.processor.ProcessorContext;
 import cn.procsl.ping.processor.generator.MethodAnnotationSpecBuilder;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.AnnotationSpec;
@@ -13,7 +13,7 @@ public class MethodRequestMappingAnnotationBuilder extends AbstractRequestMappin
 
 
     @Override
-    public AnnotationSpec build(GeneratorContext context, ExecutableElement source) {
+    public AnnotationSpec build(ProcessorContext context, ExecutableElement source) {
         AnnotationSpec.Builder builder = AnnotationSpec.builder(ClassName.bestGuess(this.requestMapping));
 
         String api = getPath("", source);
