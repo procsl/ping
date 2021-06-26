@@ -43,7 +43,7 @@
 
         <dependency>
             <groupId>cn.procsl</groupId>
-            <artifactId>ping-domain-processor</artifactId>
+            <artifactId>ping-processor-domain</artifactId>
             <version>0.0.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
