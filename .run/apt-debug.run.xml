@@ -11,6 +11,9 @@
       <option name="DEBUG_PORT" value="8000" />
       <option name="LOCAL" value="false" />
     </RunnerSettings>
-    <method v="2" />
+    <method v="2">
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="apt-install" run_configuration_type="MavenRunConfiguration" />
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="demo-debugger" run_configuration_type="ShConfigurationType" />
+    </method>
   </configuration>
 </component>

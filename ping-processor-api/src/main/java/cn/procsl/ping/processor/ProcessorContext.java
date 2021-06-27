@@ -22,8 +22,6 @@ public interface ProcessorContext {
 
     String getConfig(String key);
 
-    Set<? extends TypeElement> getAnnotations();
-
     void setAttribute(@NonNull String key, Object attr);
 
     Object getAttribute(@NonNull String key);

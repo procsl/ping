@@ -1,24 +1,22 @@
 package cn.procsl.ping.processor;
 
+import cn.procsl.ping.processor.generator.FieldAnnotationSpecBuilder;
+import cn.procsl.ping.processor.generator.MethodAnnotationSpecBuilder;
+import cn.procsl.ping.processor.generator.ParameterAnnotationSpecBuilder;
 import cn.procsl.ping.processor.generator.TypeAnnotationSpecBuilder;
+import cn.procsl.ping.processor.utils.CodeUtils;
+import cn.procsl.ping.processor.utils.NamingUtils;
 import com.google.auto.service.AutoService;
-import com.squareup.javapoet.AnnotationSpec;
-import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.*;
 import lombok.Getter;
 import lombok.NonNull;
 
 import javax.annotation.processing.*;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.*;
+import javax.lang.model.type.TypeMirror;
 import javax.ws.rs.Path;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.ServiceLoader;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @AutoService(Processor.class)
@@ -27,6 +25,12 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
     final HashMap<String, Object> attrs = new HashMap<>();
 
     final ServiceLoader<TypeAnnotationSpecBuilder> typeAnnotationSpecBuilders = ServiceLoader.load(TypeAnnotationSpecBuilder.class, this.getClass().getClassLoader());
+
+    final ServiceLoader<FieldAnnotationSpecBuilder> fieldAnnotationSpecBuilders = ServiceLoader.load(FieldAnnotationSpecBuilder.class, this.getClass().getClassLoader());
+
+    final ServiceLoader<MethodAnnotationSpecBuilder> methodAnnotationSpecBuilders = ServiceLoader.load(MethodAnnotationSpecBuilder.class, this.getClass().getClassLoader());
+
+    final ServiceLoader<ParameterAnnotationSpecBuilder> parameterAnnotationSpecBuilders = ServiceLoader.load(ParameterAnnotationSpecBuilder.class, this.getClass().getClassLoader());
 
     @Getter
     RoundEnvironment roundEnvironment;
@@ -55,11 +59,74 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
                 }
             }
 
+            String fieldName = NamingUtils.lowerCamelCase(typeElement.getSimpleName().toString());
+            FieldSpec.Builder fieldSpecBuilder = FieldSpec.builder(TypeName.get(typeElement.asType()), fieldName, Modifier.PROTECTED);
+            for (FieldAnnotationSpecBuilder fieldAnnotationSpecBuilder : this.fieldAnnotationSpecBuilders) {
+                AnnotationSpec annotation = fieldAnnotationSpecBuilder.build(this, typeElement);
+                if (annotation != null) {
+                    fieldSpecBuilder.addAnnotation(annotation);
+                }
+            }
+            builder.addField(fieldSpecBuilder.build());
+
+            typeElement.getEnclosedElements().stream()
+                .filter(item -> item instanceof ExecutableElement)
+                .filter(item -> (item).getAnnotation(Path.class) != null)
+                .map(item -> (ExecutableElement) item)
+                .forEach(item -> this.buildMethod(builder, item, fieldName));
+
+            String packageName = typeElement.getEnclosingElement().toString() + ".gen";
             JavaFile java = JavaFile
-                .builder("cn.procsl.ping.gen.web.rest", builder.build())
-                .addFileComment("这是自动生成的代码， 请勿修改").build();
+                .builder(packageName, builder.build())
+                .addFileComment("这是自动生成的代码，请勿修改").build();
             java.writeTo(this.getFiler());
         }
+    }
+
+    private void buildMethod(TypeSpec.Builder builder, ExecutableElement item, String fieldName) {
+        String methodName = item.getSimpleName().toString();
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(methodName).addModifiers(Modifier.PUBLIC);
+        methodBuilder.returns(TypeName.get(item.getReturnType()));
+
+        for (TypeMirror typeMirror : item.getThrownTypes()) {
+            methodBuilder.addException(TypeName.get(typeMirror));
+        }
+
+        for (MethodAnnotationSpecBuilder specBuilder : this.methodAnnotationSpecBuilders) {
+            AnnotationSpec methodAnnotation = specBuilder.build(this, item);
+            if (methodAnnotation != null) {
+                methodBuilder.addAnnotation(methodAnnotation);
+            }
+        }
+
+        List<String> params = new ArrayList<>(item.getParameters().size());
+        params.add(fieldName);
+        params.add(methodName);
+        for (VariableElement parameter : item.getParameters()) {
+            String simpleName = NamingUtils.lowerCamelCase(parameter.getSimpleName().toString());
+            params.add(simpleName);
+
+            TypeMirror type = parameter.asType();
+            TypeName typeName = TypeName.get(type);
+            if (type.getKind().isPrimitive() && (!typeName.isBoxedPrimitive())) {
+                typeName = typeName.box();
+            }
+
+            ParameterSpec.Builder parameterBuilder = ParameterSpec.builder(typeName, simpleName, Modifier.FINAL);
+
+            for (ParameterAnnotationSpecBuilder parameterAnnotationSpecBuilder : this.parameterAnnotationSpecBuilders) {
+                AnnotationSpec parameterAnnotation = parameterAnnotationSpecBuilder.build(this, parameter);
+                if (parameterAnnotation != null) {
+                    parameterBuilder.addAnnotation(parameterAnnotation);
+                }
+            }
+
+            methodBuilder.addParameter(parameterBuilder.build());
+        }
+
+        String template = String.format(" return this.$N.$N(%s); ", CodeUtils.convertToTemplate(params.size() - 2, "$N"));
+        methodBuilder.addCode(template, params.toArray());
+        builder.addMethod(methodBuilder.build());
     }
 
     @Override

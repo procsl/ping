@@ -27,7 +27,7 @@ public class ExampleService {
 
     @Path("test/{code}")
     @PUT
-    public String put(String userId, @PathParam("code") int code, @QueryParam("") int status, long content) {
+    public String put(String userId, @PathParam("code") int code, @QueryParam("") int status, long content) throws Exception {
         log.info("test");
         return userId;
     }

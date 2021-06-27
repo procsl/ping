@@ -10,21 +10,21 @@ import com.squareup.javapoet.ClassName;
 
 import javax.annotation.Nullable;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.TypeElement;
 import java.util.Collection;
 import java.util.Collections;
 
-@AutoService(AnnotationSpecBuilder.class)
-public class RestControllerSpecAnnotationBuilder implements AnnotationSpecBuilder {
+@AutoService(value = AnnotationSpecBuilder.class)
+public class AutowiredFieldAnnotationSpecBuilder implements AnnotationSpecBuilder {
 
     @Override
     public <T extends Element> AnnotationSpec build(ProcessorContext context, @Nullable T source, TargetElement type) {
-        return AnnotationSpec.builder(ClassName.bestGuess("org.springframework.web.bind.annotation.RestController")).build();
+        ClassName clazz = ClassName.bestGuess("org.springframework.beans.factory.annotation.Autowired");
+        return AnnotationSpec.builder(clazz).addMember("required", "true").build();
     }
 
     @Override
     public Collection<TargetElement> supportTargetElements() {
-        return Collections.singleton(TargetElement.TYPE);
+        return Collections.singleton(TargetElement.FIELD);
     }
 
     @Override
