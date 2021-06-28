@@ -11,11 +11,9 @@ import java.util.Optional;
 
 public class SimplePathResolver implements PathResolver {
 
+    public static final SimplePathResolver INSTANCE = new SimplePathResolver("");
     private static final String NO_CLASS_FOUND_TEMPLATE = "Did not find a query class %s for domain class %s!";
     private static final String NO_FIELD_FOUND_TEMPLATE = "Did not find a static field of the same type in %s!";
-
-    public static final SimplePathResolver INSTANCE = new SimplePathResolver("");
-
     private final String prefix;
 
     public SimplePathResolver(@NonNull String prefix) {

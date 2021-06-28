@@ -25,9 +25,9 @@ import java.util.Date;
 @Transactional
 @SpringBootApplication
 @EnableJpaRepositories(
-        basePackages = "cn.procsl.ping.boot.domain.domain.repository",
-        repositoryFactoryBeanClass = DomainRepositoryFactoryBean.class,
-        bootstrapMode = BootstrapMode.LAZY
+    basePackages = "cn.procsl.ping.boot.domain.domain.repository",
+    repositoryFactoryBeanClass = DomainRepositoryFactoryBean.class,
+    bootstrapMode = BootstrapMode.LAZY
 )
 @EntityScan(basePackages = "cn.procsl.ping.boot.domain.domain.model")
 public class QueryDslPersistenceRepositoryTest {
@@ -56,7 +56,7 @@ public class QueryDslPersistenceRepositoryTest {
         entity.setName("user");
         entity.setCreateDate(new Date());
         queryDslPersistenceRepository.update(entity,
-                QUser.user.name.eq("user"), "createDate");
+            QUser.user.name.eq("user"), "createDate");
     }
 
     @Test
@@ -73,7 +73,7 @@ public class QueryDslPersistenceRepositoryTest {
         entity.setName("user");
         entity.setCreateDate(new Date());
         queryDslPersistenceRepository.updateExclude(entity,
-                QUser.user.name.eq("user"), "user");
+            QUser.user.name.eq("user"), "user");
     }
 
     @Test
@@ -82,7 +82,7 @@ public class QueryDslPersistenceRepositoryTest {
         entity.setName("user");
         entity.setCreateDate(new Date());
         queryDslPersistenceRepository.updateExclude(entity,
-                QUser.user.name.eq("user"), QUser.user.name);
+            QUser.user.name.eq("user"), QUser.user.name);
     }
 
     @Test

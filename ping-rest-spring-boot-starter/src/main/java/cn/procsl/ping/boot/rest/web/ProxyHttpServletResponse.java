@@ -99,11 +99,6 @@ public enum ProxyHttpServletResponse implements HttpServletResponse {
     }
 
     @Override
-    public void setStatus(int sc) {
-        getResponse().setStatus(sc);
-    }
-
-    @Override
     public void setStatus(int sc, String sm) {
         getResponse().setStatus(sc, sm);
     }
@@ -111,6 +106,11 @@ public enum ProxyHttpServletResponse implements HttpServletResponse {
     @Override
     public int getStatus() {
         return getResponse().getStatus();
+    }
+
+    @Override
+    public void setStatus(int sc) {
+        getResponse().setStatus(sc);
     }
 
     @Override
@@ -134,8 +134,18 @@ public enum ProxyHttpServletResponse implements HttpServletResponse {
     }
 
     @Override
+    public void setCharacterEncoding(String charset) {
+        getResponse().setCharacterEncoding(charset);
+    }
+
+    @Override
     public String getContentType() {
         return getResponse().getContentType();
+    }
+
+    @Override
+    public void setContentType(String type) {
+        getResponse().setContentType(type);
     }
 
     @Override
@@ -149,11 +159,6 @@ public enum ProxyHttpServletResponse implements HttpServletResponse {
     }
 
     @Override
-    public void setCharacterEncoding(String charset) {
-        getResponse().setCharacterEncoding(charset);
-    }
-
-    @Override
     public void setContentLength(int len) {
         getResponse().setContentLength(len);
     }
@@ -164,18 +169,13 @@ public enum ProxyHttpServletResponse implements HttpServletResponse {
     }
 
     @Override
-    public void setContentType(String type) {
-        getResponse().setContentType(type);
+    public int getBufferSize() {
+        return getResponse().getBufferSize();
     }
 
     @Override
     public void setBufferSize(int size) {
         getResponse().setBufferSize(size);
-    }
-
-    @Override
-    public int getBufferSize() {
-        return getResponse().getBufferSize();
     }
 
     @Override
@@ -199,13 +199,13 @@ public enum ProxyHttpServletResponse implements HttpServletResponse {
     }
 
     @Override
-    public void setLocale(Locale loc) {
-        getResponse().setLocale(loc);
+    public Locale getLocale() {
+        return getResponse().getLocale();
     }
 
     @Override
-    public Locale getLocale() {
-        return getResponse().getLocale();
+    public void setLocale(Locale loc) {
+        getResponse().setLocale(loc);
     }
 
     protected HttpServletResponse getResponse() {

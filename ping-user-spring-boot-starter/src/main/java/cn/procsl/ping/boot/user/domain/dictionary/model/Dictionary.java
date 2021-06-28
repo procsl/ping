@@ -34,34 +34,25 @@ import java.util.function.Supplier;
 @RepositoryCreator
 public class Dictionary implements AdjacencyNode<Long, DictPath>, BooleanStateful<Long> {
 
+    public static final int SPACE_NAME_LEN = 20;
+    @Transient
+    public static Supplier<String> delimiter = () -> "/";
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "table_sequences")
     protected Long id;
-
     @Column(length = SPACE_NAME_LEN, nullable = false)
     protected String space;
-
     @Column(nullable = false)
     protected Long parentId;
-
     @Column(nullable = false)
     protected Integer depth;
-
-    @Transient
-    public static Supplier<String> delimiter = () -> "/";
-
     @ElementCollection
     protected List<Payload> payload;
-
     @ElementCollection
     @CollectionTable(joinColumns = @JoinColumn(name = "id"))
     protected Set<DictPath> path;
-
     @Column(nullable = false)
     protected Boolean state;
-
-    public static final int SPACE_NAME_LEN = 20;
-
     @Transient
     private DictPath currentNode;
 

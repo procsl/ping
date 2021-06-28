@@ -25,13 +25,13 @@ import javax.servlet.http.HttpServletRequest;
  */
 @RequiredArgsConstructor
 public class WrapperHandlerMapping implements MatchableHandlerMapping,
-        EmbeddedValueResolverAware,
-        InitializingBean,
-        HandlerMapping,
-        Ordered,
-        BeanNameAware,
-        ApplicationContextAware,
-        ServletContextAware {
+    EmbeddedValueResolverAware,
+    InitializingBean,
+    HandlerMapping,
+    Ordered,
+    BeanNameAware,
+    ApplicationContextAware,
+    ServletContextAware {
 
     @Getter
     final RestRequestMappingHandlerMapping handlerMapping;

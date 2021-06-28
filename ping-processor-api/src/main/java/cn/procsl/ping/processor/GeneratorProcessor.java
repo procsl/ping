@@ -1,9 +1,6 @@
 package cn.procsl.ping.processor;
 
-import cn.procsl.ping.processor.generator.FieldAnnotationSpecBuilder;
-import cn.procsl.ping.processor.generator.MethodAnnotationSpecBuilder;
-import cn.procsl.ping.processor.generator.ParameterAnnotationSpecBuilder;
-import cn.procsl.ping.processor.generator.TypeAnnotationSpecBuilder;
+import cn.procsl.ping.processor.generator.AnnotationSpecBuilder;
 import cn.procsl.ping.processor.utils.CodeUtils;
 import cn.procsl.ping.processor.utils.NamingUtils;
 import com.google.auto.service.AutoService;
@@ -24,19 +21,14 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
 
     final HashMap<String, Object> attrs = new HashMap<>();
 
-    final ServiceLoader<TypeAnnotationSpecBuilder> typeAnnotationSpecBuilders = ServiceLoader.load(TypeAnnotationSpecBuilder.class, this.getClass().getClassLoader());
-
-    final ServiceLoader<FieldAnnotationSpecBuilder> fieldAnnotationSpecBuilders = ServiceLoader.load(FieldAnnotationSpecBuilder.class, this.getClass().getClassLoader());
-
-    final ServiceLoader<MethodAnnotationSpecBuilder> methodAnnotationSpecBuilders = ServiceLoader.load(MethodAnnotationSpecBuilder.class, this.getClass().getClassLoader());
-
-    final ServiceLoader<ParameterAnnotationSpecBuilder> parameterAnnotationSpecBuilders = ServiceLoader.load(ParameterAnnotationSpecBuilder.class, this.getClass().getClassLoader());
+    final ServiceLoader<AnnotationSpecBuilder> annotationSpecBuilders = ServiceLoader.load(AnnotationSpecBuilder.class, this.getClass().getClassLoader());
 
     @Getter
     RoundEnvironment roundEnvironment;
 
     @Getter
     Set<? extends TypeElement> annotations;
+
 
     @Override
     protected void processor(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) throws IOException {
@@ -52,20 +44,14 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
 
             TypeSpec.Builder builder = TypeSpec.classBuilder(name).addModifiers(Modifier.PUBLIC);
 
-            for (TypeAnnotationSpecBuilder specBuilder : typeAnnotationSpecBuilders) {
-                AnnotationSpec spec = specBuilder.build(this, typeElement);
-                if (spec != null) {
-                    builder.addAnnotation(spec);
-                }
+            for (AnnotationSpecBuilder specBuilder : annotationSpecBuilders) {
+                specBuilder.build(this, typeElement, builder);
             }
 
             String fieldName = NamingUtils.lowerCamelCase(typeElement.getSimpleName().toString());
             FieldSpec.Builder fieldSpecBuilder = FieldSpec.builder(TypeName.get(typeElement.asType()), fieldName, Modifier.PROTECTED);
-            for (FieldAnnotationSpecBuilder fieldAnnotationSpecBuilder : this.fieldAnnotationSpecBuilders) {
-                AnnotationSpec annotation = fieldAnnotationSpecBuilder.build(this, typeElement);
-                if (annotation != null) {
-                    fieldSpecBuilder.addAnnotation(annotation);
-                }
+            for (AnnotationSpecBuilder specBuilder : annotationSpecBuilders) {
+                specBuilder.build(this, typeElement, fieldSpecBuilder);
             }
             builder.addField(fieldSpecBuilder.build());
 
@@ -92,11 +78,8 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
             methodBuilder.addException(TypeName.get(typeMirror));
         }
 
-        for (MethodAnnotationSpecBuilder specBuilder : this.methodAnnotationSpecBuilders) {
-            AnnotationSpec methodAnnotation = specBuilder.build(this, item);
-            if (methodAnnotation != null) {
-                methodBuilder.addAnnotation(methodAnnotation);
-            }
+        for (AnnotationSpecBuilder specBuilder : annotationSpecBuilders) {
+            specBuilder.build(this, item, methodBuilder);
         }
 
         List<String> params = new ArrayList<>(item.getParameters().size());
@@ -114,11 +97,9 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
 
             ParameterSpec.Builder parameterBuilder = ParameterSpec.builder(typeName, simpleName, Modifier.FINAL);
 
-            for (ParameterAnnotationSpecBuilder parameterAnnotationSpecBuilder : this.parameterAnnotationSpecBuilders) {
-                AnnotationSpec parameterAnnotation = parameterAnnotationSpecBuilder.build(this, parameter);
-                if (parameterAnnotation != null) {
-                    parameterBuilder.addAnnotation(parameterAnnotation);
-                }
+
+            for (AnnotationSpecBuilder specBuilder : annotationSpecBuilders) {
+                specBuilder.build(this, parameter, parameterBuilder);
             }
 
             methodBuilder.addParameter(parameterBuilder.build());

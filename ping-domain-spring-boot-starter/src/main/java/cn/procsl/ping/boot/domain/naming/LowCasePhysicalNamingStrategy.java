@@ -21,11 +21,9 @@ import java.util.Set;
 @Slf4j
 public class LowCasePhysicalNamingStrategy implements PhysicalNamingStrategy {
 
-    final DomainProperties dataProperties;
-
-    private final Converter<String, String> converter = CaseFormat.LOWER_CAMEL.converterTo(CaseFormat.LOWER_UNDERSCORE);
-
     private final static Set<String> WHITELIST = new HashSet<>();
+    final DomainProperties dataProperties;
+    private final Converter<String, String> converter = CaseFormat.LOWER_CAMEL.converterTo(CaseFormat.LOWER_UNDERSCORE);
 
     {
         WHITELIST.add("DTYPE");

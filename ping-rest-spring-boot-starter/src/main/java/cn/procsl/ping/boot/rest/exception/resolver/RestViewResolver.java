@@ -32,14 +32,10 @@ public class RestViewResolver extends ContentNegotiatingViewResolver {
 
 
     final private EnumMap<RestWebProperties.MetaMediaType, List<MediaType>> mediaTypes;
-
-    private View defaultView;
-
-    private List<View> defaultViews;
-
     final private InternalResourceViewResolver internalResourceViewResolver;
-
     HashMap<String, MediaType> cache = new HashMap<>(10);
+    private View defaultView;
+    private List<View> defaultViews;
 
     @Override
     public View resolveViewName(String viewName, Locale locale) throws Exception {

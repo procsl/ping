@@ -13,20 +13,20 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class RestDispatcherServlet extends DispatcherServlet {
 
-    @Override
-    protected void noHandlerFound(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        if (pageNotFoundLogger.isWarnEnabled()) {
-            pageNotFoundLogger.warn("No mapping for " + request.getMethod() + " " + getRequestUri(request));
-        }
-        throw new NotFoundException();
-    }
-
     private static String getRequestUri(HttpServletRequest request) {
         String uri = (String) request.getAttribute(WebUtils.INCLUDE_REQUEST_URI_ATTRIBUTE);
         if (uri == null) {
             uri = request.getRequestURI();
         }
         return uri;
+    }
+
+    @Override
+    protected void noHandlerFound(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        if (pageNotFoundLogger.isWarnEnabled()) {
+            pageNotFoundLogger.warn("No mapping for " + request.getMethod() + " " + getRequestUri(request));
+        }
+        throw new NotFoundException();
     }
 
 }

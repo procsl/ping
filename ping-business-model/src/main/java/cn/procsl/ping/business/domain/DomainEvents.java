@@ -8,7 +8,7 @@ public interface DomainEvents<ID> extends DomainEntity<ID> {
     default void postPersist() {
     }
 
-    default void prePersist(){
+    default void prePersist() {
     }
 
 }

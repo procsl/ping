@@ -2,69 +2,23 @@ package cn.procsl.ping.processor.builder;
 
 import cn.procsl.ping.processor.ProcessorContext;
 import cn.procsl.ping.processor.generator.AnnotationSpecBuilder;
-import cn.procsl.ping.processor.generator.CodeType;
-import cn.procsl.ping.processor.generator.TargetElement;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.TypeSpec;
 
 import javax.annotation.Nullable;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import javax.ws.rs.*;
-import java.util.Arrays;
-import java.util.Collection;
 
 @AutoService(AnnotationSpecBuilder.class)
 public class RequestMappingAnnotationBuilder implements AnnotationSpecBuilder {
 
 
     protected final String requestMapping = "org.springframework.web.bind.annotation.RequestMapping";
-
-    @Override
-    public <T extends Element> AnnotationSpec build(ProcessorContext context, @Nullable T source, TargetElement type) {
-
-        // 生成类的RequestMapping
-        if (source instanceof TypeElement && type == TargetElement.TYPE) {
-            AnnotationSpec.Builder builder = AnnotationSpec.builder(ClassName.bestGuess(this.requestMapping));
-
-            String prefix = context.getConfig("api.prefix");
-            String api = getPath(prefix, source);
-
-            builder.addMember("path", "$S", api);
-            return builder.build();
-        }
-
-        // 生成方法的RequestMapping
-        if (source instanceof ExecutableElement && type == TargetElement.METHOD) {
-            AnnotationSpec.Builder builder = AnnotationSpec.builder(ClassName.bestGuess(this.requestMapping));
-
-            String api = getPath("", source);
-
-            builder.addMember("path", "$S", api);
-
-            String method = getMethod((ExecutableElement) source);
-
-            builder.addMember("method", "$N", method);
-
-            return builder.build();
-        }
-
-        context.getMessager().printMessage(Diagnostic.Kind.WARNING, "传入的类型错误， 无法生成 RequestMapping 注解!");
-        return null;
-    }
-
-    @Override
-    public Collection<TargetElement> supportTargetElements() {
-        return Arrays.asList(TargetElement.METHOD, TargetElement.TYPE);
-    }
-
-    @Override
-    public CodeType supportCodeType() {
-        return CodeType.CONTROLLER;
-    }
 
     protected String getPath(String prefix, Element typeElement) {
         prefix = prefix == null ? "" : prefix.trim();
@@ -119,4 +73,35 @@ public class RequestMappingAnnotationBuilder implements AnnotationSpecBuilder {
     }
 
 
+    @Override
+    public <T extends Element> void build(ProcessorContext context, @Nullable T source, Object target) {
+
+        if (target instanceof TypeSpec.Builder) {
+            AnnotationSpec.Builder builder = AnnotationSpec.builder(ClassName.bestGuess(this.requestMapping));
+
+            String prefix = context.getConfig("api.prefix");
+            String api = getPath(prefix, source);
+
+            builder.addMember("path", "$S", api);
+            ((TypeSpec.Builder) target).addAnnotation(builder.build());
+        }
+
+        if (target instanceof MethodSpec.Builder) {
+
+            AnnotationSpec.Builder builder = AnnotationSpec.builder(ClassName.bestGuess(this.requestMapping));
+
+            String api = getPath("", source);
+
+            builder.addMember("path", "$S", api);
+
+            String method = getMethod((ExecutableElement) source);
+
+            builder.addMember("method", "$N", method);
+
+            AnnotationSpec tmp = builder.build();
+            ((MethodSpec.Builder) target).addAnnotation(tmp);
+        }
+
+        context.getMessager().printMessage(Diagnostic.Kind.WARNING, "传入的类型错误， 无法生成 RequestMapping 注解!");
+    }
 }

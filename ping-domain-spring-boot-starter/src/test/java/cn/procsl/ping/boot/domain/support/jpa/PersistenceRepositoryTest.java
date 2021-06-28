@@ -23,9 +23,9 @@ import javax.inject.Inject;
 @Transactional
 @SpringBootApplication
 @EnableJpaRepositories(
-        basePackages = "cn.procsl.ping.boot.domain.domain.repository",
-        repositoryFactoryBeanClass = DomainRepositoryFactoryBean.class,
-        bootstrapMode = BootstrapMode.LAZY
+    basePackages = "cn.procsl.ping.boot.domain.domain.repository",
+    repositoryFactoryBeanClass = DomainRepositoryFactoryBean.class,
+    bootstrapMode = BootstrapMode.LAZY
 )
 @EntityScan(basePackages = "cn.procsl.ping.boot.domain.domain.model")
 @Configuration
@@ -35,7 +35,7 @@ public class PersistenceRepositoryTest {
     PersistenceRepository<User, String> persistenceRepository;
 
     @Test
-    public void test(){
+    public void test() {
         String str = persistenceRepository.toString();
         log.info(str);
     }

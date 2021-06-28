@@ -15,17 +15,10 @@ import java.util.*;
 @Slf4j
 public class FilterPattern {
 
-    protected PatternType patternType;
-
-    protected Map<String, Object> fields;
-
     protected static final FilterPattern TRUE = new InnerFilter(true);
-
     protected static final FilterPattern FALSE = new InnerFilter(false);
-
-    public enum PatternType {
-        include, exclude, skip
-    }
+    protected PatternType patternType;
+    protected Map<String, Object> fields;
 
     public static FilterPattern compiler() {
         return TRUE;
@@ -90,34 +83,6 @@ public class FilterPattern {
             tmp[i] = param[i + 1];
         }
         resolve(tmpMap, tmp);
-    }
-
-    /**
-     * 是否跳过当前的节点的序列化
-     *
-     * @param pojo
-     * @param jgen
-     * @param provider
-     * @param writer
-     * @return true 序列化当前节点 false 忽略当前节点的序列化
-     */
-    public boolean skip(Object pojo, JsonGenerator jgen, SerializerProvider provider, PropertyWriter writer) {
-        switch (patternType) {
-            case include:
-                Object object = buildPath(jgen, writer);
-                if (object instanceof String) {
-                    return includeOne(this.fields, (String) object);
-                }
-                return includeMore(this.fields, (List<String>) object);
-            case exclude:
-                object = buildPath(jgen, writer);
-                if (object instanceof String) {
-                    return excludeOne(this.fields, (String) object);
-                }
-                return excludeMore(this.fields, (List<String>) object);
-            default:
-                return true;
-        }
     }
 
     protected static boolean excludeOne(Map<String, Object> map, String key) {
@@ -198,6 +163,34 @@ public class FilterPattern {
     }
 
     /**
+     * 是否跳过当前的节点的序列化
+     *
+     * @param pojo
+     * @param jgen
+     * @param provider
+     * @param writer
+     * @return true 序列化当前节点 false 忽略当前节点的序列化
+     */
+    public boolean skip(Object pojo, JsonGenerator jgen, SerializerProvider provider, PropertyWriter writer) {
+        switch (patternType) {
+            case include:
+                Object object = buildPath(jgen, writer);
+                if (object instanceof String) {
+                    return includeOne(this.fields, (String) object);
+                }
+                return includeMore(this.fields, (List<String>) object);
+            case exclude:
+                object = buildPath(jgen, writer);
+                if (object instanceof String) {
+                    return excludeOne(this.fields, (String) object);
+                }
+                return excludeMore(this.fields, (List<String>) object);
+            default:
+                return true;
+        }
+    }
+
+    /**
      * @param map
      * @param path
      * @return
@@ -244,6 +237,10 @@ public class FilterPattern {
         }
         defaultList.add(item);
         return defaultList;
+    }
+
+    public enum PatternType {
+        include, exclude, skip
     }
 
     private static final class InnerFilter extends FilterPattern {

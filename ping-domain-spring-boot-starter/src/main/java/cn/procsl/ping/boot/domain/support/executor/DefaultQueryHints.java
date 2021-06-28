@@ -28,71 +28,71 @@ import java.util.Map.Entry;
 
 class DefaultQueryHints implements QueryHints {
 
-	private final JpaEntityInformation<?, ?> information;
-	private final CrudMethodMetadata metadata;
-	private final Optional<EntityManager> entityManager;
-	private final boolean forCounts;
+    private final JpaEntityInformation<?, ?> information;
+    private final CrudMethodMetadata metadata;
+    private final Optional<EntityManager> entityManager;
+    private final boolean forCounts;
 
 
-	private DefaultQueryHints(JpaEntityInformation<?, ?> information, CrudMethodMetadata metadata,
+    private DefaultQueryHints(JpaEntityInformation<?, ?> information, CrudMethodMetadata metadata,
                               Optional<EntityManager> entityManager, boolean forCounts) {
-		this.information = information;
-		this.metadata = metadata;
-		this.entityManager = entityManager;
-		this.forCounts = forCounts;
-	}
+        this.information = information;
+        this.metadata = metadata;
+        this.entityManager = entityManager;
+        this.forCounts = forCounts;
+    }
 
 
-	public static QueryHints of(JpaEntityInformation<?, ?> information, CrudMethodMetadata metadata) {
+    public static QueryHints of(JpaEntityInformation<?, ?> information, CrudMethodMetadata metadata) {
 
-		return new DefaultQueryHints(information, metadata, Optional.empty(), false);
-	}
+        return new DefaultQueryHints(information, metadata, Optional.empty(), false);
+    }
 
-	@Override
-	public QueryHints withFetchGraphs(EntityManager em) {
-		return new DefaultQueryHints(this.information, this.metadata, Optional.of(em), this.forCounts);
-	}
-
-
-	@Override
-	public QueryHints forCounts() {
-		return new DefaultQueryHints(this.information, this.metadata, this.entityManager, true);
-	}
+    @Override
+    public QueryHints withFetchGraphs(EntityManager em) {
+        return new DefaultQueryHints(this.information, this.metadata, Optional.of(em), this.forCounts);
+    }
 
 
-	@Override
-	public Iterator<Entry<String, Object>> iterator() {
-		return asMap().entrySet().iterator();
-	}
+    @Override
+    public QueryHints forCounts() {
+        return new DefaultQueryHints(this.information, this.metadata, this.entityManager, true);
+    }
 
 
-	@Override
-	public Map<String, Object> asMap() {
+    @Override
+    public Iterator<Entry<String, Object>> iterator() {
+        return asMap().entrySet().iterator();
+    }
 
-		Map<String, Object> hints = new HashMap<>();
 
-		if (forCounts) {
-			hints.putAll(metadata.getQueryHintsForCount());
-		} else {
-			hints.putAll(metadata.getQueryHints());
-		}
+    @Override
+    public Map<String, Object> asMap() {
 
-		hints.putAll(getFetchGraphs());
+        Map<String, Object> hints = new HashMap<>();
 
-		return hints;
-	}
+        if (forCounts) {
+            hints.putAll(metadata.getQueryHintsForCount());
+        } else {
+            hints.putAll(metadata.getQueryHints());
+        }
 
-	private Map<String, Object> getFetchGraphs() {
+        hints.putAll(getFetchGraphs());
 
-		return Optionals
-				.mapIfAllPresent(entityManager, metadata.getEntityGraph(),
-						(em, graph) -> Jpa21Utils.tryGetFetchGraphHints(em, getEntityGraph(graph), information.getJavaType()))
-				.orElse(Collections.emptyMap());
-	}
+        return hints;
+    }
 
-	private JpaEntityGraph getEntityGraph(EntityGraph entityGraph) {
+    private Map<String, Object> getFetchGraphs() {
 
-		String fallbackName = information.getEntityName() + "." + metadata.getMethod().getName();
-		return new JpaEntityGraph(entityGraph, fallbackName);
-	}
+        return Optionals
+            .mapIfAllPresent(entityManager, metadata.getEntityGraph(),
+                (em, graph) -> Jpa21Utils.tryGetFetchGraphHints(em, getEntityGraph(graph), information.getJavaType()))
+            .orElse(Collections.emptyMap());
+    }
+
+    private JpaEntityGraph getEntityGraph(EntityGraph entityGraph) {
+
+        String fallbackName = information.getEntityName() + "." + metadata.getMethod().getName();
+        return new JpaEntityGraph(entityGraph, fallbackName);
+    }
 }

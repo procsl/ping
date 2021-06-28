@@ -17,16 +17,11 @@ import java.util.Set;
 @Setter
 public class RestWebProperties {
 
-    private boolean wrapper = true;
-
-    private String rootName = "root";
-
-    private boolean writeXmlDeclaration = true;
-
-    private boolean indentOutput = true;
-
     public final static String modelKey = RestWebProperties.class.getName() + "Key";
-
+    private boolean wrapper = true;
+    private String rootName = "root";
+    private boolean writeXmlDeclaration = true;
+    private boolean indentOutput = true;
     /**
      * 支持的元媒体类型
      */
@@ -57,6 +52,10 @@ public class RestWebProperties {
      */
     private VersionStrategy versionStrategy = VersionStrategy.path_prefix;
 
+    @Bean
+    public VersionStrategyProperties versionStrategyConfiguration() {
+        return new VersionStrategyProperties();
+    }
 
     /**
      * 版本策略
@@ -94,11 +93,6 @@ public class RestWebProperties {
 
         // application/json
         system_mime
-    }
-
-    @Bean
-    public VersionStrategyProperties versionStrategyConfiguration() {
-        return new VersionStrategyProperties();
     }
 
 

@@ -11,5 +11,5 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface TreeTestRepository extends JpaRepository<Tree, Long>,
-        QuerydslPredicateExecutor<Tree> {
+    QuerydslPredicateExecutor<Tree> {
 }

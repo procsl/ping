@@ -17,7 +17,7 @@ import java.util.Map;
 public class DefaultExceptionResolver {
 
     private final Map<String, Object> defaultMap = new HashMap<>();
-    Map<Class<? extends Throwable>,Map<String, Object>> mappingList = new HashMap<>();
+    Map<Class<? extends Throwable>, Map<String, Object>> mappingList = new HashMap<>();
 
     public DefaultExceptionResolver() {
         mappingList.put(RuntimeException.class, this.defaultMap);

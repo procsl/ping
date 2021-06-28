@@ -2,9 +2,7 @@ package cn.procsl.ping.boot.domain.config;
 
 import cn.procsl.ping.boot.domain.naming.LowCasePhysicalNamingStrategy;
 import cn.procsl.ping.boot.domain.naming.NameImplicitNamingStrategy;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateProperties;
@@ -12,8 +10,6 @@ import org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import javax.persistence.EntityManager;
 
 /**
  * 自动配置 用于注册加载时依赖注入和包扫描
@@ -31,20 +27,6 @@ public class DomainAutoConfiguration {
     final DomainProperties dataProperties;
 
     final HibernateProperties hibernateProperties;
-
-    @Bean
-    @ConditionalOnMissingBean
-    public NameImplicitNamingStrategy nameImplicitNamingStrategy() {
-        return new NameImplicitNamingStrategy(dataProperties);
-    }
-
-
-    @Bean
-    @ConditionalOnMissingBean
-    public LowCasePhysicalNamingStrategy lowCasePhysicalNamingStrategy() {
-        return new LowCasePhysicalNamingStrategy(dataProperties);
-    }
-
 
     public DomainAutoConfiguration(DomainProperties dataProperties, HibernateProperties hibernateProperties) {
         this.dataProperties = dataProperties;
@@ -64,5 +46,17 @@ public class DomainAutoConfiguration {
             hibernateProperties.getNaming().setImplicitStrategy(name);
         }
 
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public NameImplicitNamingStrategy nameImplicitNamingStrategy() {
+        return new NameImplicitNamingStrategy(dataProperties);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public LowCasePhysicalNamingStrategy lowCasePhysicalNamingStrategy() {
+        return new LowCasePhysicalNamingStrategy(dataProperties);
     }
 }

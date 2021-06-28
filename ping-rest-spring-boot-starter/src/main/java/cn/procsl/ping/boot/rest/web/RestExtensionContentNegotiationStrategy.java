@@ -28,16 +28,12 @@ public class RestExtensionContentNegotiationStrategy implements ContentNegotiati
     private final EnumMap<RestWebProperties.MetaMediaType, List<MediaType>> mediaTypes;
 
     private final String content = "format";
-
+    List<ContentNegotiationStrategy> strategies = new LinkedList();
     @Setter
     private ServletContext servletContext;
-
     @Setter
     private boolean enableCustom = false;
-
     private List<MediaType> defaultMedias;
-
-    List<ContentNegotiationStrategy> strategies = new LinkedList();
 
     public RestExtensionContentNegotiationStrategy(EnumMap<RestWebProperties.MetaMediaType, List<MediaType>> mediaTypes) {
         this.mediaTypes = mediaTypes;

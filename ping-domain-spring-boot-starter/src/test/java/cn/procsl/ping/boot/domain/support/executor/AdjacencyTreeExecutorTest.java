@@ -53,6 +53,9 @@ import static cn.procsl.ping.boot.domain.business.tree.model.AdjacencyNode.ROOT_
 @Rollback(value = false)
 public class AdjacencyTreeExecutorTest {
 
+    private static final Faker FAKER;
+    private static final MockConfig mockConfig;
+
     static {
         mockConfig = new MockConfig()
             .globalConfig()
@@ -67,30 +70,19 @@ public class AdjacencyTreeExecutorTest {
 
     @Inject
     JpaRepository<Tree, Long> jpaRepository;
-
     @Inject
     QuerydslPredicateExecutor<Tree> querydslPredicateExecutor;
-
     @Inject
     TreeTestRepository treeEntityRepository;
-
     @Inject
     JPAQueryFactory jpaQueryFactory;
-
     @Inject
     EntityManager entityManager;
-
     @Inject
     BeanFactory beanFactory;
-
-    private static final Faker FAKER;
-
-    private static final MockConfig mockConfig;
-
-    private QTree T = QTree.tree;
-
     @Inject
     AdjacencyTreeRepository<Tree, Long, Path> treeExecutor;
+    private QTree T = QTree.tree;
     private QPath P = QPath.path;
 
     private List<Long> roots;
