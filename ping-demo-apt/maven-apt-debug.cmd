@@ -1,1 +1,0 @@
-mvnDebug clean package -X
