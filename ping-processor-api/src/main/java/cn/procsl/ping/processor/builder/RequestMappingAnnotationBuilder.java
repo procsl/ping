@@ -1,7 +1,6 @@
 package cn.procsl.ping.processor.builder;
 
 import cn.procsl.ping.processor.ProcessorContext;
-import cn.procsl.ping.processor.generator.AnnotationSpecBuilder;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
@@ -11,7 +10,6 @@ import com.squareup.javapoet.TypeSpec;
 import javax.annotation.Nullable;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
-import javax.tools.Diagnostic;
 import javax.ws.rs.*;
 
 @AutoService(AnnotationSpecBuilder.class)
@@ -74,7 +72,7 @@ public class RequestMappingAnnotationBuilder implements AnnotationSpecBuilder {
 
 
     @Override
-    public <T extends Element> void build(ProcessorContext context, @Nullable T source, Object target) {
+    public <T extends Element> void build(ProcessorContext context, @Nullable T source, Object target, String type) {
 
         if (target instanceof TypeSpec.Builder) {
             AnnotationSpec.Builder builder = AnnotationSpec.builder(ClassName.bestGuess(this.requestMapping));
@@ -101,7 +99,5 @@ public class RequestMappingAnnotationBuilder implements AnnotationSpecBuilder {
             AnnotationSpec tmp = builder.build();
             ((MethodSpec.Builder) target).addAnnotation(tmp);
         }
-
-        context.getMessager().printMessage(Diagnostic.Kind.WARNING, "传入的类型错误， 无法生成 RequestMapping 注解!");
     }
 }

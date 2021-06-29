@@ -1,7 +1,6 @@
 package cn.procsl.ping.processor.builder;
 
 import cn.procsl.ping.processor.ProcessorContext;
-import cn.procsl.ping.processor.generator.AnnotationSpecBuilder;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.AnnotationSpec;
 
@@ -19,7 +18,7 @@ public class GeneratedAnnotationBuilder implements AnnotationSpecBuilder {
     static final DateFormat format = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.CHINA);
 
     @Override
-    public <T extends Element> void build(ProcessorContext context, @Nullable T source, Object target) {
+    public <T extends Element> void build(ProcessorContext context, @Nullable T source, Object target, String type) {
         AnnotationSpec generator = AnnotationSpec.builder(Generated.class)
             .addMember("value", "{$S}", format.format(new Date()))
             .build();

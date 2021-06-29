@@ -1,7 +1,6 @@
 package cn.procsl.ping.processor.builder;
 
 import cn.procsl.ping.processor.ProcessorContext;
-import cn.procsl.ping.processor.generator.AnnotationSpecBuilder;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
@@ -15,7 +14,7 @@ public class AutowiredFieldAnnotationSpecBuilder implements AnnotationSpecBuilde
 
 
     @Override
-    public <T extends Element> void build(ProcessorContext context, @Nullable T source, Object target) {
+    public <T extends Element> void build(ProcessorContext context, @Nullable T source, Object target, String type) {
         ClassName clazz = ClassName.bestGuess("org.springframework.beans.factory.annotation.Autowired");
         AnnotationSpec annotationSpec = AnnotationSpec.builder(clazz).addMember("required", "true").build();
         if (target instanceof FieldSpec.Builder) {

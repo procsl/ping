@@ -1,4 +1,4 @@
-package cn.procsl.ping.processor.generator;
+package cn.procsl.ping.processor.builder;
 
 import cn.procsl.ping.processor.ProcessorContext;
 
@@ -7,6 +7,6 @@ import javax.lang.model.element.Element;
 
 public interface AnnotationSpecBuilder {
 
-    <T extends Element> void build(ProcessorContext context, @Nullable T source, Object target);
+    <T extends Element> void build(ProcessorContext context, @Nullable T source, Object target, String type);
 
 }
