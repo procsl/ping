@@ -8,7 +8,7 @@
     <artifactId>ping-processor-domain</artifactId>
     <groupId>cn.procsl</groupId>
     <packaging>jar</packaging>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.3-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
