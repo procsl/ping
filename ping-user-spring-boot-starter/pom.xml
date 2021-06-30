@@ -28,24 +28,12 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>cn.procsl</groupId>
-            <artifactId>ping-domain-spring-boot-starter</artifactId>
-            <version>0.0.3-SNAPSHOT</version>
-        </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
             <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.procsl</groupId>
-            <artifactId>ping-processor-domain</artifactId>
-            <version>0.0.3-SNAPSHOT</version>
-            <scope>compile</scope>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
@@ -65,6 +53,12 @@
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-launcher</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
