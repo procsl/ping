@@ -1,20 +1,15 @@
 package cn.procsl.ping.processor.builder;
 
-import cn.procsl.ping.processor.ProcessorContext;
-import com.google.auto.service.AutoService;
-import com.squareup.javapoet.AnnotationSpec;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.TypeSpec;
-
-import javax.annotation.Nullable;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.ws.rs.*;
 
-@AutoService(AnnotationSpecBuilder.class)
-public class RequestMappingAnnotationBuilder implements AnnotationSpecBuilder {
+public abstract class AbstractRequestMappingAnnotationBuilder<T> extends AbstractAnnotationSpecBuilder<T> {
 
+    @Override
+    protected boolean isType(String type) {
+        return "CONTROLLER".equals(type);
+    }
 
     protected final String requestMapping = "org.springframework.web.bind.annotation.RequestMapping";
 
@@ -71,33 +66,4 @@ public class RequestMappingAnnotationBuilder implements AnnotationSpecBuilder {
     }
 
 
-    @Override
-    public <T extends Element> void build(ProcessorContext context, @Nullable T source, Object target, String type) {
-
-        if (target instanceof TypeSpec.Builder) {
-            AnnotationSpec.Builder builder = AnnotationSpec.builder(ClassName.bestGuess(this.requestMapping));
-
-            String prefix = context.getConfig("api.prefix");
-            String api = getPath(prefix, source);
-
-            builder.addMember("path", "$S", api);
-            ((TypeSpec.Builder) target).addAnnotation(builder.build());
-        }
-
-        if (target instanceof MethodSpec.Builder) {
-
-            AnnotationSpec.Builder builder = AnnotationSpec.builder(ClassName.bestGuess(this.requestMapping));
-
-            String api = getPath("", source);
-
-            builder.addMember("path", "$S", api);
-
-            String method = getMethod((ExecutableElement) source);
-
-            builder.addMember("method", "$N", method);
-
-            AnnotationSpec tmp = builder.build();
-            ((MethodSpec.Builder) target).addAnnotation(tmp);
-        }
-    }
 }

@@ -3,38 +3,30 @@ package cn.procsl.ping.processor.builder;
 import cn.procsl.ping.processor.ProcessorContext;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.AnnotationSpec;
+import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeSpec;
 
-import javax.annotation.processing.Generated;
 import javax.lang.model.element.Element;
-import java.text.DateFormat;
-import java.util.Date;
-import java.util.Locale;
-
 
 @AutoService(AnnotationSpecBuilder.class)
-public class GeneratedAnnotationBuilder extends AbstractAnnotationSpecBuilder<TypeSpec.Builder> {
-
-    static final DateFormat format = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.CHINA);
-
-
+public class GetterAndSetterAnnotationSpecBuilder extends AbstractAnnotationSpecBuilder<TypeSpec.Builder> {
     @Override
     protected boolean isType(String type) {
-        return "CONTROLLER".equals(type);
+        return "DTO".equals(type);
     }
 
     @Override
     protected <E extends Element> void buildTargetAnnotation(ProcessorContext context, E source, TypeSpec.Builder target) {
-        AnnotationSpec generator = AnnotationSpec
-            .builder(Generated.class)
-            .addMember("value", "{$S}", format.format(new Date()))
-            .build();
-        target.addAnnotation(generator);
+        ClassName getter = ClassName.bestGuess("lombok.Getter");
+        ClassName setter = ClassName.bestGuess("lombok.Setter");
+        AnnotationSpec getterBuilder = AnnotationSpec.builder(getter).build();
+        AnnotationSpec setterBuilder = AnnotationSpec.builder(setter).build();
+        target.addAnnotation(getterBuilder);
+        target.addAnnotation(setterBuilder);
     }
 
     @Override
     protected Class<TypeSpec.Builder> target() {
         return TypeSpec.Builder.class;
     }
-
 }

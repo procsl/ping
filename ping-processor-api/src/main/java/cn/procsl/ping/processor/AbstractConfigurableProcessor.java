@@ -42,9 +42,7 @@ public abstract class AbstractConfigurableProcessor extends AbstractProcessor {
         try {
             this.processor(annotations, roundEnv);
         } catch (Exception e) {
-            processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, e.getMessage());
-            log.error("编译错误", e);
-            return false;
+            throw new RuntimeException(e);
         }
 
         return true;

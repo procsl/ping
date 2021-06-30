@@ -10,14 +10,24 @@ import javax.annotation.Nullable;
 import javax.lang.model.element.Element;
 
 @AutoService(AnnotationSpecBuilder.class)
-public class RestControllerSpecAnnotationBuilder implements AnnotationSpecBuilder {
-
+public class RestControllerSpecAnnotationBuilder extends AbstractAnnotationSpecBuilder<TypeSpec.Builder> {
 
     @Override
-    public <T extends Element> void build(ProcessorContext context, @Nullable T source, Object target, String type) {
-        AnnotationSpec tmp = AnnotationSpec.builder(ClassName.bestGuess("org.springframework.web.bind.annotation.RestController")).build();
-        if (target instanceof TypeSpec.Builder) {
-            ((TypeSpec.Builder) target).addAnnotation(tmp);
-        }
+    protected boolean isType(String type) {
+        return "CONTROLLER".equals(type);
     }
+
+    @Override
+    protected <E extends Element> void buildTargetAnnotation(ProcessorContext context, @Nullable E source, TypeSpec.Builder target) {
+        AnnotationSpec tmp = AnnotationSpec
+            .builder(ClassName.bestGuess("org.springframework.web.bind.annotation.RestController"))
+            .build();
+        target.addAnnotation(tmp);
+    }
+
+    @Override
+    protected Class<TypeSpec.Builder> target() {
+        return TypeSpec.Builder.class;
+    }
+
 }
