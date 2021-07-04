@@ -22,6 +22,8 @@ public class RestControllerSpecAnnotationBuilder extends AbstractAnnotationSpecB
         AnnotationSpec tmp = AnnotationSpec
             .builder(ClassName.bestGuess("org.springframework.web.bind.annotation.RestController"))
             .build();
+        AnnotationSpec.Builder indexed = AnnotationSpec.builder(ClassName.bestGuess("org.springframework.stereotype.Indexed"));
+        target.addAnnotation(indexed.build());
         target.addAnnotation(tmp);
     }
 

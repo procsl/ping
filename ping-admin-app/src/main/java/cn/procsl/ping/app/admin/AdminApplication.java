@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
  * @author procsl
  * @date 2020/04/26
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "cn.procsl.ping.boot.user")
 @EnableJpaAuditing
 public class AdminApplication {
 

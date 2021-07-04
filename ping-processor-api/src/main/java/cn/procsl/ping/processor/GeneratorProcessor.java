@@ -72,7 +72,7 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
                 this.buildMethod(builder, item, fieldName);
             }
 
-            String packageName = typeElement.getEnclosingElement().toString() + ".gen";
+            String packageName = typeElement.getEnclosingElement().toString() + ".api";
             JavaFile java = JavaFile
                 .builder(packageName, builder.build())
                 .addFileComment("这是自动生成的代码，请勿修改").build();
@@ -158,7 +158,7 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
     String createClassName(TypeElement element) {
         String name = element.getSimpleName().toString();
         if (name.endsWith(SERVICE)) {
-            name = name.replaceAll(SERVICE + "$", "Controller");
+            name = name.replaceAll("Application", "").replaceAll(SERVICE + "$", "Controller");
         } else {
             name = name + "Controller";
         }
@@ -245,8 +245,8 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
             Element type = executableElement.getEnclosingElement();
             String packageName = type.getEnclosingElement().toString();
             String serviceName = type.getSimpleName().toString();
-            String businessName = serviceName.replaceAll(SERVICE + "$", "").toLowerCase(Locale.ROOT);
-            return String.format("%s.gen.dto.%s", packageName, businessName);
+            String businessName = serviceName.replaceAll("Application", "").replaceAll(SERVICE + "$", "").toLowerCase(Locale.ROOT);
+            return String.format("%s.api.%s", packageName, businessName);
         }
 
         boolean isSimpleRequest(ExecutableElement executableElement) {
