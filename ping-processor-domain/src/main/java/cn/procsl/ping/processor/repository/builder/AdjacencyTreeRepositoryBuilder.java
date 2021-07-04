@@ -14,7 +14,7 @@ import javax.lang.model.util.Types;
 import java.util.*;
 
 
-@AutoService(RepositoryBuilder.class)
+//@AutoService(RepositoryBuilder.class)
 @Slf4j
 public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
 
@@ -31,6 +31,7 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
     private TypeMirror domainEntity;
     private TypeMirror domainId;
     private TypeMirror domainEvents;
+    private boolean init = false;
 
     /**
      * 内部初始化
@@ -40,6 +41,9 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
         typeUtils = this.processingEnvironment.getTypeUtils();
         elementUtils = this.processingEnvironment.getElementUtils();
         TypeElement adjacencyType = elementUtils.getTypeElement(adjacencyNodeName);
+        if (adjacencyType == null) {
+            return;
+        }
         // 删除泛型
         node = this.typeUtils.erasure(adjacencyType.asType());
         path = this.typeUtils.erasure(elementUtils.getTypeElement(adjacencyPathNodeName).asType());
@@ -47,9 +51,11 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
         domainEntity = this.typeUtils.erasure(elementUtils.getTypeElement(domainEntityName).asType());
         domainId = this.typeUtils.erasure(elementUtils.getTypeElement(domainIdName).asType());
         domainEvents = this.typeUtils.erasure(elementUtils.getTypeElement(domainEventsName).asType());
+        init = true;
     }
 
     protected DeclaredType getSubType(TypeElement entity) {
+
         // jb 代码写的太垃圾了
         List<TypeElement> elementsClass = new LinkedList<>();
         List<TypeMirror> mirrorsClass = new LinkedList<>();
@@ -162,6 +168,9 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
      */
     @Override
     public Map<String, List<TypeMirror>> generator(TypeElement entity, RoundEnvironment roundEnv) {
+        if (!init) {
+            return null;
+        }
 
         TypeMirror idType = findIdType(entity);
         if (idType == null) {

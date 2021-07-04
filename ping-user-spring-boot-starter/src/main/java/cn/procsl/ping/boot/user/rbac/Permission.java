@@ -1,6 +1,8 @@
 package cn.procsl.ping.boot.user.rbac;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Embeddable;
 import java.io.Serializable;
@@ -10,6 +12,8 @@ import java.io.Serializable;
  */
 @Data
 @Embeddable
+@NoArgsConstructor
+@AllArgsConstructor
 public class Permission implements Serializable {
     String name;
 }

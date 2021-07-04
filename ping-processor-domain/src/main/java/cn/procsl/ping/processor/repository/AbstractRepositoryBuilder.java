@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.persistence.Id;
 import javax.tools.Diagnostic;
@@ -75,6 +76,16 @@ public abstract class AbstractRepositoryBuilder implements RepositoryBuilder {
                 return element.asType();
             }
         }
+
+        TypeMirror superClass = entity.getSuperclass();
+        if (superClass.toString().startsWith("org.springframework.data.jpa.domain.AbstractPersistable") && superClass instanceof DeclaredType) {
+            List<? extends TypeMirror> arguments = ((DeclaredType) superClass).getTypeArguments();
+            if (!arguments.isEmpty()) {
+                return arguments.get(0);
+            }
+        }
+//        ((DeclaredType)entity.getSuperclass()).getTypeArguments();
+
         this.processingEnvironment.getMessager().printMessage(Diagnostic.Kind.WARNING, "Not fount @Id annotation", entity);
         log.warn("Not fount annotation @javax.persistence.Id");
         return null;

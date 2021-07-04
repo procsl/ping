@@ -8,7 +8,7 @@ import com.google.auto.service.AutoService;
  * @author procsl
  * @date 2020/06/21
  */
-@AutoService(RepositoryBuilder.class)
+//@AutoService(RepositoryBuilder.class)
 public class CrudRepositoryBuilder extends EntityAndIdRepositoryBuilder {
     @Override
     protected String getSupportRepositoryClass() {

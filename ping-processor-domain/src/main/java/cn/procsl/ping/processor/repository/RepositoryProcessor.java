@@ -12,6 +12,7 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import javax.persistence.Entity;
+import javax.tools.Diagnostic;
 import javax.tools.StandardLocation;
 import java.io.IOException;
 import java.io.InputStream;
@@ -109,7 +110,7 @@ public class RepositoryProcessor extends AbstractProcessor {
 
     @Override
     public synchronized boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        if (init && roundEnv.processingOver()) {
+        if (!init || roundEnv.processingOver()) {
             return false;
         }
 
@@ -213,7 +214,11 @@ public class RepositoryProcessor extends AbstractProcessor {
         this.builders = new LinkedList<>();
         this.singletonBuilders = new LinkedList<>();
         for (RepositoryBuilder curr : services) {
-            curr.init(processingEnv, this::getConfig);
+            try {
+                curr.init(processingEnv, this::getConfig);
+            } catch (Exception e) {
+                this.messager.printMessage(WARNING, curr.getClass().getName() + "初始化失败: " + e.getMessage());
+            }
             if (curr.isSingleton()) {
                 this.singletonBuilders.add(curr);
             } else {

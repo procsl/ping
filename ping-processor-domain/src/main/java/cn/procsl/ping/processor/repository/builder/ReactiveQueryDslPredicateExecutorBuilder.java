@@ -11,7 +11,7 @@ import java.util.Collections;
  * @author procsl
  * @date 2020/06/21
  */
-@AutoService(RepositoryBuilder.class)
+//@AutoService(RepositoryBuilder.class)
 public class ReactiveQueryDslPredicateExecutorBuilder extends EntityRepositoryBuilder {
 
     @Override

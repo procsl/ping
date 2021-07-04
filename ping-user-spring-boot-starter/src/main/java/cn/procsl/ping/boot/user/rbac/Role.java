@@ -1,12 +1,11 @@
 package cn.procsl.ping.boot.user.rbac;
 
+import cn.procsl.ping.processor.repository.annotation.RepositoryCreator;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
@@ -14,28 +13,35 @@ import java.util.Set;
 
 @Data
 @Entity
-@Table(name = "s_role")
+@Table(name = "u_role")
 @NoArgsConstructor
+@RepositoryCreator
 public class Role extends AbstractPersistable<Long> implements Serializable {
 
+    @Column(unique = true)
     String name;
 
     @ElementCollection
+    @CollectionTable(name = "u_role_permission")
     Set<Permission> permissions;
 
-    public void changePermissions(Collection<Permission> permissions) {
-        if (!permissions.isEmpty()) {
+    public void changePermissions(Collection<String> permissions) {
+
+        if (this.permissions == null) {
+            this.permissions = new HashSet<>(permissions.size());
+        }
+
+        if (!this.permissions.isEmpty()) {
             this.permissions.clear();
-            this.permissions.addAll(permissions);
+        }
+        for (String permission : permissions) {
+            this.permissions.add(new Permission(permission));
         }
     }
 
-    public Role(String name, Collection<Permission> permissions) {
+
+    public Role(String name, Collection<String> permissions) {
         this.name = name;
-        if (permissions instanceof HashSet) {
-            this.permissions = (Set<Permission>) permissions;
-            return;
-        }
-        this.permissions = new HashSet<>(permissions);
+        this.changePermissions(permissions);
     }
 }

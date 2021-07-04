@@ -1,0 +1,28 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="create_u_role_table" author="user_module">
+        <createTable tableName="u_role" remarks="RBAC模块角色表">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="name" type="varchar(20)" remarks="角色名称">
+                <constraints nullable="false" unique="true" uniqueConstraintName="u_uk_role_name"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create_u_role_permission" author="user_module">
+        <createTable tableName="u_role_permission" remarks="RBAC模块权限表">
+            <column name="role_id" type="bigint">
+                <constraints references="u_role" foreignKeyName="role_id"/>
+            </column>
+            <column name="name" type="varchar(128)" remarks="权限名称"/>
+        </createTable>
+    </changeSet>
+
+
+</databaseChangeLog>

@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 
-@AutoService(RepositoryBuilder.class)
+//@AutoService(RepositoryBuilder.class)
 public class BooleanStatefulRepositoryBuilder extends EntityAndIdRepositoryBuilder {
 
     private TypeMirror booleanStatefulType;
@@ -24,8 +24,11 @@ public class BooleanStatefulRepositoryBuilder extends EntityAndIdRepositoryBuild
     @Override
     protected void innerInit() {
         CharSequence name = "cn.procsl.ping.boot.domain.business.state.model.BooleanStateful";
-        TypeMirror tmp = processingEnvironment.getElementUtils().getTypeElement(name).asType();
-        booleanStatefulType = processingEnvironment.getTypeUtils().erasure(tmp);
+        TypeElement tmp = processingEnvironment.getElementUtils().getTypeElement(name);
+        if (tmp == null) {
+            return;
+        }
+        booleanStatefulType = processingEnvironment.getTypeUtils().erasure(tmp.asType());
     }
 
     /**

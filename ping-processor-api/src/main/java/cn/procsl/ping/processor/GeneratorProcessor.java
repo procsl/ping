@@ -65,7 +65,7 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
 
             List<ExecutableElement> list = typeElement.getEnclosedElements().stream()
                 .filter(item -> item instanceof ExecutableElement)
-                .filter(item -> (item).getAnnotation(Path.class) != null)
+                .filter(this::methodSelector)
                 .map(item -> (ExecutableElement) item)
                 .collect(Collectors.toList());
             for (ExecutableElement item : list) {
@@ -78,6 +78,19 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
                 .addFileComment("这是自动生成的代码，请勿修改").build();
             java.writeTo(this.getFiler());
         }
+    }
+
+    boolean methodSelector(Element element) {
+        Set<String> set = element.getAnnotationMirrors()
+            .stream()
+            .map(item -> item.getAnnotationType().asElement().toString())
+            .collect(Collectors.toSet());
+        return set.contains("javax.ws.rs.PATCH")
+            || set.contains("javax.ws.rs.POST")
+            || set.contains("javax.ws.rs.GET")
+            || set.contains("javax.ws.rs.DELETE")
+            || set.contains("javax.ws.rs.PATH")
+            || set.contains("javax.ws.rs.PUT");
     }
 
     private void buildMethod(TypeSpec.Builder builder, ExecutableElement item, String fieldName) throws IOException {
@@ -174,6 +187,8 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
 
         final String dtoPackage;
 
+        final boolean createDTO;
+
         TypeSpec dtoType;
 
         public ParameterConstructor(GeneratorProcessor processor, String methodName, String fieldName, @NonNull ExecutableElement executableElement) throws IOException {
@@ -186,36 +201,43 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
             List<? extends VariableElement> parameters = executableElement.getParameters();
 
             for (int i = 0; i < parameters.size(); i++) {
+                if (simpleRequest) {
+                    params.put(i, parameters.get(i));
+                    continue;
+                }
                 if (isSimpleParameter(parameters.get(i))) {
                     params.put(i, parameters.get(i));
                 } else {
                     dtoFields.put(i, parameters.get(i));
                 }
             }
+
             this.dtoName = NamingUtils.upperCamelCase(methodName) + dtoFields.size() + params.size() + "DTO";
             this.size = parameters.size();
             this.dtoPackage = getPackage();
+            this.createDTO = (simpleRequest || dtoFields.isEmpty());
 
-            if (!dtoFields.isEmpty()) {
-                TypeSpec.Builder dto = TypeSpec.classBuilder(this.dtoName);
-                dto.addModifiers(Modifier.PUBLIC);
-                for (AnnotationSpecBuilder specBuilder : processor.annotationSpecBuilders) {
-                    specBuilder.build(processor, this.executableElement, dto, DTO);
-                }
-                dtoFields.forEach((k, v) -> {
-                    TypeName type = toBoxed(v);
-                    FieldSpec.Builder fieldBuilder = FieldSpec.builder(type, v.getSimpleName().toString(), Modifier.PROTECTED);
-
-                    for (AnnotationSpecBuilder specBuilder : processor.annotationSpecBuilders) {
-                        specBuilder.build(processor, v, fieldBuilder, DTO);
-                    }
-
-                    dto.addField(fieldBuilder.build());
-                });
-                this.dtoType = dto.build();
-                JavaFile javaFile = JavaFile.builder(this.dtoPackage, this.dtoType).build();
-                javaFile.writeTo(this.processor.getFiler());
+            if (createDTO) {
+                return;
             }
+            TypeSpec.Builder dto = TypeSpec.classBuilder(this.dtoName);
+            dto.addModifiers(Modifier.PUBLIC);
+            for (AnnotationSpecBuilder specBuilder : processor.annotationSpecBuilders) {
+                specBuilder.build(processor, this.executableElement, dto, DTO);
+            }
+            dtoFields.forEach((k, v) -> {
+                TypeName type = toBoxed(v);
+                FieldSpec.Builder fieldBuilder = FieldSpec.builder(type, v.getSimpleName().toString(), Modifier.PROTECTED);
+
+                for (AnnotationSpecBuilder specBuilder : processor.annotationSpecBuilders) {
+                    specBuilder.build(processor, v, fieldBuilder, DTO);
+                }
+
+                dto.addField(fieldBuilder.build());
+            });
+            this.dtoType = dto.build();
+            JavaFile javaFile = JavaFile.builder(this.dtoPackage, this.dtoType).build();
+            javaFile.writeTo(this.processor.getFiler());
 
         }
 
@@ -264,11 +286,12 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
 
             ArrayList<ParameterSpec> result = new ArrayList<>(size);
             buildParamSpec(result);
-            if (!dtoFields.isEmpty()) {
-                ClassName clazz = ClassName.get(this.dtoPackage, this.dtoName);
-                ParameterSpec.Builder dtoBuilder = ParameterSpec.builder(clazz, NamingUtils.lowerCamelCase(this.dtoName), Modifier.FINAL);
-                result.add(dtoBuilder.build());
+            if (this.createDTO) {
+                return result;
             }
+            ClassName clazz = ClassName.get(this.dtoPackage, this.dtoName);
+            ParameterSpec.Builder dtoBuilder = ParameterSpec.builder(clazz, NamingUtils.lowerCamelCase(this.dtoName), Modifier.FINAL);
+            result.add(dtoBuilder.build());
             return result;
         }
 
@@ -291,7 +314,13 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
 
         public CodeBlock buildCaller() {
 
-            String returned = "return this.%s.%s(%s);\n";
+            String returned;
+            if (executableElement.getReturnType().toString().equals("void")) {
+                returned = " this.%s.%s(%s);\n";
+            } else {
+                returned = "return this.%s.%s(%s);\n";
+            }
+
             if (size == 0) {
                 return CodeBlock.builder().add(String.format(returned, fieldName, methodName, "")).build();
             }
