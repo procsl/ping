@@ -18,7 +18,7 @@
     <changeSet id="create_u_role_permission" author="user_module">
         <createTable tableName="u_role_permission" remarks="RBAC模块权限表">
             <column name="role_id" type="bigint">
-                <constraints references="u_role" foreignKeyName="role_id"/>
+                <constraints references="u_role(id)" foreignKeyName="fk_role_id" referencedTableName="u_role" referencedColumnNames="id"/>
             </column>
             <column name="name" type="varchar(128)" remarks="权限名称"/>
         </createTable>
