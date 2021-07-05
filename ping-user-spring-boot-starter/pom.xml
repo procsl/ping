@@ -72,7 +72,7 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-indexer</artifactId>
             <optional>true</optional>
-<!--            <scope>provided</scope>-->
+            <!--            <scope>provided</scope>-->
         </dependency>
 
         <dependency>
@@ -99,6 +99,7 @@
             <groupId>cn.procsl</groupId>
             <artifactId>ping-processor-domain</artifactId>
             <version>0.0.3-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/javax.validation/validation-api -->
