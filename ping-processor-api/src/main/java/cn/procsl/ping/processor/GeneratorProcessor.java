@@ -291,6 +291,9 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
             }
             ClassName clazz = ClassName.get(this.dtoPackage, this.dtoName);
             ParameterSpec.Builder dtoBuilder = ParameterSpec.builder(clazz, NamingUtils.lowerCamelCase(this.dtoName), Modifier.FINAL);
+            for (AnnotationSpecBuilder specBuilder : processor.annotationSpecBuilders) {
+                specBuilder.build(processor, this.executableElement, dtoBuilder, CONTROLLER);
+            }
             result.add(dtoBuilder.build());
             return result;
         }

@@ -19,7 +19,7 @@ public class MethodRequestMappingAnnotationBuilder
 
         String api = getPath("", source);
 
-        builder.addMember("path", "$S", api);
+        builder.addMember("path", "$S", api.replaceAll("/$", ""));
 
         String method = getMethod((ExecutableElement) source);
 
