@@ -14,6 +14,10 @@ import javax.validation.constraints.Size;
 import javax.ws.rs.*;
 import java.util.Collection;
 
+/**
+ * @name: RBAC权限管理模块
+ * @description: 这是用于管理角色的模块
+ */
 @Named("rbacApplicationService")
 @Path("roles")
 @NoArgsConstructor

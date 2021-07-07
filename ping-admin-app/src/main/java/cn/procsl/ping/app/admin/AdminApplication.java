@@ -2,7 +2,6 @@ package cn.procsl.ping.app.admin;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 /**
  * starter
@@ -10,8 +9,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
  * @author procsl
  * @date 2020/04/26
  */
-@SpringBootApplication(scanBasePackages = "cn.procsl.ping.boot.user")
-@EnableJpaAuditing
+@SpringBootApplication(scanBasePackages = "cn.procsl.ping")
 public class AdminApplication {
 
     public static void main(String[] args) {
