@@ -10,6 +10,7 @@ import com.squareup.javapoet.TypeSpec;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import javax.lang.model.element.Element;
+import javax.tools.Diagnostic;
 
 /**
  * 注释规范, 如果存在 @name 标记的文本, 则会被转化为 name 属性, 如果不存在, 则使用类名,并除去 "Service", "Controller"等
@@ -26,11 +27,25 @@ public class TagBuilder extends AbstractAnnotationSpecBuilder<TypeSpec.Builder> 
 
     @Override
     protected <E extends Element> void buildTargetAnnotation(ProcessorContext context, E source, TypeSpec.Builder target) {
-        String name = "";
-        String description = "";
-        if (source != null) {
-            description = context.getProcessingEnvironment().getElementUtils().getDocComment(source);
+
+        if (source == null) {
+            context.getMessager().printMessage(Diagnostic.Kind.WARNING, "TypeElement is null," + Tag.class.getName() + " 创建失败");
+            return;
         }
+
+        String tmp = context.getProcessingEnvironment().getElementUtils().getDocComment(source);
+        JavaCommentResolver comment = new JavaCommentResolver(tmp);
+        String name = comment.findOndTag("@name");
+        String description = comment.findOndTag("@description");
+
+        if (name == null) {
+            name = source.getSimpleName().toString().replaceAll("Service", "接口");
+        }
+
+        if (description == null) {
+            description = tmp;
+        }
+
         AnnotationSpec tagAnnotation = AnnotationSpec
             .builder(ClassName.get(Tag.class))
             .addMember("name", "$S", name)

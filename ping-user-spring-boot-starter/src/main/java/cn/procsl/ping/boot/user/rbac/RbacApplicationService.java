@@ -15,8 +15,8 @@ import javax.ws.rs.*;
 import java.util.Collection;
 
 /**
- * @name: RBAC权限管理模块
- * @description: 这是用于管理角色的模块
+ * @name 角色管理模块
+ * @description RBAC模块之一， 用于管理角色
  */
 @Named("rbacApplicationService")
 @Path("roles")

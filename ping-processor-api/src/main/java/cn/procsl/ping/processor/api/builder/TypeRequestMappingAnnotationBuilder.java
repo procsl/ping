@@ -17,7 +17,7 @@ public class TypeRequestMappingAnnotationBuilder
     protected <E extends Element> void buildTargetAnnotation(ProcessorContext context, E source, TypeSpec.Builder target) {
         AnnotationSpec.Builder builder = AnnotationSpec.builder(ClassName.bestGuess(this.requestMapping));
 
-        String prefix = context.getConfig("api.prefix");
+        String prefix = context.getConfig("processor.api.prefix");
         String api = getPath(prefix, source);
 
         builder.addMember("path", "$S", api);
