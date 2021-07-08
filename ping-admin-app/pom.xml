@@ -51,6 +51,23 @@
             <groupId>cn.procsl</groupId>
             <artifactId>ping-user-spring-boot-starter</artifactId>
             <version>0.0.3-SNAPSHOT</version>
+            <exclusions>
+
+                <exclusion>
+                    <groupId>cn.procsl</groupId>
+                    <artifactId>ping-processor-repo</artifactId>
+                </exclusion>
+
+                <exclusion>
+                    <groupId>cn.procsl</groupId>
+                    <artifactId>ping-processor-api</artifactId>
+                </exclusion>
+
+                <exclusion>
+                    <groupId>cn.procsl</groupId>
+                    <artifactId>ping-processor-doc</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -173,6 +190,23 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <jvmArguments>-Dspring.application.admin.enabled=true</jvmArguments>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>pre-integration-test</id>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>post-integration-test</id>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
@@ -188,7 +222,23 @@
                     </compilerArgs>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-maven-plugin</artifactId>
+                <version>1.3</version>
+                <executions>
+                    <execution>
+                        <id>integration-test</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
+
 
     </build>
 

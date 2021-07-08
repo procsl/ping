@@ -39,7 +39,7 @@ public class TagBuilder extends AbstractAnnotationSpecBuilder<TypeSpec.Builder> 
         String description = comment.findOndTag("@description");
 
         if (name == null) {
-            name = source.getSimpleName().toString().replaceAll("Service", "接口");
+            name = source.getSimpleName().toString().replaceAll("Service$", "接口");
         }
 
         if (description == null) {
