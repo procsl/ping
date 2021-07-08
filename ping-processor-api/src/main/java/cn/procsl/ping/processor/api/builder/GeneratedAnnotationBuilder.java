@@ -22,7 +22,7 @@ public class GeneratedAnnotationBuilder extends AbstractAnnotationSpecBuilder<Ty
 
     @Override
     protected boolean isType(String type) {
-        return "CONTROLLER".equals(type);
+        return true;
     }
 
     @Override

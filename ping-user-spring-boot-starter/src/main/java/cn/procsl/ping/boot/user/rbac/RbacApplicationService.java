@@ -41,7 +41,7 @@ public class RbacApplicationService {
      */
     @POST
     @Transactional(rollbackOn = Exception.class)
-    public Long createRole(@NotBlank @Max(value = 20) String name, @NotNull @Size(max = 100) Collection<String> permissions) throws RbacException {
+    public Long createRole(@NotBlank @Size(max = 20) String name, @NotNull @Size(max = 100) Collection<@Size(max = 100) String> permissions) throws RbacException {
         this.verifyPermissionService.verify(permissions);
         Role role = roleJpaRepository.save(new Role(name, permissions));
         return role.getId();
@@ -68,7 +68,7 @@ public class RbacApplicationService {
      * @throws RbacException 如果修改失败，则抛出异常
      */
     @Transactional(rollbackOn = Exception.class)
-    public void changeRolePermissions(@NotNull Long id, @NotNull @Size(max = 100) Collection<String> permissions) throws RbacException {
+    public void changeRolePermissions(@NotNull Long id, @NotNull @Size(max = 100) Collection<@Max(100) String> permissions) throws RbacException {
         Role role = this.roleJpaRepository.getOne(id);
         this.verifyPermissionService.verify(permissions);
         role.changePermissions(permissions);
@@ -81,7 +81,7 @@ public class RbacApplicationService {
      * @throws RbacException 如果修改失败，则抛出异常
      */
     @Transactional(rollbackOn = Exception.class)
-    public void changeRoleName(@NotNull Long id, @NotBlank @Max(20) String name) throws RbacException {
+    public void changeRoleName(@NotNull Long id, @NotBlank @Size(max = 20) String name) throws RbacException {
         Role role = this.roleJpaRepository.getOne(id);
         role.setName(name);
         this.roleJpaRepository.save(role);
@@ -97,7 +97,7 @@ public class RbacApplicationService {
      */
     @PATCH
     @Transactional(rollbackOn = Exception.class)
-    public void changeRole(@NotNull Long id, @Max(20) String name, @Size(max = 100) Collection<String> permissions) throws RbacException {
+    public void changeRole(@NotNull Long id, @Size(max = 20) String name, @Size(max = 100) Collection<@Size(max = 100) String> permissions) throws RbacException {
         if (name != null) {
             this.changeRoleName(id, name);
         }

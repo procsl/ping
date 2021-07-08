@@ -13,6 +13,8 @@ import javax.lang.model.element.Element;
 public class TypeRequestMappingAnnotationBuilder
     extends AbstractRequestMappingAnnotationBuilder<TypeSpec.Builder> {
 
+    final String validate = "org.springframework.validation.annotation.Validated";
+
     @Override
     protected <E extends Element> void buildTargetAnnotation(ProcessorContext context, E source, TypeSpec.Builder target) {
         AnnotationSpec.Builder builder = AnnotationSpec.builder(ClassName.bestGuess(this.requestMapping));
@@ -22,6 +24,10 @@ public class TypeRequestMappingAnnotationBuilder
 
         builder.addMember("path", "$S", api);
         target.addAnnotation(builder.build());
+
+        AnnotationSpec validateAnnotation = AnnotationSpec.builder(ClassName.bestGuess(validate)).build();
+        target.addAnnotation(validateAnnotation);
+
     }
 
     @Override

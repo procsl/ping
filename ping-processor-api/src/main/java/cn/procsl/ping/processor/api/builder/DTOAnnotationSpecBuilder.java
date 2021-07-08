@@ -11,11 +11,15 @@ import com.squareup.javapoet.TypeSpec;
 import javax.lang.model.element.Element;
 
 @AutoService(AnnotationSpecBuilder.class)
-public class GetterAndSetterAnnotationSpecBuilder extends AbstractAnnotationSpecBuilder<TypeSpec.Builder> {
+public class DTOAnnotationSpecBuilder extends AbstractAnnotationSpecBuilder<TypeSpec.Builder> {
+
+    final String validate = "org.springframework.validation.annotation.Validated";
+
     @Override
     protected boolean isType(String type) {
         return "DTO".equals(type);
     }
+
 
     @Override
     protected <E extends Element> void buildTargetAnnotation(ProcessorContext context, E source, TypeSpec.Builder target) {
@@ -25,6 +29,8 @@ public class GetterAndSetterAnnotationSpecBuilder extends AbstractAnnotationSpec
         AnnotationSpec setterBuilder = AnnotationSpec.builder(setter).build();
         target.addAnnotation(getterBuilder);
         target.addAnnotation(setterBuilder);
+        AnnotationSpec validateAnnotation = AnnotationSpec.builder(ClassName.bestGuess(validate)).build();
+        target.addAnnotation(validateAnnotation);
     }
 
     @Override

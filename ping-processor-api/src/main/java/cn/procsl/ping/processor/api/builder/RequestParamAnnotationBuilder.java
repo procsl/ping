@@ -50,7 +50,7 @@ public class RequestParamAnnotationBuilder extends AbstractAnnotationSpecBuilder
             if (query != null) {
                 AnnotationSpec.Builder spec = AnnotationSpec
                     .builder(ClassName.bestGuess(requestParam))
-                    .addMember("name", query.value());
+                    .addMember("name", "$S", query.value());
                 if (defaultValue != null) {
                     spec.addMember("defaultValue", "$S", defaultValue.value());
                 }
@@ -64,7 +64,7 @@ public class RequestParamAnnotationBuilder extends AbstractAnnotationSpecBuilder
             if (path != null) {
                 AnnotationSpec spec = AnnotationSpec
                     .builder(ClassName.bestGuess(pathVariable))
-                    .addMember("name", path.value())
+                    .addMember("name", "$S", path.value())
                     .build();
                 target.addAnnotation(spec);
                 bool = true;
@@ -76,7 +76,7 @@ public class RequestParamAnnotationBuilder extends AbstractAnnotationSpecBuilder
             if (header != null) {
                 AnnotationSpec.Builder spec = AnnotationSpec
                     .builder(ClassName.bestGuess(requestHeader))
-                    .addMember("name", header.value());
+                    .addMember("name", "$S", header.value());
                 if (defaultValue != null) {
                     spec.addMember("defaultValue", "$S", defaultValue.value());
                 }
@@ -90,7 +90,7 @@ public class RequestParamAnnotationBuilder extends AbstractAnnotationSpecBuilder
             if (cookie != null) {
                 AnnotationSpec.Builder spec = AnnotationSpec
                     .builder(ClassName.bestGuess(cookieValue))
-                    .addMember("name", cookie.value());
+                    .addMember("name", "$S", cookie.value());
                 if (defaultValue != null) {
                     spec.addMember("defaultValue", "$S", defaultValue.value());
                 }
@@ -113,8 +113,20 @@ public class RequestParamAnnotationBuilder extends AbstractAnnotationSpecBuilder
             }
         }
 
-        // default
+        // default 如果是 java or javax打头
         if (!bool) {
+            String name = source.toString();
+            if (name.startsWith("java.") || name.startsWith("javax.")) {
+                AnnotationSpec.Builder spec = AnnotationSpec
+                    .builder(ClassName.bestGuess(requestParam));
+                if (defaultValue != null) {
+                    spec.addMember("defaultValue", "$S", defaultValue.value());
+                }
+                target.addAnnotation(spec.build());
+            } else {
+                AnnotationSpec spec = AnnotationSpec.builder(ClassName.bestGuess(responseBody)).build();
+                target.addAnnotation(spec);
+            }
 
         }
 
