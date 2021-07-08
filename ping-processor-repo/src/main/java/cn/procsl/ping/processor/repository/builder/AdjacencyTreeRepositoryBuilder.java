@@ -15,7 +15,6 @@ import java.util.*;
 
 
 //@AutoService(RepositoryBuilder.class)
-@Slf4j
 public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
 
     final static String supportName = "cn.procsl.ping.boot.domain.business.tree.repository.AdjacencyTreeRepository";
@@ -179,7 +178,7 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
 
         DeclaredType tmp = this.getSubType(entity);
         if (tmp == null) {
-            log.info("Not implement {} interface, skip!", adjacencyNodeName);
+//            log.info("Not implement {} interface, skip!", adjacencyNodeName);
             return null;
         }
 
@@ -193,7 +192,7 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
         }
 
         if (pathType == null) {
-            log.warn("Not find: {} subType", adjacencyNodeName);
+//            log.warn("Not find: {} subType", adjacencyNodeName);
             return null;
         }
 

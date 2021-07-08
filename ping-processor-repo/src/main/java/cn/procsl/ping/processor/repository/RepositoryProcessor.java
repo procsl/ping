@@ -3,7 +3,6 @@ package cn.procsl.ping.processor.repository;
 import cn.procsl.ping.processor.repository.annotation.RepositoryCreator;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
-import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -12,7 +11,6 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import javax.persistence.Entity;
-import javax.tools.Diagnostic;
 import javax.tools.StandardLocation;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +30,6 @@ import static javax.tools.Diagnostic.Kind.WARNING;
  * @author procsl
  * @date 2020/05/18
  */
-@Slf4j
 @AutoService(Processor.class)
 public class RepositoryProcessor extends AbstractProcessor {
 
@@ -67,7 +64,6 @@ public class RepositoryProcessor extends AbstractProcessor {
 
         } catch (Exception e) {
             messager.printMessage(WARNING, "Initializing the annotation processor failed for a number of reasons: " + e.getMessage());
-            log.warn("Initializing the annotation processor failed for a number of reasons: ", e);
             init = false;
         }
     }
@@ -93,7 +89,6 @@ public class RepositoryProcessor extends AbstractProcessor {
 
         } catch (IOException e) {
             messager.printMessage(WARNING, "The profile could not be found: '" + RepositoryBuilder.processor + "'. by error:" + e.getMessage());
-            log.warn("The profile could not be found: '{}'. by error:", RepositoryBuilder.processor, e);
         }
         this.config = emptyMap();
     }
@@ -121,12 +116,10 @@ public class RepositoryProcessor extends AbstractProcessor {
                 if (!(entity instanceof TypeElement)) {
                     String str = entity.asType().toString();
                     messager.printMessage(WARNING, "The element of the annotation label is not a class type: '" + str + "'", entity);
-                    log.warn("The element of the annotation label is not a class type: {}", str);
                     continue;
                 }
 
                 String name = this.createPackageName((TypeElement) entity);
-                log.info("The entity corresponds to the name of the repository package:{} - {}", entity.toString(), name);
                 // 生成多继承源文件
                 this.generateSourceCode((TypeElement) entity, name, roundEnv);
                 // 生成单继承源文件
@@ -135,10 +128,8 @@ public class RepositoryProcessor extends AbstractProcessor {
 
         } catch (Exception e) {
             messager.printMessage(WARNING, "The build of the source code failed:" + e.getClass().getName() + ":" + e.getMessage());
-            log.error("The build of the source code failed:", e);
             return false;
         }
-        log.info("The annotation processing is complete");
         return true;
     }
 
@@ -162,7 +153,6 @@ public class RepositoryProcessor extends AbstractProcessor {
 
             Map<String, List<TypeMirror>> type = builder.generator(entity, roundEnv);
             if (type == null) {
-                log.warn("This interface generation failed because the generator returned null:{}", builder.getClass().getName());
                 messager.printMessage(WARNING, "This interface generation failed because the generator returned null:" + builder.getClass().getName());
                 continue;
             }
@@ -198,7 +188,6 @@ public class RepositoryProcessor extends AbstractProcessor {
 
         if (tmp == null || tmp.isEmpty()) {
             messager.printMessage(WARNING, "Only the default repositories will be created: [org.springframework.data.jpa.repository.JpaRepository]");
-            log.warn("Only the default repositories will be created: [org.springframework.data.jpa.repository.JpaRepository]");
             includes = Collections.singletonList("org.springframework.data.jpa.repository.JpaRepository");
         } else {
             includes = Arrays.stream(tmp.split(","))
@@ -233,7 +222,6 @@ public class RepositoryProcessor extends AbstractProcessor {
             return true;
         } catch (ClassNotFoundException e) {
             messager.printMessage(WARNING, "Class not found:" + clazz);
-            log.warn("Class not found:{}", clazz);
         }
         return false;
     }
@@ -260,7 +248,6 @@ public class RepositoryProcessor extends AbstractProcessor {
         }
 
         messager.printMessage(WARNING, "This property is not a simple type: " + key);
-        log.warn("This property is not a simple type: {}", key);
         return null;
     }
 
@@ -277,7 +264,6 @@ public class RepositoryProcessor extends AbstractProcessor {
         // 如果没有匹配到, 直接退出
         if (matcher.isEmpty()) {
             messager.printMessage(WARNING, "Not matched to repository:" + entity.getSimpleName(), entity);
-            log.warn("Not matched to repository:{}", entity.getSimpleName());
             return;
         }
 
@@ -285,7 +271,6 @@ public class RepositoryProcessor extends AbstractProcessor {
 
         if (inter.isEmpty()) {
             messager.printMessage(WARNING, "Not matched to repository:" + entity.getSimpleName(), entity);
-            log.warn("Not matched to repository:{}", entity.getSimpleName());
             return;
         }
         Collection<String> repositories = new HashSet<>();
@@ -378,7 +363,6 @@ public class RepositoryProcessor extends AbstractProcessor {
         for (RepositoryBuilder builder : matcher) {
             Map<String, List<TypeMirror>> type = builder.generator(entity, environment);
             if (type == null || type.isEmpty()) {
-                log.warn("This interface generation failed because the generator returned null:{}", builder.getClass().getName());
                 messager.printMessage(WARNING, "This interface generation failed because the generator returned null:" + builders.getClass().getName());
                 continue;
             }
