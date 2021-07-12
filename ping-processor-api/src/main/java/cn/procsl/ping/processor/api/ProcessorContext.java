@@ -1,7 +1,5 @@
 package cn.procsl.ping.processor.api;
 
-import lombok.NonNull;
-
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -19,9 +17,4 @@ public interface ProcessorContext {
     Filer getFiler();
 
     String getConfig(String key);
-
-    void setAttribute(@NonNull String key, Object attr);
-
-    Object getAttribute(@NonNull String key);
-
 }

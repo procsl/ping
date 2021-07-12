@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="AdminApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+  <configuration default="false" name="AdminApplication-full" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <module name="ping-admin-app" />
     <extension name="coverage">
       <pattern>
@@ -16,6 +16,7 @@
     <method v="2">
       <option name="RunConfigurationTask" enabled="true" run_configuration_name="api-install" run_configuration_type="MavenRunConfiguration" />
       <option name="RunConfigurationTask" enabled="true" run_configuration_name="doc-install" run_configuration_type="MavenRunConfiguration" />
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="repo-install" run_configuration_type="MavenRunConfiguration" />
       <option name="RunConfigurationTask" enabled="true" run_configuration_name="user-install" run_configuration_type="MavenRunConfiguration" />
       <option name="Make" enabled="true" />
     </method>

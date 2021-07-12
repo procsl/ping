@@ -87,8 +87,6 @@
             <!--                    <groupId>com.google.guava</groupId>-->
             <!--                </exclusion>-->
             <!--            </exclusions>-->
-            <!--            <optional>true</optional>-->
-            <!--            <scope>compile</scope>-->
         </dependency>
 
         <dependency>
@@ -96,13 +94,6 @@
             <artifactId>javax.ws.rs-api</artifactId>
             <version>2.1.1</version>
             <type>jar</type>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.eclipse.jdt/org.eclipse.jdt.core -->
-        <dependency>
-            <groupId>org.eclipse.jdt</groupId>
-            <artifactId>org.eclipse.jdt.core</artifactId>
-            <version>3.24.0</version>
         </dependency>
 
 

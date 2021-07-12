@@ -12,6 +12,7 @@
             <list>
               <option value="install" />
               <option value="-Dskiptest=true" />
+              <option value="-X" />
             </list>
           </option>
           <option name="pomFileName" />

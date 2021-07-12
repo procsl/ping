@@ -1,8 +1,7 @@
-package cn.procsl.ping.processor.api.builder;
+package cn.procsl.ping.processor.api.spring;
 
-import cn.procsl.ping.processor.api.AbstractAnnotationSpecBuilder;
-import cn.procsl.ping.processor.api.AnnotationSpecBuilder;
-import cn.procsl.ping.processor.api.ProcessorContext;
+import cn.procsl.ping.processor.api.AbstractGeneratorBuilder;
+import cn.procsl.ping.processor.api.GeneratorBuilder;
 import cn.procsl.ping.processor.api.syntax.VariableDTOElement;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.AnnotationSpec;
@@ -13,8 +12,8 @@ import javax.lang.model.element.Element;
 import javax.tools.Diagnostic;
 import javax.ws.rs.*;
 
-@AutoService(AnnotationSpecBuilder.class)
-public class RequestParamAnnotationBuilder extends AbstractAnnotationSpecBuilder<ParameterSpec.Builder> {
+@AutoService(GeneratorBuilder.class)
+public class SpringParameterBuilder extends AbstractGeneratorBuilder {
 
     final static String requestParam = "org.springframework.web.bind.annotation.RequestParam";
     final static String responseBody = "org.springframework.web.bind.annotation.RequestBody";
@@ -25,12 +24,7 @@ public class RequestParamAnnotationBuilder extends AbstractAnnotationSpecBuilder
 
 
     @Override
-    protected boolean isType(String type) {
-        return "CONTROLLER".equals(type);
-    }
-
-    @Override
-    protected <E extends Element> void buildTargetAnnotation(ProcessorContext context, E source, ParameterSpec.Builder target) {
+    public void parameterAnnotation(String type, Element source, ParameterSpec.Builder target) {
 
         if (source == null) {
             context.getProcessingEnvironment().getMessager().printMessage(Diagnostic.Kind.WARNING, "找不到VariableElement");
@@ -132,10 +126,9 @@ public class RequestParamAnnotationBuilder extends AbstractAnnotationSpecBuilder
 
     }
 
+
     @Override
-    protected Class<ParameterSpec.Builder> target() {
-        return ParameterSpec.Builder.class;
+    public boolean support(String type) {
+        return "CONTROLLER".equals(type);
     }
-
-
 }

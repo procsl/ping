@@ -1,17 +1,14 @@
-package cn.procsl.ping.processor.api.builder;
+package cn.procsl.ping.processor.api.spring;
 
-import cn.procsl.ping.processor.api.AbstractAnnotationSpecBuilder;
+import com.squareup.javapoet.AnnotationSpec;
+import com.squareup.javapoet.ClassName;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.ws.rs.*;
 
-public abstract class AbstractRequestMappingAnnotationBuilder<T> extends AbstractAnnotationSpecBuilder<T> {
+public class RequestMappingAnnotation {
 
-    @Override
-    protected boolean isType(String type) {
-        return "CONTROLLER".equals(type);
-    }
 
     protected final String requestMapping = "org.springframework.web.bind.annotation.RequestMapping";
 
@@ -67,5 +64,30 @@ public abstract class AbstractRequestMappingAnnotationBuilder<T> extends Abstrac
         return "org.springframework.web.bind.annotation.RequestMethod.GET";
     }
 
+
+    public AnnotationSpec builder(String prefix, Element element) {
+
+        AnnotationSpec.Builder builder = AnnotationSpec.builder(ClassName.bestGuess(this.requestMapping));
+
+        String api = getPath(prefix, element);
+
+        builder.addMember("path", "$S", api.replaceAll("/$", ""));
+
+        return builder.build();
+    }
+
+    public AnnotationSpec builder(Element element) {
+        AnnotationSpec.Builder builder = AnnotationSpec.builder(ClassName.bestGuess(this.requestMapping));
+
+        String api = getPath("", element);
+
+        builder.addMember("path", "$S", api.replaceAll("/$", ""));
+
+        String method = getMethod((ExecutableElement) element);
+
+        builder.addMember("method", "$N", method);
+
+        return builder.build();
+    }
 
 }

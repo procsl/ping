@@ -4,7 +4,6 @@ import cn.procsl.ping.processor.api.utils.NamingUtils;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
 import lombok.Getter;
-import lombok.NonNull;
 
 import javax.annotation.processing.*;
 import javax.lang.model.element.Element;
@@ -22,12 +21,13 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
 
     final HashMap<String, Object> attrs = new HashMap<>();
 
-    static final String CONTROLLER = "CONTROLLER";
+    final static String CONTROLLER = "CONTROLLER";
 
+    final static String SERVICE = "Service";
 
-    static final String SERVICE = "Service";
+    final List<GeneratorBuilder> controller = new ArrayList<>();
 
-    final ServiceLoader<AnnotationSpecBuilder> annotationSpecBuilders = ServiceLoader.load(AnnotationSpecBuilder.class, this.getClass().getClassLoader());
+    final List<GeneratorBuilder> dto = new ArrayList<>();
 
     @Getter
     RoundEnvironment roundEnvironment;
@@ -35,6 +35,19 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
     @Getter
     Set<? extends TypeElement> annotations;
 
+    @Override
+    protected void init() {
+        final ServiceLoader<GeneratorBuilder> generator = ServiceLoader.load(GeneratorBuilder.class, this.getClass().getClassLoader());
+        for (GeneratorBuilder builder : generator) {
+            builder.init(this);
+            if (builder.support(CONTROLLER)) {
+                controller.add(builder);
+            }
+            if (builder.support("DTO")) {
+                dto.add(builder);
+            }
+        }
+    }
 
     @Override
     protected void processor(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) throws IOException {
@@ -50,14 +63,14 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
 
             TypeSpec.Builder builder = TypeSpec.classBuilder(name).addModifiers(Modifier.PUBLIC);
 
-            for (AnnotationSpecBuilder specBuilder : annotationSpecBuilders) {
-                specBuilder.build(this, typeElement, builder, CONTROLLER);
+            for (GeneratorBuilder specBuilder : controller) {
+                specBuilder.typeAnnotation(CONTROLLER, typeElement, builder);
             }
 
             String fieldName = NamingUtils.lowerCamelCase(typeElement.getSimpleName().toString());
             FieldSpec.Builder fieldSpecBuilder = FieldSpec.builder(TypeName.get(typeElement.asType()), fieldName, Modifier.PROTECTED);
-            for (AnnotationSpecBuilder specBuilder : annotationSpecBuilders) {
-                specBuilder.build(this, typeElement, fieldSpecBuilder, CONTROLLER);
+            for (GeneratorBuilder specBuilder : controller) {
+                specBuilder.fieldAnnotation(CONTROLLER, typeElement, fieldSpecBuilder);
             }
             builder.addField(fieldSpecBuilder.build());
 
@@ -100,8 +113,8 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
             methodBuilder.addException(TypeName.get(typeMirror));
         }
 
-        for (AnnotationSpecBuilder specBuilder : annotationSpecBuilders) {
-            specBuilder.build(this, item, methodBuilder, CONTROLLER);
+        for (GeneratorBuilder specBuilder : controller) {
+            specBuilder.methodAnnotation(CONTROLLER, item, methodBuilder);
         }
 
         ParameterConstructor constructor = new ParameterConstructor(this, methodName, fieldName, item);
@@ -124,16 +137,6 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
     @Override
     public Filer getFiler() {
         return filer;
-    }
-
-    @Override
-    public synchronized void setAttribute(@NonNull String key, Object attr) {
-        this.attrs.put(key, attr);
-    }
-
-    @Override
-    public synchronized Object getAttribute(@NonNull String key) {
-        return this.attrs.get(key);
     }
 
     @Override

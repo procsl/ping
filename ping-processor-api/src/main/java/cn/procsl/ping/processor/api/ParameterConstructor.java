@@ -80,15 +80,15 @@ class ParameterConstructor {
         }
         TypeSpec.Builder dto = TypeSpec.classBuilder(this.dtoName);
         dto.addModifiers(Modifier.PUBLIC);
-        for (AnnotationSpecBuilder specBuilder : processor.annotationSpecBuilders) {
-            specBuilder.build(processor, this.executable, dto, DTO);
+        for (GeneratorBuilder specBuilder : processor.dto) {
+            specBuilder.typeAnnotation(DTO, executableElement, dto);
         }
         dtoFields.forEach((k, v) -> {
             TypeName type = toBoxed(v);
             FieldSpec.Builder fieldBuilder = FieldSpec.builder(type, v.getSimpleName().toString(), Modifier.PROTECTED);
 
-            for (AnnotationSpecBuilder specBuilder : processor.annotationSpecBuilders) {
-                specBuilder.build(processor, v, fieldBuilder, DTO);
+            for (GeneratorBuilder specBuilder : processor.dto) {
+                specBuilder.fieldAnnotation(DTO, v, fieldBuilder);
             }
 
             dto.addField(fieldBuilder.build());
@@ -149,8 +149,8 @@ class ParameterConstructor {
         }
         ClassName clazz = ClassName.get(this.dtoPackage, this.dtoName);
         ParameterSpec.Builder dtoBuilder = ParameterSpec.builder(clazz, NamingUtils.lowerCamelCase(this.dtoName), Modifier.FINAL);
-        for (AnnotationSpecBuilder specBuilder : processor.annotationSpecBuilders) {
-            specBuilder.build(processor, new VariableDTOElement(executable, dtoFields, this.dtoPackage, this.dtoName), dtoBuilder, CONTROLLER);
+        for (GeneratorBuilder specBuilder : processor.controller) {
+            specBuilder.parameterAnnotation(CONTROLLER, new VariableDTOElement(executable, dtoFields, this.dtoPackage, this.dtoName), dtoBuilder);
         }
         result.add(dtoBuilder.build());
         return result;
@@ -167,8 +167,8 @@ class ParameterConstructor {
         String simpleName = NamingUtils.lowerCamelCase(v.getSimpleName().toString());
         TypeName typeName = toBoxed(v);
         ParameterSpec.Builder parameterBuilder = ParameterSpec.builder(typeName, simpleName, Modifier.FINAL);
-        for (AnnotationSpecBuilder specBuilder : processor.annotationSpecBuilders) {
-            specBuilder.build(processor, v, parameterBuilder, CONTROLLER);
+        for (GeneratorBuilder specBuilder : processor.controller) {
+            specBuilder.parameterAnnotation(CONTROLLER, v, parameterBuilder);
         }
         result.add(parameterBuilder.build());
     }
