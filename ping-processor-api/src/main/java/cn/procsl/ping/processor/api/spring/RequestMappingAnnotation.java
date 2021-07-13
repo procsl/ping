@@ -7,7 +7,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.ws.rs.*;
 
-public class RequestMappingAnnotation {
+class RequestMappingAnnotation {
 
 
     protected final String requestMapping = "org.springframework.web.bind.annotation.RequestMapping";
@@ -19,7 +19,7 @@ public class RequestMappingAnnotation {
         if (path == null) {
             api = prefix + "/";
         } else {
-            api = (prefix + path.value().trim());
+            api = (prefix + "/" + path.value().trim());
         }
         api = api.replaceAll("/+", "/").trim();
         return String.format("%s", api);

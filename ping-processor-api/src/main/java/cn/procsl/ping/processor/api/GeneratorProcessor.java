@@ -83,6 +83,7 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
                 this.buildMethod(builder, item, fieldName);
             }
 
+
             String packageName = typeElement.getEnclosingElement().toString() + ".api";
             JavaFile java = JavaFile
                 .builder(packageName, builder.build())

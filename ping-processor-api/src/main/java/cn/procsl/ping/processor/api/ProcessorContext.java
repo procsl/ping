@@ -17,4 +17,8 @@ public interface ProcessorContext {
     Filer getFiler();
 
     String getConfig(String key);
+
+//    void importType(String type);
+//
+//    void importStatic(String type);
 }

@@ -29,7 +29,7 @@ public class IndexController {
     public Map<String, String> index(@Size(min = 1, max = 100, message = "区间") @Deprecated(forRemoval = true)
                                      @Parameter(description = "这是参数描述")
                                      @PathVariable("id") String id) {
-        return Map.of("root", "123456");
+        return Map.of("root", id);
     }
 
 

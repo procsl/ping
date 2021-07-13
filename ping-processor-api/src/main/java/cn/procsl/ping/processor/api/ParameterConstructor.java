@@ -9,7 +9,9 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Types;
 import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -84,7 +86,7 @@ class ParameterConstructor {
             specBuilder.typeAnnotation(DTO, executableElement, dto);
         }
         dtoFields.forEach((k, v) -> {
-            TypeName type = toBoxed(v);
+            TypeName type = toWrapper(v);
             FieldSpec.Builder fieldBuilder = FieldSpec.builder(type, v.getSimpleName().toString(), Modifier.PROTECTED);
 
             for (GeneratorBuilder specBuilder : processor.dto) {
@@ -120,13 +122,40 @@ class ParameterConstructor {
         return patch == null;
     }
 
-    TypeName toBoxed(VariableElement parameter) {
+    TypeName toWrapper(VariableElement parameter) {
         TypeMirror type = parameter.asType();
         TypeName typeName = TypeName.get(type);
         if (type.getKind().isPrimitive() && (!typeName.isBoxedPrimitive())) {
             typeName = typeName.box();
         }
-        return typeName;
+
+        if (!(typeName instanceof ParameterizedTypeName)) {
+            return typeName;
+        }
+
+        if (!(type instanceof DeclaredType)) {
+            return typeName;
+        }
+
+        if (((DeclaredType) type).getTypeArguments().isEmpty()) {
+            return typeName;
+        }
+
+        Types util = processor.getProcessingEnvironment().getTypeUtils();
+        List<? extends TypeMirror> arguments = ((DeclaredType) type).getTypeArguments();
+        ArrayList<String> cont = new ArrayList<>();
+        for (TypeMirror item : arguments) {
+            Element ele = util.asElement(item);
+            String simpleName = ele.getSimpleName().toString();
+            String annotationStr = item.toString().replaceAll(ele.toString(), "").trim();
+            if (!annotationStr.endsWith(")")) {
+                annotationStr += "()";
+            }
+            cont.add(String.format("%s.%s %s", ele.getEnclosingElement().toString(), annotationStr, simpleName));
+        }
+
+        ClassName rewType = ((ParameterizedTypeName) typeName).rawType;
+        return TypeVariableName.get(String.format("%s.%s<%s>", rewType.packageName(), rewType.simpleName(), String.join(", ", cont)));
     }
 
     boolean isSimpleParameter(VariableElement variableElement) {
@@ -165,7 +194,7 @@ class ParameterConstructor {
 
     void buildSpec(ArrayList<ParameterSpec> result, VariableElement v) {
         String simpleName = NamingUtils.lowerCamelCase(v.getSimpleName().toString());
-        TypeName typeName = toBoxed(v);
+        TypeName typeName = toWrapper(v);
         ParameterSpec.Builder parameterBuilder = ParameterSpec.builder(typeName, simpleName, Modifier.FINAL);
         for (GeneratorBuilder specBuilder : processor.controller) {
             specBuilder.parameterAnnotation(CONTROLLER, v, parameterBuilder);
