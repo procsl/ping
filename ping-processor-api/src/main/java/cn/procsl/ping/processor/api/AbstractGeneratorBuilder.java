@@ -46,4 +46,9 @@ public abstract class AbstractGeneratorBuilder implements GeneratorBuilder {
     public void returnType(String type, Element element, MethodSpec.Builder spec) {
 
     }
+
+    @Override
+    public void end(String type, Element element) {
+
+    }
 }

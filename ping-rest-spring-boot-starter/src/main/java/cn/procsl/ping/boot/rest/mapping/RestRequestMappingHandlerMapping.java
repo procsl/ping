@@ -1,6 +1,5 @@
 package cn.procsl.ping.boot.rest.mapping;
 
-import cn.procsl.ping.boot.rest.annotation.RestEndpoint;
 import cn.procsl.ping.boot.rest.hook.RegisterMappingHook;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -64,41 +63,41 @@ public class RestRequestMappingHandlerMapping extends RequestMappingHandlerMappi
         registerHook.forEach(i -> i.init(this));
     }
 
-    @Override
-    protected RequestMappingInfo getMappingForMethod(Method method, Class<?> handlerType) {
-
-
-        boolean bool = (AnnotatedElementUtils.hasAnnotation(handlerType, RestEndpoint.class) || AnnotatedElementUtils.hasAnnotation(method, RestEndpoint.class)) && (!CollectionUtils.isEmpty(registerHook));
-
-        if (!bool) {
-            return super.getMappingForMethod(method, handlerType);
-        }
-
-        registerHook.forEach(i -> i.onBuild(method, handlerType));
-
-        RequestMappingInfo.BuilderConfiguration config = findConfig(this);
-        assert config != null;
-
-        RequestMappingInfo info = createRequestMappingInfo(handlerType, method, false, config);
-        if (info == null) {
-            return null;
-        }
-
-        RequestMappingInfo typeInfo = createRequestMappingInfo(handlerType, method, true, config);
-        if (typeInfo != null) {
-            info = typeInfo.combine(info);
-        }
-
-        String prefix = callSuperGetPathPrefix(this, handlerType);
-        if (prefix != null) {
-            info = RequestMappingInfo.paths(prefix).options(config).build().combine(info);
-        }
-
-        final RequestMappingInfo tmp = info;
-        registerHook.forEach(i -> i.onComplete(method, handlerType, tmp));
-        log.trace("创建映射:{}", info);
-        return info;
-    }
+//    @Override
+//    protected RequestMappingInfo getMappingForMethod(Method method, Class<?> handlerType) {
+//
+//
+//        boolean bool = (AnnotatedElementUtils.hasAnnotation(handlerType, RestEndpoint.class) || AnnotatedElementUtils.hasAnnotation(method, RestEndpoint.class)) && (!CollectionUtils.isEmpty(registerHook));
+//
+//        if (!bool) {
+//            return super.getMappingForMethod(method, handlerType);
+//        }
+//
+//        registerHook.forEach(i -> i.onBuild(method, handlerType));
+//
+//        RequestMappingInfo.BuilderConfiguration config = findConfig(this);
+//        assert config != null;
+//
+//        RequestMappingInfo info = createRequestMappingInfo(handlerType, method, false, config);
+//        if (info == null) {
+//            return null;
+//        }
+//
+//        RequestMappingInfo typeInfo = createRequestMappingInfo(handlerType, method, true, config);
+//        if (typeInfo != null) {
+//            info = typeInfo.combine(info);
+//        }
+//
+//        String prefix = callSuperGetPathPrefix(this, handlerType);
+//        if (prefix != null) {
+//            info = RequestMappingInfo.paths(prefix).options(config).build().combine(info);
+//        }
+//
+//        final RequestMappingInfo tmp = info;
+//        registerHook.forEach(i -> i.onComplete(method, handlerType, tmp));
+//        log.trace("创建映射:{}", info);
+//        return info;
+//    }
 
     protected RequestMappingInfo createRequestMappingInfo(Class clazz,
                                                           Method method,

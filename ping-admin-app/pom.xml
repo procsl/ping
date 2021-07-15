@@ -242,6 +242,12 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <apiDocsUrl>http://localhost:10000/v3/api-docs</apiDocsUrl>
+                    <outputFileName>openapi.json</outputFileName>
+                    <outputDir>${project.build.directory}/spring-doc</outputDir>
+                    <skip>false</skip>
+                </configuration>
             </plugin>
 
         </plugins>

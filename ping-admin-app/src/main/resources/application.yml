@@ -50,3 +50,4 @@ debug: false
 springdoc:
   swagger-ui:
     path: index.html
+  show-actuator: true

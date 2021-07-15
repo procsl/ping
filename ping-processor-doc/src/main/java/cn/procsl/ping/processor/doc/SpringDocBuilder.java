@@ -2,6 +2,7 @@ package cn.procsl.ping.processor.doc;
 
 import cn.procsl.ping.processor.api.AbstractGeneratorBuilder;
 import cn.procsl.ping.processor.api.GeneratorBuilder;
+import cn.procsl.ping.processor.api.utils.NamingUtils;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,12 +10,15 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import javax.lang.model.element.Element;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 这里需要读取配置, 需要更改
  */
 @AutoService(GeneratorBuilder.class)
 public class SpringDocBuilder extends AbstractGeneratorBuilder {
+
 
     @Override
     public void methodAnnotation(String type, Element element, MethodSpec.Builder spec) {
@@ -30,6 +34,8 @@ public class SpringDocBuilder extends AbstractGeneratorBuilder {
             operation.addMember("summary", "$S", "详细信息见描述");
             operation.addMember("description", "$S", commentStr);
         }
+        String operationId = NamingUtils.lowerCamelCase(element.getSimpleName().toString());
+        operation.addMember("operationId", "$", operationId);
         spec.addAnnotation(operation.build());
     }
 
@@ -78,4 +84,5 @@ public class SpringDocBuilder extends AbstractGeneratorBuilder {
     public boolean support(String type) {
         return "CONTROLLER".equals(type);
     }
+
 }

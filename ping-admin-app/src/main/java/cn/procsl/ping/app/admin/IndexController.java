@@ -1,20 +1,20 @@
 package cn.procsl.ping.app.admin;
 
-import cn.procsl.ping.boot.rest.annotation.RestEndpoint;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.SpringDocUtils;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Map;
 
-@RestEndpoint
+@RestController
 @RequestMapping
 @Tag(name = "这是Tag", description = "这是tag.description")
 @Validated
@@ -32,5 +32,9 @@ public class IndexController {
         return Map.of("root", id);
     }
 
+    @PutMapping(path = "map-tst")
+    public Map<String, String> mapTest(@RequestBody Map<@Size(min = 3, max = 10) String, @Email @NotBlank String> map) {
+        return map;
+    }
 
 }

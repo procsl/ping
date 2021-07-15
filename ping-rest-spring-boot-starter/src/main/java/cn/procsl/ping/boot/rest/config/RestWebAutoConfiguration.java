@@ -1,10 +1,6 @@
 package cn.procsl.ping.boot.rest.config;
 
-import cn.procsl.ping.boot.rest.doc.SpringDocHook;
 import cn.procsl.ping.boot.rest.exception.resolver.RestViewResolver;
-import cn.procsl.ping.boot.rest.hook.RegisterMappingHook;
-import cn.procsl.ping.boot.rest.hook.RequestMappingBuilderHook;
-import cn.procsl.ping.boot.rest.mapping.RestRequestMappingHandlerMapping;
 import cn.procsl.ping.boot.rest.serial.PropertyFilterMixin;
 import cn.procsl.ping.boot.rest.serial.SerializableFilter;
 import cn.procsl.ping.boot.rest.view.JsonView;
@@ -20,12 +16,10 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration;
@@ -50,7 +44,6 @@ import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.xml.MappingJackson2XmlView;
 
@@ -209,12 +202,12 @@ public class RestWebAutoConfiguration implements ApplicationContextAware {
         this.applicationContext = applicationContext;
     }
 
-    @Bean
-    public WebComponentRegister webComponentRegister(@Autowired(required = false) List<RegisterMappingHook> registerHook) {
-        ExceptionHandlerExceptionResolver resolver = new ExceptionHandlerExceptionResolver();
-        RestRequestMappingHandlerMapping mapping = new RestRequestMappingHandlerMapping(registerHook);
-        return new WebComponentRegister(mapping, resolver);
-    }
+//    @Bean
+//    public WebComponentRegister webComponentRegister(@Autowired(required = false) List<RegisterMappingHook> registerHook) {
+//        ExceptionHandlerExceptionResolver resolver = new ExceptionHandlerExceptionResolver();
+//        RestRequestMappingHandlerMapping mapping = new RestRequestMappingHandlerMapping(registerHook);
+//        return new WebComponentRegister(mapping, resolver);
+//    }
 
     @Bean
     @ConditionalOnMissingBean
@@ -295,18 +288,11 @@ public class RestWebAutoConfiguration implements ApplicationContextAware {
     }
 
 
-    @Bean
-    @ConditionalOnMissingBean
-    public RequestMappingBuilderHook pathVersioningHook() {
-        return new RequestMappingBuilderHook(this.properties, this.mediaTypes);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    @ConditionalOnProperty(prefix = "springdoc.api-docs", value = "enabled", matchIfMissing = true)
-    public SpringDocHook springDocHook() {
-        return new SpringDocHook();
-    }
+//    @Bean
+//    @ConditionalOnMissingBean
+//    public RequestMappingBuilderHook pathVersioningHook() {
+//        return new RequestMappingBuilderHook(this.properties, this.mediaTypes);
+//    }
 
     @Bean
     @ConditionalOnMissingBean
@@ -326,11 +312,5 @@ public class RestWebAutoConfiguration implements ApplicationContextAware {
         };
         return new HttpMessageConverters(false, Arrays.asList(converters));
     }
-
-//    @Bean
-//    @ConditionalOnMissingBean
-//    public AnnotationBodyAdvice annotationBodyAdvice() {
-//        return new AnnotationBodyAdvice();
-//    }
 
 }

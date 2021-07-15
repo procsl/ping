@@ -24,4 +24,6 @@ public interface GeneratorBuilder {
     void variableAnnotation(String type, Element element, ParameterSpec.Builder spec);
 
     void returnType(String type, Element element, MethodSpec.Builder spec);
+
+    void end(String type, Element element);
 }

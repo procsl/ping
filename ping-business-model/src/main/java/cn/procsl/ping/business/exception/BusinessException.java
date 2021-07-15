@@ -1,5 +1,6 @@
 package cn.procsl.ping.business.exception;
 
+import cn.procsl.ping.web.ErrorEntity;
 import lombok.NonNull;
 
 /**
@@ -8,7 +9,7 @@ import lombok.NonNull;
  * @author procsl
  * @date 2020/05/15
  */
-public class BusinessException extends RuntimeException {
+public class BusinessException extends RuntimeException implements ErrorEntity {
 
     final static String MESSAGE_TEMPLATE = "[%s] not found!";
 
@@ -28,5 +29,20 @@ public class BusinessException extends RuntimeException {
         if (entity == null) {
             throw new IllegalArgumentException(String.format(MESSAGE_TEMPLATE, message));
         }
+    }
+
+    @Override
+    public Integer httpStatus() {
+        return null;
+    }
+
+    @Override
+    public String code() {
+        return null;
+    }
+
+    @Override
+    public String message() {
+        return null;
     }
 }
