@@ -10,8 +10,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import javax.lang.model.element.Element;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 这里需要读取配置, 需要更改
@@ -35,7 +33,7 @@ public class SpringDocBuilder extends AbstractGeneratorBuilder {
             operation.addMember("description", "$S", commentStr);
         }
         String operationId = NamingUtils.lowerCamelCase(element.getSimpleName().toString());
-        operation.addMember("operationId", "$", operationId);
+        operation.addMember("operationId", "$S", operationId);
         spec.addAnnotation(operation.build());
     }
 

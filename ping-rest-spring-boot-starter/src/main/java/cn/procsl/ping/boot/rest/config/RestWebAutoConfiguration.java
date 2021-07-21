@@ -52,16 +52,14 @@ import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static cn.procsl.ping.boot.rest.config.RestWebProperties.MetaMediaType.*;
+import static cn.procsl.ping.boot.rest.config.RestWebProperties.MetaMediaType.json;
+import static cn.procsl.ping.boot.rest.config.RestWebProperties.MetaMediaType.xml;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_XML;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_XML_VALUE;
 
-/**
- * @author procsl
- * @date 2020/02/18
- */
+
 @Slf4j
 @Configuration
 @EnableConfigurationProperties({RestWebProperties.class, VersionStrategyProperties.class, DefaultExceptionResolver.class})
@@ -72,9 +70,7 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_XML_VALUE;
 @AutoConfigureBefore({WebMvcAutoConfiguration.class})
 public class RestWebAutoConfiguration implements ApplicationContextAware {
 
-    private final RestWebProperties properties;
-
-    private final DefaultExceptionResolver resolver;
+    final RestWebProperties properties;
 
     @Getter
     private EnumMap<RestWebProperties.MetaMediaType, List<MediaType>> mediaTypes;
@@ -86,9 +82,8 @@ public class RestWebAutoConfiguration implements ApplicationContextAware {
 
     private HashMap<String, View> contentTypeMap = new HashMap<>();
 
-    public RestWebAutoConfiguration(RestWebProperties properties, DefaultExceptionResolver resolver) {
+    public RestWebAutoConfiguration(RestWebProperties properties) {
         this.properties = properties;
-        this.resolver = resolver;
 
         // 创建支持的媒体类型
         createMediaTypes();
@@ -97,7 +92,7 @@ public class RestWebAutoConfiguration implements ApplicationContextAware {
         createObjectMappers();
     }
 
-    private void setMediaTypes(RestWebProperties.MetaMediaType key, MediaType mediaType) {
+    void setMediaTypes(RestWebProperties.MetaMediaType key, MediaType mediaType) {
         if (this.mediaTypes.containsKey(key)) {
             this.mediaTypes.get(key).add(mediaType);
         } else {
@@ -147,11 +142,6 @@ public class RestWebAutoConfiguration implements ApplicationContextAware {
         this.objectMappers = new EnumMap<>(RestWebProperties.MetaMediaType.class);
         this.objectMappers.put(json, createJsonMapper(serializableFilter));
         this.objectMappers.put(xml, createXmlMapper(serializableFilter));
-        this.objectMappers.put(yaml, createYamlMapper());
-    }
-
-    protected ObjectMapper createYamlMapper() {
-        return new ObjectMapper();
     }
 
     protected void createMediaTypes() {
@@ -179,10 +169,6 @@ public class RestWebAutoConfiguration implements ApplicationContextAware {
                 case xml:
                     setMediaTypes(xml, APPLICATION_XML);
                     break;
-                case yaml:
-                    MediaType yamlMime = new MediaType("application", yaml.name());
-                    setMediaTypes(yaml, yamlMime);
-                    break;
             }
         });
     }
@@ -201,13 +187,6 @@ public class RestWebAutoConfiguration implements ApplicationContextAware {
     public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
-
-//    @Bean
-//    public WebComponentRegister webComponentRegister(@Autowired(required = false) List<RegisterMappingHook> registerHook) {
-//        ExceptionHandlerExceptionResolver resolver = new ExceptionHandlerExceptionResolver();
-//        RestRequestMappingHandlerMapping mapping = new RestRequestMappingHandlerMapping(registerHook);
-//        return new WebComponentRegister(mapping, resolver);
-//    }
 
     @Bean
     @ConditionalOnMissingBean
@@ -286,13 +265,6 @@ public class RestWebAutoConfiguration implements ApplicationContextAware {
         this.contentTypeMap.put(contentType, view);
         return view;
     }
-
-
-//    @Bean
-//    @ConditionalOnMissingBean
-//    public RequestMappingBuilderHook pathVersioningHook() {
-//        return new RequestMappingBuilderHook(this.properties, this.mediaTypes);
-//    }
 
     @Bean
     @ConditionalOnMissingBean

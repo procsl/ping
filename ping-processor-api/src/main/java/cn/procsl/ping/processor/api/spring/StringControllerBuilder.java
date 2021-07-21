@@ -2,12 +2,14 @@ package cn.procsl.ping.processor.api.spring;
 
 import cn.procsl.ping.processor.api.AbstractGeneratorBuilder;
 import cn.procsl.ping.processor.api.GeneratorBuilder;
+import cn.procsl.ping.processor.api.annotation.HttpStatus;
 import cn.procsl.ping.processor.api.syntax.VariableDTOElement;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
 
 import javax.annotation.processing.Generated;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -27,6 +29,8 @@ public class StringControllerBuilder extends AbstractGeneratorBuilder {
     final ClassName autowired = ClassName.bestGuess("org.springframework.beans.factory.annotation.Autowired");
 
     final static DateFormat format = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.CHINA);
+
+    final ClassName responseStatusName = ClassName.get("org.springframework.web.bind.annotation", "ResponseStatus");
 
     final RequestMappingAnnotation request = new RequestMappingAnnotation();
 
@@ -61,6 +65,23 @@ public class StringControllerBuilder extends AbstractGeneratorBuilder {
     public void methodAnnotation(String type, Element element, MethodSpec.Builder spec) {
         AnnotationSpec annotation = this.request.builder(element);
         spec.addAnnotation(annotation);
+
+        if (!(element instanceof ExecutableElement)) {
+            return;
+        }
+
+        AnnotationSpec.Builder statusAnnotation = AnnotationSpec.builder(responseStatusName);
+
+        HttpStatus httpStatus = element.getAnnotation(HttpStatus.class);
+        if (httpStatus != null) {
+            statusAnnotation.addMember("code", "$S", String.valueOf(httpStatus.code()));
+        }
+
+        if (((ExecutableElement) element).getReturnType().getKind().toString().equals("VOID")) {
+            statusAnnotation.addMember("code", "$N", "org.springframework.http.HttpStatus.NO_CONTENT");
+            statusAnnotation.addMember("reason", "$S", "no content");
+            spec.addAnnotation(statusAnnotation.build());
+        }
     }
 
     @Override

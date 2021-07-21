@@ -3,7 +3,6 @@ package cn.procsl.ping.boot.rest.config;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Bean;
 
 import java.util.Collections;
 import java.util.Set;
@@ -25,56 +24,24 @@ public class RestWebProperties {
     /**
      * 支持的元媒体类型
      */
-    private Set<MetaMediaType> metaMediaTypes = Collections.singleton(MetaMediaType.json);
+    Set<MetaMediaType> metaMediaTypes = Collections.singleton(MetaMediaType.json);
 
     /**
      * 是否启用自定义媒体类型
      */
-    private RepresentationStrategy representationStrategy = RepresentationStrategy.system_mime;
+    RepresentationStrategy representationStrategy = RepresentationStrategy.system_mime;
 
     /**
      * 如果不为null 则生成 诸如 application/vnd.api+json 的格式
      * <p>
      * 自定义媒体类型
      */
-    private String mimeSubtype = "vnd.api";
+    String mimeSubtype = "vnd.api";
 
     /**
      * 是否启用版本管理
      */
-    private boolean enableVersion = true;
-
-    /**
-     * 版本策略
-     * <p>
-     * 默认为前缀模
-     * 式
-     */
-    private VersionStrategy versionStrategy = VersionStrategy.path_prefix;
-
-    @Bean
-    public VersionStrategyProperties versionStrategyConfiguration() {
-        return new VersionStrategyProperties();
-    }
-
-    /**
-     * 版本策略
-     */
-    public enum VersionStrategy {
-        /**
-         * 基于路径前缀
-         * 比如  https://api.procsl.cn/v1/products
-         */
-        path_prefix,
-
-
-        /**
-         * 基于MIME
-         * application/vnd.api.v1+json
-         */
-        mime_type
-
-    }
+    boolean enableVersion = true;
 
     /**
      * 表征媒体类型

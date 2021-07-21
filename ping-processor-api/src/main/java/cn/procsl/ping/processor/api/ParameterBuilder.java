@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-class ParameterConstructor {
+class ParameterBuilder {
 
     static final String DTO = "DTO";
 
@@ -51,7 +51,7 @@ class ParameterConstructor {
 
     TypeSpec dtoType;
 
-    public ParameterConstructor(GeneratorProcessor processor, String methodName, String fieldName, @NonNull ExecutableElement executableElement) throws IOException {
+    public ParameterBuilder(GeneratorProcessor processor, String methodName, String fieldName, @NonNull ExecutableElement executableElement) throws IOException {
         this.executable = executableElement;
         this.processor = processor;
         this.methodName = methodName;

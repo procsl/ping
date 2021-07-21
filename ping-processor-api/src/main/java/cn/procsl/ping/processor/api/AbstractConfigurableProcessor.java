@@ -1,12 +1,10 @@
 package cn.procsl.ping.processor.api;
 
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
-import javax.tools.Diagnostic;
 import javax.tools.StandardLocation;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +15,6 @@ import java.util.Set;
 import static java.util.Collections.emptyMap;
 import static javax.tools.Diagnostic.Kind.WARNING;
 
-@Slf4j
 public abstract class AbstractConfigurableProcessor extends AbstractProcessor {
     protected Messager messager;
     protected Filer filer;
@@ -25,7 +22,6 @@ public abstract class AbstractConfigurableProcessor extends AbstractProcessor {
     protected Map<Object, Object> config;
 
     @Override
-
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         if (roundEnv.processingOver()) {
             return false;
@@ -63,7 +59,6 @@ public abstract class AbstractConfigurableProcessor extends AbstractProcessor {
         } catch (IOException e) {
             this.config = emptyMap();
             this.processingEnv.getMessager().printMessage(WARNING, "The profile could not be found: '" + processor + "'. by error:" + e.getMessage());
-            log.warn("The profile could not be found: '{}'. by error:", processor, e);
         }
     }
 
@@ -92,7 +87,6 @@ public abstract class AbstractConfigurableProcessor extends AbstractProcessor {
         }
 
         messager.printMessage(WARNING, "This property is not a simple type: " + key);
-        log.warn("This property is not a simple type: {}", key);
         return null;
     }
 

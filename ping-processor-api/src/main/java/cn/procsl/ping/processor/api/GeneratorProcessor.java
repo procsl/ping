@@ -118,7 +118,7 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
             specBuilder.methodAnnotation(CONTROLLER, item, methodBuilder);
         }
 
-        ParameterConstructor constructor = new ParameterConstructor(this, methodName, fieldName, item);
+        ParameterBuilder constructor = new ParameterBuilder(this, methodName, fieldName, item);
         methodBuilder.addParameters(constructor.buildParameters());
 
         methodBuilder.addCode(constructor.buildCaller());

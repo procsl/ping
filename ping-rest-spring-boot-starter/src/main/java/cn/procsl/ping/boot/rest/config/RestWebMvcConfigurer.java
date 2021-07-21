@@ -1,6 +1,5 @@
 package cn.procsl.ping.boot.rest.config;
 
-//import cn.procsl.ping.boot.rest.exception.resolver.AnnotationHandlerExceptionResolver;
 import cn.procsl.ping.boot.rest.exception.resolver.ConfigureHandlerExceptionResolver;
 import cn.procsl.ping.boot.rest.exception.resolver.MethodArgumentNotValidExceptionResolver;
 import cn.procsl.ping.boot.rest.exception.resolver.RestHandlerExceptionResolver;
@@ -50,7 +49,6 @@ public class RestWebMvcConfigurer implements WebMvcConfigurer {
     public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
         resolvers.clear();
         resolvers.add(new MethodArgumentNotValidExceptionResolver());
-//        resolvers.add(new AnnotationHandlerExceptionResolver());
         resolvers.add(new ConfigureHandlerExceptionResolver());
         resolvers.add(new RestHandlerExceptionResolver());
     }
@@ -86,30 +84,6 @@ public class RestWebMvcConfigurer implements WebMvcConfigurer {
             builder.configure(xmlMapper);
             xmlConvert.setObjectMapper(xmlMapper);
         }
-    }
-
-    protected MappingJackson2HttpMessageConverter createJackson2HttpMessageConverter() {
-        ObjectMapper jsonMapper = this.objectMappers.get(json);
-        MappingJackson2HttpMessageConverter jsonConverter;
-        Jackson2ObjectMapperBuilder builder = Jackson2ObjectMapperBuilder.json();
-        builder.applicationContext(this.applicationContext);
-        builder.configure(jsonMapper);
-        jsonConverter = new MappingJackson2HttpMessageConverter(jsonMapper);
-        jsonConverter.setObjectMapper(jsonMapper);
-        jsonConverter.setSupportedMediaTypes(this.mediaTypes.get(json));
-        return jsonConverter;
-    }
-
-    protected MappingJackson2XmlHttpMessageConverter createJackson2XmlHttpMessageConverter() {
-        ObjectMapper xmlMapper = this.objectMappers.get(xml);
-        MappingJackson2XmlHttpMessageConverter xmlConverter;
-        Jackson2ObjectMapperBuilder builder = Jackson2ObjectMapperBuilder.xml();
-        builder.applicationContext(this.applicationContext);
-        builder.configure(xmlMapper);
-        xmlConverter = new MappingJackson2XmlHttpMessageConverter(xmlMapper);
-        xmlConverter.setObjectMapper(xmlMapper);
-        xmlConverter.setSupportedMediaTypes(this.mediaTypes.get(xml));
-        return xmlConverter;
     }
 
 
