@@ -17,8 +17,6 @@ import java.util.Set;
 @Slf4j
 public class LoginConfiguration implements WebMvcConfigurer {
 
-    private Map<String, Set<String>> permissionUrlMap;
-
     @Override
     public void addCorsMappings(CorsRegistry corsRegistry) {
         corsRegistry

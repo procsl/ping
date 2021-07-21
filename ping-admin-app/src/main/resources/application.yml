@@ -42,12 +42,9 @@ spring:
   liquibase:
     change-log: classpath*:/changelog/master.xml
     enabled: true
-#    database-change-log-lock-table: databasechangeloglock
-#    database-change-log-table: databasechangelog
 
 #      开启debug模式
 debug: false
 springdoc:
   swagger-ui:
     path: index.html
-  show-actuator: true
