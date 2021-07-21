@@ -12,6 +12,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -28,7 +29,9 @@ public class IndexController {
     @Valid
     public Map<String, String> index(@Size(min = 1, max = 100, message = "区间") @Deprecated(forRemoval = true)
                                      @Parameter(description = "这是参数描述")
-                                     @PathVariable("id") String id) {
+                                     @PathVariable("id") String id,
+                                     @RequestBody List<@Size(min = 10, max = 20) String> list
+    ) {
         return Map.of("root", id);
     }
 
