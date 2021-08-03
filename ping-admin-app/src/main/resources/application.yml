@@ -45,6 +45,10 @@ spring:
 
 #      开启debug模式
 debug: false
+
 springdoc:
   swagger-ui:
     path: index.html
+  api-docs:
+    resolve-schema-properties: true
+  show-login-endpoint: true

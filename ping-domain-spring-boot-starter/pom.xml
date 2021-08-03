@@ -21,7 +21,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jdk.version>11</jdk.version>
         <compiler.version>11</compiler.version>
-        <querydsl.version>4.3.1</querydsl.version>
+        <querydsl.version>5.0.0</querydsl.version>
         <spring-framework.version>5.2.3.RELEASE</spring-framework.version>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
@@ -100,14 +100,14 @@
         <dependency>
             <groupId>com.github.jsonzou</groupId>
             <artifactId>jmockdata</artifactId>
-            <version>4.2.0</version>
+            <version>4.3.0</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>com.github.javafaker</groupId>
             <artifactId>javafaker</artifactId>
-            <version>0.17.2</version>
+            <version>1.0.2</version>
             <scope>test</scope>
         </dependency>
 

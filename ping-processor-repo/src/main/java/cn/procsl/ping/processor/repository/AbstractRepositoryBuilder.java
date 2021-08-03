@@ -1,7 +1,5 @@
 package cn.procsl.ping.processor.repository;
 
-import lombok.extern.slf4j.Slf4j;
-
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
@@ -18,7 +16,6 @@ import java.util.function.Function;
  * @author procsl
  * @date 2020/06/21
  */
-@Slf4j
 public abstract class AbstractRepositoryBuilder implements RepositoryBuilder {
 
     /**
@@ -41,7 +38,7 @@ public abstract class AbstractRepositoryBuilder implements RepositoryBuilder {
         this.processingEnvironment = processingEnv;
         this.configFinder = configFinder;
         innerInit();
-        log.debug("Init builder:{}", this.getClass().getName());
+        this.processingEnvironment.getMessager().printMessage(Diagnostic.Kind.NOTE, "Init builder: " + this.getClass().getName());
     }
 
     /**
@@ -87,7 +84,6 @@ public abstract class AbstractRepositoryBuilder implements RepositoryBuilder {
 //        ((DeclaredType)entity.getSuperclass()).getTypeArguments();
 
         this.processingEnvironment.getMessager().printMessage(Diagnostic.Kind.WARNING, "Not fount @Id annotation", entity);
-        log.warn("Not fount annotation @javax.persistence.Id");
         return null;
     }
 
