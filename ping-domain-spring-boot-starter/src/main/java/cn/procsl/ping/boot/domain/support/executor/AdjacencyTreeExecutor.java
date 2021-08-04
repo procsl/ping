@@ -337,7 +337,7 @@ class AdjacencyTreeExecutor<
             @SuppressWarnings("unchecked")
             ID childId = (ID) calcChildren(Q.id, root, target);
             if (ObjectUtils.nullSafeEquals(childId, root)) {
-                throw new BusinessException("不可将父节点附加至自身子节点");
+                throw new BusinessException(401, "H001", "不可将父节点附加至自身子节点");
             }
 
             sourceNode = this.entityManager.find(javaType, root, PESSIMISTIC_READ);

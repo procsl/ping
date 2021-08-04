@@ -1,6 +1,7 @@
 package cn.procsl.ping.processor.api;
 
 import cn.procsl.ping.processor.api.syntax.VariableDTOElement;
+import cn.procsl.ping.processor.api.utils.ClassUtils;
 import cn.procsl.ping.processor.api.utils.NamingUtils;
 import com.squareup.javapoet.*;
 import lombok.NonNull;
@@ -12,12 +13,8 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
-import javax.ws.rs.PATCH;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 class ParameterBuilder {
 
@@ -56,7 +53,7 @@ class ParameterBuilder {
         this.processor = processor;
         this.methodName = methodName;
         this.fieldName = fieldName;
-        this.simpleRequest = isSimpleRequest(executableElement);
+        this.simpleRequest = ClassUtils.isSimpleRequest(executableElement);
 
         List<? extends VariableElement> parameters = executableElement.getParameters();
 
@@ -65,7 +62,7 @@ class ParameterBuilder {
                 params.put(i, parameters.get(i));
                 continue;
             }
-            if (isSimpleParameter(parameters.get(i))) {
+            if (ClassUtils.isSimpleParameter(parameters.get(i))) {
                 params.put(i, parameters.get(i));
             } else {
                 dtoFields.put(i, parameters.get(i));
@@ -109,19 +106,6 @@ class ParameterBuilder {
         return String.format("%s.api.%s", packageName, businessName);
     }
 
-    boolean isSimpleRequest(ExecutableElement executableElement) {
-        POST post = executableElement.getAnnotation(POST.class);
-        if (post != null) {
-            return false;
-        }
-        PUT put = executableElement.getAnnotation(PUT.class);
-        if (put != null) {
-            return false;
-        }
-        PATCH patch = executableElement.getAnnotation(PATCH.class);
-        return patch == null;
-    }
-
     TypeName toWrapper(VariableElement parameter) {
         TypeMirror type = parameter.asType();
         TypeName typeName = TypeName.get(type);
@@ -158,22 +142,18 @@ class ParameterBuilder {
         return TypeVariableName.get(String.format("%s.%s<%s>", rewType.packageName(), rewType.simpleName(), String.join(", ", cont)));
     }
 
-    boolean isSimpleParameter(VariableElement variableElement) {
-        Set<String> set = variableElement.getAnnotationMirrors().stream().map(item -> item.getAnnotationType().asElement().toString()).collect(Collectors.toSet());
-        return set.contains("javax.ws.rs.QueryParam")
-            || set.contains("javax.ws.rs.MatrixParam")
-            || set.contains("javax.ws.rs.HeaderParam")
-            || set.contains("javax.ws.rs.CookieParam");
-    }
 
     public List<ParameterSpec> buildParameters() {
+        ParameterSpec spec = this.buildHttpResponse();
+
         if (size == 0) {
-            return Collections.emptyList();
+            return Collections.singletonList(spec);
         }
 
         ArrayList<ParameterSpec> result = new ArrayList<>(size);
         buildParamSpec(result);
         if (this.createDTO) {
+            result.add(spec);
             return result;
         }
         ClassName clazz = ClassName.get(this.dtoPackage, this.dtoName);
@@ -182,7 +162,13 @@ class ParameterBuilder {
             specBuilder.parameterAnnotation(CONTROLLER, new VariableDTOElement(executable, dtoFields, this.dtoPackage, this.dtoName), dtoBuilder);
         }
         result.add(dtoBuilder.build());
+        result.add(spec);
         return result;
+    }
+
+    ParameterSpec buildHttpResponse() {
+        ClassName response = ClassName.get("javax.servlet.http", "HttpServletResponse");
+        return ParameterSpec.builder(response, "response", Modifier.FINAL).build();
     }
 
     void buildParamSpec(ArrayList<ParameterSpec> result) {
@@ -206,13 +192,14 @@ class ParameterBuilder {
 
         String returned;
         if (executable.getReturnType().toString().equals("void")) {
-            returned = " this.%s.%s(%s);\n";
+            returned = "this.%s.%s(%s);\n";
         } else {
-            returned = "return this.%s.%s(%s);\n";
+            returned = "$T returnObject =  this.%s.%s(%s);\n";
         }
 
         if (size == 0) {
-            return CodeBlock.builder().add(String.format(returned, fieldName, methodName, "")).build();
+            String caller = String.format(returned, fieldName, methodName, "");
+            return toWrapper(caller, executable.getReturnType());
         }
 
         String[] templates = new String[size];
@@ -229,6 +216,14 @@ class ParameterBuilder {
         }
 
         String args = String.join(",", templates);
-        return CodeBlock.builder().add(String.format(returned, fieldName, methodName, args)).build();
+        String caller = String.format(returned, fieldName, methodName, args);
+        return toWrapper(caller, executable.getReturnType());
+    }
+
+    CodeBlock toWrapper(String caller, TypeMirror mirror) {
+        if (!caller.contains("=")) {
+            return CodeBlock.builder().add(caller).build();
+        }
+        return CodeBlock.builder().add(caller, TypeName.get(mirror)).build();
     }
 }

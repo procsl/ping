@@ -16,10 +16,9 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
 @AutoService(Processor.class)
 public class GeneratorProcessor extends AbstractConfigurableProcessor implements ProcessorContext {
-
-    final HashMap<String, Object> attrs = new HashMap<>();
 
     final static String CONTROLLER = "CONTROLLER";
 
@@ -51,10 +50,8 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
 
     @Override
     protected void processor(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) throws IOException {
-        synchronized (attrs) {
-            this.roundEnvironment = roundEnv;
-            this.annotations = annotations;
-        }
+        this.roundEnvironment = roundEnv;
+        this.annotations = annotations;
 
         Set<TypeElement> element = this.selector(roundEnv);
         for (TypeElement typeElement : element) {
@@ -73,6 +70,12 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
                 specBuilder.fieldAnnotation(CONTROLLER, typeElement, fieldSpecBuilder);
             }
             builder.addField(fieldSpecBuilder.build());
+
+            FieldSpec.Builder request = FieldSpec.builder(ClassName.get("javax.servlet.http", "HttpServletRequest"), "request", Modifier.PROTECTED);
+            for (GeneratorBuilder specBuilder : controller) {
+                specBuilder.fieldAnnotation(CONTROLLER, typeElement, request);
+            }
+            builder.addField(request.build());
 
             List<ExecutableElement> list = typeElement.getEnclosedElements().stream()
                 .filter(item -> item instanceof ExecutableElement)
@@ -108,7 +111,6 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
     private void buildMethod(TypeSpec.Builder builder, ExecutableElement item, String fieldName) throws IOException {
         String methodName = item.getSimpleName().toString();
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(methodName).addModifiers(Modifier.PUBLIC);
-        methodBuilder.returns(TypeName.get(item.getReturnType()));
 
         for (TypeMirror typeMirror : item.getThrownTypes()) {
             methodBuilder.addException(TypeName.get(typeMirror));
@@ -121,9 +123,19 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
         ParameterBuilder constructor = new ParameterBuilder(this, methodName, fieldName, item);
         methodBuilder.addParameters(constructor.buildParameters());
 
-        methodBuilder.addCode(constructor.buildCaller());
+        for (GeneratorBuilder generatorBuilder : controller) {
+            TypeName returnType = generatorBuilder.returnType(CONTROLLER, item);
+            if (returnType != null) {
+                methodBuilder.returns(returnType);
+            }
+            CodeBlock codeBlack = generatorBuilder.returnCodeBlack(CONTROLLER, item, constructor.buildCaller());
+            if (codeBlack != null) {
+                methodBuilder.addCode(codeBlack);
+            }
+        }
         builder.addMethod(methodBuilder.build());
     }
+
 
     @Override
     public ProcessingEnvironment getProcessingEnvironment() {

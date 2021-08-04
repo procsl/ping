@@ -4,16 +4,19 @@ import cn.procsl.ping.processor.api.AbstractGeneratorBuilder;
 import cn.procsl.ping.processor.api.GeneratorBuilder;
 import cn.procsl.ping.processor.api.annotation.HttpStatus;
 import cn.procsl.ping.processor.api.syntax.VariableDTOElement;
+import cn.procsl.ping.processor.api.utils.CodeUtils;
+import cn.procsl.ping.web.SimpleTypeWrapper;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
 
 import javax.annotation.processing.Generated;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeMirror;
+import javax.ws.rs.GET;
 import java.text.DateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @AutoService(GeneratorBuilder.class)
@@ -25,6 +28,13 @@ public class StringControllerBuilder extends AbstractGeneratorBuilder {
     final AnnotationSpec restController = AnnotationSpec.builder(ClassName.bestGuess("org.springframework.web.bind.annotation.RestController")).build();
 
     final AnnotationSpec indexed = AnnotationSpec.builder(ClassName.bestGuess("org.springframework.stereotype.Indexed")).build();
+
+    final AnnotationSpec transaction = AnnotationSpec
+        .builder(ClassName.bestGuess("org.springframework.transaction.annotation.Transactional"))
+        .addMember("rollbackFor", "$T.class", Exception.class).build();
+
+    final AnnotationSpec readOnlyTransaction = transaction.toBuilder()
+        .addMember("readOnly", "$N", "true").build();
 
     final ClassName autowired = ClassName.bestGuess("org.springframework.beans.factory.annotation.Autowired");
 
@@ -70,8 +80,13 @@ public class StringControllerBuilder extends AbstractGeneratorBuilder {
             return;
         }
 
-        AnnotationSpec.Builder statusAnnotation = AnnotationSpec.builder(responseStatusName);
+        if (element.getAnnotation(GET.class) != null) {
+            spec.addAnnotation(readOnlyTransaction);
+        } else {
+            spec.addAnnotation(transaction);
+        }
 
+        AnnotationSpec.Builder statusAnnotation = AnnotationSpec.builder(responseStatusName);
         HttpStatus httpStatus = element.getAnnotation(HttpStatus.class);
         if (httpStatus != null) {
             statusAnnotation.addMember("code", "$S", String.valueOf(httpStatus.code()));
@@ -99,5 +114,75 @@ public class StringControllerBuilder extends AbstractGeneratorBuilder {
         spec.addAnnotations(annotations);
     }
 
+    @Override
+    public TypeName returnType(String type, ExecutableElement element) {
 
+        TypeMirror returned = element.getReturnType();
+        if (returned.getKind().toString().equals("VOID")) {
+            return TypeName.get(element.getReturnType());
+        }
+
+        if (CodeUtils.hasNeedWrapper(element.getReturnType())) {
+            ClassName clazz = ClassName.get(SimpleTypeWrapper.class);
+            TypeName returnType = TypeName.get(returned);
+            return ParameterizedTypeName.get(clazz, returnType);
+        }
+
+        boolean bool = returned.toString().startsWith(Optional.class.getName()) && returned instanceof DeclaredType;
+        if (!bool) {
+            return TypeName.get(returned);
+        }
+
+        List<? extends TypeMirror> args = ((DeclaredType) returned).getTypeArguments();
+        if (args.isEmpty()) {
+            return TypeName.get(returned);
+        }
+
+        TypeMirror argType = args.get(0);
+        if (CodeUtils.hasNeedWrapper(argType)) {
+            return ParameterizedTypeName.get(ClassName.get(SimpleTypeWrapper.class), TypeName.get(argType));
+        }
+        // 其他
+        return TypeName.get(argType);
+    }
+
+    @Override
+    public CodeBlock returnCodeBlack(String type, ExecutableElement element, CodeBlock preStatement) {
+
+        TypeMirror returned = element.getReturnType();
+        if (returned.getKind().toString().equals("VOID")) {
+            return CodeBlock.builder().add(preStatement).build();
+        }
+
+        CodeBlock.Builder start = CodeBlock.builder().add("\n").add(preStatement);
+        if (CodeUtils.hasNeedWrapper(returned)) {
+            ClassName clazz = ClassName.get(SimpleTypeWrapper.class);
+            TypeName returnType = TypeName.get(returned);
+            ParameterizedTypeName parameter = ParameterizedTypeName.get(clazz, returnType);
+            start.add("\nreturn new $T(returnObject);", parameter).add("\n");
+            return start.build();
+        }
+
+        boolean bool = returned.toString().startsWith(Optional.class.getName()) && returned instanceof DeclaredType;
+        if (!bool) {
+            return start.add("\nreturn returnObject;").add("\n").build();
+        }
+
+        List<? extends TypeMirror> args = ((DeclaredType) returned).getTypeArguments();
+        if (args.isEmpty()) {
+            return start.add("\nreturn returnObject;").add("\n").build();
+        }
+
+        TypeMirror argType = args.get(0);
+        String tmp = " if (returnObject.isEmpty()) {\n\t  throw new $T($N, $S, $S); \n\t} \n $T option = returnObject.get(); \n";
+
+        ClassName exp = ClassName.get("cn.procsl.ping.business.exception", "BusinessException");
+        CodeBlock notFound = CodeBlock.builder().add(tmp, exp, "404", "H001", "Not Found", TypeName.get(argType)).build();
+
+        start.add(notFound);
+        if (CodeUtils.hasNeedWrapper(argType)) {
+            return start.add("\nreturn new $T(option);", ClassName.get(SimpleTypeWrapper.class)).add("\n").build();
+        }
+        return start.add("\nreturn option;").add("\n").build();
+    }
 }

@@ -13,9 +13,15 @@ public class BusinessException extends RuntimeException implements ErrorEntity {
 
     final static String MESSAGE_TEMPLATE = "[%s] not found!";
 
-    public BusinessException(String format, Object... arguments) {
+    Integer httpStatus;
+
+    String code;
+
+    public BusinessException(Integer httpStatus, String code, String format, Object... arguments) {
         // TODO 这里应该用占位符的, 先写着
         super(format);
+        this.httpStatus = httpStatus;
+        this.code = code;
     }
 
     public static <T> T ifNotFound(T entity, @NonNull String message) {
@@ -33,16 +39,16 @@ public class BusinessException extends RuntimeException implements ErrorEntity {
 
     @Override
     public Integer httpStatus() {
-        return null;
+        return httpStatus;
     }
 
     @Override
     public String code() {
-        return null;
+        return code;
     }
 
     @Override
     public String message() {
-        return null;
+        return super.getMessage();
     }
 }

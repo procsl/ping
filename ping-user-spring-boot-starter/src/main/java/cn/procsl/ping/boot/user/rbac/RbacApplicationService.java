@@ -6,13 +6,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.transaction.Transactional;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.ws.rs.*;
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * @name 角色管理模块
@@ -40,7 +40,6 @@ public class RbacApplicationService {
      * @param permissions 权限
      */
     @POST
-    @Transactional(rollbackOn = Exception.class)
     public Long createRole(@NotBlank @Size(max = 20) String name, @NotNull @Size(max = 100) Collection<@Size(max = 100) String> permissions) throws RbacException {
         this.verifyPermissionService.verify(permissions);
         Role role = roleJpaRepository.save(new Role(name, permissions));
@@ -54,9 +53,8 @@ public class RbacApplicationService {
      * @throws RbacException 如果删除失败
      */
     @DELETE
-    @Path("{role_id}")
-    @Transactional(rollbackOn = Exception.class)
-    public void deleteRole(@PathParam(value = "role_id") @NotNull Long roleId) throws RbacException {
+    @Path("{id}")
+    public void deleteRole(@PathParam(value = "id") @NotNull Long roleId) throws RbacException {
         this.roleJpaRepository.deleteById(roleId);
     }
 
@@ -67,7 +65,6 @@ public class RbacApplicationService {
      * @param permissions 权限列表
      * @throws RbacException 如果修改失败，则抛出异常
      */
-    @Transactional(rollbackOn = Exception.class)
     public void changeRolePermissions(@NotNull Long id, @NotNull @Size(max = 100) Collection<@Max(100) String> permissions) throws RbacException {
         Role role = this.roleJpaRepository.getOne(id);
         this.verifyPermissionService.verify(permissions);
@@ -80,7 +77,6 @@ public class RbacApplicationService {
      * @param name 角色名称
      * @throws RbacException 如果修改失败，则抛出异常
      */
-    @Transactional(rollbackOn = Exception.class)
     public void changeRoleName(@NotNull Long id, @NotBlank @Size(max = 20) String name) throws RbacException {
         Role role = this.roleJpaRepository.getOne(id);
         role.setName(name);
@@ -96,7 +92,6 @@ public class RbacApplicationService {
      * @throws RbacException 如果修改失败，则抛出异常
      */
     @PATCH
-    @Transactional(rollbackOn = Exception.class)
     public void changeRole(@NotNull Long id, @Size(max = 20) String name, @Size(max = 100) Collection<@Size(max = 100) String> permissions) throws RbacException {
         if (name != null) {
             this.changeRoleName(id, name);
@@ -105,5 +100,12 @@ public class RbacApplicationService {
             this.changeRolePermissions(id, permissions);
         }
     }
+
+    @GET
+    @Path(value = "{id}")
+    public Optional<Role> getById(@PathParam("id") Long id) {
+        return this.roleJpaRepository.findById(id);
+    }
+
 
 }

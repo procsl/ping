@@ -1,11 +1,9 @@
 package cn.procsl.ping.processor.api;
 
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterSpec;
-import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.*;
 
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 
 public abstract class AbstractGeneratorBuilder implements GeneratorBuilder {
 
@@ -43,12 +41,12 @@ public abstract class AbstractGeneratorBuilder implements GeneratorBuilder {
     }
 
     @Override
-    public void returnType(String type, Element element, MethodSpec.Builder spec) {
-
+    public TypeName returnType(String type, ExecutableElement element) {
+        return null;
     }
 
     @Override
-    public void end(String type, Element element) {
-
+    public CodeBlock returnCodeBlack(String type, ExecutableElement element, CodeBlock caller) {
+        return null;
     }
 }

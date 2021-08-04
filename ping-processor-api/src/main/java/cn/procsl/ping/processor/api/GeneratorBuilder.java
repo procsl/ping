@@ -1,11 +1,9 @@
 package cn.procsl.ping.processor.api;
 
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterSpec;
-import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.*;
 
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 
 public interface GeneratorBuilder {
 
@@ -23,7 +21,7 @@ public interface GeneratorBuilder {
 
     void variableAnnotation(String type, Element element, ParameterSpec.Builder spec);
 
-    void returnType(String type, Element element, MethodSpec.Builder spec);
+    TypeName returnType(String type, ExecutableElement element);
 
-    void end(String type, Element element);
+    CodeBlock returnCodeBlack(String type, ExecutableElement element, CodeBlock caller);
 }
