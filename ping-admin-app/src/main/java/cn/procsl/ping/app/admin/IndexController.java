@@ -5,13 +5,18 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springdoc.core.SpringDocUtils;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.HttpHeadersReturnValueHandler;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
@@ -35,9 +40,14 @@ public class IndexController {
         return Map.of("root", id);
     }
 
-    @PutMapping(path = "map-tst")
+    @PutMapping(path = "map-test")
     public Map<String, String> mapTest(@RequestBody Map<@Size(min = 3, max = 10) String, @Email @NotBlank String> map) {
         return map;
+    }
+
+    @PutMapping(path = "response")
+    public ResponseEntity<String> response() {
+        return ResponseEntity.created(URI.create("https://procsl.cn/hello.json")).body("hello world");
     }
 
 }

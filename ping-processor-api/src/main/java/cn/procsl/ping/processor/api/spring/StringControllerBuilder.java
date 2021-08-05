@@ -5,7 +5,6 @@ import cn.procsl.ping.processor.api.GeneratorBuilder;
 import cn.procsl.ping.processor.api.annotation.HttpStatus;
 import cn.procsl.ping.processor.api.syntax.VariableDTOElement;
 import cn.procsl.ping.processor.api.utils.CodeUtils;
-import cn.procsl.ping.web.SimpleTypeWrapper;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
 
@@ -28,6 +27,8 @@ public class StringControllerBuilder extends AbstractGeneratorBuilder {
     final AnnotationSpec restController = AnnotationSpec.builder(ClassName.bestGuess("org.springframework.web.bind.annotation.RestController")).build();
 
     final AnnotationSpec indexed = AnnotationSpec.builder(ClassName.bestGuess("org.springframework.stereotype.Indexed")).build();
+
+    final ClassName simpleTypeWrapper = ClassName.get("cn.procsl.ping.web", "SimpleTypeWrapper");
 
     final AnnotationSpec transaction = AnnotationSpec
         .builder(ClassName.bestGuess("org.springframework.transaction.annotation.Transactional"))
@@ -123,9 +124,8 @@ public class StringControllerBuilder extends AbstractGeneratorBuilder {
         }
 
         if (CodeUtils.hasNeedWrapper(element.getReturnType())) {
-            ClassName clazz = ClassName.get(SimpleTypeWrapper.class);
             TypeName returnType = TypeName.get(returned);
-            return ParameterizedTypeName.get(clazz, returnType);
+            return ParameterizedTypeName.get(simpleTypeWrapper, returnType);
         }
 
         boolean bool = returned.toString().startsWith(Optional.class.getName()) && returned instanceof DeclaredType;
@@ -140,7 +140,7 @@ public class StringControllerBuilder extends AbstractGeneratorBuilder {
 
         TypeMirror argType = args.get(0);
         if (CodeUtils.hasNeedWrapper(argType)) {
-            return ParameterizedTypeName.get(ClassName.get(SimpleTypeWrapper.class), TypeName.get(argType));
+            return ParameterizedTypeName.get(simpleTypeWrapper, TypeName.get(argType));
         }
         // 其他
         return TypeName.get(argType);
@@ -156,9 +156,8 @@ public class StringControllerBuilder extends AbstractGeneratorBuilder {
 
         CodeBlock.Builder start = CodeBlock.builder().add("\n").add(preStatement);
         if (CodeUtils.hasNeedWrapper(returned)) {
-            ClassName clazz = ClassName.get(SimpleTypeWrapper.class);
             TypeName returnType = TypeName.get(returned);
-            ParameterizedTypeName parameter = ParameterizedTypeName.get(clazz, returnType);
+            ParameterizedTypeName parameter = ParameterizedTypeName.get(simpleTypeWrapper, returnType);
             start.add("\nreturn new $T(returnObject);", parameter).add("\n");
             return start.build();
         }
@@ -181,7 +180,7 @@ public class StringControllerBuilder extends AbstractGeneratorBuilder {
 
         start.add(notFound);
         if (CodeUtils.hasNeedWrapper(argType)) {
-            return start.add("\nreturn new $T(option);", ClassName.get(SimpleTypeWrapper.class)).add("\n").build();
+            return start.add("\nreturn new $T(option);", simpleTypeWrapper).add("\n").build();
         }
         return start.add("\nreturn option;").add("\n").build();
     }

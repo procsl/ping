@@ -19,7 +19,7 @@ public class BusinessException extends RuntimeException implements ErrorEntity {
 
     public BusinessException(Integer httpStatus, String code, String format, Object... arguments) {
         // TODO 这里应该用占位符的, 先写着
-        super(format);
+        super(format, null, false, false);
         this.httpStatus = httpStatus;
         this.code = code;
     }

@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.rest.config;
 
+import cn.procsl.ping.boot.rest.exception.resolver.BusinessExceptionResolver;
 import cn.procsl.ping.boot.rest.exception.resolver.ConfigureHandlerExceptionResolver;
 import cn.procsl.ping.boot.rest.exception.resolver.MethodArgumentNotValidExceptionResolver;
 import cn.procsl.ping.boot.rest.exception.resolver.RestHandlerExceptionResolver;
@@ -49,6 +50,7 @@ public class RestWebMvcConfigurer implements WebMvcConfigurer {
     public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
         resolvers.clear();
         resolvers.add(new MethodArgumentNotValidExceptionResolver());
+        resolvers.add(new BusinessExceptionResolver());
         resolvers.add(new ConfigureHandlerExceptionResolver());
         resolvers.add(new RestHandlerExceptionResolver());
     }
