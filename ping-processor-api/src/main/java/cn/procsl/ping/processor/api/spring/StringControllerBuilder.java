@@ -22,22 +22,22 @@ import java.util.stream.Collectors;
 public class StringControllerBuilder extends AbstractGeneratorBuilder {
 
 
-    final AnnotationSpec validate = AnnotationSpec.builder(ClassName.bestGuess("org.springframework.validation.annotation.Validated")).build();
+    final AnnotationSpec validate = AnnotationSpec.builder(ClassName.get("org.springframework.validation.annotation", "Validated")).build();
 
-    final AnnotationSpec restController = AnnotationSpec.builder(ClassName.bestGuess("org.springframework.web.bind.annotation.RestController")).build();
+    final AnnotationSpec restController = AnnotationSpec.builder(ClassName.get("org.springframework.web.bind.annotation", "RestController")).build();
 
-    final AnnotationSpec indexed = AnnotationSpec.builder(ClassName.bestGuess("org.springframework.stereotype.Indexed")).build();
+    final AnnotationSpec indexed = AnnotationSpec.builder(ClassName.get("org.springframework.stereotype", "Indexed")).build();
 
     final ClassName simpleTypeWrapper = ClassName.get("cn.procsl.ping.web", "SimpleTypeWrapper");
 
     final AnnotationSpec transaction = AnnotationSpec
-        .builder(ClassName.bestGuess("org.springframework.transaction.annotation.Transactional"))
+        .builder(ClassName.get("org.springframework.transaction.annotation", "Transactional"))
         .addMember("rollbackFor", "$T.class", Exception.class).build();
 
     final AnnotationSpec readOnlyTransaction = transaction.toBuilder()
         .addMember("readOnly", "$N", "true").build();
 
-    final ClassName autowired = ClassName.bestGuess("org.springframework.beans.factory.annotation.Autowired");
+    final ClassName autowired = ClassName.get("org.springframework.beans.factory.annotation", "Autowired");
 
     final static DateFormat format = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.CHINA);
 
@@ -139,11 +139,32 @@ public class StringControllerBuilder extends AbstractGeneratorBuilder {
         }
 
         TypeMirror argType = args.get(0);
+
+        TypeName typeName = hasToDTO(argType) ? toBuildReturnType(argType) : ClassName.get(argType);
+
         if (CodeUtils.hasNeedWrapper(argType)) {
-            return ParameterizedTypeName.get(simpleTypeWrapper, TypeName.get(argType));
+            return ParameterizedTypeName.get(simpleTypeWrapper, typeName);
         }
         // 其他
-        return TypeName.get(argType);
+        return typeName;
+    }
+
+    // 创建返回值DTO
+    TypeName toBuildReturnType(TypeMirror argType) {
+        Element element = this.context.getProcessingEnvironment().getTypeUtils().asElement(argType);
+        String name = element.getSimpleName().toString() + "DTO";
+        String packageName = element.getEnclosingElement().toString() + ".returned";
+        return ClassName.get(packageName, name);
+    }
+
+    TypeSpec createReturnDTO(TypeMirror mirror) {
+        return null;
+    }
+
+    boolean hasToDTO(TypeMirror argType) {
+        Element element = this.context.getProcessingEnvironment().getTypeUtils().asElement(argType);
+        Set<String> set = element.getAnnotationMirrors().stream().map(Object::toString).filter(item -> item.startsWith("@javax.persistence")).collect(Collectors.toSet());
+        return !set.isEmpty();
     }
 
     @Override

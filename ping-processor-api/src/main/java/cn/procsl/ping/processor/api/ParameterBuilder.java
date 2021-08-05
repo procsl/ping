@@ -69,7 +69,7 @@ class ParameterBuilder {
             }
         }
 
-        this.dtoName = NamingUtils.upperCamelCase(methodName) + dtoFields.size() + params.size() + "DTO";
+        this.dtoName = NamingUtils.upperCamelCase(methodName) + "DTO";
         this.size = parameters.size();
         this.dtoPackage = getPackage();
         this.createDTO = (simpleRequest || dtoFields.isEmpty());
@@ -101,9 +101,9 @@ class ParameterBuilder {
     private String getPackage() {
         Element type = executable.getEnclosingElement();
         String packageName = type.getEnclosingElement().toString();
-        String serviceName = type.getSimpleName().toString();
-        String businessName = serviceName.replaceAll("Application", "").replaceAll(SERVICE + "$", "").toLowerCase(Locale.ROOT);
-        return String.format("%s.api.%s", packageName, businessName);
+//        String serviceName = type.getSimpleName().toString();
+//        String businessName = serviceName.replaceAll("Application", "").replaceAll(SERVICE + "$", "").toLowerCase(Locale.ROOT);
+        return String.format("%s", packageName);
     }
 
     TypeName toWrapper(VariableElement parameter) {

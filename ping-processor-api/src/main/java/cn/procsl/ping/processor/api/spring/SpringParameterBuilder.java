@@ -15,12 +15,13 @@ import javax.ws.rs.*;
 @AutoService(GeneratorBuilder.class)
 public class SpringParameterBuilder extends AbstractGeneratorBuilder {
 
-    final static String requestParam = "org.springframework.web.bind.annotation.RequestParam";
-    final static String responseBody = "org.springframework.web.bind.annotation.RequestBody";
-    final static String pathVariable = "org.springframework.web.bind.annotation.PathVariable";
-    final static String cookieValue = "org.springframework.web.bind.annotation.CookieValue";
-    final static String requestHeader = "org.springframework.web.bind.annotation.RequestHeader";
-    final static String matrixVariable = "org.springframework.web.bind.annotation.MatrixVariable";
+    final static String packageName = "org.springframework.web.bind.annotation";
+    final static String requestParam = "RequestParam";
+    final static String responseBody = "RequestBody";
+    final static String pathVariable = "PathVariable";
+    final static String cookieValue = "CookieValue";
+    final static String requestHeader = "RequestHeader";
+    final static String matrixVariable = "MatrixVariable";
 
 
     @Override
@@ -32,7 +33,7 @@ public class SpringParameterBuilder extends AbstractGeneratorBuilder {
         }
 
         if (source instanceof VariableDTOElement) {
-            AnnotationSpec spec = AnnotationSpec.builder(ClassName.bestGuess(responseBody)).build();
+            AnnotationSpec spec = AnnotationSpec.builder(ClassName.get(packageName, responseBody)).build();
             target.addAnnotation(spec);
             return;
         }
@@ -43,7 +44,7 @@ public class SpringParameterBuilder extends AbstractGeneratorBuilder {
             QueryParam query = source.getAnnotation(QueryParam.class);
             if (query != null) {
                 AnnotationSpec.Builder spec = AnnotationSpec
-                    .builder(ClassName.bestGuess(requestParam))
+                    .builder(ClassName.get(packageName, requestParam))
                     .addMember("name", "$S", query.value());
                 if (defaultValue != null) {
                     spec.addMember("defaultValue", "$S", defaultValue.value());
@@ -57,7 +58,7 @@ public class SpringParameterBuilder extends AbstractGeneratorBuilder {
             PathParam path = source.getAnnotation(PathParam.class);
             if (path != null) {
                 AnnotationSpec spec = AnnotationSpec
-                    .builder(ClassName.bestGuess(pathVariable))
+                    .builder(ClassName.get(packageName, pathVariable))
                     .addMember("name", "$S", path.value())
                     .build();
                 target.addAnnotation(spec);
@@ -69,7 +70,7 @@ public class SpringParameterBuilder extends AbstractGeneratorBuilder {
             HeaderParam header = source.getAnnotation(HeaderParam.class);
             if (header != null) {
                 AnnotationSpec.Builder spec = AnnotationSpec
-                    .builder(ClassName.bestGuess(requestHeader))
+                    .builder(ClassName.get(packageName, requestHeader))
                     .addMember("name", "$S", header.value());
                 if (defaultValue != null) {
                     spec.addMember("defaultValue", "$S", defaultValue.value());
@@ -83,7 +84,7 @@ public class SpringParameterBuilder extends AbstractGeneratorBuilder {
             CookieParam cookie = source.getAnnotation(CookieParam.class);
             if (cookie != null) {
                 AnnotationSpec.Builder spec = AnnotationSpec
-                    .builder(ClassName.bestGuess(cookieValue))
+                    .builder(ClassName.get(packageName, cookieValue))
                     .addMember("name", "$S", cookie.value());
                 if (defaultValue != null) {
                     spec.addMember("defaultValue", "$S", defaultValue.value());
@@ -97,7 +98,7 @@ public class SpringParameterBuilder extends AbstractGeneratorBuilder {
             MatrixParam matrix = source.getAnnotation(MatrixParam.class);
             if (matrix != null) {
                 AnnotationSpec.Builder spec = AnnotationSpec
-                    .builder(ClassName.bestGuess(matrixVariable))
+                    .builder(ClassName.get(packageName, matrixVariable))
                     .addMember("name", matrix.value());
                 if (defaultValue != null) {
                     spec.addMember("defaultValue", "$S", defaultValue.value());
@@ -108,20 +109,17 @@ public class SpringParameterBuilder extends AbstractGeneratorBuilder {
         }
 
         // default 如果是 java or javax打头
-        if (!bool) {
-            String name = source.toString();
-            if (name.startsWith("java.") || name.startsWith("javax.")) {
-                AnnotationSpec.Builder spec = AnnotationSpec
-                    .builder(ClassName.bestGuess(requestParam));
-                if (defaultValue != null) {
-                    spec.addMember("defaultValue", "$S", defaultValue.value());
-                }
-                target.addAnnotation(spec.build());
-            } else {
-                AnnotationSpec spec = AnnotationSpec.builder(ClassName.bestGuess(responseBody)).build();
-                target.addAnnotation(spec);
+        if (bool) {
+            return;
+        }
+        String name = source.toString();
+        if (name.startsWith("java.") || name.startsWith("javax.")) {
+            AnnotationSpec.Builder spec = AnnotationSpec
+                .builder(ClassName.get(packageName, requestParam));
+            if (defaultValue != null) {
+                spec.addMember("defaultValue", "$S", defaultValue.value());
             }
-
+            target.addAnnotation(spec.build());
         }
 
     }

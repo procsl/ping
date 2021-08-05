@@ -18,7 +18,4 @@ public interface ProcessorContext {
 
     String getConfig(String key);
 
-//    void importType(String type);
-//
-//    void importStatic(String type);
 }

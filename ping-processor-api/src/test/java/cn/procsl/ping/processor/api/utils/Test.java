@@ -17,6 +17,7 @@ public class Test {
 //        collect.annotations.add(AnnotationSpec.builder(Generated.class).build());
         System.out.printf(collect.toString());
 
+//        JavaFile.builder("name", ).build();
     }
 
 }

@@ -20,7 +20,7 @@ public class BusinessExceptionResolver extends AbstractHandlerExceptionResolver 
             ModelAndView mv = new ModelAndView();
             ExceptionCode code = new ExceptionCode();
             code.setMessage(e.getMessage());
-            code.setCode(((BusinessException) e).code());
+            code.setCode(String.format("%s%s", ((BusinessException) e).httpStatus(), ((BusinessException) e).code()));
             mv.addObject(RestWebProperties.modelKey, code);
             mv.setStatus(HttpStatus.resolve(((BusinessException) e).httpStatus()));
             log.warn("业务异常处理:", e);

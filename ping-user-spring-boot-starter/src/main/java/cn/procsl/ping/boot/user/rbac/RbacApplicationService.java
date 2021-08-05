@@ -95,7 +95,7 @@ public class RbacApplicationService {
     public void changeRole(@NotNull Long id, @Size(max = 20) String name, @Size(max = 100) Collection<@Size(max = 100) String> permissions) throws RbacException {
         if (name != null) {
             this.changeRoleName(id, name);
-        r
+        }
         if (permissions != null) {
             this.changeRolePermissions(id, permissions);
         }
@@ -103,12 +103,12 @@ public class RbacApplicationService {
 
     /**
      * 获取角色
+     *
      * @param id 角色ID
      * @return 返回角色信息
      */
     @GET
-    @Path(value = "{id}")
-    public Optional<Role> getById(@PathParam("id") Long id) {
+    public Optional<Role> getById(Long id) {
         return this.roleJpaRepository.findById(id);
     }
 
