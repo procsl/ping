@@ -149,27 +149,8 @@
             <groupId>cn.procsl</groupId>
             <artifactId>ping-processor-doc</artifactId>
             <version>0.0.3-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
-
-
-        <!--        <dependency>-->
-        <!--            <groupId>com.querydsl</groupId>-->
-        <!--            <artifactId>querydsl-apt</artifactId>-->
-        <!--            <version>${querydsl.version}</version>-->
-        <!--            <classifier>jpa</classifier>-->
-        <!--            <scope>provided</scope>-->
-        <!--            <exclusions>-->
-        <!--                <exclusion>-->
-        <!--                    <artifactId>guava</artifactId>-->
-        <!--                    <groupId>com.google.guava</groupId>-->
-        <!--                </exclusion>-->
-        <!--                <exclusion>-->
-        <!--                    <artifactId>javassist</artifactId>-->
-        <!--                    <groupId>org.javassist</groupId>-->
-        <!--                </exclusion>-->
-        <!--            </exclusions>-->
-        <!--        </dependency>-->
-
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

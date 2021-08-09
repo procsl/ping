@@ -7,6 +7,7 @@ import cn.procsl.ping.processor.api.syntax.VariableDTOElement;
 import cn.procsl.ping.processor.api.utils.CodeUtils;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
+import lombok.SneakyThrows;
 
 import javax.annotation.processing.Generated;
 import javax.lang.model.element.Element;
@@ -140,7 +141,8 @@ public class StringControllerBuilder extends AbstractGeneratorBuilder {
 
         TypeMirror argType = args.get(0);
 
-        TypeName typeName = hasToDTO(argType) ? toBuildReturnType(argType) : ClassName.get(argType);
+        ReturnedTypeBuilder builder = new ReturnedTypeBuilder(argType, this.context);
+        TypeName typeName = hasToDTO(argType) ? builder.toBuildReturnType() : ClassName.get(argType);
 
         if (CodeUtils.hasNeedWrapper(argType)) {
             return ParameterizedTypeName.get(simpleTypeWrapper, typeName);
@@ -149,17 +151,6 @@ public class StringControllerBuilder extends AbstractGeneratorBuilder {
         return typeName;
     }
 
-    // 创建返回值DTO
-    TypeName toBuildReturnType(TypeMirror argType) {
-        Element element = this.context.getProcessingEnvironment().getTypeUtils().asElement(argType);
-        String name = element.getSimpleName().toString() + "DTO";
-        String packageName = element.getEnclosingElement().toString() + ".returned";
-        return ClassName.get(packageName, name);
-    }
-
-    TypeSpec createReturnDTO(TypeMirror mirror) {
-        return null;
-    }
 
     boolean hasToDTO(TypeMirror argType) {
         Element element = this.context.getProcessingEnvironment().getTypeUtils().asElement(argType);
@@ -167,6 +158,7 @@ public class StringControllerBuilder extends AbstractGeneratorBuilder {
         return !set.isEmpty();
     }
 
+    @SneakyThrows
     @Override
     public CodeBlock returnCodeBlack(String type, ExecutableElement element, CodeBlock preStatement) {
 
@@ -200,9 +192,25 @@ public class StringControllerBuilder extends AbstractGeneratorBuilder {
         CodeBlock notFound = CodeBlock.builder().add(tmp, exp, "404", "H001", "Not Found", TypeName.get(argType)).build();
 
         start.add(notFound);
+
+        // 是否需要包装
         if (CodeUtils.hasNeedWrapper(argType)) {
             return start.add("\nreturn new $T(option);", simpleTypeWrapper).add("\n").build();
         }
+
+        // 是否需要将entity转换成dto
+        if (hasToDTO(argType)) {
+            ReturnedTypeBuilder builder = new ReturnedTypeBuilder(argType, this.context);
+            ClassName returnedType = builder.toBuildReturnType();
+
+            TypeSpec dto = builder.createReturnDTO();
+            JavaFile.builder(returnedType.packageName(), dto).build().writeTo(this.context.getFiler());
+
+            start.add(builder.getCaller());
+
+            return start.add("\nreturn returnDto;").add("\n").build();
+        }
+
         return start.add("\nreturn option;").add("\n").build();
     }
 }

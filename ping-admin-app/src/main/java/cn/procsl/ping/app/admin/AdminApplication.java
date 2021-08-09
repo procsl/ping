@@ -16,7 +16,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
     info = @Info(
         title = "接口文档",
         version = "1.0",
-        license = @License(url = "https://springdoc.org", name = "Apache 2.0"),
+        license = @License(url = "https://www.apache.org/licenses/LICENSE-2.0", name = "Apache License 2.0"),
         description = "Ping接口参考文档, 可用于指导生成测试用例, HTTP Client SDK"
     )
 )
