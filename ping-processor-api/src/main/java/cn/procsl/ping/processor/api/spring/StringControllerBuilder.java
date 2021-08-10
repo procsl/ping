@@ -140,15 +140,16 @@ public class StringControllerBuilder extends AbstractGeneratorBuilder {
         }
 
         TypeMirror argType = args.get(0);
-
-        ReturnedTypeBuilder builder = new ReturnedTypeBuilder(argType, this.context);
-        TypeName typeName = hasToDTO(argType) ? builder.toBuildReturnType() : ClassName.get(argType);
-
-        if (CodeUtils.hasNeedWrapper(argType)) {
-            return ParameterizedTypeName.get(simpleTypeWrapper, typeName);
-        }
-        // 其他
-        return typeName;
+        return ClassName.get(argType);
+//
+//        ReturnedTypeBuilder builder = new ReturnedTypeBuilder(argType, this.context);
+//        TypeName typeName = hasToDTO(argType) ? builder.toBuildReturnType() : ClassName.get(argType);
+//
+//        if (CodeUtils.hasNeedWrapper(argType)) {
+//            return ParameterizedTypeName.get(simpleTypeWrapper, typeName);
+//        }
+//        // 其他
+//        return typeName;
     }
 
 
@@ -193,23 +194,27 @@ public class StringControllerBuilder extends AbstractGeneratorBuilder {
 
         start.add(notFound);
 
+        if (hasToDTO(argType)) {
+            start.add(" option.toString(); ");
+        }
+
         // 是否需要包装
         if (CodeUtils.hasNeedWrapper(argType)) {
             return start.add("\nreturn new $T(option);", simpleTypeWrapper).add("\n").build();
         }
 
         // 是否需要将entity转换成dto
-        if (hasToDTO(argType)) {
-            ReturnedTypeBuilder builder = new ReturnedTypeBuilder(argType, this.context);
-            ClassName returnedType = builder.toBuildReturnType();
-
-            TypeSpec dto = builder.createReturnDTO();
-            JavaFile.builder(returnedType.packageName(), dto).build().writeTo(this.context.getFiler());
-
-            start.add(builder.getCaller());
-
-            return start.add("\nreturn returnDto;").add("\n").build();
-        }
+//        if (hasToDTO(argType)) {
+//            ReturnedTypeBuilder builder = new ReturnedTypeBuilder(argType, this.context);
+//            ClassName returnedType = builder.toBuildReturnType();
+//
+//            TypeSpec dto = builder.createReturnDTO();
+//            JavaFile.builder(returnedType.packageName(), dto).build().writeTo(this.context.getFiler());
+//
+//            start.add(builder.getCaller());
+//
+//            return start.add("\nreturn returnDto;").add("\n").build();
+//        }
 
         return start.add("\nreturn option;").add("\n").build();
     }

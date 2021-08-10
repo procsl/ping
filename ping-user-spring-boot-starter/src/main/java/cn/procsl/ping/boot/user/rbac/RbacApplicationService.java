@@ -108,9 +108,21 @@ public class RbacApplicationService {
      * @return 返回角色信息
      */
     @GET
-    public Optional<Role> getById(Long id) {
+    @Path("{id}")
+    public Optional<Role> getById(@PathParam("id") Long id) {
         return this.roleJpaRepository.findById(id);
     }
+
+//    /**
+//     * 分页查询角色接口
+//     *
+//     * @param pageable 分页对象
+//     * @return 返回分页的角色对象
+//     */
+//    @GET
+//    public Page<Role> query(PageRequest request) {
+//        return this.roleJpaRepository.findAll(request);
+//    }
 
 
 }

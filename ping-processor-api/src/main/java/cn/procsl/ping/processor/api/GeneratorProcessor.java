@@ -128,6 +128,7 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
             if (returnType != null) {
                 methodBuilder.returns(returnType);
             }
+
             CodeBlock codeBlack = generatorBuilder.returnCodeBlack(CONTROLLER, item, constructor.buildCaller());
             if (codeBlack != null) {
                 methodBuilder.addCode(codeBlack);
