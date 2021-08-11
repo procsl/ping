@@ -47,7 +47,7 @@ public class IndexController {
     }
 
     @GetMapping(path = "response")
-    public ResponseEntity<String> getResponse(@RequestParam(required = false) @Parameter String code) {
+    public ResponseEntity<String> getResponse(@RequestParam(defaultValue = "123") @Parameter String code) {
         return ResponseEntity.created(URI.create("https://procsl.cn/hello.json")).body(code);
     }
 

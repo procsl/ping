@@ -18,4 +18,7 @@ public interface ProcessorContext {
 
     String getConfig(String key);
 
+    default String getRootPackageName() {
+        return this.getConfig("creator.api.packageName");
+    }
 }

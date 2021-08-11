@@ -2,6 +2,9 @@ package cn.procsl.ping.boot.user.rbac;
 
 
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import javax.inject.Inject;
@@ -113,16 +116,18 @@ public class RbacApplicationService {
         return this.roleJpaRepository.findById(id);
     }
 
-//    /**
-//     * 分页查询角色接口
-//     *
-//     * @param pageable 分页对象
-//     * @return 返回分页的角色对象
-//     */
-//    @GET
-//    public Page<Role> query(PageRequest request) {
-//        return this.roleJpaRepository.findAll(request);
-//    }
+    /**
+     * 分页查询角色接口
+     *
+     * @param page  第几页
+     * @param order 排序方式
+     * @param size  每页大小
+     * @return 返回分页的角色对象
+     */
+    @GET
+    public Page<Role> query(@DefaultValue("1") int page, @DefaultValue("10") int size, Sort.Direction order) {
+        return this.roleJpaRepository.findAll(PageRequest.of(page, size, order, "name"));
+    }
 
 
 }

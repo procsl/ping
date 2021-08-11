@@ -1,11 +1,13 @@
 package cn.procsl.ping.processor.api;
 
 import cn.procsl.ping.processor.api.utils.NamingUtils;
-import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
 import lombok.Getter;
 
-import javax.annotation.processing.*;
+import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
@@ -17,7 +19,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
-@AutoService(Processor.class)
 public class GeneratorProcessor extends AbstractConfigurableProcessor implements ProcessorContext {
 
     final static String CONTROLLER = "CONTROLLER";
