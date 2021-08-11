@@ -1,7 +1,7 @@
 package cn.procsl.ping.processor.doc;
 
-import cn.procsl.ping.processor.api.AbstractGeneratorBuilder;
-import cn.procsl.ping.processor.api.GeneratorBuilder;
+import cn.procsl.ping.processor.api.AbstractGeneratedVisitor;
+import cn.procsl.ping.processor.api.GeneratedVisitor;
 import cn.procsl.ping.processor.api.utils.NamingUtils;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
@@ -14,12 +14,12 @@ import javax.lang.model.element.Element;
 /**
  * 这里需要读取配置, 需要更改
  */
-@AutoService(GeneratorBuilder.class)
-public class SpringDocBuilder extends AbstractGeneratorBuilder {
+@AutoService(GeneratedVisitor.class)
+public class SpringDocBuilder extends AbstractGeneratedVisitor {
 
 
     @Override
-    public void methodAnnotation(String type, Element element, MethodSpec.Builder spec) {
+    public void methodVisitor(String type, Element element, MethodSpec.Builder spec) {
         JavaCommentResolver comment = resolver(element);
 
         AnnotationSpec.Builder operation = AnnotationSpec.builder(Operation.class);
@@ -43,7 +43,7 @@ public class SpringDocBuilder extends AbstractGeneratorBuilder {
     }
 
     @Override
-    public void typeAnnotation(String type, Element source, TypeSpec.Builder spec) {
+    public void typeVisitor(String type, Element source, TypeSpec.Builder spec) {
 
         JavaCommentResolver comment = resolver(source);
         String name = comment.getName();
@@ -66,7 +66,7 @@ public class SpringDocBuilder extends AbstractGeneratorBuilder {
     }
 
     @Override
-    public void parameterAnnotation(String type, Element element, ParameterSpec.Builder spec) {
+    public void parameterVisitor(String type, Element element, ParameterSpec.Builder spec) {
         JavaCommentResolver comment = this.resolver(element.getEnclosingElement());
         String description = comment.getParameterComment(element.getSimpleName().toString());
         if (description == null) {

@@ -18,35 +18,29 @@ import java.util.*;
 
 class ParameterBuilder {
 
-    static final String DTO = "DTO";
+    final private ExecutableElement executable;
 
-    static final String CONTROLLER = "CONTROLLER";
+    final private GeneratorProcessor processor;
 
-    static final String SERVICE = "Service";
+    final private String methodName;
 
-    final ExecutableElement executable;
+    final private String fieldName;
 
-    final GeneratorProcessor processor;
+    final private String dtoName;
 
-    final String methodName;
+    final private HashMap<Integer, VariableElement> dtoFields = new HashMap<>();
 
-    final String fieldName;
+    final private HashMap<Integer, VariableElement> params = new HashMap<>();
 
-    final String dtoName;
+    final private boolean simpleRequest;
 
-    final HashMap<Integer, VariableElement> dtoFields = new HashMap<>();
+    final private int size;
 
-    final HashMap<Integer, VariableElement> params = new HashMap<>();
+    final private String dtoPackage;
 
-    final boolean simpleRequest;
+    final private boolean createDTO;
 
-    final int size;
-
-    final String dtoPackage;
-
-    final boolean createDTO;
-
-    TypeSpec dtoType;
+    private TypeSpec dtoType;
 
     public ParameterBuilder(GeneratorProcessor processor, String methodName, String fieldName, @NonNull ExecutableElement executableElement) throws IOException {
         this.executable = executableElement;
@@ -79,15 +73,15 @@ class ParameterBuilder {
         }
         TypeSpec.Builder dto = TypeSpec.classBuilder(this.dtoName);
         dto.addModifiers(Modifier.PUBLIC);
-        for (GeneratorBuilder specBuilder : processor.dto) {
-            specBuilder.typeAnnotation(DTO, executableElement, dto);
+        for (GeneratedVisitor specBuilder : processor.parameter) {
+            specBuilder.typeVisitor(executableElement, dto);
         }
         dtoFields.forEach((k, v) -> {
             TypeName type = toWrapper(v);
             FieldSpec.Builder fieldBuilder = FieldSpec.builder(type, v.getSimpleName().toString(), Modifier.PROTECTED);
 
-            for (GeneratorBuilder specBuilder : processor.dto) {
-                specBuilder.fieldAnnotation(DTO, v, fieldBuilder);
+            for (GeneratedVisitor specBuilder : processor.parameter) {
+                specBuilder.fieldVisitor(v, fieldBuilder);
             }
 
             dto.addField(fieldBuilder.build());
@@ -106,7 +100,7 @@ class ParameterBuilder {
         return String.format("%s", packageName);
     }
 
-    TypeName toWrapper(VariableElement parameter) {
+    private TypeName toWrapper(VariableElement parameter) {
         TypeMirror type = parameter.asType();
         TypeName typeName = TypeName.get(type);
         if (type.getKind().isPrimitive() && (!typeName.isBoxedPrimitive())) {
@@ -158,32 +152,32 @@ class ParameterBuilder {
         }
         ClassName clazz = ClassName.get(this.dtoPackage, this.dtoName);
         ParameterSpec.Builder dtoBuilder = ParameterSpec.builder(clazz, NamingUtils.lowerCamelCase(this.dtoName), Modifier.FINAL);
-        for (GeneratorBuilder specBuilder : processor.controller) {
-            specBuilder.parameterAnnotation(CONTROLLER, new VariableDTOElement(executable, dtoFields, this.dtoPackage, this.dtoName), dtoBuilder);
+        for (GeneratedVisitor specBuilder : processor.controller) {
+            specBuilder.parameterVisitor(new VariableDTOElement(executable, dtoFields, this.dtoPackage, this.dtoName), dtoBuilder);
         }
         result.add(dtoBuilder.build());
         result.add(spec);
         return result;
     }
 
-    ParameterSpec buildHttpResponse() {
+    private ParameterSpec buildHttpResponse() {
         ClassName response = ClassName.get("javax.servlet.http", "HttpServletResponse");
         return ParameterSpec.builder(response, "response", Modifier.FINAL).build();
     }
 
-    void buildParamSpec(ArrayList<ParameterSpec> result) {
+    private void buildParamSpec(ArrayList<ParameterSpec> result) {
         for (Map.Entry<Integer, VariableElement> entry : params.entrySet()) {
             VariableElement v = entry.getValue();
             buildSpec(result, v);
         }
     }
 
-    void buildSpec(ArrayList<ParameterSpec> result, VariableElement v) {
+    private void buildSpec(ArrayList<ParameterSpec> result, VariableElement v) {
         String simpleName = NamingUtils.lowerCamelCase(v.getSimpleName().toString());
         TypeName typeName = toWrapper(v);
         ParameterSpec.Builder parameterBuilder = ParameterSpec.builder(typeName, simpleName, Modifier.FINAL);
-        for (GeneratorBuilder specBuilder : processor.controller) {
-            specBuilder.parameterAnnotation(CONTROLLER, v, parameterBuilder);
+        for (GeneratedVisitor specBuilder : processor.controller) {
+            specBuilder.parameterVisitor(v, parameterBuilder);
         }
         result.add(parameterBuilder.build());
     }
@@ -220,7 +214,7 @@ class ParameterBuilder {
         return toWrapper(caller, executable.getReturnType());
     }
 
-    CodeBlock toWrapper(String caller, TypeMirror mirror) {
+    private CodeBlock toWrapper(String caller, TypeMirror mirror) {
         if (!caller.contains("=")) {
             return CodeBlock.builder().add(caller).build();
         }

@@ -23,10 +23,7 @@ public class RestDispatcherServlet extends DispatcherServlet {
 
     @Override
     protected void noHandlerFound(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        if (pageNotFoundLogger.isWarnEnabled()) {
-            pageNotFoundLogger.warn("No mapping for " + request.getMethod() + " " + getRequestUri(request));
-        }
-        throw new NotFoundException();
+        throw new NotFoundException(request.getMethod(), getRequestUri(request));
     }
 
 }

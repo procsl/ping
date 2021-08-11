@@ -7,6 +7,7 @@ spring:
   application:
     name: @project.artifactId@.@project.version@
 
+
   jpa:
     show-sql: true
     generate-ddl: true

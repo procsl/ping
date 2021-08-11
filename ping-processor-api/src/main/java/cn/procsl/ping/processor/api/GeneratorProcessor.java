@@ -1,11 +1,13 @@
 package cn.procsl.ping.processor.api;
 
 import cn.procsl.ping.processor.api.utils.NamingUtils;
-import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
 import lombok.Getter;
 
-import javax.annotation.processing.*;
+import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
@@ -17,16 +19,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
-@AutoService(Processor.class)
 public class GeneratorProcessor extends AbstractConfigurableProcessor implements ProcessorContext {
 
-    final static String CONTROLLER = "CONTROLLER";
+    final List<GeneratedVisitor> controller = new ArrayList<>();
 
-    final static String SERVICE = "Service";
+    final List<GeneratedVisitor> parameter = new ArrayList<>();
 
-    final List<GeneratorBuilder> controller = new ArrayList<>();
-
-    final List<GeneratorBuilder> dto = new ArrayList<>();
+    final List<GeneratedVisitor> returned = new ArrayList<>();
 
     @Getter
     RoundEnvironment roundEnvironment;
@@ -36,16 +35,11 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
 
     @Override
     protected void init() {
-        final ServiceLoader<GeneratorBuilder> generator = ServiceLoader.load(GeneratorBuilder.class, this.getClass().getClassLoader());
-        for (GeneratorBuilder builder : generator) {
-            builder.init(this);
-            if (builder.support(CONTROLLER)) {
-                controller.add(builder);
-            }
-            if (builder.support("DTO")) {
-                dto.add(builder);
-            }
-        }
+        final ServiceLoader<GeneratedVisitor> generator = ServiceLoader.load(GeneratedVisitor.class, this.getClass().getClassLoader());
+        Map<String, List<GeneratedVisitor>> annotationProcessor = generator.stream().map(ServiceLoader.Provider::get).peek(item -> item.init(this)).collect(Collectors.groupingBy(GeneratedVisitor::support));
+        this.controller.addAll(annotationProcessor.get("controller"));
+        this.parameter.addAll(annotationProcessor.get("controller.parameter"));
+        this.returned.addAll(annotationProcessor.get("controller.returned"));
     }
 
     @Override
@@ -60,20 +54,20 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
 
             TypeSpec.Builder builder = TypeSpec.classBuilder(name).addModifiers(Modifier.PUBLIC);
 
-            for (GeneratorBuilder specBuilder : controller) {
-                specBuilder.typeAnnotation(CONTROLLER, typeElement, builder);
+            for (GeneratedVisitor specBuilder : controller) {
+                specBuilder.typeVisitor(typeElement, builder);
             }
 
             String fieldName = NamingUtils.lowerCamelCase(typeElement.getSimpleName().toString());
             FieldSpec.Builder fieldSpecBuilder = FieldSpec.builder(TypeName.get(typeElement.asType()), fieldName, Modifier.PROTECTED);
-            for (GeneratorBuilder specBuilder : controller) {
-                specBuilder.fieldAnnotation(CONTROLLER, typeElement, fieldSpecBuilder);
+            for (GeneratedVisitor specBuilder : controller) {
+                specBuilder.fieldVisitor(typeElement, fieldSpecBuilder);
             }
             builder.addField(fieldSpecBuilder.build());
 
             FieldSpec.Builder request = FieldSpec.builder(ClassName.get("javax.servlet.http", "HttpServletRequest"), "request", Modifier.PROTECTED);
-            for (GeneratorBuilder specBuilder : controller) {
-                specBuilder.fieldAnnotation(CONTROLLER, typeElement, request);
+            for (GeneratedVisitor specBuilder : controller) {
+                specBuilder.fieldVisitor(typeElement, request);
             }
             builder.addField(request.build());
 
@@ -116,24 +110,16 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
             methodBuilder.addException(TypeName.get(typeMirror));
         }
 
-        for (GeneratorBuilder specBuilder : controller) {
-            specBuilder.methodAnnotation(CONTROLLER, item, methodBuilder);
+        for (GeneratedVisitor specBuilder : controller) {
+            specBuilder.methodVisitor(item, methodBuilder);
         }
 
         ParameterBuilder constructor = new ParameterBuilder(this, methodName, fieldName, item);
         methodBuilder.addParameters(constructor.buildParameters());
 
-        for (GeneratorBuilder generatorBuilder : controller) {
-            TypeName returnType = generatorBuilder.returnType(CONTROLLER, item);
-            if (returnType != null) {
-                methodBuilder.returns(returnType);
-            }
-
-            CodeBlock codeBlack = generatorBuilder.returnCodeBlack(CONTROLLER, item, constructor.buildCaller());
-            if (codeBlack != null) {
-                methodBuilder.addCode(codeBlack);
-            }
-        }
+        ReturnedBuilder returnedBuilder = new ReturnedBuilder(this, methodName, fieldName, item, constructor.buildCaller());
+        methodBuilder.returns(returnedBuilder.buildReturnedType());
+        methodBuilder.addCode(returnedBuilder.buildCodeBlack());
         builder.addMethod(methodBuilder.build());
     }
 
@@ -172,8 +158,8 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
 
     String createClassName(TypeElement element) {
         String name = element.getSimpleName().toString();
-        if (name.endsWith(SERVICE)) {
-            name = name.replaceAll("Application", "").replaceAll(SERVICE + "$", "Controller");
+        if (name.endsWith("Service")) {
+            name = name.replaceAll("Application", "").replaceAll("Service" + "$", "Controller");
         } else {
             name = name + "Controller";
         }

@@ -7,7 +7,7 @@ package cn.procsl.ping.boot.rest.exception;
  */
 public class NotFoundException extends RuntimeException {
 
-    public NotFoundException() {
-        super("Not Found", null, false, false);
+    public NotFoundException(String method, String uri) {
+        super(String.format("[%s %s] Not Found", method, uri), null, false, false);
     }
 }

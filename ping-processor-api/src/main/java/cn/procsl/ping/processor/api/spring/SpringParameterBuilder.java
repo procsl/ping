@@ -1,7 +1,7 @@
 package cn.procsl.ping.processor.api.spring;
 
-import cn.procsl.ping.processor.api.AbstractGeneratorBuilder;
-import cn.procsl.ping.processor.api.GeneratorBuilder;
+import cn.procsl.ping.processor.api.AbstractGeneratedVisitor;
+import cn.procsl.ping.processor.api.GeneratedVisitor;
 import cn.procsl.ping.processor.api.syntax.VariableDTOElement;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.AnnotationSpec;
@@ -12,8 +12,8 @@ import javax.lang.model.element.Element;
 import javax.tools.Diagnostic;
 import javax.ws.rs.*;
 
-@AutoService(GeneratorBuilder.class)
-public class SpringParameterBuilder extends AbstractGeneratorBuilder {
+@AutoService(GeneratedVisitor.class)
+public class SpringParameterBuilder extends AbstractGeneratedVisitor {
 
     final static String packageName = "org.springframework.web.bind.annotation";
     final static String requestParam = "RequestParam";
@@ -25,7 +25,7 @@ public class SpringParameterBuilder extends AbstractGeneratorBuilder {
 
 
     @Override
-    public void parameterAnnotation(String type, Element source, ParameterSpec.Builder target) {
+    public void parameterVisitor(String type, Element source, ParameterSpec.Builder target) {
 
         if (source == null) {
             context.getProcessingEnvironment().getMessager().printMessage(Diagnostic.Kind.WARNING, "找不到VariableElement");

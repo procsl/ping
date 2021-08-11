@@ -1,5 +1,6 @@
 package cn.procsl.ping.processor.api;
 
+import lombok.Getter;
 import lombok.NonNull;
 
 import javax.annotation.processing.*;
@@ -16,9 +17,15 @@ import static java.util.Collections.emptyMap;
 import static javax.tools.Diagnostic.Kind.WARNING;
 
 public abstract class AbstractConfigurableProcessor extends AbstractProcessor {
+
+    @Getter
     protected Messager messager;
+
+    @Getter
     protected Filer filer;
+
     protected String processor = "META-INF/processor.config";
+
     protected Map<Object, Object> config;
 
     @Override
