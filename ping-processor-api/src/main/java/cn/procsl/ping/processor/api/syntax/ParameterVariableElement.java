@@ -7,7 +7,7 @@ import javax.lang.model.type.TypeMirror;
 import java.lang.annotation.Annotation;
 import java.util.*;
 
-public class VariableDTOElement implements VariableElement {
+public class ParameterVariableElement implements VariableElement {
 
     @Getter
     final ExecutableElement enclosingElement;
@@ -16,7 +16,7 @@ public class VariableDTOElement implements VariableElement {
 
     final String packageName;
 
-    TypeMirrorDTO type;
+    ParameterTypeMirrorModel type;
 
     @Getter
     Set<Modifier> modifiers;
@@ -26,17 +26,17 @@ public class VariableDTOElement implements VariableElement {
 
     String constant;
 
-    public VariableDTOElement(ExecutableElement enclosingElement,
-                              Map<Integer, VariableElement> elements,
-                              String packageName,
-                              String name) {
+    public ParameterVariableElement(ExecutableElement enclosingElement,
+                                    Map<Integer, javax.lang.model.element.VariableElement> elements,
+                                    String packageName,
+                                    String name) {
         this.enclosingElement = enclosingElement;
         this.elements = elements;
         this.packageName = packageName;
         this.modifiers = Collections.singleton(Modifier.PUBLIC);
-        this.simpleName = new NameDTO(name);
+        this.simpleName = new ParameterNameModel(name);
         this.constant = packageName + simpleName;
-        this.type = new TypeMirrorDTO(constant);
+        this.type = new ParameterTypeMirrorModel(constant);
     }
 
     @Override

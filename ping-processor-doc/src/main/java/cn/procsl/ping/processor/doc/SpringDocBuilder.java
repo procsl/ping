@@ -19,7 +19,7 @@ public class SpringDocBuilder extends AbstractGeneratedVisitor {
 
 
     @Override
-    public void methodVisitor(String type, Element element, MethodSpec.Builder spec) {
+    public void methodVisitor(Element element, MethodSpec.Builder spec) {
         JavaCommentResolver comment = resolver(element);
 
         AnnotationSpec.Builder operation = AnnotationSpec.builder(Operation.class);
@@ -43,7 +43,7 @@ public class SpringDocBuilder extends AbstractGeneratedVisitor {
     }
 
     @Override
-    public void typeVisitor(String type, Element source, TypeSpec.Builder spec) {
+    public void typeVisitor(Element source, TypeSpec.Builder spec) {
 
         JavaCommentResolver comment = resolver(source);
         String name = comment.getName();
@@ -66,7 +66,7 @@ public class SpringDocBuilder extends AbstractGeneratedVisitor {
     }
 
     @Override
-    public void parameterVisitor(String type, Element element, ParameterSpec.Builder spec) {
+    public void parameterVisitor(Element element, ParameterSpec.Builder spec) {
         JavaCommentResolver comment = this.resolver(element.getEnclosingElement());
         String description = comment.getParameterComment(element.getSimpleName().toString());
         if (description == null) {
@@ -79,8 +79,7 @@ public class SpringDocBuilder extends AbstractGeneratedVisitor {
     }
 
     @Override
-    public boolean support(String type) {
-        return "CONTROLLER".equals(type);
+    public SupportType support() {
+        return SupportType.CONTROLLER;
     }
-
 }

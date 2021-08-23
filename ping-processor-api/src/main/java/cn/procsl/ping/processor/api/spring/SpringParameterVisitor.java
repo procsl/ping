@@ -2,7 +2,7 @@ package cn.procsl.ping.processor.api.spring;
 
 import cn.procsl.ping.processor.api.AbstractGeneratedVisitor;
 import cn.procsl.ping.processor.api.GeneratedVisitor;
-import cn.procsl.ping.processor.api.syntax.VariableDTOElement;
+import cn.procsl.ping.processor.api.syntax.ParameterVariableElement;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
@@ -13,7 +13,7 @@ import javax.tools.Diagnostic;
 import javax.ws.rs.*;
 
 @AutoService(GeneratedVisitor.class)
-public class SpringParameterBuilder extends AbstractGeneratedVisitor {
+public class SpringParameterVisitor extends AbstractGeneratedVisitor {
 
     final static String packageName = "org.springframework.web.bind.annotation";
     final static String requestParam = "RequestParam";
@@ -25,14 +25,14 @@ public class SpringParameterBuilder extends AbstractGeneratedVisitor {
 
 
     @Override
-    public void parameterVisitor(String type, Element source, ParameterSpec.Builder target) {
+    public void parameterVisitor(Element source, ParameterSpec.Builder target) {
 
         if (source == null) {
             context.getProcessingEnvironment().getMessager().printMessage(Diagnostic.Kind.WARNING, "找不到VariableElement");
             return;
         }
 
-        if (source instanceof VariableDTOElement) {
+        if (source instanceof ParameterVariableElement) {
             AnnotationSpec spec = AnnotationSpec.builder(ClassName.get(packageName, responseBody)).build();
             target.addAnnotation(spec);
             return;
@@ -124,9 +124,8 @@ public class SpringParameterBuilder extends AbstractGeneratedVisitor {
 
     }
 
-
     @Override
-    public boolean support(String type) {
-        return "CONTROLLER".equals(type);
+    public SupportType support() {
+        return SupportType.CONTROLLER;
     }
 }

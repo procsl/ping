@@ -1,13 +1,11 @@
 package cn.procsl.ping.processor.api;
 
 import cn.procsl.ping.processor.api.utils.NamingUtils;
+import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
 import lombok.Getter;
 
-import javax.annotation.processing.Filer;
-import javax.annotation.processing.Messager;
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.*;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
@@ -15,17 +13,16 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import javax.ws.rs.Path;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
+@AutoService(Processor.class)
 public class GeneratorProcessor extends AbstractConfigurableProcessor implements ProcessorContext {
 
-    final List<GeneratedVisitor> controller = new ArrayList<>();
-
-    final List<GeneratedVisitor> parameter = new ArrayList<>();
-
-    final List<GeneratedVisitor> returned = new ArrayList<>();
+    GeneratedVisitor controller;
 
     @Getter
     RoundEnvironment roundEnvironment;
@@ -35,11 +32,7 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
 
     @Override
     protected void init() {
-        final ServiceLoader<GeneratedVisitor> generator = ServiceLoader.load(GeneratedVisitor.class, this.getClass().getClassLoader());
-        Map<String, List<GeneratedVisitor>> annotationProcessor = generator.stream().map(ServiceLoader.Provider::get).peek(item -> item.init(this)).collect(Collectors.groupingBy(GeneratedVisitor::support));
-        this.controller.addAll(annotationProcessor.get("controller"));
-        this.parameter.addAll(annotationProcessor.get("controller.parameter"));
-        this.returned.addAll(annotationProcessor.get("controller.returned"));
+        controller = new GeneratedVisitorLoader(this, GeneratedVisitor.SupportType.CONTROLLER);
     }
 
     @Override
@@ -54,21 +47,17 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
 
             TypeSpec.Builder builder = TypeSpec.classBuilder(name).addModifiers(Modifier.PUBLIC);
 
-            for (GeneratedVisitor specBuilder : controller) {
-                specBuilder.typeVisitor(typeElement, builder);
-            }
+            controller.typeVisitor(typeElement, builder);
 
             String fieldName = NamingUtils.lowerCamelCase(typeElement.getSimpleName().toString());
             FieldSpec.Builder fieldSpecBuilder = FieldSpec.builder(TypeName.get(typeElement.asType()), fieldName, Modifier.PROTECTED);
-            for (GeneratedVisitor specBuilder : controller) {
-                specBuilder.fieldVisitor(typeElement, fieldSpecBuilder);
-            }
+            controller.fieldVisitor(typeElement, fieldSpecBuilder);
+
             builder.addField(fieldSpecBuilder.build());
 
             FieldSpec.Builder request = FieldSpec.builder(ClassName.get("javax.servlet.http", "HttpServletRequest"), "request", Modifier.PROTECTED);
-            for (GeneratedVisitor specBuilder : controller) {
-                specBuilder.fieldVisitor(typeElement, request);
-            }
+            controller.fieldVisitor(typeElement, request);
+
             builder.addField(request.build());
 
             List<ExecutableElement> list = typeElement.getEnclosedElements().stream()
@@ -110,16 +99,16 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
             methodBuilder.addException(TypeName.get(typeMirror));
         }
 
-        for (GeneratedVisitor specBuilder : controller) {
-            specBuilder.methodVisitor(item, methodBuilder);
-        }
+        controller.methodVisitor(item, methodBuilder);
 
-        ParameterBuilder constructor = new ParameterBuilder(this, methodName, fieldName, item);
-        methodBuilder.addParameters(constructor.buildParameters());
+        ParameterCreator parameterCreator = new ParameterCreator(this, methodName, fieldName, item);
+        methodBuilder.addParameters(parameterCreator.creatorParameters());
+        CodeBlock caller = parameterCreator.creatorCaller();
 
-        ReturnedBuilder returnedBuilder = new ReturnedBuilder(this, methodName, fieldName, item, constructor.buildCaller());
-        methodBuilder.returns(returnedBuilder.buildReturnedType());
-        methodBuilder.addCode(returnedBuilder.buildCodeBlack());
+        ReturnedCreator returnedCreator = new ReturnedCreator(this, methodName, fieldName, item, caller);
+        methodBuilder.returns(returnedCreator.createReturnedType());
+
+        methodBuilder.addCode(returnedCreator.createCodeBlack());
         builder.addMethod(methodBuilder.build());
     }
 

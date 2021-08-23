@@ -8,11 +8,11 @@ import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.List;
 
-public class TypeMirrorDTO implements TypeMirror {
+public class ParameterTypeMirrorModel implements TypeMirror {
 
     final String name;
 
-    public TypeMirrorDTO(String name) {
+    public ParameterTypeMirrorModel(String name) {
         this.name = name;
     }
 

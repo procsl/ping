@@ -8,10 +8,17 @@ import com.squareup.javapoet.TypeSpec;
 import javax.lang.model.element.Element;
 
 public interface GeneratedVisitor {
+    SupportType support();
+
 
     void init(ProcessorContext context);
 
-    String support();
+    enum SupportType {
+        CONTROLLER,
+        CONTROLLER_PARAMETER,
+        CONTROLLER_RETURNED,
+        REPOSITORY
+    }
 
     void typeVisitor(Element element, TypeSpec.Builder spec);
 
@@ -22,8 +29,4 @@ public interface GeneratedVisitor {
     void parameterVisitor(Element element, ParameterSpec.Builder spec);
 
     void variableVisitor(Element element, ParameterSpec.Builder spec);
-
-//    TypeName returnTypeVisitor(ExecutableElement element);
-//
-//    CodeBlock methodCodeBlackVisitor(ExecutableElement element, CodeBlock caller);
 }

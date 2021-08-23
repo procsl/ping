@@ -3,12 +3,12 @@ package cn.procsl.ping.processor.api.syntax;
 
 import javax.lang.model.element.Name;
 
-public class NameDTO implements Name {
+public class ParameterNameModel implements Name {
 
     final String name;
 
 
-    public NameDTO(String name) {
+    public ParameterNameModel(String name) {
         this.name = name;
     }
 

@@ -7,7 +7,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.ws.rs.*;
 
-class RequestMappingAnnotation {
+class RequestMappingAnnotationBuilder {
 
 
     protected final String requestMapping = "org.springframework.web.bind.annotation.RequestMapping";
