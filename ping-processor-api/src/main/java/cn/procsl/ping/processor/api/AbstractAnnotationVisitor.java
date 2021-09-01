@@ -7,7 +7,7 @@ import com.squareup.javapoet.TypeSpec;
 
 import javax.lang.model.element.Element;
 
-public abstract class AbstractGeneratedVisitor implements GeneratedVisitor {
+public abstract class AbstractAnnotationVisitor implements AnnotationVisitor {
 
     protected ProcessorContext context;
 

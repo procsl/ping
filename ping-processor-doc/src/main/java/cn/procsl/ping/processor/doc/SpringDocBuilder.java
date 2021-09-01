@@ -1,7 +1,7 @@
 package cn.procsl.ping.processor.doc;
 
-import cn.procsl.ping.processor.api.AbstractGeneratedVisitor;
-import cn.procsl.ping.processor.api.GeneratedVisitor;
+import cn.procsl.ping.processor.api.AbstractAnnotationVisitor;
+import cn.procsl.ping.processor.api.AnnotationVisitor;
 import cn.procsl.ping.processor.api.utils.NamingUtils;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
@@ -14,8 +14,8 @@ import javax.lang.model.element.Element;
 /**
  * 这里需要读取配置, 需要更改
  */
-@AutoService(GeneratedVisitor.class)
-public class SpringDocBuilder extends AbstractGeneratedVisitor {
+@AutoService(AnnotationVisitor.class)
+public class SpringDocBuilder extends AbstractAnnotationVisitor {
 
 
     @Override

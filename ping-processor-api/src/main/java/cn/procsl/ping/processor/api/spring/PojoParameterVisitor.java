@@ -1,7 +1,7 @@
 package cn.procsl.ping.processor.api.spring;
 
-import cn.procsl.ping.processor.api.AbstractGeneratedVisitor;
-import cn.procsl.ping.processor.api.GeneratedVisitor;
+import cn.procsl.ping.processor.api.AbstractAnnotationVisitor;
+import cn.procsl.ping.processor.api.AnnotationVisitor;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
@@ -12,8 +12,8 @@ import javax.lang.model.element.Element;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@AutoService(GeneratedVisitor.class)
-public class PojoParameterVisitor extends AbstractGeneratedVisitor {
+@AutoService(AnnotationVisitor.class)
+public class PojoParameterVisitor extends AbstractAnnotationVisitor {
 
 
     final AnnotationSpec validateAnnotation = AnnotationSpec.builder(ClassName.bestGuess("org.springframework.validation.annotation.Validated")).build();

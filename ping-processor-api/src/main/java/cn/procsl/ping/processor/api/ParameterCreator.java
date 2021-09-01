@@ -9,6 +9,7 @@ import lombok.NonNull;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
@@ -39,13 +40,13 @@ class ParameterCreator {
 
     final private boolean createDTO;
 
-    private final GeneratedVisitor parameter;
+    private final AnnotationVisitor parameter;
 
-    private final GeneratedVisitor returned;
+    private final AnnotationVisitor returned;
 
     private TypeSpec dtoType;
 
-    private GeneratedVisitor controller;
+    private AnnotationVisitor controller;
 
     public ParameterCreator(GeneratorProcessor processor, String methodName, String fieldName, @NonNull ExecutableElement executableElement) throws IOException {
         this.executable = executableElement;
@@ -53,11 +54,11 @@ class ParameterCreator {
         this.methodName = methodName;
         this.fieldName = fieldName;
         this.simpleRequest = ClassUtils.isSimpleRequest(executableElement);
-        this.controller = new GeneratedVisitorLoader(processor, GeneratedVisitor.SupportType.CONTROLLER);
-        this.parameter = new GeneratedVisitorLoader(processor, GeneratedVisitor.SupportType.CONTROLLER_PARAMETER);
-        this.returned = new GeneratedVisitorLoader(processor, GeneratedVisitor.SupportType.CONTROLLER_RETURNED);
+        this.controller = new AnnotationVisitorLoader(processor, AnnotationVisitor.SupportType.CONTROLLER);
+        this.parameter = new AnnotationVisitorLoader(processor, AnnotationVisitor.SupportType.CONTROLLER_PARAMETER);
+        this.returned = new AnnotationVisitorLoader(processor, AnnotationVisitor.SupportType.CONTROLLER_RETURNED);
 
-        List<? extends javax.lang.model.element.VariableElement> parameters = executableElement.getParameters();
+        List<? extends VariableElement> parameters = executableElement.getParameters();
 
         for (int i = 0; i < parameters.size(); i++) {
             if (simpleRequest) {

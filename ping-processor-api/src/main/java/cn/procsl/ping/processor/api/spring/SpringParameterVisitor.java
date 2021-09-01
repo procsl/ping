@@ -1,7 +1,7 @@
 package cn.procsl.ping.processor.api.spring;
 
-import cn.procsl.ping.processor.api.AbstractGeneratedVisitor;
-import cn.procsl.ping.processor.api.GeneratedVisitor;
+import cn.procsl.ping.processor.api.AbstractAnnotationVisitor;
+import cn.procsl.ping.processor.api.AnnotationVisitor;
 import cn.procsl.ping.processor.api.syntax.ParameterVariableElement;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.AnnotationSpec;
@@ -12,8 +12,8 @@ import javax.lang.model.element.Element;
 import javax.tools.Diagnostic;
 import javax.ws.rs.*;
 
-@AutoService(GeneratedVisitor.class)
-public class SpringParameterVisitor extends AbstractGeneratedVisitor {
+@AutoService(AnnotationVisitor.class)
+public class SpringParameterVisitor extends AbstractAnnotationVisitor {
 
     final static String packageName = "org.springframework.web.bind.annotation";
     final static String requestParam = "RequestParam";

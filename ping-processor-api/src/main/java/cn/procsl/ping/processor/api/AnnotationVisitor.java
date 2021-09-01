@@ -7,7 +7,8 @@ import com.squareup.javapoet.TypeSpec;
 
 import javax.lang.model.element.Element;
 
-public interface GeneratedVisitor {
+public interface AnnotationVisitor {
+
     SupportType support();
 
 

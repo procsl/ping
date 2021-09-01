@@ -1,7 +1,7 @@
 package cn.procsl.ping.processor.api.spring;
 
-import cn.procsl.ping.processor.api.AbstractGeneratedVisitor;
-import cn.procsl.ping.processor.api.GeneratedVisitor;
+import cn.procsl.ping.processor.api.AbstractAnnotationVisitor;
+import cn.procsl.ping.processor.api.AnnotationVisitor;
 import cn.procsl.ping.processor.api.annotation.HttpStatus;
 import cn.procsl.ping.processor.api.syntax.ParameterVariableElement;
 import com.google.auto.service.AutoService;
@@ -17,8 +17,8 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@AutoService(GeneratedVisitor.class)
-public class StringControllerVisitor extends AbstractGeneratedVisitor {
+@AutoService(AnnotationVisitor.class)
+public class StringControllerVisitor extends AbstractAnnotationVisitor {
 
 
     final AnnotationSpec validate = AnnotationSpec.builder(ClassName.get("org.springframework.validation.annotation", "Validated")).build();

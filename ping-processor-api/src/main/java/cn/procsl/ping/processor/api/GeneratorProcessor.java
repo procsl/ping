@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @AutoService(Processor.class)
 public class GeneratorProcessor extends AbstractConfigurableProcessor implements ProcessorContext {
 
-    GeneratedVisitor controller;
+    AnnotationVisitor controller;
 
     @Getter
     RoundEnvironment roundEnvironment;
@@ -32,7 +32,7 @@ public class GeneratorProcessor extends AbstractConfigurableProcessor implements
 
     @Override
     protected void init() {
-        controller = new GeneratedVisitorLoader(this, GeneratedVisitor.SupportType.CONTROLLER);
+        controller = new AnnotationVisitorLoader(this, AnnotationVisitor.SupportType.CONTROLLER);
     }
 
     @Override

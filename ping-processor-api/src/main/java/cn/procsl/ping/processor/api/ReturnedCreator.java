@@ -30,6 +30,7 @@ class ReturnedCreator {
     private final Elements elements;
     private final TypeName returnType;
     private final TypeMirror returned;
+    private final AnnotationVisitor returnAnnotationVisitor;
 
     public ReturnedCreator(GeneratorProcessor generatorProcessor, String methodName, String fieldName, ExecutableElement element, CodeBlock buildCaller) {
         this.generatorProcessor = generatorProcessor;
@@ -40,6 +41,7 @@ class ReturnedCreator {
         this.returned = element.getReturnType();
         this.utils = this.generatorProcessor.getProcessingEnvironment().getTypeUtils();
         this.elements = this.generatorProcessor.getProcessingEnvironment().getElementUtils();
+        this.returnAnnotationVisitor = new AnnotationVisitorLoader(generatorProcessor, AnnotationVisitor.SupportType.CONTROLLER_RETURNED);
         this.returnType = init();
     }
 
@@ -135,7 +137,7 @@ class ReturnedCreator {
 
         String argName = "option";
 
-        ReturnedDTOBuilder builder = new ReturnedDTOBuilder(elements, utils, this.generatorProcessor.returned, argType, returnedType, argName);
+        ReturnedDTOBuilder builder = new ReturnedDTOBuilder(elements, utils, this.returnAnnotationVisitor, argType, returnedType, argName);
 
         builder.toWrite(this.generatorProcessor.getFiler());
 
@@ -194,10 +196,13 @@ class ReturnedCreator {
             Character.class.getName()
         ));
 
-        public ReturnedDTOBuilder(Elements elementUtils, Types utils, List<GeneratedVisitor> returned, TypeMirror argType,
+        private final AnnotationVisitor visitor;
+
+        public ReturnedDTOBuilder(Elements elementUtils, Types utils, AnnotationVisitor visitor, TypeMirror argType,
                                   ClassName returnedType, String argName) {
 
             this.utils = utils;
+            this.visitor = visitor;
             this.elementUtils = elementUtils;
             this.masterBuilder = TypeSpec
                 .classBuilder(returnedType)
@@ -210,9 +215,7 @@ class ReturnedCreator {
             this.COLLECTION_ELEMENT_TYPE = elementUtils.getTypeElement(Collection.class.getName());
             this.MAP_ELEMENT_TYPE = elementUtils.getTypeElement(Map.class.getName());
 
-            for (GeneratedVisitor visitor : returned) {
-                visitor.typeVisitor(returnElement, masterBuilder);
-            }
+            visitor.typeVisitor(returnElement, masterBuilder);
 
             List<? extends Element> elements = returnElement.getEnclosedElements();
             Set<VariableElement> fieldElements = elements
@@ -247,7 +250,7 @@ class ReturnedCreator {
 
             }
 
-            buildFieldAndGetterSetter(returned);
+            buildFieldAndGetterSetter();
 
             // build convert
             this.methodName = "convertTo";
@@ -308,7 +311,7 @@ class ReturnedCreator {
             this.masterBuilder.addMethod(convertMethodBuilder.build());
         }
 
-        private void buildFieldAndGetterSetter(List<GeneratedVisitor> returned) {
+        private void buildFieldAndGetterSetter() {
             for (VariableElement fieldElement : simpleFieldElements) {
                 String fieldName = fieldElement.getSimpleName().toString();
                 TypeName type = TypeName.get(fieldElement.asType());
@@ -323,12 +326,10 @@ class ReturnedCreator {
 
                 ParameterSpec.Builder parameterBuilder = ParameterSpec.builder(type, fieldName, Modifier.FINAL);
 
-                for (GeneratedVisitor visitor : returned) {
-                    visitor.fieldVisitor(fieldElement, fields);
-                    visitor.methodVisitor(fieldElement, getter);
-                    visitor.parameterVisitor(fieldElement, parameterBuilder);
-                    visitor.methodVisitor(fieldElement, setter);
-                }
+                visitor.fieldVisitor(fieldElement, fields);
+                visitor.methodVisitor(fieldElement, getter);
+                visitor.parameterVisitor(fieldElement, parameterBuilder);
+                visitor.methodVisitor(fieldElement, setter);
                 setter.addParameter(parameterBuilder.build());
                 masterBuilder.addField(fields.build());
                 masterBuilder.addMethod(setter.build());
