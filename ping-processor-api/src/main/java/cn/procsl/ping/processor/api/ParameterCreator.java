@@ -28,9 +28,9 @@ class ParameterCreator {
 
     final private String dtoName;
 
-    final private HashMap<Integer, javax.lang.model.element.VariableElement> dtoFields = new HashMap<>();
+    final private HashMap<Integer, VariableElement> dtoFields = new HashMap<>();
 
-    final private HashMap<Integer, javax.lang.model.element.VariableElement> params = new HashMap<>();
+    final private HashMap<Integer, VariableElement> params = new HashMap<>();
 
     final private boolean simpleRequest;
 

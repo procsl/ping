@@ -1,13 +1,18 @@
 package cn.procsl.ping.processor.api.builder.spring;
 
 import cn.procsl.ping.processor.api.AnnotationVisitor;
+import cn.procsl.ping.processor.api.AnnotationVisitorLoader;
 import cn.procsl.ping.processor.api.Generator;
+import cn.procsl.ping.processor.api.ProcessorContext;
 import com.squareup.javapoet.TypeSpec;
 import lombok.NonNull;
-import lombok.Setter;
 
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class SpringCtrlTypeBuilder implements Generator<TypeSpec> {
 
@@ -16,60 +21,54 @@ public class SpringCtrlTypeBuilder implements Generator<TypeSpec> {
 
     final TypeSpec.Builder builder;
 
-    // 是否创建接口
-    @Setter
-    private boolean needCreateInterface = false;
+    final AnnotationVisitorLoader visitor;
 
-    @Setter
-    private AnnotationVisitor visitor;
+    ServiceFieldBuilder fieldBuilder;
 
-    public SpringCtrlTypeBuilder(@NonNull TypeElement targetElement) {
+    private ProcessorContext context;
+
+    public SpringCtrlTypeBuilder(@NonNull TypeElement targetElement, ProcessorContext context) {
         this.targetElement = targetElement;
         String name = this.getBaseTargetElementCtrlName();
         this.builder = TypeSpec.classBuilder(name);
-    }
-
-    public SpringCtrlTypeBuilder(@NonNull TypeElement targetElement, AnnotationVisitor visitor) {
-        this(targetElement);
-        this.visitor = visitor;
+        visitor = new AnnotationVisitorLoader(context, AnnotationVisitor.SupportType.CONTROLLER);
+        fieldBuilder = new ServiceFieldBuilder(targetElement, context);
+        this.context = context;
     }
 
     @Override
     public TypeSpec getSpec() {
 
         this.builder.addModifiers(Modifier.PUBLIC);
-        if (visitor != null) {
-            visitor.typeVisitor(targetElement, this.builder);
-        }
+        visitor.typeVisitor(targetElement, this.builder);
 
-//        String fieldName = NamingUtils.lowerCamelCase(targetElement.getSimpleName().toString());
-//        FieldSpec.Builder fieldSpecBuilder = FieldSpec.builder(TypeName.get(targetElement.asType()), fieldName, Modifier.PROTECTED);
-//        visitor.fieldVisitor(targetElement, fieldSpecBuilder);
-//
-//        builder.addField(fieldSpecBuilder.build());
-//
-//        FieldSpec.Builder request = FieldSpec.builder(ClassName.get("javax.servlet.http", "HttpServletRequest"), "request", Modifier.PROTECTED);
-//        visitor.fieldVisitor(targetElement, request);
-//
-//        builder.addField(request.build());
+        builder.addField(this.fieldBuilder.getSpec());
 
-//        List<ExecutableElement> list = targetElement.getEnclosedElements().stream()
-//            .filter(item -> item instanceof ExecutableElement)
-//            .filter(this::methodSelector)
-//            .map(item -> (ExecutableElement) item)
-//            .collect(Collectors.toList());
-//        for (ExecutableElement item : list) {
-//            this.buildMethod(builder, item, fieldName);
-//        }
+        targetElement.getEnclosedElements()
+            .stream()
+            .filter(item -> item instanceof ExecutableElement)
+            .filter(this::methodSelector)
+            .map(item -> (ExecutableElement) item)
+            .map(item -> new ControllerMethodBuilder(item, this.context))
+            .map(ControllerMethodBuilder::getSpec)
+            .forEach(builder::addMethod);
 
-
-//        String packageName = targetElement.getEnclosingElement().toString() + ".api";
-//        JavaFile java = JavaFile
-//            .builder(packageName, builder.build())
-//            .addFileComment("这是自动生成的代码，请勿修改").build();
-//
         return builder.build();
     }
+
+    boolean methodSelector(Element element) {
+        Set<String> set = element.getAnnotationMirrors()
+            .stream()
+            .map(item -> item.getAnnotationType().asElement().toString())
+            .collect(Collectors.toSet());
+        return set.contains("javax.ws.rs.PATCH")
+            || set.contains("javax.ws.rs.POST")
+            || set.contains("javax.ws.rs.GET")
+            || set.contains("javax.ws.rs.DELETE")
+            || set.contains("javax.ws.rs.PATH")
+            || set.contains("javax.ws.rs.PUT");
+    }
+
 
     public String getBaseTargetElementCtrlName() {
         String name = targetElement.getSimpleName().toString();
