@@ -13,7 +13,6 @@
     <option name="ALTERNATIVE_JRE_PATH" />
     <option name="SHORTEN_COMMAND_LINE" value="NONE" />
     <method v="2">
-      <option name="RunConfigurationTask" enabled="true" run_configuration_name="api-install" run_configuration_type="MavenRunConfiguration" />
       <option name="RunConfigurationTask" enabled="true" run_configuration_name="repo-install" run_configuration_type="MavenRunConfiguration" />
       <option name="RunConfigurationTask" enabled="true" run_configuration_name="user-install" run_configuration_type="MavenRunConfiguration" />
       <option name="Make" enabled="true" />

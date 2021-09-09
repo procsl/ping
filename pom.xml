@@ -18,7 +18,6 @@
     </properties>
 
     <modules>
-<!--        <module>ping-domain-spring-boot-starter</module>-->
         <module>ping-business-model</module>
         <module>ping-user-spring-boot-starter</module>
         <module>ping-admin-app</module>

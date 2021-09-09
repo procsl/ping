@@ -139,7 +139,7 @@
 
         <dependency>
             <groupId>cn.procsl</groupId>
-            <artifactId>ping-processor-api</artifactId>
+            <artifactId>ping-processor-restful</artifactId>
             <version>0.0.3-SNAPSHOT</version>
             <scope>provided</scope>
             <!--防止被打包进去-->

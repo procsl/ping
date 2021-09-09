@@ -36,7 +36,7 @@
             <map />
           </option>
           <option name="resolveToWorkspace" value="false" />
-          <option name="workingDirPath" value="$PROJECT_DIR$/ping-processor-api" />
+          <option name="workingDirPath" value="$PROJECT_DIR$/ping-processor-restful"/>
         </MavenRunnerParameters>
       </option>
     </MavenSettings>
