@@ -1,11 +1,14 @@
 package cn.procsl.ping.processor.restful.utils;
 
 
+import com.squareup.javapoet.ClassName;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 import javax.lang.model.element.Element;
+import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Types;
 import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -48,5 +51,22 @@ public final class ClassUtils {
         return patch == null;
     }
 
+    // 创建返回值DTO
+    public static ClassName toBuildReturnType(TypeMirror mirror, Types types) {
+        Element element = types.asElement(mirror);
+        String name = element.getSimpleName().toString() + "DTO";
+        String packageName = element.getEnclosingElement().toString() + ".returned";
+        return ClassName.get(packageName, name);
+
+    }
+
+    public static boolean isPersistenceEntity(Element element) {
+        Set<String> set = element.getAnnotationMirrors()
+            .stream()
+            .map(Object::toString)
+            .filter(item -> item.startsWith("@javax.persistence"))
+            .collect(Collectors.toSet());
+        return !set.isEmpty();
+    }
 
 }

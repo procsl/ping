@@ -2,9 +2,9 @@ package cn.procsl.ping.processor.restful.spring;
 
 import cn.procsl.ping.processor.AbstractConfigurableProcessor;
 import cn.procsl.ping.processor.AnnotationVisitor;
+import cn.procsl.ping.processor.ProcessorContext;
+import cn.procsl.ping.processor.SimpleProcessorContext;
 import cn.procsl.ping.processor.restful.AnnotationVisitorLoader;
-import cn.procsl.ping.processor.restful.ParameterCreator;
-import cn.procsl.ping.processor.restful.ReturnedCreator;
 import cn.procsl.ping.processor.restful.utils.NamingUtils;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
@@ -37,9 +37,12 @@ public class SpringGeneratorProcessor extends AbstractConfigurableProcessor {
     @Getter
     Set<? extends TypeElement> annotations;
 
+    ProcessorContext context;
+
     @Override
     protected void init() {
-        controller = new AnnotationVisitorLoader(this, AnnotationVisitor.SupportType.CONTROLLER);
+        context = new SimpleProcessorContext(this.roundEnvironment, this.processingEnv, this.messager, this.filer, this::getConfig);
+        controller = new AnnotationVisitorLoader(context, "CONTROLLER");
     }
 
     @Override
@@ -108,11 +111,11 @@ public class SpringGeneratorProcessor extends AbstractConfigurableProcessor {
 
         controller.methodVisitor(item, methodBuilder);
 
-        ParameterCreator parameterCreator = new ParameterCreator(this, methodName, fieldName, item);
+        ParameterCreator parameterCreator = new ParameterCreator(context, methodName, fieldName, item);
         methodBuilder.addParameters(parameterCreator.creatorParameters());
         CodeBlock caller = parameterCreator.creatorCaller();
 
-        ReturnedCreator returnedCreator = new ReturnedCreator(this, methodName, fieldName, item, caller);
+        ReturnedCreator returnedCreator = new ReturnedCreator(context, methodName, fieldName, item, caller);
         methodBuilder.returns(returnedCreator.createReturnedType());
 
         methodBuilder.addCode(returnedCreator.createCodeBlack());

@@ -28,6 +28,6 @@ public class SimpleProcessorContext implements ProcessorContext {
 
     @Override
     public String getConfig(String key) {
-        return config.apply(t);
+        return config.apply(key);
     }
 }
