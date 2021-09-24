@@ -25,7 +25,6 @@
           </option>
           <option name="goals">
             <list>
-              <option value="clean" />
               <option value="install" />
               <option value="-Dskiptest=true" />
               <option value="-X" />

@@ -1,7 +1,9 @@
-package cn.procsl.ping.processor.restful;
+package cn.procsl.ping.processor.restful.spring;
 
+import cn.procsl.ping.processor.AnnotationVisitor;
+import cn.procsl.ping.processor.ProcessorContext;
+import cn.procsl.ping.processor.restful.AnnotationVisitorLoader;
 import cn.procsl.ping.processor.restful.model.ParameterVariableElement;
-import cn.procsl.ping.processor.restful.spring.SpringGeneratorProcessor;
 import cn.procsl.ping.processor.restful.utils.ClassUtils;
 import cn.procsl.ping.processor.restful.utils.NamingUtils;
 import com.squareup.javapoet.*;
@@ -21,7 +23,7 @@ class ParameterCreator {
 
     final private ExecutableElement executable;
 
-    final private SpringGeneratorProcessor processor;
+    final private ProcessorContext context;
 
     final private String methodName;
 
@@ -49,15 +51,15 @@ class ParameterCreator {
 
     private AnnotationVisitor controller;
 
-    public ParameterCreator(SpringGeneratorProcessor processor, String methodName, String fieldName, @NonNull ExecutableElement executableElement) throws IOException {
+    public ParameterCreator(ProcessorContext context, String methodName, String fieldName, @NonNull ExecutableElement executableElement) throws IOException {
         this.executable = executableElement;
-        this.processor = processor;
+        this.context = context;
         this.methodName = methodName;
         this.fieldName = fieldName;
         this.simpleRequest = ClassUtils.isSimpleRequest(executableElement);
-        this.controller = new AnnotationVisitorLoader(processor, AnnotationVisitor.SupportType.CONTROLLER);
-        this.parameter = new AnnotationVisitorLoader(processor, AnnotationVisitor.SupportType.CONTROLLER_PARAMETER);
-        this.returned = new AnnotationVisitorLoader(processor, AnnotationVisitor.SupportType.CONTROLLER_RETURNED);
+        this.controller = new AnnotationVisitorLoader(context, "CONTROLLER");
+        this.parameter = new AnnotationVisitorLoader(context, "CONTROLLER_PARAMETER");
+        this.returned = new AnnotationVisitorLoader(context, "CONTROLLER_RETURNED");
 
         List<? extends VariableElement> parameters = executableElement.getParameters();
 
@@ -93,7 +95,7 @@ class ParameterCreator {
         });
         this.dtoType = dto.build();
         JavaFile javaFile = JavaFile.builder(this.dtoPackage, this.dtoType).build();
-        javaFile.writeTo(this.processor.getFiler());
+        javaFile.writeTo(this.context.getFiler());
 
     }
 
@@ -124,7 +126,7 @@ class ParameterCreator {
             return typeName;
         }
 
-        Types util = processor.getProcessingEnvironment().getTypeUtils();
+        Types util = context.getProcessingEnvironment().getTypeUtils();
         List<? extends TypeMirror> arguments = ((DeclaredType) type).getTypeArguments();
         ArrayList<String> cont = new ArrayList<>();
         for (TypeMirror item : arguments) {

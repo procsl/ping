@@ -79,7 +79,7 @@ public class SpringDocBuilder extends AbstractAnnotationVisitor {
     }
 
     @Override
-    public SupportType support() {
-        return SupportType.CONTROLLER;
+    public String support() {
+        return "CONTROLLER";
     }
 }
