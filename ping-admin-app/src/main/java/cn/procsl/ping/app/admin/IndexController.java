@@ -36,11 +36,23 @@ public class IndexController {
         return Map.of("root", id);
     }
 
+    /**
+     * 接口测试
+     *
+     * @param map 这是map参数
+     * @return 返回了啥?
+     */
     @PutMapping(path = "map-test")
     public Map<String, String> mapTest(@RequestBody Map<@Size(min = 3, max = 10) String, @Email @NotBlank String> map) {
         return map;
     }
 
+    /**
+     * 测试javadoc
+     *
+     * @param code code参数
+     * @return 返回默认的
+     */
     @PutMapping(path = "response")
     public ResponseEntity<String> putResponse(String code) {
         return ResponseEntity.created(URI.create("https://procsl.cn/hello.json")).body(code);

@@ -15,5 +15,9 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Permission implements Serializable {
+
+    /**
+     * 权限名称
+     */
     String name;
 }

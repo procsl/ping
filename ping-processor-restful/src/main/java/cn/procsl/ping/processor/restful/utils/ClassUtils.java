@@ -6,12 +6,15 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -61,12 +64,19 @@ public final class ClassUtils {
     }
 
     public static boolean isPersistenceEntity(Element element) {
-        Set<String> set = element.getAnnotationMirrors()
-            .stream()
-            .map(Object::toString)
-            .filter(item -> item.startsWith("@javax.persistence"))
-            .collect(Collectors.toSet());
-        return !set.isEmpty();
+        List<? extends AnnotationMirror> mirrors = element.getAnnotationMirrors();
+        return isPersistenceEntity(mirrors);
     }
+
+    public static boolean isPersistenceEntity(Collection<? extends AnnotationMirror> mirrors) {
+        for (AnnotationMirror annotationMirror : mirrors) {
+            String item = annotationMirror.toString();
+            if (item.startsWith("@javax.persistence")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 }

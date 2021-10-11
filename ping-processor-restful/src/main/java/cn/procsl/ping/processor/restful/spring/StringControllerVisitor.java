@@ -37,7 +37,7 @@ public class StringControllerVisitor extends AbstractAnnotationVisitor {
 
     @Override
     public String support() {
-        return "Controller";
+        return "CONTROLLER";
     }
 
     @Override

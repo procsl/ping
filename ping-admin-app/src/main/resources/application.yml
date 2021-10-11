@@ -53,3 +53,16 @@ springdoc:
   api-docs:
     resolve-schema-properties: true
   show-login-endpoint: true
+  show-actuator: true
+
+
+
+# 管理节点
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    shutdown:
+      enabled: true

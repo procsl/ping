@@ -61,6 +61,8 @@ public class DataTransferObjectBuilder {
 
     final TypeElement COLLECTION_TYPE;
 
+    final List<DataTransferObjectBuilder> builders = new ArrayList<>();
+
     final Set<String> SIMPLE_TYPE = new HashSet<>(Arrays.asList(
         String.class.getName(),
         BigInteger.class.getName(),
@@ -71,6 +73,10 @@ public class DataTransferObjectBuilder {
     ));
 
     final AnnotationVisitor visitor;
+
+    final MethodSpec.Builder convertMethodBuilder;
+    final String convertArgumentName;
+    String convertDTOName;
 
     public DataTransferObjectBuilder(Elements elementUtils,
                                      Types utils,
@@ -113,12 +119,33 @@ public class DataTransferObjectBuilder {
             this.idMirror = null;
         }
 
-        builderMethodAndField(fieldElements);
-
         // build convert
         this.methodName = "convertTo";
-        buildConvertMethod();
         this.codeBlack = CodeBlock.builder().add("\n$T dto =  $T.$N($N);\n", returnedType, returnedType, methodName, argName);
+
+        this.convertMethodBuilder = MethodSpec.methodBuilder(methodName).addModifiers(Modifier.FINAL, Modifier.STATIC, Modifier.PUBLIC);
+        this.convertArgumentName = NamingUtils.lowerCamelCase(this.returnElement.getSimpleName().toString());
+
+        convertMethodBuilder.returns(returnedType);
+        //argument entity name
+
+        // entity type
+        TypeName entityType = TypeName.get(this.returnMirror);
+        ParameterSpec.Builder parameter = ParameterSpec.builder(entityType, convertArgumentName, Modifier.FINAL);
+        convertMethodBuilder.addParameter(parameter.build());
+
+        // DTO variable name
+        String dtoName = NamingUtils.lowerCamelCase(returnedType.simpleName());
+
+        // 构造函数 DTO dto = new DTO();
+        convertMethodBuilder.addCode("$T $N = new $T();\n", returnedType, dtoName, returnedType);
+
+        this.convertDTOName = dtoName;
+
+        builderMethodAndField(fieldElements);
+
+        convertMethodBuilder.addCode("return $N;\n", convertDTOName);
+        masterBuilder.addMethod(this.convertMethodBuilder.build());
     }
 
     private void builderMethodAndField(Set<VariableElement> fieldElements) {
@@ -127,16 +154,19 @@ public class DataTransferObjectBuilder {
             if (isSimpleType(fieldElement)) {
                 this.simpleFieldElements.add(fieldElement);
                 this.buildFieldAndGetterSetter(fieldElement);
+                // 赋值
+                @NonNull String currentFieldName = fieldElement.getSimpleName().toString();
+                convertMethodBuilder.addCode("$N.$N = $N.get$N();\n", this.convertDTOName, currentFieldName, convertArgumentName, NamingUtils.upperCamelCase(currentFieldName));
                 continue;
             }
 
             if (isSubType(fieldElement, this.SET_TYPE)) {
-                this.collectionFieldElements.put(this.SET_TYPE, fieldElement);
+                builderCollections(fieldElement, this.SET_TYPE, HashSet.class, 0);
                 continue;
             }
 
             if (isSubType(fieldElement, this.LIST_TYPE)) {
-                this.collectionFieldElements.put(this.LIST_TYPE, fieldElement);
+                builderCollections(fieldElement, this.LIST_TYPE, ArrayList.class, 0);
                 continue;
             }
 
@@ -146,12 +176,12 @@ public class DataTransferObjectBuilder {
             }
 
             if (isSubType(fieldElement, this.COLLECTION_TYPE)) {
-                this.collectionFieldElements.put(this.COLLECTION_TYPE, fieldElement);
+                builderCollections(fieldElement, this.COLLECTION_TYPE, ArrayList.class, 0);
                 continue;
             }
 
             if (isSubType(fieldElement, this.ITERABLE_TYPE)) {
-                this.collectionFieldElements.put(this.ITERABLE_TYPE, fieldElement);
+                builderCollections(fieldElement, this.ITERABLE_TYPE, ArrayList.class, 0);
                 continue;
             }
 
@@ -165,6 +195,78 @@ public class DataTransferObjectBuilder {
             }
 
         }
+    }
+
+    void builderCollections(VariableElement fieldElement, TypeElement type, Class<? extends Iterable> impl, int index) {
+        this.collectionFieldElements.put(type, fieldElement);
+        TypeMirror mirror = this.getGenerics(fieldElement, index);
+        if (mirror == null) {
+            return;
+        }
+
+        TypeName typeName = TypeName.get(mirror);
+
+        boolean isPersistence = isPersistenceEntity(this.utils.asElement(mirror));
+        String fieldName = fieldElement.getSimpleName().toString();
+
+        ParameterizedTypeName collectType = ParameterizedTypeName.get(ClassName.get(type), typeName);
+        if (isPersistence) {
+            DataTransferObjectBuilder trans = new DataTransferObjectBuilder(this.elementUtils, this.utils, this.visitor, mirror, fieldName);
+            this.builders.add(trans);
+            typeName = trans.getType();
+            collectType = ParameterizedTypeName.get(ClassName.get(type), typeName);
+            getterAndSetterMethodBuilder(fieldElement, fieldName, collectType);
+        }
+
+        FieldSpec.Builder field = FieldSpec.builder(collectType, fieldName, Modifier.PUBLIC);
+        visitor.fieldVisitor(fieldElement, field);
+        this.masterBuilder.addField(field.build());
+
+        // 创建convert
+        String lowName = NamingUtils.lowerCamelCase(type.getSimpleName().toString());
+
+//        type = (TypeElement) this.utils.asElement(this.utils.erasure(type.asType()));
+
+        ParameterizedTypeName t = ParameterizedTypeName.get(ClassName.get(type), typeName);
+        this.convertMethodBuilder.addStatement("{\n$T $N = new $T<>()", t, lowName, impl);
+        this.convertMethodBuilder.addStatement("$N.$N = $N", this.convertDTOName, fieldName, lowName);
+        this.convertMethodBuilder.beginControlFlow("for ($T tmp : $N.$N())", TypeName.get(mirror), this.convertArgumentName, String.format("get%s", NamingUtils.upperCamelCase(fieldName)));
+        this.convertMethodBuilder.addStatement("$N.add($T.convertTo(tmp))", lowName, typeName);
+        this.convertMethodBuilder.endControlFlow();
+        this.convertMethodBuilder.addCode("\n}");
+    }
+
+    private void getterAndSetterMethodBuilder(VariableElement fieldElement, String fieldName, TypeName type) {
+        String upperCamelCaseStr = NamingUtils.upperCamelCase(fieldName);
+        String getterStr = String.format("get%s", upperCamelCaseStr);
+        MethodSpec.Builder getter = MethodSpec.methodBuilder(getterStr).addModifiers(Modifier.PUBLIC).returns(type).addCode("\nreturn this.$N;\n", fieldName);
+
+        String setterStr = String.format("set%s", upperCamelCaseStr);
+        MethodSpec.Builder setter = MethodSpec.methodBuilder(setterStr).addModifiers(Modifier.PUBLIC).returns(TypeName.VOID).addCode("\n this.$N = $N;\n", fieldName, fieldName);
+
+        ParameterSpec.Builder parameterBuilder = ParameterSpec.builder(type, fieldName, Modifier.FINAL);
+
+        visitor.methodVisitor(fieldElement, getter);
+        visitor.parameterVisitor(fieldElement, parameterBuilder);
+        visitor.methodVisitor(fieldElement, setter);
+        setter.addParameter(parameterBuilder.build());
+
+        masterBuilder.addMethod(setter.build());
+        masterBuilder.addMethod(getter.build());
+    }
+
+    private TypeMirror getGenerics(Element element, int index) {
+        TypeMirror type = element.asType();
+
+        if (!(type instanceof DeclaredType)) {
+            return null;
+        }
+        List<? extends TypeMirror> arguments = ((DeclaredType) type).getTypeArguments();
+        if (arguments.isEmpty() || arguments.size() < index) {
+            return null;
+        }
+
+        return arguments.get(index);
     }
 
     private boolean isSubType(VariableElement fieldElement, TypeElement element) {
@@ -187,31 +289,7 @@ public class DataTransferObjectBuilder {
     }
 
     private void buildConvertMethod() {
-        MethodSpec.Builder convertMethodBuilder = MethodSpec.methodBuilder(methodName)
-            .addModifiers(Modifier.FINAL, Modifier.STATIC, Modifier.PUBLIC);
-        convertMethodBuilder.returns(returnedType);
-        //argument entity name
-        String argumentName = NamingUtils.lowerCamelCase(this.returnElement.getSimpleName().toString());
 
-        // entity type
-        TypeName entityType = TypeName.get(this.returnMirror);
-        ParameterSpec.Builder parameter = ParameterSpec.builder(entityType, argumentName, Modifier.FINAL);
-        convertMethodBuilder.addParameter(parameter.build());
-
-        // DTO variable name
-        String dtoName = NamingUtils.lowerCamelCase(returnedType.simpleName());
-
-        // 构造函数 DTO dto = new DTO();
-        convertMethodBuilder.addCode("$T $N = new $T();\n", returnedType, dtoName, returnedType);
-
-        // 赋值
-        for (VariableElement fieldElement : this.simpleFieldElements) {
-            @NonNull String currentFieldName = fieldElement.getSimpleName().toString();
-            convertMethodBuilder.addCode("$N.$N = $N.get$N();\n", dtoName, currentFieldName, argumentName, NamingUtils.upperCamelCase(currentFieldName));
-        }
-
-        convertMethodBuilder.addCode("return $N;\n", dtoName);
-        this.masterBuilder.addMethod(convertMethodBuilder.build());
     }
 
     void buildFieldAndGetterSetter(VariableElement fieldElement) {
@@ -219,23 +297,12 @@ public class DataTransferObjectBuilder {
         TypeName type = TypeName.get(fieldElement.asType());
         FieldSpec.Builder fields = FieldSpec.builder(type, fieldName, Modifier.PUBLIC);
 
-        String upperCamelCaseStr = NamingUtils.upperCamelCase(fieldName);
-        String getterStr = String.format("get%s", upperCamelCaseStr);
-        MethodSpec.Builder getter = MethodSpec.methodBuilder(getterStr).addModifiers(Modifier.PUBLIC).returns(type).addCode("\nreturn this.$N;\n", fieldName);
-
-        String setterStr = String.format("set%s", upperCamelCaseStr);
-        MethodSpec.Builder setter = MethodSpec.methodBuilder(setterStr).addModifiers(Modifier.PUBLIC).returns(TypeName.VOID).addCode("\n this.$N = $N;\n", fieldName, fieldName);
-
         ParameterSpec.Builder parameterBuilder = ParameterSpec.builder(type, fieldName, Modifier.FINAL);
 
         visitor.fieldVisitor(fieldElement, fields);
-        visitor.methodVisitor(fieldElement, getter);
         visitor.parameterVisitor(fieldElement, parameterBuilder);
-        visitor.methodVisitor(fieldElement, setter);
-        setter.addParameter(parameterBuilder.build());
         masterBuilder.addField(fields.build());
-        masterBuilder.addMethod(setter.build());
-        masterBuilder.addMethod(getter.build());
+        this.getterAndSetterMethodBuilder(fieldElement, fieldName, type);
     }
 
 
@@ -276,9 +343,16 @@ public class DataTransferObjectBuilder {
         return this.codeBlack.build();
     }
 
+    public TypeName getType() {
+        return this.returnedType;
+    }
+
     public void toWrite(Filer filer) throws IOException {
         JavaFile
             .builder(this.returnedType.packageName(), this.masterBuilder.build()).
             build().writeTo(filer);
+        for (DataTransferObjectBuilder builder : this.builders) {
+            builder.toWrite(filer);
+        }
     }
 }
