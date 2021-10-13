@@ -25,7 +25,7 @@ public class SpringParameterVisitor extends AbstractAnnotationVisitor {
 
 
     @Override
-    public void parameterVisitor(Element source, ParameterSpec.Builder target) {
+    public void visitor(Element source, ParameterSpec.Builder target) {
 
         if (source == null) {
             context.getProcessingEnvironment().getMessager().printMessage(Diagnostic.Kind.WARNING, "找不到VariableElement");

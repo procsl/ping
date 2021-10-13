@@ -17,22 +17,22 @@ public abstract class AbstractAnnotationVisitor implements AnnotationVisitor {
     }
 
     @Override
-    public void typeVisitor(Element element, TypeSpec.Builder spec) {
+    public void visitor(Element element, TypeSpec.Builder spec) {
 
     }
 
     @Override
-    public void fieldVisitor(Element element, FieldSpec.Builder spec) {
+    public void visitor(Element element, FieldSpec.Builder spec) {
 
     }
 
     @Override
-    public void methodVisitor(Element element, MethodSpec.Builder spec) {
+    public void visitor(Element element, MethodSpec.Builder spec) {
 
     }
 
     @Override
-    public void parameterVisitor(Element element, ParameterSpec.Builder spec) {
+    public void visitor(Element element, ParameterSpec.Builder spec) {
 
     }
 

@@ -58,7 +58,7 @@ public final class ClassUtils {
     public static ClassName toBuildReturnType(TypeMirror mirror, Types types) {
         Element element = types.asElement(mirror);
         String name = element.getSimpleName().toString() + "DTO";
-        String packageName = element.getEnclosingElement().toString() + ".returned";
+        String packageName = element.getEnclosingElement().toString() + "controller.returned";
         return ClassName.get(packageName, name);
 
     }

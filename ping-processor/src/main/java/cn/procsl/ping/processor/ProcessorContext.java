@@ -18,6 +18,10 @@ public interface ProcessorContext {
 
     String getConfig(String key);
 
+//    AnnotationVisitor getVisitor(String supportType);
+//
+//    String createFieldName(Element element);
+
     default String getRootPackageName() {
         return this.getConfig("creator.api.packageName");
     }

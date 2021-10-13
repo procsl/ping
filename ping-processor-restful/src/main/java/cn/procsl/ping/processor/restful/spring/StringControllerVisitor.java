@@ -41,7 +41,7 @@ public class StringControllerVisitor extends AbstractAnnotationVisitor {
     }
 
     @Override
-    public void typeVisitor(Element element, TypeSpec.Builder spec) {
+    public void visitor(Element element, TypeSpec.Builder spec) {
         String prefix = this.context.getConfig("processor.api.prefix");
         spec.addAnnotation(request.builder(prefix, element));
         spec.addAnnotation(validate);
@@ -57,13 +57,13 @@ public class StringControllerVisitor extends AbstractAnnotationVisitor {
     }
 
     @Override
-    public void fieldVisitor(Element element, FieldSpec.Builder spec) {
+    public void visitor(Element element, FieldSpec.Builder spec) {
         AnnotationSpec annotationSpec = AnnotationSpec.builder(autowired).addMember("required", "true").build();
         spec.addAnnotation(annotationSpec);
     }
 
     @Override
-    public void methodVisitor(Element element, MethodSpec.Builder spec) {
+    public void visitor(Element element, MethodSpec.Builder spec) {
         AnnotationSpec annotation = this.request.builder(element);
         spec.addAnnotation(annotation);
 
@@ -91,7 +91,7 @@ public class StringControllerVisitor extends AbstractAnnotationVisitor {
     }
 
     @Override
-    public void parameterVisitor(Element element, ParameterSpec.Builder spec) {
+    public void visitor(Element element, ParameterSpec.Builder spec) {
         if (element instanceof ParameterVariableElement) {
             spec.addAnnotation(this.validate);
             return;

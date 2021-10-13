@@ -26,14 +26,14 @@ public class PojoParameterVisitor extends AbstractAnnotationVisitor {
     }
 
     @Override
-    public void typeVisitor(Element element, TypeSpec.Builder target) {
+    public void visitor(Element element, TypeSpec.Builder target) {
         target.addAnnotation(getterBuilder);
         target.addAnnotation(setterBuilder);
         target.addAnnotation(validateAnnotation);
     }
 
     @Override
-    public void fieldVisitor(Element element, FieldSpec.Builder spec) {
+    public void visitor(Element element, FieldSpec.Builder spec) {
         Set<AnnotationSpec> annotations = element.getAnnotationMirrors()
             .stream()
             .filter(item -> item.getAnnotationType().toString().startsWith("javax.validation"))

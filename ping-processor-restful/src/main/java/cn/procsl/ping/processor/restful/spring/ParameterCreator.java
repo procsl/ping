@@ -85,12 +85,12 @@ class ParameterCreator {
         }
         TypeSpec.Builder dto = TypeSpec.classBuilder(this.dtoName);
         dto.addModifiers(Modifier.PUBLIC);
-        parameter.typeVisitor(executableElement, dto);
+        parameter.visitor(executableElement, dto);
 
         dtoFields.forEach((k, v) -> {
             TypeName type = toWrapper(v);
             FieldSpec.Builder fieldBuilder = FieldSpec.builder(type, v.getSimpleName().toString(), Modifier.PROTECTED);
-            parameter.fieldVisitor(v, fieldBuilder);
+            parameter.visitor(v, fieldBuilder);
             dto.addField(fieldBuilder.build());
         });
         this.dtoType = dto.build();
@@ -159,7 +159,7 @@ class ParameterCreator {
         }
         ClassName clazz = ClassName.get(this.dtoPackage, this.dtoName);
         ParameterSpec.Builder dtoBuilder = ParameterSpec.builder(clazz, NamingUtils.lowerCamelCase(this.dtoName), Modifier.FINAL);
-        controller.parameterVisitor(new ParameterVariableElement(executable, dtoFields, this.dtoPackage, this.dtoName), dtoBuilder);
+        controller.visitor(new ParameterVariableElement(executable, dtoFields, this.dtoPackage, this.dtoName), dtoBuilder);
 
         result.add(dtoBuilder.build());
         result.add(spec);
@@ -182,7 +182,7 @@ class ParameterCreator {
         String simpleName = NamingUtils.lowerCamelCase(v.getSimpleName().toString());
         TypeName typeName = toWrapper(v);
         ParameterSpec.Builder parameterBuilder = ParameterSpec.builder(typeName, simpleName, Modifier.FINAL);
-        controller.parameterVisitor(v, parameterBuilder);
+        controller.visitor(v, parameterBuilder);
 
         result.add(parameterBuilder.build());
     }

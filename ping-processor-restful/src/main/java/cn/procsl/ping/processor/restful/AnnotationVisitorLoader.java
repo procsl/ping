@@ -51,30 +51,30 @@ public final class AnnotationVisitorLoader implements AnnotationVisitor {
     }
 
     @Override
-    public void typeVisitor(Element element, TypeSpec.Builder spec) {
+    public void visitor(Element element, TypeSpec.Builder spec) {
         for (AnnotationVisitor visitor : current) {
-            visitor.typeVisitor(element, spec);
+            visitor.visitor(element, spec);
         }
     }
 
     @Override
-    public void fieldVisitor(Element element, FieldSpec.Builder spec) {
+    public void visitor(Element element, FieldSpec.Builder spec) {
         for (AnnotationVisitor visitor : current) {
-            visitor.fieldVisitor(element, spec);
+            visitor.visitor(element, spec);
         }
     }
 
     @Override
-    public void methodVisitor(Element element, MethodSpec.Builder spec) {
+    public void visitor(Element element, MethodSpec.Builder spec) {
         for (AnnotationVisitor visitor : current) {
-            visitor.methodVisitor(element, spec);
+            visitor.visitor(element, spec);
         }
     }
 
     @Override
-    public void parameterVisitor(Element element, ParameterSpec.Builder spec) {
+    public void visitor(Element element, ParameterSpec.Builder spec) {
         for (AnnotationVisitor visitor : current) {
-            visitor.parameterVisitor(element, spec);
+            visitor.visitor(element, spec);
         }
     }
 

@@ -57,16 +57,16 @@ public class SpringGeneratorProcessor extends AbstractConfigurableProcessor {
 
             TypeSpec.Builder builder = TypeSpec.classBuilder(name).addModifiers(Modifier.PUBLIC);
 
-            controller.typeVisitor(typeElement, builder);
+            controller.visitor(typeElement, builder);
 
             String fieldName = NamingUtils.lowerCamelCase(typeElement.getSimpleName().toString());
             FieldSpec.Builder fieldSpecBuilder = FieldSpec.builder(TypeName.get(typeElement.asType()), fieldName, Modifier.PROTECTED);
-            controller.fieldVisitor(typeElement, fieldSpecBuilder);
+            controller.visitor(typeElement, fieldSpecBuilder);
 
             builder.addField(fieldSpecBuilder.build());
 
             FieldSpec.Builder request = FieldSpec.builder(ClassName.get("javax.servlet.http", "HttpServletRequest"), "request", Modifier.PROTECTED);
-            controller.fieldVisitor(typeElement, request);
+            controller.visitor(typeElement, request);
 
             builder.addField(request.build());
 
@@ -80,7 +80,7 @@ public class SpringGeneratorProcessor extends AbstractConfigurableProcessor {
             }
 
 
-            String packageName = typeElement.getEnclosingElement().toString() + ".api";
+            String packageName = typeElement.getEnclosingElement().toString() + ".controller";
             JavaFile java = JavaFile
                 .builder(packageName, builder.build())
                 .addFileComment("这是自动生成的代码，请勿修改").build();
@@ -109,7 +109,7 @@ public class SpringGeneratorProcessor extends AbstractConfigurableProcessor {
             methodBuilder.addException(TypeName.get(typeMirror));
         }
 
-        controller.methodVisitor(item, methodBuilder);
+        controller.visitor(item, methodBuilder);
 
         ParameterCreator parameterCreator = new ParameterCreator(context, methodName, fieldName, item);
         methodBuilder.addParameters(parameterCreator.creatorParameters());

@@ -13,21 +13,21 @@ public class SchemaBuilder extends AbstractAnnotationVisitor {
     final AnnotationSpec annotation = AnnotationSpec.builder(ClassName.get("io.swagger.v3.oas.annotations.media", "Schema")).build();
 
     @Override
-    public void typeVisitor(Element element, TypeSpec.Builder spec) {
+    public void visitor(Element element, TypeSpec.Builder spec) {
         spec.addAnnotation(annotation);
     }
 
     @Override
-    public void fieldVisitor(Element element, FieldSpec.Builder spec) {
+    public void visitor(Element element, FieldSpec.Builder spec) {
         spec.addAnnotation(annotation);
     }
 
     @Override
-    public void methodVisitor(Element element, MethodSpec.Builder spec) {
+    public void visitor(Element element, MethodSpec.Builder spec) {
     }
 
     @Override
-    public void parameterVisitor(Element element, ParameterSpec.Builder spec) {
+    public void visitor(Element element, ParameterSpec.Builder spec) {
     }
 
     @Override

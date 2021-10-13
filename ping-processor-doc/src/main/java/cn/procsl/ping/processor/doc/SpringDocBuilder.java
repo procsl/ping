@@ -19,7 +19,7 @@ public class SpringDocBuilder extends AbstractAnnotationVisitor {
 
 
     @Override
-    public void methodVisitor(Element element, MethodSpec.Builder spec) {
+    public void visitor(Element element, MethodSpec.Builder spec) {
         JavaCommentResolver comment = resolver(element);
 
         AnnotationSpec.Builder operation = AnnotationSpec.builder(Operation.class);
@@ -43,7 +43,7 @@ public class SpringDocBuilder extends AbstractAnnotationVisitor {
     }
 
     @Override
-    public void typeVisitor(Element source, TypeSpec.Builder spec) {
+    public void visitor(Element source, TypeSpec.Builder spec) {
 
         JavaCommentResolver comment = resolver(source);
         String name = comment.getName();
@@ -66,7 +66,7 @@ public class SpringDocBuilder extends AbstractAnnotationVisitor {
     }
 
     @Override
-    public void parameterVisitor(Element element, ParameterSpec.Builder spec) {
+    public void visitor(Element element, ParameterSpec.Builder spec) {
         JavaCommentResolver comment = this.resolver(element.getEnclosingElement());
         String description = comment.getParameterComment(element.getSimpleName().toString());
         if (description == null) {

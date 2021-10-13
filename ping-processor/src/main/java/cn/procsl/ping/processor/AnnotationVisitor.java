@@ -13,13 +13,13 @@ public interface AnnotationVisitor {
 
     void init(ProcessorContext context);
 
-    void typeVisitor(Element element, TypeSpec.Builder spec);
+    void visitor(Element element, TypeSpec.Builder spec);
 
-    void fieldVisitor(Element element, FieldSpec.Builder spec);
+    void visitor(Element element, FieldSpec.Builder spec);
 
-    void methodVisitor(Element element, MethodSpec.Builder spec);
+    void visitor(Element element, MethodSpec.Builder spec);
 
-    void parameterVisitor(Element element, ParameterSpec.Builder spec);
+    void visitor(Element element, ParameterSpec.Builder spec);
 
     void variableVisitor(Element element, ParameterSpec.Builder spec);
 }

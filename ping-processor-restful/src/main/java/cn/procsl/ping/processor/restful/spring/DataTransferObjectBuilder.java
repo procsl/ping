@@ -102,7 +102,7 @@ public class DataTransferObjectBuilder {
         this.ITERABLE_TYPE = elementUtils.getTypeElement(Iterable.class.getName());
         this.OPTIONAL_TYPE = elementUtils.getTypeElement(Optional.class.getName());
 
-        visitor.typeVisitor(returnElement, masterBuilder);
+        visitor.visitor(returnElement, masterBuilder);
 
         List<? extends Element> elements = returnElement.getEnclosedElements();
         Set<VariableElement> fieldElements = elements
@@ -219,7 +219,7 @@ public class DataTransferObjectBuilder {
         }
 
         FieldSpec.Builder field = FieldSpec.builder(collectType, fieldName, Modifier.PUBLIC);
-        visitor.fieldVisitor(fieldElement, field);
+        visitor.visitor(fieldElement, field);
         this.masterBuilder.addField(field.build());
 
         // 创建convert
@@ -246,9 +246,9 @@ public class DataTransferObjectBuilder {
 
         ParameterSpec.Builder parameterBuilder = ParameterSpec.builder(type, fieldName, Modifier.FINAL);
 
-        visitor.methodVisitor(fieldElement, getter);
-        visitor.parameterVisitor(fieldElement, parameterBuilder);
-        visitor.methodVisitor(fieldElement, setter);
+        visitor.visitor(fieldElement, getter);
+        visitor.visitor(fieldElement, parameterBuilder);
+        visitor.visitor(fieldElement, setter);
         setter.addParameter(parameterBuilder.build());
 
         masterBuilder.addMethod(setter.build());
@@ -299,8 +299,8 @@ public class DataTransferObjectBuilder {
 
         ParameterSpec.Builder parameterBuilder = ParameterSpec.builder(type, fieldName, Modifier.FINAL);
 
-        visitor.fieldVisitor(fieldElement, fields);
-        visitor.parameterVisitor(fieldElement, parameterBuilder);
+        visitor.visitor(fieldElement, fields);
+        visitor.visitor(fieldElement, parameterBuilder);
         masterBuilder.addField(fields.build());
         this.getterAndSetterMethodBuilder(fieldElement, fieldName, type);
     }
