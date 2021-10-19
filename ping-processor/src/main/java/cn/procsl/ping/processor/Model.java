@@ -1,6 +1,6 @@
 package cn.procsl.ping.processor;
 
-public interface GeneratorDefinition {
+public interface Model {
 
     String generatorType();
 
@@ -10,13 +10,17 @@ public interface GeneratorDefinition {
      *
      * @return 模块名称
      */
-    String getModuleName();
+    default String getModuleName() {
+        return null;
+    }
 
     /**
      * 获取详细信息描述, 用于描述此文件
      *
      * @return 详细描述
      */
-    String getDescription();
+    default String getDescription() {
+
+    }
 
 }
