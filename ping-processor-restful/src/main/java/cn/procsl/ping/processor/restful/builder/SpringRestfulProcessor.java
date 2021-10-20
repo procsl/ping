@@ -15,13 +15,13 @@ import java.util.Set;
 @AutoService(Processor.class)
 public class SpringRestfulProcessor extends AbstractConfigurableProcessor {
 
-    Builder<Type, TypeElement> builder;
+    Builder builder;
 
     Convertor<JavaFile, Type> convertor;
 
     @Override
     protected void init() {
-        // TODO
+        this.builder = new BuilderLoader(processingEnv);
     }
 
     @Override
@@ -29,7 +29,8 @@ public class SpringRestfulProcessor extends AbstractConfigurableProcessor {
 
         TypeElement target = annotations.iterator().next();
 
-        Type type = builder.build(new Type(), target, roundEnv);
+        Type type = new Type();
+        builder.build(type, target);
 
         JavaFile javaFile = convertor.convertTo(type);
 

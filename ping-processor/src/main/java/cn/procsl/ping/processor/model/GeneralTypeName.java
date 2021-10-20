@@ -1,12 +1,16 @@
 package cn.procsl.ping.processor.model;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-@Data
+@Getter
+@RequiredArgsConstructor
 public class GeneralTypeName implements TypeName {
 
-    String packageName;
-    String className;
+    final String packageName;
+
+    final String className;
+
 
     @Override
     public String generatorType() {

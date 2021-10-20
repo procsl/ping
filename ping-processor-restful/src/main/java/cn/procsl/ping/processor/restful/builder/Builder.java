@@ -1,13 +1,11 @@
 package cn.procsl.ping.processor.restful.builder;
 
-import cn.procsl.ping.processor.Model;
 import cn.procsl.ping.processor.model.Type;
 
-import javax.annotation.processing.RoundEnvironment;
-import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
 
-public interface Builder<T extends Model> {
+public interface Builder {
 
-    void build(Type input, Element element, RoundEnvironment roundEnv);
+    void build(Type input, TypeElement serviceElement);
 
 }

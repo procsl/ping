@@ -1,22 +1,21 @@
 package cn.procsl.ping.processor.model;
 
 import cn.procsl.ping.processor.Model;
-import lombok.Data;
 
 import java.util.List;
 
-@Data
-public class Code implements Model {
+public interface Code extends Model {
 
-    // 代码模板
-    String codeTemplate;
+    Code EMPTY_CODE = new EmptyCode();
 
-    // 代码占位符参数
-    List<String> codeParameters;
+    String getTemplate();
 
+    List<String> getParameters();
 
     @Override
-    public String generatorType() {
+    default String generatorType() {
         return "Code";
     }
+
+
 }

@@ -6,4 +6,11 @@ public interface Annotation extends Model {
 
     TypeName getType();
 
+    @Override
+    default String generatorType() {
+        return "annotation";
+    }
+
+    Code getCode();
+
 }
