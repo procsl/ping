@@ -5,6 +5,7 @@ import cn.procsl.ping.processor.model.Type;
 import cn.procsl.ping.processor.model.TypeName;
 import cn.procsl.ping.processor.restful.builder.model.*;
 
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 
 public class SpringControllerBuilder implements Builder {
@@ -14,14 +15,21 @@ public class SpringControllerBuilder implements Builder {
     @Override
     public void build(Type input, TypeElement serviceElement) {
 
+        input.setModifier(Modifier.PUBLIC);
+
+        // 添加方法类型
         input.setType(getControllerTypeName(serviceElement));
 
+        // 添加方法注解
         input.addAnnotation(new GeneratedAnnotation());
         input.addAnnotation(new RestControllerAnnotation(serviceElement));
         input.addAnnotation(new RequestMappingAnnotation());
         input.addAnnotation(new IndexedAnnotation());
         input.addAnnotation(new SpringValidatedAnnotation());
 
+        input.setGeneratedInterface(true);
+
+        input.addField(new ServiceTypeField(serviceElement));
     }
 
     private TypeName getControllerTypeName(TypeElement serviceElement) {
