@@ -6,10 +6,12 @@ import cn.procsl.ping.processor.ProcessorContext;
 import cn.procsl.ping.processor.SimpleProcessorContext;
 import cn.procsl.ping.processor.restful.AnnotationVisitorLoader;
 import cn.procsl.ping.processor.restful.utils.NamingUtils;
+import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
 import lombok.Getter;
 
 import javax.annotation.processing.Filer;
+import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -24,7 +26,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 
-//@AutoService(Processor.class)
+@AutoService(Processor.class)
 public class SpringGeneratorProcessor extends AbstractConfigurableProcessor {
 
     AnnotationVisitor controller;

@@ -34,10 +34,6 @@ public class SpringRestfulProcessor extends AbstractConfigurableProcessor {
 
         JavaFile javaFile = convertor.convertTo(type);
 
-        writeTo(javaFile);
-    }
-
-    void writeTo(JavaFile javaFile) throws IOException {
         javaFile.writeTo(this.filer);
     }
 

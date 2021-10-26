@@ -11,7 +11,7 @@ public interface Model {
      * @return 模块名称
      */
     default String getModuleName() {
-        return null;
+        return "";
     }
 
     /**
@@ -20,7 +20,7 @@ public interface Model {
      * @return 详细描述
      */
     default String getDescription() {
-
+        return "";
     }
 
 }

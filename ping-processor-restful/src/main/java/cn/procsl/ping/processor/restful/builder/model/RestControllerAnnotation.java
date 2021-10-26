@@ -24,6 +24,6 @@ public class RestControllerAnnotation implements Annotation {
         // TODO
 //        Code code = new Code();
 //        code.addCodeParameters(NamingUtils.lowerCamelCase(typeElement.getSimpleName().toString()));
-        return code;
+        return null;
     }
 }
