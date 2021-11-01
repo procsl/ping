@@ -7,8 +7,8 @@ import lombok.NonNull;
 
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.*;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeMirror;
+import javax.lang.model.typeComponent.DeclaredType;
+import javax.lang.model.typeComponent.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.io.IOException;
@@ -129,7 +129,7 @@ public class DataTransferObjectBuilder {
         convertMethodBuilder.returns(returnedType);
         //argument entity name
 
-        // entity type
+        // entity typeComponent
         TypeName entityType = TypeName.get(this.returnMirror);
         ParameterSpec.Builder parameter = ParameterSpec.builder(entityType, convertArgumentName, Modifier.FINAL);
         convertMethodBuilder.addParameter(parameter.build());
@@ -197,8 +197,8 @@ public class DataTransferObjectBuilder {
         }
     }
 
-    void builderCollections(VariableElement fieldElement, TypeElement type, Class<? extends Iterable> impl, int index) {
-        this.collectionFieldElements.put(type, fieldElement);
+    void builderCollections(VariableElement fieldElement, TypeElement typeComponent, Class<? extends Iterable> impl, int index) {
+        this.collectionFieldElements.put(typeComponent, fieldElement);
         TypeMirror mirror = this.getGenerics(fieldElement, index);
         if (mirror == null) {
             return;
@@ -209,12 +209,12 @@ public class DataTransferObjectBuilder {
         boolean isPersistence = isPersistenceEntity(this.utils.asElement(mirror));
         String fieldName = fieldElement.getSimpleName().toString();
 
-        ParameterizedTypeName collectType = ParameterizedTypeName.get(ClassName.get(type), typeName);
+        ParameterizedTypeName collectType = ParameterizedTypeName.get(ClassName.get(typeComponent), typeName);
         if (isPersistence) {
             DataTransferObjectBuilder trans = new DataTransferObjectBuilder(this.elementUtils, this.utils, this.visitor, mirror, fieldName);
             this.builders.add(trans);
             typeName = trans.getType();
-            collectType = ParameterizedTypeName.get(ClassName.get(type), typeName);
+            collectType = ParameterizedTypeName.get(ClassName.get(typeComponent), typeName);
             getterAndSetterMethodBuilder(fieldElement, fieldName, collectType);
         }
 
@@ -223,11 +223,11 @@ public class DataTransferObjectBuilder {
         this.masterBuilder.addField(field.build());
 
         // 创建convert
-        String lowName = NamingUtils.lowerCamelCase(type.getSimpleName().toString());
+        String lowName = NamingUtils.lowerCamelCase(typeComponent.getSimpleName().toString());
 
-//        type = (TypeElement) this.utils.asElement(this.utils.erasure(type.asType()));
+//        typeComponent = (TypeElement) this.utils.asElement(this.utils.erasure(typeComponent.asType()));
 
-        ParameterizedTypeName t = ParameterizedTypeName.get(ClassName.get(type), typeName);
+        ParameterizedTypeName t = ParameterizedTypeName.get(ClassName.get(typeComponent), typeName);
         this.convertMethodBuilder.addStatement("{\n$T $N = new $T<>()", t, lowName, impl);
         this.convertMethodBuilder.addStatement("$N.$N = $N", this.convertDTOName, fieldName, lowName);
         this.convertMethodBuilder.beginControlFlow("for ($T tmp : $N.$N())", TypeName.get(mirror), this.convertArgumentName, String.format("get%s", NamingUtils.upperCamelCase(fieldName)));
@@ -236,15 +236,15 @@ public class DataTransferObjectBuilder {
         this.convertMethodBuilder.addCode("\n}");
     }
 
-    private void getterAndSetterMethodBuilder(VariableElement fieldElement, String fieldName, TypeName type) {
+    private void getterAndSetterMethodBuilder(VariableElement fieldElement, String fieldName, TypeName typeComponent) {
         String upperCamelCaseStr = NamingUtils.upperCamelCase(fieldName);
         String getterStr = String.format("get%s", upperCamelCaseStr);
-        MethodSpec.Builder getter = MethodSpec.methodBuilder(getterStr).addModifiers(Modifier.PUBLIC).returns(type).addCode("\nreturn this.$N;\n", fieldName);
+        MethodSpec.Builder getter = MethodSpec.methodBuilder(getterStr).addModifiers(Modifier.PUBLIC).returns(typeComponent).addCode("\nreturn this.$N;\n", fieldName);
 
         String setterStr = String.format("set%s", upperCamelCaseStr);
         MethodSpec.Builder setter = MethodSpec.methodBuilder(setterStr).addModifiers(Modifier.PUBLIC).returns(TypeName.VOID).addCode("\n this.$N = $N;\n", fieldName, fieldName);
 
-        ParameterSpec.Builder parameterBuilder = ParameterSpec.builder(type, fieldName, Modifier.FINAL);
+        ParameterSpec.Builder parameterBuilder = ParameterSpec.builder(typeComponent, fieldName, Modifier.FINAL);
 
         visitor.visitor(fieldElement, getter);
         visitor.visitor(fieldElement, parameterBuilder);
@@ -256,12 +256,12 @@ public class DataTransferObjectBuilder {
     }
 
     private TypeMirror getGenerics(Element element, int index) {
-        TypeMirror type = element.asType();
+        TypeMirror typeComponent = element.asType();
 
-        if (!(type instanceof DeclaredType)) {
+        if (!(typeComponent instanceof DeclaredType)) {
             return null;
         }
-        List<? extends TypeMirror> arguments = ((DeclaredType) type).getTypeArguments();
+        List<? extends TypeMirror> arguments = ((DeclaredType) typeComponent).getTypeArguments();
         if (arguments.isEmpty() || arguments.size() < index) {
             return null;
         }
@@ -294,15 +294,15 @@ public class DataTransferObjectBuilder {
 
     void buildFieldAndGetterSetter(VariableElement fieldElement) {
         String fieldName = fieldElement.getSimpleName().toString();
-        TypeName type = TypeName.get(fieldElement.asType());
-        FieldSpec.Builder fields = FieldSpec.builder(type, fieldName, Modifier.PUBLIC);
+        TypeName typeComponent = TypeName.get(fieldElement.asType());
+        FieldSpec.Builder fields = FieldSpec.builder(typeComponent, fieldName, Modifier.PUBLIC);
 
-        ParameterSpec.Builder parameterBuilder = ParameterSpec.builder(type, fieldName, Modifier.FINAL);
+        ParameterSpec.Builder parameterBuilder = ParameterSpec.builder(typeComponent, fieldName, Modifier.FINAL);
 
         visitor.visitor(fieldElement, fields);
         visitor.visitor(fieldElement, parameterBuilder);
         masterBuilder.addField(fields.build());
-        this.getterAndSetterMethodBuilder(fieldElement, fieldName, type);
+        this.getterAndSetterMethodBuilder(fieldElement, fieldName, typeComponent);
     }
 
 

@@ -1,11 +1,11 @@
 package cn.procsl.ping.processor.restful.builder;
 
-import cn.procsl.ping.processor.model.Type;
+import cn.procsl.ping.processor.component.TypeComponent;
 
 import javax.lang.model.element.TypeElement;
 
 public interface Builder {
 
-    void build(Type input, TypeElement serviceElement);
+    void build(TypeComponent input, TypeElement serviceElement);
 
 }

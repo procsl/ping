@@ -1,15 +1,16 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="AdminApplication-full" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-    <module name="ping-admin-app" />
-    <extension name="coverage">
-      <pattern>
-        <option name="PATTERN" value="cn.procsl.ping.app.admin.*" />
-        <option name="ENABLED" value="true" />
-      </pattern>
-    </extension>
-    <option name="SPRING_BOOT_MAIN_CLASS" value="cn.procsl.ping.app.admin.AdminApplication" />
-    <option name="DEBUG_MODE" value="true" />
-    <option name="VM_PARAMETERS" value="-ea -Dlog4j.skipJansi=false --illegal-access=warn" />
+  <configuration default="false" name="AdminApplication-full" typeComponent="SpringBootApplicationConfigurationType"
+                 factoryName="Spring Boot">
+      <module name="ping-admin-app"/>
+      <extension name="coverage">
+          <pattern>
+              <option name="PATTERN" value="cn.procsl.ping.app.admin.*"/>
+              <option name="ENABLED" value="true"/>
+          </pattern>
+      </extension>
+      <option name="SPRING_BOOT_MAIN_CLASS" value="cn.procsl.ping.app.admin.AdminApplication"/>
+      <option name="DEBUG_MODE" value="true"/>
+      <option name="VM_PARAMETERS" value="-ea -Dlog4j.skipJansi=false --illegal-access=warn"/>
     <option name="ALTERNATIVE_JRE_PATH" />
     <option name="SHORTEN_COMMAND_LINE" value="ARGS_FILE"/>
       <method v="2">
@@ -28,15 +29,16 @@
           <option name="Make" enabled="true"/>
       </method>
   </configuration>
-  <configuration default="false" name="AdminApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-    <module name="ping-admin-app" />
-    <option name="SPRING_BOOT_MAIN_CLASS" value="cn.procsl.ping.app.admin.AdminApplication" />
-    <option name="DEBUG_MODE" value="true" />
-    <option name="VM_PARAMETERS" value="-ea -Dlog4j.skipJansi=false" />
-    <option name="ALTERNATIVE_JRE_PATH" />
-    <option name="SHORTEN_COMMAND_LINE" value="NONE" />
-    <method v="2">
-      <option name="Make" enabled="true" />
-    </method>
-  </configuration>
+    <configuration default="false" name="AdminApplication" typeComponent="SpringBootApplicationConfigurationType"
+                   factoryName="Spring Boot">
+        <module name="ping-admin-app"/>
+        <option name="SPRING_BOOT_MAIN_CLASS" value="cn.procsl.ping.app.admin.AdminApplication"/>
+        <option name="DEBUG_MODE" value="true"/>
+        <option name="VM_PARAMETERS" value="-ea -Dlog4j.skipJansi=false"/>
+        <option name="ALTERNATIVE_JRE_PATH"/>
+        <option name="SHORTEN_COMMAND_LINE" value="NONE"/>
+        <method v="2">
+            <option name="Make" enabled="true"/>
+        </method>
+    </configuration>
 </component>

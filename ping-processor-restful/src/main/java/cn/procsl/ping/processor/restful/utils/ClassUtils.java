@@ -8,7 +8,7 @@ import lombok.NonNull;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
-import javax.lang.model.type.TypeMirror;
+import javax.lang.model.typeComponent.TypeMirror;
 import javax.lang.model.util.Types;
 import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;

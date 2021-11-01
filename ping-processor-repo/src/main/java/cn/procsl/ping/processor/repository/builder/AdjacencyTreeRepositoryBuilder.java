@@ -1,14 +1,11 @@
 package cn.procsl.ping.processor.repository.builder;
 
 import cn.procsl.ping.processor.repository.AbstractRepositoryBuilder;
-import cn.procsl.ping.processor.repository.RepositoryBuilder;
-import com.google.auto.service.AutoService;
-import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.*;
+import javax.lang.model.typeComponent.*;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.util.*;
@@ -230,9 +227,9 @@ public class AdjacencyTreeRepositoryBuilder extends AbstractRepositoryBuilder {
             return null;
         }
 
-        Element type = this.typeUtils.asElement(mirror);
-        if (type instanceof TypeElement) {
-            return (TypeElement) type;
+        Element typeComponent = this.typeUtils.asElement(mirror);
+        if (typeComponent instanceof TypeElement) {
+            return (TypeElement) typeComponent;
         }
         return null;
     }

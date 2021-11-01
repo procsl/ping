@@ -9,7 +9,7 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.TypeMirror;
+import javax.lang.model.typeComponent.TypeMirror;
 import javax.persistence.Entity;
 import javax.tools.StandardLocation;
 import java.io.IOException;
@@ -115,7 +115,7 @@ public class RepositoryProcessor extends AbstractProcessor {
             for (Element entity : entities) {
                 if (!(entity instanceof TypeElement)) {
                     String str = entity.asType().toString();
-                    messager.printMessage(WARNING, "The element of the annotation label is not a class type: '" + str + "'", entity);
+                    messager.printMessage(WARNING, "The element of the annotation label is not a class typeComponent: '" + str + "'", entity);
                     continue;
                 }
 
@@ -151,14 +151,14 @@ public class RepositoryProcessor extends AbstractProcessor {
         for (RepositoryBuilder builder : matcher) {
             String className = this.createClassName(entity, builder.getName());
 
-            Map<String, List<TypeMirror>> type = builder.generator(entity, roundEnv);
-            if (type == null) {
+            Map<String, List<TypeMirror>> typeComponent = builder.generator(entity, roundEnv);
+            if (typeComponent == null) {
                 messager.printMessage(WARNING, "This interface generation failed because the generator returned null:" + builder.getClass().getName());
                 continue;
             }
 
             TypeSpec.Builder typeSpecBuilder = this.buildRepository(className);
-            type.forEach((k, v) -> {
+            typeComponent.forEach((k, v) -> {
                 TypeName[] mirrors = v.stream().map(TypeName::get).toArray(value -> new TypeName[v.size()]);
                 ClassName repositoryType = ClassName.get(this.processingEnv.getElementUtils().getTypeElement(k));
                 ParameterizedTypeName interfaceType = ParameterizedTypeName.get(repositoryType, mirrors);
@@ -247,7 +247,7 @@ public class RepositoryProcessor extends AbstractProcessor {
             return String.valueOf(prop);
         }
 
-        messager.printMessage(WARNING, "This property is not a simple type: " + key);
+        messager.printMessage(WARNING, "This property is not a simple typeComponent: " + key);
         return null;
     }
 
@@ -361,13 +361,13 @@ public class RepositoryProcessor extends AbstractProcessor {
     Set<? extends TypeName> getMultipleInterfaceType(TypeElement entity, RoundEnvironment environment, List<RepositoryBuilder> matcher) {
         HashSet<TypeName> types = new HashSet<>();
         for (RepositoryBuilder builder : matcher) {
-            Map<String, List<TypeMirror>> type = builder.generator(entity, environment);
-            if (type == null || type.isEmpty()) {
+            Map<String, List<TypeMirror>> typeComponent = builder.generator(entity, environment);
+            if (typeComponent == null || typeComponent.isEmpty()) {
                 messager.printMessage(WARNING, "This interface generation failed because the generator returned null:" + builders.getClass().getName());
                 continue;
             }
 
-            type.forEach((k, v) -> {
+            typeComponent.forEach((k, v) -> {
                 TypeName[] mirrors = v.stream().map(TypeName::get).toArray(value -> new TypeName[v.size()]);
                 ClassName repositoryType = ClassName.get(this.processingEnv.getElementUtils().getTypeElement(k));
                 ParameterizedTypeName interfaceType = ParameterizedTypeName.get(repositoryType, mirrors);

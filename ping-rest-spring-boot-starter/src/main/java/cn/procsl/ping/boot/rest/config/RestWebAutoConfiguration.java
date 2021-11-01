@@ -63,7 +63,7 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_XML_VALUE;
 @Slf4j
 @Configuration
 @EnableConfigurationProperties({RestWebProperties.class, VersionStrategyProperties.class, DefaultExceptionResolver.class})
-@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+@ConditionalOnWebApplication(typeComponent = ConditionalOnWebApplication.Type.SERVLET)
 @ConditionalOnClass({Servlet.class, DispatcherServlet.class, WebMvcConfigurer.class})
 @AutoConfigureAfter({RestDispatcherServletAutoConfiguration.class, TaskExecutionAutoConfiguration.class, ValidationAutoConfiguration.class})
 @ConditionalOnMissingBean(RestWebAutoConfiguration.class)
@@ -161,8 +161,8 @@ public class RestWebAutoConfiguration implements ApplicationContextAware {
     }
 
     private void pushSystemMime(Set<RestWebProperties.MetaMediaType> mediaTypes) {
-        mediaTypes.forEach(type -> {
-            switch (type) {
+        mediaTypes.forEach(typeComponent -> {
+            switch (typeComponent) {
                 case json:
                     setMediaTypes(json, APPLICATION_JSON);
                     break;
@@ -176,9 +176,9 @@ public class RestWebAutoConfiguration implements ApplicationContextAware {
     private void pushCustomMime(Set<RestWebProperties.MetaMediaType> mediaTypes) {
         String mime = this.properties.getMimeSubtype() == null || this.properties.getMimeSubtype().isEmpty() ? "vnd.api" : this.properties.getMimeSubtype();
         mediaTypes.forEach(
-            type -> setMediaTypes(
-                type,
-                new MediaType("application", mime + "+" + type.name(), Charset.defaultCharset())
+            typeComponent -> setMediaTypes(
+                typeComponent,
+                new MediaType("application", mime + "+" + typeComponent.name(), Charset.defaultCharset())
             )
         );
     }

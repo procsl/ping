@@ -93,7 +93,7 @@ public abstract class AbstractConfigurableProcessor extends AbstractProcessor {
             return String.valueOf(prop);
         }
 
-        messager.printMessage(WARNING, "This property is not a simple type: " + key);
+        messager.printMessage(WARNING, "This property is not a simple typeComponent: " + key);
         return null;
     }
 

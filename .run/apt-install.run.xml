@@ -1,15 +1,16 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="api-install" type="MavenRunConfiguration" factoryName="Maven" singleton="false">
-    <MavenSettings>
-      <option name="myGeneralSettings" />
-      <option name="myRunnerSettings">
-        <MavenRunnerSettings>
-          <option name="delegateBuildToMaven" value="false" />
-          <option name="environmentProperties">
-            <map />
-          </option>
-          <option name="jreName" value="#USE_PROJECT_JDK" />
-          <option name="mavenProperties">
+  <configuration default="false" name="api-install" typeComponent="MavenRunConfiguration" factoryName="Maven"
+                 singleton="false">
+      <MavenSettings>
+          <option name="myGeneralSettings"/>
+          <option name="myRunnerSettings">
+              <MavenRunnerSettings>
+                  <option name="delegateBuildToMaven" value="false"/>
+                  <option name="environmentProperties">
+                      <map/>
+                  </option>
+                  <option name="jreName" value="#USE_PROJECT_JDK"/>
+                  <option name="mavenProperties">
             <map />
           </option>
           <option name="passParentEnv" value="true" />

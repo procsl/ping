@@ -1,12 +1,11 @@
-package cn.procsl.ping.processor.restful.builder.model;
+package cn.procsl.ping.processor.restful.builder.component;
 
-import cn.procsl.ping.processor.model.TypeName;
 import lombok.RequiredArgsConstructor;
 
 import javax.lang.model.element.TypeElement;
 
 @RequiredArgsConstructor
-public class ElementTypeName implements TypeName {
+public class TypeNameComponent implements cn.procsl.ping.processor.component.TypeNameComponent {
 
     final TypeElement typeElement;
 

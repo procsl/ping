@@ -154,7 +154,7 @@
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
             <version>2.1.1</version>
-            <type>jar</type>
+            <typeComponent>jar</typeComponent>
             <scope>provided</scope>
         </dependency>
 
@@ -167,7 +167,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
                 <version>2.3.3.RELEASE</version>
-                <type>pom</type>
+                <typeComponent>pom</typeComponent>
                 <scope>import</scope>
             </dependency>
         </dependencies>
