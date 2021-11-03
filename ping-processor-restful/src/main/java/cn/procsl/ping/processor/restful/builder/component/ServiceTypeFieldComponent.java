@@ -1,39 +1,33 @@
 package cn.procsl.ping.processor.restful.builder.component;
 
+import cn.procsl.ping.processor.ProcessorContext;
+import cn.procsl.ping.processor.component.AbstractComponent;
 import cn.procsl.ping.processor.component.AnnotationComponent;
 import cn.procsl.ping.processor.component.FieldComponent;
-import cn.procsl.ping.processor.component.TypeNameComponent;
+import cn.procsl.ping.processor.restful.utils.NamingUtils;
+import com.squareup.javapoet.AnnotationSpec;
+import com.squareup.javapoet.FieldSpec;
+import com.squareup.javapoet.TypeName;
 
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import java.util.ArrayList;
-import java.util.Collection;
 
-public class ServiceTypeFieldComponent extends FieldComponent {
-
-    final TypeElement typeElement;
-
-    public ServiceTypeFieldComponent(TypeElement serviceElement) {
-        this.typeElement = serviceElement;
-    }
+public class ServiceTypeFieldComponent extends AbstractComponent<FieldSpec, TypeElement> implements FieldComponent<TypeElement> {
 
     @Override
-    public Collection<AnnotationComponent> getFieldAnnotations() {
-        return new ArrayList<>();
+    public FieldSpec generateStruct(ProcessorContext context, TypeElement element) {
+        TypeName type = TypeName.get(element.asType());
+        String name = NamingUtils.lowerCamelCase(element.getSimpleName().toString());
+        FieldSpec.Builder builder = FieldSpec.builder(type, name, Modifier.PRIVATE);
+
+        this.getChildren().forEach(item -> {
+            if (item instanceof AnnotationComponent) {
+                Object result = item.generateStruct(context, element);
+                builder.addAnnotation((AnnotationSpec) result);
+            }
+        });
+
+        return builder.build();
     }
 
-    @Override
-    public TypeNameComponent getType() {
-        return super.getType();
-    }
-
-    @Override
-    public String getName() {
-        return super.getName();
-    }
-
-    @Override
-    public Modifier getModifier() {
-        return super.getModifier();
-    }
 }
