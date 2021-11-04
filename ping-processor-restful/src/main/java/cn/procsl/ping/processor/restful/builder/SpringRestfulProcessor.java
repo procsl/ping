@@ -2,9 +2,7 @@ package cn.procsl.ping.processor.restful.builder;
 
 import cn.procsl.ping.processor.AbstractConfigurableProcessor;
 import cn.procsl.ping.processor.component.TypeComponent;
-import cn.procsl.ping.processor.restful.builder.component.GeneratedAnnotationComponent;
-import cn.procsl.ping.processor.restful.builder.component.ServiceTypeFieldComponent;
-import cn.procsl.ping.processor.restful.builder.component.SpringControllerComposite;
+import cn.procsl.ping.processor.restful.builder.component.*;
 import com.google.auto.service.AutoService;
 
 import javax.annotation.processing.Processor;
@@ -24,9 +22,12 @@ public class SpringRestfulProcessor extends AbstractConfigurableProcessor {
 
         ServiceTypeFieldComponent serviceField = new ServiceTypeFieldComponent();
 
-
         TypeComponent<TypeElement> component = new SpringControllerComposite();
         component.addChild(generatorAnnotation);
+        component.addChild(serviceField);
+        component.addChild(new IndexedAnnotationComponent());
+        component.addChild(new ControllerRequestMappingAnnotationComponent());
+        component.addChild(new RestControllerAnnotationComponent());
 
     }
 

@@ -7,34 +7,27 @@ import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 
-public interface TypeComponent<E> extends Component<TypeSpec, E> {
+public interface TypeComponent<E> extends Component<TypeSpec, E>, AnnotationAware<E> {
 
-
-    @Override
-    default TypeSpec generateStruct(ProcessorContext context, E element) {
-        TypeSpec.Builder type = this.builder(context, element);
-
-        this.getChildren().forEach(item -> {
-            Object result = item.generateStruct(context, element);
-            if (result instanceof AnnotationSpec) {
-                type.addAnnotation((AnnotationSpec) result);
-                return;
-            }
-
-            if (result instanceof FieldSpec) {
-                type.addField((FieldSpec) result);
-                return;
-            }
-
-            if (result instanceof MethodSpec) {
-                type.addMethod((MethodSpec) result);
-            }
-
-        });
-
-        return type.build();
+    /**
+     * 添加字段组件
+     *
+     * @param fieldComponent 字段生成组件
+     * @return 如果添加失败则返回false
+     */
+    default boolean addFieldComponent(FieldComponent<E> fieldComponent) {
+        return false;
     }
 
-    TypeSpec.Builder builder(ProcessorContext context, E element);
+    /**
+     * 方法字段组件
+     *
+     * @param methodComponent 方法生成组件
+     * @return 如果添加失败则返回false
+     */
+    default boolean addMethodComponent(MethodComponent<E> methodComponent) {
+        return false;
+    }
+
 
 }
