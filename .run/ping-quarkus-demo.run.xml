@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-    <configuration default="false" name="ping-quarkus-demo" type="QuarkusRunConfigurationType" factoryName="Quarkus">
+    <configuration default="false" name="ping-quarkus-demo" typeComponent="MavenRunConfiguration" type="QuarkusRunConfigurationType" factoryName="Quarkus">
         <module name="ping-demo-quarkus"/>
         <QsMavenRunConfiguration>
             <MavenSettings>
