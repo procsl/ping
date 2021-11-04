@@ -1,6 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-    <configuration default="false" name="native-image-springboot" typeComponent="MavenRunConfiguration"
-                   factoryName="Maven">
+    <configuration default="false" name="native-image-springboot" type="MavenRunConfiguration" factoryName="Maven">
         <MavenSettings>
             <option name="myGeneralSettings"/>
             <option name="myRunnerSettings">
@@ -26,7 +25,6 @@
                     </option>
                     <option name="goals">
                         <list>
-                            <option value="clean"/>
                             <option value="package"/>
                             <option value="-P"/>
                             <option value="native"/>
@@ -37,7 +35,7 @@
                         <map/>
                     </option>
                     <option name="resolveToWorkspace" value="false"/>
-                    <option name="workingDirPath" value="$PROJECT_DIR$/ping-graalvm-demo"/>
+                    <option name="workingDirPath" value="$PROJECT_DIR$/ping-demo-graalvm"/>
                 </MavenRunnerParameters>
             </option>
         </MavenSettings>

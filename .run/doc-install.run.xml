@@ -1,14 +1,16 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="doc-install" typeComponent="MavenRunConfiguration" factoryName="Maven">
-      <MavenSettings>
-          <option name="myGeneralSettings"/>
-          <option name="myRunnerSettings">
-              <MavenRunnerSettings>
-                  <option name="delegateBuildToMaven" value="false"/>
-                  <option name="environmentProperties">
-                      <map/>
-                  </option>
-                  <option name="jreName" value="#USE_PROJECT_JDK"/>
+    <configuration default="false" name="doc-install" type="MavenRunConfiguration" typeComponent="MavenRunConfiguration"
+                   factoryName="Maven">
+
+        <MavenSettings>
+            <option name="myGeneralSettings"/>
+            <option name="myRunnerSettings">
+                <MavenRunnerSettings>
+                    <option name="delegateBuildToMaven" value="false"/>
+                    <option name="environmentProperties">
+                        <map/>
+                    </option>
+                    <option name="jreName" value="#USE_PROJECT_JDK"/>
                   <option name="mavenProperties">
             <map />
           </option>

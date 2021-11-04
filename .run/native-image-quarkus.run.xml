@@ -1,5 +1,6 @@
 <component name="ProjectRunConfigurationManager">
     <configuration default="false" name="native-image-quarkus" typeComponent="MavenRunConfiguration"
+                   type="MavenRunConfiguration"
                    factoryName="Maven">
         <MavenSettings>
             <option name="myGeneralSettings"/>

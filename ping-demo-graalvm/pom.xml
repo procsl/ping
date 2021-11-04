@@ -107,6 +107,7 @@
                             </BP_BOOT_NATIVE_IMAGE_BUILD_ARGUMENTS>
                         </env>
                     </image>
+                    <classifier>exec</classifier>
                 </configuration>
             </plugin>
         </plugins>
