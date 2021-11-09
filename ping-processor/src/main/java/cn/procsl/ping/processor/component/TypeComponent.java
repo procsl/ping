@@ -29,5 +29,4 @@ public interface TypeComponent<E> extends Component<TypeSpec, E>, AnnotationAwar
         return false;
     }
 
-
 }

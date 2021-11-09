@@ -5,6 +5,5 @@ import com.squareup.javapoet.MethodSpec;
 
 public interface MethodComponent<E> extends Component<MethodSpec, E>, AnnotationAware<E> {
 
-//    default void addCodeComponent( );
 
 }
