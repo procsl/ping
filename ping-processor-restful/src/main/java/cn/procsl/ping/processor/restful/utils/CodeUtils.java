@@ -6,7 +6,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.typeComponent.TypeMirror;
+import javax.lang.model.type.TypeMirror;
 import java.lang.annotation.Annotation;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -67,9 +67,9 @@ public final class CodeUtils {
     }
 
     public static boolean hasNeedWrapper(TypeMirror returnType) {
-        String typeComponent = returnType.toString();
+        String type = returnType.toString();
 
-        if (SIMPLE_TYPES.contains(typeComponent)) {
+        if (SIMPLE_TYPES.contains(type)) {
             return true;
         }
 

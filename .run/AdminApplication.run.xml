@@ -1,6 +1,5 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="AdminApplication-full" type="SpringBootApplicationConfigurationType"
-                 typeComponent="SpringBootApplicationConfigurationType"
                  factoryName="Spring Boot">
       <module name="ping-admin-app"/>
       <extension name="coverage">
@@ -30,8 +29,8 @@
           <option name="Make" enabled="true"/>
       </method>
   </configuration>
-    <configuration default="false" name="AdminApplication" type="SpringBootApplicationConfigurationType"
-                   typeComponent="SpringBootApplicationConfigurationType"
+    <configuration default="false" name="AdminApplication"
+                   type="SpringBootApplicationConfigurationType"
                    factoryName="Spring Boot">
         <module name="ping-admin-app"/>
         <option name="SPRING_BOOT_MAIN_CLASS" value="cn.procsl.ping.app.admin.AdminApplication"/>

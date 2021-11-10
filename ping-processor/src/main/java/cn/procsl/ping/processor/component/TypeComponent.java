@@ -7,7 +7,7 @@ import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 
-public interface TypeComponent<E> extends Component<TypeSpec, E>, AnnotationAware<E> {
+public interface type<E> extends Component<TypeSpec, E>, AnnotationAware<E> {
 
     /**
      * 添加字段组件

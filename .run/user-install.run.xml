@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="user-install" typeComponent="MavenRunConfiguration" type="MavenRunConfiguration"
+  <configuration default="false" name="user-install" type="MavenRunConfiguration"
                  factoryName="Maven">
       <MavenSettings>
           <option name="myGeneralSettings"/>

@@ -69,7 +69,7 @@ public class RbacApplicationService {
      * @throws RbacException 如果修改失败，则抛出异常
      */
     public void changeRolePermissions(@NotNull Long id, @NotNull @Size(max = 100) Collection<@Max(100) String> permissions) throws RbacException {
-        Role role = this.roleJpaRepository.getOne(id);
+        Role role = this.roleJpaRepository.getById(id);
         this.verifyPermissionService.verify(permissions);
         role.changePermissions(permissions);
         this.roleJpaRepository.save(role);
@@ -81,7 +81,7 @@ public class RbacApplicationService {
      * @throws RbacException 如果修改失败，则抛出异常
      */
     public void changeRoleName(@NotNull Long id, @NotBlank @Size(max = 20) String name) throws RbacException {
-        Role role = this.roleJpaRepository.getOne(id);
+        Role role = this.roleJpaRepository.getById(id);
         role.setName(name);
         this.roleJpaRepository.save(role);
     }

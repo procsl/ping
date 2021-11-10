@@ -114,10 +114,10 @@ class AdjacencyTreeExecutor<
 
             this.Q = new QAdjacencyNode(entityPathResolver.createPath(javaType));
 
-            Class<P> typeComponent = this.getNodeType(javaType);
+            Class<P> type = this.getNodeType(javaType);
 
             SimplePathResolver resolver = beanFactory.getBeanProvider(SimplePathResolver.class).getIfAvailable(() -> SimplePathResolver.INSTANCE);
-            this.P = new QAdjacencyPathNode(resolver.createPath(typeComponent));
+            this.P = new QAdjacencyPathNode(resolver.createPath(type));
 
             this.querydsl = new Querydsl(entityManager, new PathBuilder<>(javaType, this.Q.getMetadata()));
             queryHint = metadata == null ? QueryHints.NoHints.INSTANCE : DefaultQueryHints.of(entityInformation, metadata);
@@ -616,12 +616,12 @@ class AdjacencyTreeExecutor<
     }
 
     protected Class<P> findNodeType(Type... types) {
-        for (Type typeComponent : types) {
-            if (!(typeComponent instanceof ParameterizedType)) {
+        for (Type type : types) {
+            if (!(type instanceof ParameterizedType)) {
                 continue;
             }
 
-            Type[] args = ((ParameterizedType) (typeComponent)).getActualTypeArguments();
+            Type[] args = ((ParameterizedType) (type)).getActualTypeArguments();
             for (Type arg : args) {
                 if (!(arg instanceof Class)) {
                     continue;
@@ -715,8 +715,8 @@ class AdjacencyTreeExecutor<
             return query;
         }
 
-        LockModeType typeComponent = metadata.getLockModeType();
-        return typeComponent == null ? query : query.setLockMode(typeComponent);
+        LockModeType type = metadata.getLockModeType();
+        return type == null ? query : query.setLockMode(type);
     }
 
 }
