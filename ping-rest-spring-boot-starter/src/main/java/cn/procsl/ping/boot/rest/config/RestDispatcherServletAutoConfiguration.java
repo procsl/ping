@@ -12,7 +12,7 @@ import org.springframework.web.servlet.DispatcherServlet;
  * @author procsl
  * @date 2020/02/19
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @AutoConfigureBefore({DispatcherServletAutoConfiguration.class})
 public class RestDispatcherServletAutoConfiguration {
 

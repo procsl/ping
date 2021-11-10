@@ -12,18 +12,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.stereotype.Indexed;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.util.Collection;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnMissingBean({UserAutoConfiguration.class})
 @RequiredArgsConstructor
 @EntityScan(basePackages = "cn.procsl.ping.boot.user")
-@EnableJpaRepositories("cn.procsl.ping.boot.user")
+@EnableJpaRepositories(basePackages = "cn.procsl.ping.boot.user.repository")
 @EnableTransactionManagement
-@Indexed
 public class UserAutoConfiguration {
 
     @Bean
