@@ -19,14 +19,14 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-webmvc-core</artifactId>
-            <version>1.5.11</version>
+            <version>1.5.12</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-common -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-common</artifactId>
-            <version>1.5.11</version>
+            <version>1.5.12</version>
         </dependency>
 
         <dependency>

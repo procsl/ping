@@ -29,9 +29,16 @@
         </dependency>
 
         <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>5.3.11</version>
+            <version>5.3.12</version>
             <scope>provided</scope>
         </dependency>
 
@@ -45,7 +52,7 @@
         <dependency>
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service</artifactId>
-            <version>1.0</version>
+            <version>1.0.1</version>
             <!--            <exclusions>-->
             <!--                <exclusion>-->
             <!--                    <artifactId>guava</artifactId>-->
@@ -60,6 +67,7 @@
             <version>2.1.1</version>
             <type>jar</type>
         </dependency>
+
 
 
         <!-- https://mvnrepository.com/artifact/junit/junit -->
