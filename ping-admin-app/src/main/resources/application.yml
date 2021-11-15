@@ -41,7 +41,7 @@ spring:
 
   #    liquibase配置
   liquibase:
-    change-log: classpath*:/changelog/master.xml
+    change-log: classpath*:/changelog/db.changelog-master.xml
     enabled: true
 
 #      开启debug模式
