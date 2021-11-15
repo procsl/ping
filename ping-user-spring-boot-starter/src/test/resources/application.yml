@@ -23,5 +23,12 @@ spring:
   profiles:
     active: @profiles.active@
 
+  #    liquibase配置
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    enabled: true
+
 #      开启debug模式
 debug: false
+
+

@@ -25,14 +25,13 @@ import java.util.Collection;
 public class UserAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean(SimpleVerifyPermissionService.class)
+    @ConditionalOnMissingBean(VerifyPermissionService.class)
     public SimpleVerifyPermissionService InnerVerifyPermissionService() {
         return new SimpleVerifyPermissionService();
     }
 
     @Bean
     @ConditionalOnMissingBean(RbacApplicationService.class)
-    @Autowired
     public RbacApplicationService rbacApplicationService(JpaRepository<Role, Long> roleJpaRepository, VerifyPermissionService verifyPermissionServiceProvider) {
         return new RbacApplicationService(roleJpaRepository, verifyPermissionServiceProvider);
     }
