@@ -25,6 +25,6 @@
         <module>ping-producer-spring-boot-starter</module>
     </modules>
 
-    <name>ping</name>
+    <name>Ping Projects</name>
 
 </project>

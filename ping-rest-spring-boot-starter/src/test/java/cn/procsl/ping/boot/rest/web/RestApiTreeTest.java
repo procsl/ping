@@ -1,7 +1,7 @@
 package cn.procsl.ping.boot.rest.web;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
 import java.nio.charset.StandardCharsets;

@@ -7,6 +7,7 @@
     <artifactId>ping-business-model</artifactId>
     <groupId>cn.procsl</groupId>
     <packaging>jar</packaging>
+    <name>Ping Business Model</name>
     <version>0.0.3-SNAPSHOT</version>
 
     <properties>

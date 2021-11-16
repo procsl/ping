@@ -9,6 +9,7 @@
     <groupId>cn.procsl</groupId>
     <packaging>jar</packaging>
     <version>0.0.3-SNAPSHOT</version>
+    <name>Ping Processor Repository</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

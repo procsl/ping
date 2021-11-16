@@ -1,9 +1,9 @@
-package cn.procsl.ping.processor.component;
+package cn.procsl.ping.processor;
 
 import java.util.Collection;
 import java.util.Collections;
 
-public interface AnnotationAware<E> {
+public interface AnnotationAware {
 
     /**
      * 添加注解组件
@@ -11,7 +11,7 @@ public interface AnnotationAware<E> {
      * @param annotationComponent 注解生成组件
      * @return 如果添加失败则返回false
      */
-    default boolean addAnnotationComponent(AnnotationComponent<E> annotationComponent) {
+    default boolean addAnnotationComponent(AnnotationComponent annotationComponent) {
         return false;
     }
 
@@ -21,7 +21,7 @@ public interface AnnotationAware<E> {
      *
      * @return 获取注解组件
      */
-    default Collection<E> getAnnotationComponents() {
+    default Collection getAnnotationComponents() {
         return Collections.emptyList();
     }
 }

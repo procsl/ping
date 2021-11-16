@@ -16,6 +16,7 @@
     <groupId>cn.procsl</groupId>
     <version>0.0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
+    <name>Ping Rest SpringBoot Starter</name>
 
     <properties>
         <jackson.version>2.13.0</jackson.version>
@@ -112,152 +113,152 @@
     <!--    </dependencyManagement>-->
 
     <profiles>
-        <profile>
-            <id>native</id>
+        <!--        <profile>-->
+        <!--            <id>native</id>-->
 
-            <dependencies>
+        <!--            <dependencies>-->
 
-                <dependency>
-                    <groupId>org.springframework.experimental</groupId>
-                    <artifactId>spring-native</artifactId>
-                    <version>0.10.5</version>
-                </dependency>
+        <!--                <dependency>-->
+        <!--                    <groupId>org.springframework.experimental</groupId>-->
+        <!--                    <artifactId>spring-native</artifactId>-->
+        <!--                    <version>0.10.5</version>-->
+        <!--                </dependency>-->
 
-                <!-- https://mvnrepository.com/artifact/org.springframework.experimental/spring-native-configuration -->
-                <dependency>
-                    <groupId>org.springframework.experimental</groupId>
-                    <artifactId>spring-native-configuration</artifactId>
-                    <version>0.10.5</version>
-                </dependency>
+        <!--                &lt;!&ndash; https://mvnrepository.com/artifact/org.springframework.experimental/spring-native-configuration &ndash;&gt;-->
+        <!--                <dependency>-->
+        <!--                    <groupId>org.springframework.experimental</groupId>-->
+        <!--                    <artifactId>spring-native-configuration</artifactId>-->
+        <!--                    <version>0.10.5</version>-->
+        <!--                </dependency>-->
 
-            </dependencies>
+        <!--            </dependencies>-->
 
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.springframework.experimental</groupId>
-                        <artifactId>spring-aot-maven-plugin</artifactId>
-                        <version>0.10.5</version>
-                        <executions>
-                            <!--                            <execution>-->
-                            <!--                                <id>test-generate</id>-->
-                            <!--                                <goals>-->
-                            <!--                                    <goal>test-generate</goal>-->
-                            <!--                                </goals>-->
-                            <!--                            </execution>-->
-                            <execution>
-                                <id>generate</id>
-                                <goals>
-                                    <goal>generate</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
+        <!--            <build>-->
+        <!--                <plugins>-->
+        <!--                    <plugin>-->
+        <!--                        <groupId>org.springframework.experimental</groupId>-->
+        <!--                        <artifactId>spring-aot-maven-plugin</artifactId>-->
+        <!--                        <version>0.10.5</version>-->
+        <!--                        <executions>-->
+        <!--                            &lt;!&ndash;                            <execution>&ndash;&gt;-->
+        <!--                            &lt;!&ndash;                                <id>test-generate</id>&ndash;&gt;-->
+        <!--                            &lt;!&ndash;                                <goals>&ndash;&gt;-->
+        <!--                            &lt;!&ndash;                                    <goal>test-generate</goal>&ndash;&gt;-->
+        <!--                            &lt;!&ndash;                                </goals>&ndash;&gt;-->
+        <!--                            &lt;!&ndash;                            </execution>&ndash;&gt;-->
+        <!--                            <execution>-->
+        <!--                                <id>generate</id>-->
+        <!--                                <goals>-->
+        <!--                                    <goal>generate</goal>-->
+        <!--                                </goals>-->
+        <!--                            </execution>-->
+        <!--                        </executions>-->
+        <!--                    </plugin>-->
 
-                    <plugin>
-                        <groupId>org.graalvm.buildtools</groupId>
-                        <artifactId>native-maven-plugin</artifactId>
-                        <version>0.9.4</version>
-                        <executions>
-                            <!--                            <execution>-->
-                            <!--                                <id>test-native</id>-->
-                            <!--                                <goals>-->
-                            <!--                                    <goal>test</goal>-->
-                            <!--                                </goals>-->
-                            <!--                                <phase>test</phase>-->
-                            <!--                            </execution>-->
-                            <execution>
-                                <id>build-native</id>
-                                <goals>
-                                    <goal>build</goal>
-                                </goals>
-                                <phase>package</phase>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <buildArgs combine.children="append">
-                                <buildArg>--verbose</buildArg>
-                            </buildArgs>
-                        </configuration>
-                    </plugin>
+        <!--                    <plugin>-->
+        <!--                        <groupId>org.graalvm.buildtools</groupId>-->
+        <!--                        <artifactId>native-maven-plugin</artifactId>-->
+        <!--                        <version>0.9.4</version>-->
+        <!--                        <executions>-->
+        <!--                            &lt;!&ndash;                            <execution>&ndash;&gt;-->
+        <!--                            &lt;!&ndash;                                <id>test-native</id>&ndash;&gt;-->
+        <!--                            &lt;!&ndash;                                <goals>&ndash;&gt;-->
+        <!--                            &lt;!&ndash;                                    <goal>test</goal>&ndash;&gt;-->
+        <!--                            &lt;!&ndash;                                </goals>&ndash;&gt;-->
+        <!--                            &lt;!&ndash;                                <phase>test</phase>&ndash;&gt;-->
+        <!--                            &lt;!&ndash;                            </execution>&ndash;&gt;-->
+        <!--                            <execution>-->
+        <!--                                <id>build-native</id>-->
+        <!--                                <goals>-->
+        <!--                                    <goal>build</goal>-->
+        <!--                                </goals>-->
+        <!--                                <phase>package</phase>-->
+        <!--                            </execution>-->
+        <!--                        </executions>-->
+        <!--                        <configuration>-->
+        <!--                            <buildArgs combine.children="append">-->
+        <!--                                <buildArg>&#45;&#45;verbose</buildArg>-->
+        <!--                            </buildArgs>-->
+        <!--                        </configuration>-->
+        <!--                    </plugin>-->
 
-                    <plugin>
-                        <groupId>org.springframework.experimental</groupId>
-                        <artifactId>spring-aot-maven-plugin</artifactId>
-                        <version>0.10.5</version>
-                        <executions>
-                            <!--                            <execution>-->
-                            <!--                                <id>test-generate</id>-->
-                            <!--                                <goals>-->
-                            <!--                                    <goal>test-generate</goal>-->
-                            <!--                                </goals>-->
-                            <!--                            </execution>-->
-                            <execution>
-                                <id>generate</id>
-                                <goals>
-                                    <goal>generate</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
+        <!--                    <plugin>-->
+        <!--                        <groupId>org.springframework.experimental</groupId>-->
+        <!--                        <artifactId>spring-aot-maven-plugin</artifactId>-->
+        <!--                        <version>0.10.5</version>-->
+        <!--                        <executions>-->
+        <!--                            &lt;!&ndash;                            <execution>&ndash;&gt;-->
+        <!--                            &lt;!&ndash;                                <id>test-generate</id>&ndash;&gt;-->
+        <!--                            &lt;!&ndash;                                <goals>&ndash;&gt;-->
+        <!--                            &lt;!&ndash;                                    <goal>test-generate</goal>&ndash;&gt;-->
+        <!--                            &lt;!&ndash;                                </goals>&ndash;&gt;-->
+        <!--                            &lt;!&ndash;                            </execution>&ndash;&gt;-->
+        <!--                            <execution>-->
+        <!--                                <id>generate</id>-->
+        <!--                                <goals>-->
+        <!--                                    <goal>generate</goal>-->
+        <!--                                </goals>-->
+        <!--                            </execution>-->
+        <!--                        </executions>-->
+        <!--                    </plugin>-->
 
-                    <!-- Avoid a clash between Spring Boot repackaging and native-maven-plugin -->
-                    <plugin>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-maven-plugin</artifactId>
-                        <!--                        <configuration>-->
-                        <!--                            <classifier>exec</classifier>-->
-                        <!--                        </configuration>-->
-                    </plugin>
+        <!--                    &lt;!&ndash; Avoid a clash between Spring Boot repackaging and native-maven-plugin &ndash;&gt;-->
+        <!--                    <plugin>-->
+        <!--                        <groupId>org.springframework.boot</groupId>-->
+        <!--                        <artifactId>spring-boot-maven-plugin</artifactId>-->
+        <!--                        &lt;!&ndash;                        <configuration>&ndash;&gt;-->
+        <!--                        &lt;!&ndash;                            <classifier>exec</classifier>&ndash;&gt;-->
+        <!--                        &lt;!&ndash;                        </configuration>&ndash;&gt;-->
+        <!--                    </plugin>-->
 
-                </plugins>
-            </build>
+        <!--                </plugins>-->
+        <!--            </build>-->
 
-            <repositories>
-                <repository>
-                    <id>spring-milestones</id>
-                    <name>Spring Milestones</name>
-                    <url>https://repo.spring.io/milestone</url>
-                </repository>
-                <repository>
-                    <id>spring-snapshots</id>
-                    <name>Spring Snapshots</name>
-                    <url>https://repo.spring.io/snapshot</url>
-                    <!--            <snapshots>-->
-                    <!--                <enabled>true</enabled>-->
-                    <!--            </snapshots>-->
-                </repository>
+        <!--            <repositories>-->
+        <!--                <repository>-->
+        <!--                    <id>spring-milestones</id>-->
+        <!--                    <name>Spring Milestones</name>-->
+        <!--                    <url>https://repo.spring.io/milestone</url>-->
+        <!--                </repository>-->
+        <!--                <repository>-->
+        <!--                    <id>spring-snapshots</id>-->
+        <!--                    <name>Spring Snapshots</name>-->
+        <!--                    <url>https://repo.spring.io/snapshot</url>-->
+        <!--                    &lt;!&ndash;            <snapshots>&ndash;&gt;-->
+        <!--                    &lt;!&ndash;                <enabled>true</enabled>&ndash;&gt;-->
+        <!--                    &lt;!&ndash;            </snapshots>&ndash;&gt;-->
+        <!--                </repository>-->
 
-                <repository>
-                    <id>spring-release</id>
-                    <name>Spring release</name>
-                    <url>https://repo.spring.io/release</url>
-                </repository>
+        <!--                <repository>-->
+        <!--                    <id>spring-release</id>-->
+        <!--                    <name>Spring release</name>-->
+        <!--                    <url>https://repo.spring.io/release</url>-->
+        <!--                </repository>-->
 
-            </repositories>
-            <pluginRepositories>
-                <pluginRepository>
-                    <id>spring-milestones</id>
-                    <name>Spring Milestones</name>
-                    <url>https://repo.spring.io/milestone</url>
-                </pluginRepository>
-                <pluginRepository>
-                    <id>spring-snapshots</id>
-                    <name>Spring Snapshots</name>
-                    <url>https://repo.spring.io/snapshot</url>
-                    <!--            <snapshots>-->
-                    <!--                <enabled>true</enabled>-->
-                    <!--            </snapshots>-->
-                </pluginRepository>
+        <!--            </repositories>-->
+        <!--            <pluginRepositories>-->
+        <!--                <pluginRepository>-->
+        <!--                    <id>spring-milestones</id>-->
+        <!--                    <name>Spring Milestones</name>-->
+        <!--                    <url>https://repo.spring.io/milestone</url>-->
+        <!--                </pluginRepository>-->
+        <!--                <pluginRepository>-->
+        <!--                    <id>spring-snapshots</id>-->
+        <!--                    <name>Spring Snapshots</name>-->
+        <!--                    <url>https://repo.spring.io/snapshot</url>-->
+        <!--                    &lt;!&ndash;            <snapshots>&ndash;&gt;-->
+        <!--                    &lt;!&ndash;                <enabled>true</enabled>&ndash;&gt;-->
+        <!--                    &lt;!&ndash;            </snapshots>&ndash;&gt;-->
+        <!--                </pluginRepository>-->
 
-                <pluginRepository>
-                    <id>spring-release</id>
-                    <name>Spring release</name>
-                    <url>https://repo.spring.io/release</url>
-                </pluginRepository>
-            </pluginRepositories>
+        <!--                <pluginRepository>-->
+        <!--                    <id>spring-release</id>-->
+        <!--                    <name>Spring release</name>-->
+        <!--                    <url>https://repo.spring.io/release</url>-->
+        <!--                </pluginRepository>-->
+        <!--            </pluginRepositories>-->
 
-        </profile>
+        <!--        </profile>-->
 
     </profiles>
 
