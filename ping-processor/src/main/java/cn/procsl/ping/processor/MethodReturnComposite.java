@@ -7,5 +7,5 @@ import javax.lang.model.element.ExecutableElement;
 /**
  * 方法返回值组件
  */
-public interface MethodReturnComposite extends Component<TypeName, ExecutableElement>, AnnotationAware {
+public interface MethodReturnComposite extends Component<TypeName, ExecutableElement>, AnnotationComponentAware {
 }
