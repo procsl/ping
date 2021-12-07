@@ -5,7 +5,6 @@ import cn.procsl.ping.boot.user.rbac.RbacException;
 import cn.procsl.ping.boot.user.rbac.Role;
 import cn.procsl.ping.boot.user.rbac.VerifyPermissionService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
