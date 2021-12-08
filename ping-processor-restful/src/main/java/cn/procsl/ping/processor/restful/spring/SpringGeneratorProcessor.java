@@ -1,7 +1,7 @@
 package cn.procsl.ping.processor.restful.spring;
 
-import cn.procsl.ping.processor.AbstractConfigurableProcessor;
 import cn.procsl.ping.processor.AnnotationVisitor;
+import cn.procsl.ping.processor.GeneratorProcessor;
 import cn.procsl.ping.processor.ProcessorContext;
 import cn.procsl.ping.processor.SimpleProcessorContext;
 import cn.procsl.ping.processor.restful.AnnotationVisitorLoader;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 
 @AutoService(Processor.class)
-public class SpringGeneratorProcessor extends AbstractConfigurableProcessor {
+public class SpringGeneratorProcessor extends GeneratorProcessor {
 
     AnnotationVisitor controller;
 

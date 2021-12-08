@@ -16,7 +16,7 @@ import java.util.Set;
 import static java.util.Collections.emptyMap;
 import static javax.tools.Diagnostic.Kind.WARNING;
 
-public abstract class AbstractConfigurableProcessor extends AbstractProcessor {
+public class GeneratorProcessor extends AbstractProcessor {
 
     @Getter
     protected Messager messager;
@@ -51,7 +51,9 @@ public abstract class AbstractConfigurableProcessor extends AbstractProcessor {
         return true;
     }
 
-    protected abstract void processor(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) throws IOException;
+    protected void processor(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) throws IOException {
+
+    }
 
     @Override
     public final synchronized void init(ProcessingEnvironment processingEnv) {
