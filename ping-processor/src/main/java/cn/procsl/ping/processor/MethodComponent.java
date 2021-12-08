@@ -4,7 +4,7 @@ import com.squareup.javapoet.MethodSpec;
 
 import javax.lang.model.element.ExecutableElement;
 
-public interface MethodComponent extends Component<MethodSpec, ExecutableElement>, AnnotationAware {
+public interface MethodComponent extends Component<MethodSpec, ExecutableElement>, AnnotationComponentAware {
 
     /**
      * 设置方法参数组件

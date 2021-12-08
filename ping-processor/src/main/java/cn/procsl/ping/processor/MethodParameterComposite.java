@@ -9,6 +9,6 @@ import java.util.List;
 /**
  * 方法参数组件
  */
-public interface MethodParameterComposite extends Component<List<ParameterSpec>, ExecutableElement>, AnnotationAware {
+public interface MethodParameterComposite extends Component<List<ParameterSpec>, ExecutableElement>, AnnotationComponentAware {
 
 }

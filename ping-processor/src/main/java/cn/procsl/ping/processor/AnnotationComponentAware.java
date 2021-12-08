@@ -3,7 +3,7 @@ package cn.procsl.ping.processor;
 import java.util.Collection;
 import java.util.Collections;
 
-public interface AnnotationAware {
+public interface AnnotationComponentAware {
 
     /**
      * 添加注解组件
