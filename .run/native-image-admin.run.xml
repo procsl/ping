@@ -6,7 +6,7 @@
                     <option name="alwaysUpdateSnapshots" value="false"/>
                     <option name="checksumPolicy" value="NOT_SET"/>
                     <option name="failureBehavior" value="NOT_SET"/>
-                    <option name="localRepository" value="D:\r"/>
+                    <option name="localRepository" value="$PROJECT_DIR$/../../r"/>
                     <option name="mavenHome" value="$PROJECT_DIR$/../../Program Files/Apache/maven/apache-maven-3.8.1"/>
                     <option name="nonRecursive" value="false"/>
                     <option name="outputLevel" value="INFO"/>
@@ -14,6 +14,7 @@
                     <option name="printErrorStackTraces" value="true"/>
                     <option name="showDialogWithAdvancedSettings" value="false"/>
                     <option name="threads"/>
+                    <option name="useMavenConfig" value="false"/>
                     <option name="usePluginRegistry" value="false"/>
                     <option name="userSettingsFile" value=""/>
                     <option name="workOffline" value="false"/>
@@ -57,8 +58,8 @@
                     <option name="pomFileName"/>
                     <option name="profilesMap">
                         <map>
-                            <entry key="h2" value="true"/>
                             <entry key="native" value="true"/>
+                            <entry key="h2" value="true"/>
                         </map>
                     </option>
                     <option name="resolveToWorkspace" value="false"/>

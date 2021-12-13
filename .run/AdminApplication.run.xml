@@ -18,12 +18,6 @@
                     run_configuration_type="ShConfigurationType"/>
             <option name="RunConfigurationTask" enabled="true" run_configuration_name="processor-install"
                     run_configuration_type="MavenRunConfiguration"/>
-            <option name="RunConfigurationTask" enabled="true" run_configuration_name="repo-install"
-                    run_configuration_type="MavenRunConfiguration"/>
-            <option name="RunConfigurationTask" enabled="true" run_configuration_name="api-install"
-                    run_configuration_type="MavenRunConfiguration"/>
-            <option name="RunConfigurationTask" enabled="true" run_configuration_name="doc-install"
-                    run_configuration_type="MavenRunConfiguration"/>
             <option name="RunConfigurationTask" enabled="true" run_configuration_name="user-install"
                     run_configuration_type="MavenRunConfiguration"/>
             <option name="Make" enabled="true"/>

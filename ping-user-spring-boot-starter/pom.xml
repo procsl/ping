@@ -106,17 +106,10 @@
 
         <dependency>
             <groupId>cn.procsl</groupId>
-            <artifactId>ping-processor-restful</artifactId>
+            <artifactId>ping-processor</artifactId>
             <version>0.0.3-SNAPSHOT</version>
             <scope>provided</scope>
             <!--防止被打包进去-->
-        </dependency>
-
-        <dependency>
-            <groupId>cn.procsl</groupId>
-            <artifactId>ping-processor-doc</artifactId>
-            <version>0.0.3-SNAPSHOT</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
