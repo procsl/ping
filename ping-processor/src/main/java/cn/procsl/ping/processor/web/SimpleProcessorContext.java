@@ -1,4 +1,4 @@
-package cn.procsl.ping.processor;
+package cn.procsl.ping.processor.web;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

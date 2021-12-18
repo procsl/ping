@@ -1,11 +1,10 @@
 package cn.procsl.ping.processor.web.spring;
 
-import cn.procsl.ping.processor.AnnotationVisitor;
-import cn.procsl.ping.processor.GeneratorProcessor;
-import cn.procsl.ping.processor.ProcessorContext;
-import cn.procsl.ping.processor.SimpleProcessorContext;
+import cn.procsl.ping.processor.utils.NamingUtils;
+import cn.procsl.ping.processor.web.AnnotationVisitor;
 import cn.procsl.ping.processor.web.AnnotationVisitorLoader;
-import cn.procsl.ping.processor.web.utils.NamingUtils;
+import cn.procsl.ping.processor.web.ProcessorContext;
+import cn.procsl.ping.processor.web.SimpleProcessorContext;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
 import lombok.Getter;

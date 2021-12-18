@@ -1,6 +1,6 @@
-package cn.procsl.ping.processor.repository.builder;
+package cn.procsl.ping.processor.repo.builder;
 
-import cn.procsl.ping.processor.repository.EntityRepositoryBuilder;
+import cn.procsl.ping.processor.repo.EntityRepositoryBuilder;
 
 import java.util.Collection;
 import java.util.Collections;

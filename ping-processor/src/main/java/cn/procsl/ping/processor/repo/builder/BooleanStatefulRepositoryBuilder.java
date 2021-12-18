@@ -1,6 +1,6 @@
-package cn.procsl.ping.processor.repository.builder;
+package cn.procsl.ping.processor.repo.builder;
 
-import cn.procsl.ping.processor.repository.EntityAndIdRepositoryBuilder;
+import cn.procsl.ping.processor.repo.EntityAndIdRepositoryBuilder;
 
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.TypeElement;

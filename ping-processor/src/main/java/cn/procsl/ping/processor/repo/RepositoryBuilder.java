@@ -1,4 +1,4 @@
-package cn.procsl.ping.processor.repository;
+package cn.procsl.ping.processor.repo;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;

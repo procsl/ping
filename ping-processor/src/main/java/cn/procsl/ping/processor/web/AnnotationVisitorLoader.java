@@ -1,7 +1,5 @@
 package cn.procsl.ping.processor.web;
 
-import cn.procsl.ping.processor.AnnotationVisitor;
-import cn.procsl.ping.processor.ProcessorContext;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;

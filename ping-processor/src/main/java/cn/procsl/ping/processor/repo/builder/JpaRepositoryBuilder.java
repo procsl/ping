@@ -1,7 +1,7 @@
-package cn.procsl.ping.processor.repository.builder;
+package cn.procsl.ping.processor.repo.builder;
 
-import cn.procsl.ping.processor.repository.EntityAndIdRepositoryBuilder;
-import cn.procsl.ping.processor.repository.RepositoryBuilder;
+import cn.procsl.ping.processor.repo.EntityAndIdRepositoryBuilder;
+import cn.procsl.ping.processor.repo.RepositoryBuilder;
 import com.google.auto.service.AutoService;
 
 

@@ -1,8 +1,8 @@
 package cn.procsl.ping.processor.web.spring;
 
-import cn.procsl.ping.processor.AnnotationVisitor;
-import cn.procsl.ping.processor.web.utils.ClassUtils;
-import cn.procsl.ping.processor.web.utils.NamingUtils;
+import cn.procsl.ping.processor.utils.ClassUtils;
+import cn.procsl.ping.processor.utils.NamingUtils;
+import cn.procsl.ping.processor.web.AnnotationVisitor;
 import com.squareup.javapoet.*;
 import lombok.NonNull;
 

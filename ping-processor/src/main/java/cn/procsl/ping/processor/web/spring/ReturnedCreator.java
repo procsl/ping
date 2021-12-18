@@ -1,9 +1,9 @@
 package cn.procsl.ping.processor.web.spring;
 
-import cn.procsl.ping.processor.AnnotationVisitor;
-import cn.procsl.ping.processor.ProcessorContext;
+import cn.procsl.ping.processor.utils.CodeUtils;
+import cn.procsl.ping.processor.web.AnnotationVisitor;
 import cn.procsl.ping.processor.web.AnnotationVisitorLoader;
-import cn.procsl.ping.processor.web.utils.CodeUtils;
+import cn.procsl.ping.processor.web.ProcessorContext;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.ParameterizedTypeName;
@@ -18,8 +18,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import static cn.procsl.ping.processor.web.utils.ClassUtils.isPersistenceEntity;
-import static cn.procsl.ping.processor.web.utils.ClassUtils.toBuildReturnType;
+import static cn.procsl.ping.processor.utils.ClassUtils.isPersistenceEntity;
+import static cn.procsl.ping.processor.utils.ClassUtils.toBuildReturnType;
 
 class ReturnedCreator {
 

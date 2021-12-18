@@ -1,4 +1,4 @@
-package cn.procsl.ping.processor.repository.annotation;
+package cn.procsl.ping.processor.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

@@ -1,4 +1,4 @@
-package cn.procsl.ping.processor.web.utils;
+package cn.procsl.ping.processor.utils;
 
 
 import com.squareup.javapoet.TypeName;

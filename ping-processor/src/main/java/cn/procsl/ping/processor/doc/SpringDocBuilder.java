@@ -1,8 +1,8 @@
 package cn.procsl.ping.processor.doc;
 
-import cn.procsl.ping.processor.AbstractAnnotationVisitor;
-import cn.procsl.ping.processor.AnnotationVisitor;
-import cn.procsl.ping.processor.web.utils.NamingUtils;
+import cn.procsl.ping.processor.utils.NamingUtils;
+import cn.procsl.ping.processor.web.AbstractAnnotationVisitor;
+import cn.procsl.ping.processor.web.AnnotationVisitor;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
 import io.swagger.v3.oas.annotations.Operation;

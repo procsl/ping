@@ -1,6 +1,6 @@
-package cn.procsl.ping.processor.repository;
+package cn.procsl.ping.processor.repo;
 
-import cn.procsl.ping.processor.repository.annotation.RepositoryCreator;
+import cn.procsl.ping.processor.annotation.RepositoryCreator;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
 

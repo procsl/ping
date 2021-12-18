@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.user.rbac;
 
-import cn.procsl.ping.processor.repository.annotation.RepositoryCreator;
+import cn.procsl.ping.processor.annotation.RepositoryCreator;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.AbstractPersistable;
