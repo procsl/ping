@@ -42,7 +42,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
-            <version>5.3.13</version>
+            <version>5.3.14</version>
             <scope>provided</scope>
         </dependency>
 
@@ -56,7 +56,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>5.3.13</version>
+            <version>5.3.14</version>
             <scope>provided</scope>
         </dependency>
 
@@ -98,14 +98,14 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-webmvc-core</artifactId>
-            <version>1.5.12</version>
+            <version>1.6.3</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-common -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-common</artifactId>
-            <version>1.5.12</version>
+            <version>1.6.3</version>
         </dependency>
 
         <dependency>
