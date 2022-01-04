@@ -9,6 +9,7 @@ import javax.lang.model.element.TypeElement;
 import javax.tools.StandardLocation;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -16,6 +17,7 @@ import java.util.Set;
 import static java.util.Collections.emptyMap;
 import static javax.tools.Diagnostic.Kind.WARNING;
 
+// 明天移除配置获取相关的代码， 移动到Env中
 public abstract class AbstractConfigureProcessor extends AbstractProcessor {
 
     @Getter
@@ -27,6 +29,9 @@ public abstract class AbstractConfigureProcessor extends AbstractProcessor {
     protected String processor = "META-INF/processor.config";
 
     protected Map<Object, Object> config;
+
+    // 应该要加载构建器相关的代码
+    protected TypeSpecBuilder builder;
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
@@ -43,7 +48,12 @@ public abstract class AbstractConfigureProcessor extends AbstractProcessor {
         }
 
         try {
-            this.processor(annotations, roundEnv);
+            Collection<TypeElement> collection = this.processor(annotations, roundEnv);
+            for (TypeElement element : collection) {
+                // TODO
+                ProcessorEnvironment env = null;
+                this.builder.build(element, env);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -51,7 +61,7 @@ public abstract class AbstractConfigureProcessor extends AbstractProcessor {
         return true;
     }
 
-    abstract protected void processor(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) throws IOException;
+    abstract protected Collection<TypeElement> processor(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) throws IOException;
 
     @Override
     public final synchronized void init(ProcessingEnvironment processingEnv) {
