@@ -1,9 +1,9 @@
 package cn.procsl.ping.processor;
 
-import com.squareup.javapoet.TypeSpec;
 import lombok.NonNull;
 
 import javax.lang.model.element.TypeElement;
+import java.io.IOException;
 
 
 /**
@@ -11,6 +11,5 @@ import javax.lang.model.element.TypeElement;
  */
 public interface TypeSpecBuilder {
 
-    TypeSpec build(@NonNull TypeElement element, @NonNull ProcessorEnvironment env);
-
+    void create(@NonNull TypeElement element, @NonNull ProcessorEnvironment env) throws IOException;
 }

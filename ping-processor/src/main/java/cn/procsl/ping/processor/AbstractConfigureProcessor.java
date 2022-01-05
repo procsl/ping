@@ -1,6 +1,7 @@
 package cn.procsl.ping.processor;
 
 import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
@@ -8,11 +9,12 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
 
-// 明天移除配置获取相关的代码， 移动到Env中
 public abstract class AbstractConfigureProcessor extends AbstractProcessor {
 
-    // 应该要加载构建器相关的代码
-    protected TypeSpecBuilder builder;
+    @Override
+    public synchronized void init(ProcessingEnvironment processingEnv) {
+        super.init(processingEnv);
+    }
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
@@ -32,11 +34,9 @@ public abstract class AbstractConfigureProcessor extends AbstractProcessor {
         }
 
         try {
-            Collection<TypeElement> collection = this.processor(annotations, processorEnvironment);
+            Collection<TypeElement> collection = this.findTargetElements(annotations, processorEnvironment);
             for (TypeElement element : collection) {
-                // TODO
-                ProcessorEnvironment env = null;
-                this.builder.build(element, env);
+                this.getBuilder().create(element, processorEnvironment);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -45,11 +45,15 @@ public abstract class AbstractConfigureProcessor extends AbstractProcessor {
         return true;
     }
 
-    abstract protected Collection<TypeElement> processor(Set<? extends TypeElement> annotations, ProcessorEnvironment env) throws IOException;
+    abstract protected Collection<TypeElement> findTargetElements(Set<? extends TypeElement> annotations, ProcessorEnvironment env);
 
     @Override
     public SourceVersion getSupportedSourceVersion() {
         return SourceVersion.latestSupported();
     }
+
+
+    // 应该要加载构建器相关的代码
+    abstract protected TypeSpecBuilder getBuilder();
 
 }

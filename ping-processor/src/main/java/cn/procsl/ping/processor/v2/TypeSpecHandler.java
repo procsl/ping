@@ -1,5 +1,6 @@
-package cn.procsl.ping.processor;
+package cn.procsl.ping.processor.v2;
 
+import cn.procsl.ping.processor.ProcessorEnvironment;
 import com.squareup.javapoet.TypeSpec;
 
 /**
@@ -13,7 +14,7 @@ public interface TypeSpecHandler {
      * @param builder     处理器节点元素
      * @param environment 环境上下文及工具
      */
-    void handler(TypeSpec.Builder builder, ProcessorEnvironment environment);
+    void handle(TypeSpec.Builder builder, ProcessorEnvironment environment);
 
     /**
      * 不同处理器的顺序
