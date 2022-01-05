@@ -13,5 +13,4 @@ public interface TypeSpecBuilder {
 
     TypeSpec build(@NonNull TypeElement element, @NonNull ProcessorEnvironment env);
 
-//    String getPackageName();
 }
