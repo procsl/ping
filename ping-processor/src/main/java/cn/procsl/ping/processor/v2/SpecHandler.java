@@ -8,7 +8,7 @@ import javax.lang.model.element.Element;
 /**
  * 处理器， 用来处理不同节点
  */
-public interface TypeSpecHandler {
+public interface SpecHandler<T> {
 
     /**
      * 生成不同代码片段的处理器
@@ -17,7 +17,7 @@ public interface TypeSpecHandler {
      * @param builder     处理器节点元素
      * @param environment 环境上下文及工具
      */
-    void handle(Element element, TypeSpec.Builder builder, ProcessorEnvironment environment);
+    void handle(Element element, T builder, ProcessorEnvironment environment);
 
     /**
      * 不同处理器的顺序

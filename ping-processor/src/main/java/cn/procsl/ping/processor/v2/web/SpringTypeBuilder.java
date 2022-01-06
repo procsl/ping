@@ -2,7 +2,7 @@ package cn.procsl.ping.processor.v2.web;
 
 import cn.procsl.ping.processor.ProcessorEnvironment;
 import cn.procsl.ping.processor.TypeSpecBuilder;
-import cn.procsl.ping.processor.v2.TypeSpecHandler;
+import cn.procsl.ping.processor.v2.SpecHandler;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
 import lombok.NonNull;
@@ -17,7 +17,7 @@ import java.util.List;
 
 class SpringTypeBuilder implements TypeSpecBuilder {
 
-    List<TypeSpecHandler> handlers;
+    List<SpecHandler> handlers;
 
     public SpringTypeBuilder(ProcessingEnvironment processingEnv) {
         this.handlers = Arrays.asList(
@@ -30,7 +30,7 @@ class SpringTypeBuilder implements TypeSpecBuilder {
         String name = createClassName(target);
         TypeSpec.Builder typeSpec = TypeSpec.classBuilder(name).addModifiers(Modifier.PUBLIC);
 
-        for (TypeSpecHandler handler : this.getSortedHandlers()) {
+        for (SpecHandler handler : this.getSortedHandlers()) {
             handler.handle(target, typeSpec, env);
         }
 
@@ -42,7 +42,7 @@ class SpringTypeBuilder implements TypeSpecBuilder {
         javaFile.build().writeTo(env.getFiler());
     }
 
-    public Collection<TypeSpecHandler> getSortedHandlers() {
+    public Collection<SpecHandler> getSortedHandlers() {
         return handlers;
     }
 

@@ -2,7 +2,7 @@ package cn.procsl.ping.processor.v2.web;
 
 import cn.procsl.ping.processor.ProcessorEnvironment;
 import cn.procsl.ping.processor.utils.NamingUtils;
-import cn.procsl.ping.processor.v2.TypeSpecHandler;
+import cn.procsl.ping.processor.v2.SpecHandler;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
@@ -13,13 +13,20 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeMirror;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class SpringControllerHandler implements TypeSpecHandler {
+public class SpringControllerHandler implements SpecHandler<TypeSpec.Builder> {
 
     final String httpServletRequest = "javax.servlet.http.HttpServletRequest";
+    final List<SpecHandler<MethodSpec.Builder>> methodHandlers;
+
+    public SpringControllerHandler() {
+        methodHandlers = Arrays.asList(new GetMethodHandler(), new PostRequestMethodHandler());
+    }
 
     @Override
     public void handle(Element source, TypeSpec.Builder builder, ProcessorEnvironment environment) {
@@ -27,31 +34,34 @@ public class SpringControllerHandler implements TypeSpecHandler {
             return;
         }
 
-        String fieldName = null;
-
         TypeElement fieldRef = environment.getTypeElementByName(httpServletRequest);
         if (fieldRef != null) {
             TypeName type = TypeName.get(fieldRef.asType());
-            fieldName = NamingUtils.lowerCamelCase(fieldRef.getSimpleName().toString());
+            String fieldName = NamingUtils.lowerCamelCase(fieldRef.getSimpleName().toString());
             FieldSpec.Builder request = FieldSpec.builder(type, fieldName, Modifier.PROTECTED);
             builder.addField(request.build());
         }
 
-        List<ExecutableElement> list = source.getEnclosedElements().stream().filter(item -> item instanceof ExecutableElement).filter(this::methodSelector).map(item -> (ExecutableElement) item).collect(Collectors.toList());
-        for (ExecutableElement item : list) {
-            MethodSpec method = this.buildMethod((TypeElement) source, item, fieldRef, fieldName, builder);
+        for (Element item : source.getEnclosedElements()) {
+            MethodSpec method = this.buildMethod(item, environment);
             builder.addMethod(method);
         }
     }
 
-    MethodSpec buildMethod(TypeElement source, ExecutableElement item, TypeElement fieldRef, @Nullable String fieldName, TypeSpec.Builder builder) {
-        return null;
+    MethodSpec buildMethod(Element item, ProcessorEnvironment env) {
+        String methodName = item.getSimpleName().toString();
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(methodName).addModifiers(Modifier.PUBLIC);
+        // 通过不同的类创建不同的方法
+        for (SpecHandler<MethodSpec.Builder> handler : this.methodHandlers) {
+            handler.handle(item, methodBuilder, env);
+        }
+        return methodBuilder.build();
     }
 
-    boolean methodSelector(Element element) {
-        Set<String> set = element.getAnnotationMirrors().stream().map(item -> item.getAnnotationType().asElement().toString()).collect(Collectors.toSet());
-        return set.contains("javax.ws.rs.PATCH") || set.contains("javax.ws.rs.POST") || set.contains("javax.ws.rs.GET") || set.contains("javax.ws.rs.DELETE") || set.contains("javax.ws.rs.PATH") || set.contains("javax.ws.rs.PUT");
-    }
+//    boolean methodSelector(Element element) {
+//        Set<String> set = element.getAnnotationMirrors().stream().map(item -> item.getAnnotationType().asElement().toString()).collect(Collectors.toSet());
+//        return set.contains("javax.ws.rs.PATCH") || set.contains("javax.ws.rs.POST") || set.contains("javax.ws.rs.GET") || set.contains("javax.ws.rs.DELETE") || set.contains("javax.ws.rs.PATH") || set.contains("javax.ws.rs.PUT");
+//    }
 
     @Override
     public int order() {
