@@ -7,12 +7,14 @@ import com.google.auto.service.AutoService;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.ws.rs.Path;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 生成 SpringController 类
@@ -35,11 +37,10 @@ public class SpringControllerProcessor extends AbstractConfigureProcessor {
      * @param annotations 被 @Path 标记的注解
      * @param env         获取环境相关参数
      * @return 返回需要生成的基准类
-     * @throws IOException 如果出现错误
      */
     @Override
     protected Collection<TypeElement> findTargetElements(Set<? extends TypeElement> annotations, ProcessorEnvironment env) {
-        return null;
+        return env.getRoundEnvironment().getElementsAnnotatedWith(Path.class).stream().filter(item -> item instanceof ExecutableElement).map(item -> (ExecutableElement) item).map(Element::getEnclosingElement).filter(item -> item instanceof TypeElement).map(item -> (TypeElement) item).collect(Collectors.toSet());
     }
 
     @Override

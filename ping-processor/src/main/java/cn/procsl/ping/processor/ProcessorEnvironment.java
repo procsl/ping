@@ -1,14 +1,27 @@
 package cn.procsl.ping.processor;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.element.TypeElement;
 
 public interface ProcessorEnvironment {
 
+    /**
+     * 通过类名获取 element
+     *
+     * @param elementName 全限定名
+     * @return 全限定名对应的Element
+     */
+    @Nullable
+    TypeElement getTypeElementByName(String elementName);
 
     ProcessingEnvironment getProcessingEnvironment();
+
+    RoundEnvironment getRoundEnvironment();
 
     /**
      * @return 获取编译时日志组件

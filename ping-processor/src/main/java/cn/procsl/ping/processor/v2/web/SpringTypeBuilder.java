@@ -20,20 +20,23 @@ class SpringTypeBuilder implements TypeSpecBuilder {
     List<TypeSpecHandler> handlers;
 
     public SpringTypeBuilder(ProcessingEnvironment processingEnv) {
-        this.handlers = Arrays.asList();
+        this.handlers = Arrays.asList(
+            new SpringControllerHandler()
+        );
     }
 
     @Override
-    public void create(@NonNull TypeElement element, @NonNull ProcessorEnvironment env) throws IOException {
-        String name = createClassName(element);
+    public void create(@NonNull TypeElement target, @NonNull ProcessorEnvironment env) throws IOException {
+        String name = createClassName(target);
         TypeSpec.Builder typeSpec = TypeSpec.classBuilder(name).addModifiers(Modifier.PUBLIC);
+
         for (TypeSpecHandler handler : this.getSortedHandlers()) {
-            handler.handle(typeSpec, env);
+            handler.handle(target, typeSpec, env);
         }
 
         TypeSpec result = typeSpec.build();
         // TODO to create PackageName
-        String packageName = null;
+        String packageName = env.getConfig("package.name");
         JavaFile.Builder javaFile = JavaFile.builder(packageName, result);
         javaFile.skipJavaLangImports(false);
         javaFile.build().writeTo(env.getFiler());

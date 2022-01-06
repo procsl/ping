@@ -2,7 +2,6 @@ package cn.procsl.ping.processor.web.spring;
 
 import cn.procsl.ping.processor.web.AbstractAnnotationVisitor;
 import cn.procsl.ping.processor.web.AnnotationVisitor;
-import cn.procsl.ping.processor.web.annotation.HttpStatus;
 import cn.procsl.ping.processor.web.model.ParameterVariableElement;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
@@ -78,10 +77,6 @@ public class StringControllerVisitor extends AbstractAnnotationVisitor {
         }
 
         AnnotationSpec.Builder statusAnnotation = AnnotationSpec.builder(responseStatusName);
-        HttpStatus httpStatus = element.getAnnotation(HttpStatus.class);
-        if (httpStatus != null) {
-            statusAnnotation.addMember("code", "$S", String.valueOf(httpStatus.code()));
-        }
 
         if (((ExecutableElement) element).getReturnType().getKind().toString().equals("VOID")) {
             statusAnnotation.addMember("code", "$N", "org.springframework.http.HttpStatus.NO_CONTENT");

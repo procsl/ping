@@ -58,7 +58,7 @@ class RequestMappingAnnotationBuilder {
 
         OPTIONS options = item.getAnnotation(OPTIONS.class);
         if (options != null) {
-            return "org.springframework.web.bind.annotation.RequestMethod.OPTIONS}";
+            return "org.springframework.web.bind.annotation.RequestMethod.OPTIONS";
         }
 
         return "org.springframework.web.bind.annotation.RequestMethod.GET";

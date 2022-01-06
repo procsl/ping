@@ -2,10 +2,12 @@ package cn.procsl.ping.processor;
 
 import lombok.NonNull;
 
+import javax.annotation.Nullable;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.element.TypeElement;
 import javax.tools.StandardLocation;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,6 +42,17 @@ class SimpleEnvironment implements ProcessorEnvironment {
             this.processingEnv.getMessager().printMessage(WARNING, "The profile could not be found: '" + processor + "'. by error:" + e.getMessage());
         }
         this.config = tmp;
+    }
+
+
+    public RoundEnvironment getRoundEnvironment() {
+        return roundEnvironment;
+    }
+
+    @Nullable
+    @Override
+    public TypeElement getTypeElementByName(String elementName) {
+        return this.processingEnv.getElementUtils().getTypeElement(elementName);
     }
 
     @Override
