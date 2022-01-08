@@ -27,7 +27,7 @@ public class SpringControllerProcessor extends AbstractConfigureProcessor {
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
-        this.builder = new SpringTypeBuilder(processingEnv);
+        this.builder = new SpringTypeBuilder();
         super.init(processingEnv);
     }
 

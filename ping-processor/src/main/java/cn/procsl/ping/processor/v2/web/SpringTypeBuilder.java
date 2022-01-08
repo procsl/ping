@@ -7,7 +7,6 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
 import lombok.NonNull;
 
-import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import java.io.IOException;
@@ -17,9 +16,9 @@ import java.util.List;
 
 class SpringTypeBuilder implements TypeSpecBuilder {
 
-    List<SpecHandler> handlers;
+    List<SpecHandler<TypeSpec.Builder>> handlers;
 
-    public SpringTypeBuilder(ProcessingEnvironment processingEnv) {
+    public SpringTypeBuilder() {
         this.handlers = Arrays.asList(
             new SpringControllerHandler()
         );
@@ -30,7 +29,7 @@ class SpringTypeBuilder implements TypeSpecBuilder {
         String name = createClassName(target);
         TypeSpec.Builder typeSpec = TypeSpec.classBuilder(name).addModifiers(Modifier.PUBLIC);
 
-        for (SpecHandler handler : this.getSortedHandlers()) {
+        for (SpecHandler<TypeSpec.Builder> handler : this.getSortedHandlers()) {
             handler.handle(target, typeSpec, env);
         }
 
@@ -42,7 +41,7 @@ class SpringTypeBuilder implements TypeSpecBuilder {
         javaFile.build().writeTo(env.getFiler());
     }
 
-    public Collection<SpecHandler> getSortedHandlers() {
+    public Collection<SpecHandler<TypeSpec.Builder>> getSortedHandlers() {
         return handlers;
     }
 

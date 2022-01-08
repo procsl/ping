@@ -8,6 +8,7 @@ import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeMirror;
 import javax.tools.StandardLocation;
 import java.io.IOException;
 import java.io.InputStream;
@@ -86,6 +87,17 @@ class SimpleEnvironment implements ProcessorEnvironment {
         }
 
         messager.printMessage(WARNING, "This property is not a simple type: " + key);
+        return null;
+    }
+
+    /**
+     * 获取指定的类型的包装器
+     *
+     * @param realTypeName 类型名称
+     * @return 返回包装器名称
+     */
+    @Override
+    public String getWrapperType(TypeMirror realTypeName) {
         return null;
     }
 

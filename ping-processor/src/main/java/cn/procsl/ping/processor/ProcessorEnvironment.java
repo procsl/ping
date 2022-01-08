@@ -7,6 +7,7 @@ import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeMirror;
 
 public interface ProcessorEnvironment {
 
@@ -40,4 +41,11 @@ public interface ProcessorEnvironment {
      */
     String getConfig(@Nonnull String key);
 
+    /**
+     * 获取指定的类型的包装器
+     *
+     * @param realTypeName 类型名称
+     * @return 返回包装器名称
+     */
+    String getWrapperType(TypeMirror realTypeName);
 }
