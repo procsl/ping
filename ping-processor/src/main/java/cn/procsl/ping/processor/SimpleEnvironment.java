@@ -18,7 +18,7 @@ import java.util.Properties;
 import static java.util.Collections.emptyMap;
 import static javax.tools.Diagnostic.Kind.WARNING;
 
-class SimpleEnvironment implements ProcessorEnvironment {
+public class SimpleEnvironment implements ProcessorEnvironment {
 
     protected final ProcessingEnvironment processingEnv;
     protected final RoundEnvironment roundEnvironment;

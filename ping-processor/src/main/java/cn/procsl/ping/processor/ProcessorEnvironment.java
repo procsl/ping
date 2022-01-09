@@ -6,8 +6,12 @@ import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
+import java.lang.annotation.Annotation;
 
 public interface ProcessorEnvironment {
 
@@ -48,4 +52,13 @@ public interface ProcessorEnvironment {
      * @return 返回包装器名称
      */
     String getWrapperType(TypeMirror realTypeName);
+
+    boolean isPublic(ExecutableElement element);
+
+    boolean isStatic(ExecutableElement element);
+
+    AnnotationMirror findAnnotationMirror(Element element, String name);
+
+    AnnotationMirror findAnnotationMirror(Element element, Class<? extends Annotation> name);
+
 }
