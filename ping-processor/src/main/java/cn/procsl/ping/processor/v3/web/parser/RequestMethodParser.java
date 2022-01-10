@@ -1,13 +1,13 @@
 package cn.procsl.ping.processor.v3.web.parser;
 
-import cn.procsl.ping.processor.ProcessorEnvironment;
-import cn.procsl.ping.processor.v3.web.descriptor.RequestMethodDescriptor;
+import cn.procsl.ping.processor.v3.ProcessorEnvironment;
+import cn.procsl.ping.processor.v3.MethodDescriptor;
 
 import javax.lang.model.element.ExecutableElement;
 
 public class RequestMethodParser {
 
-    public RequestMethodDescriptor parser(ExecutableElement element, ProcessorEnvironment environment) {
+    public MethodDescriptor parser(ExecutableElement element, ProcessorEnvironment environment) {
 
 
         if (!environment.isPublic(element)) {

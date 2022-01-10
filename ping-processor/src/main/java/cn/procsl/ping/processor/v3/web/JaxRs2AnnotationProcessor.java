@@ -1,8 +1,8 @@
 package cn.procsl.ping.processor.v3.web;
 
-import cn.procsl.ping.processor.ProcessorEnvironment;
-import cn.procsl.ping.processor.SimpleEnvironment;
-import cn.procsl.ping.processor.v3.web.descriptor.RequestMethodDescriptor;
+import cn.procsl.ping.processor.v3.MethodDescriptor;
+import cn.procsl.ping.processor.v3.ProcessorEnvironment;
+import cn.procsl.ping.processor.v3.SimpleEnvironment;
 import cn.procsl.ping.processor.v3.web.generator.ParameterGenerator;
 import cn.procsl.ping.processor.v3.web.generator.ReturnGenerator;
 import cn.procsl.ping.processor.v3.web.generator.SpringControllerGenerator;
@@ -35,7 +35,7 @@ public class JaxRs2AnnotationProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         SimpleEnvironment env = new SimpleEnvironment(this.processingEnv, roundEnv);
 
-        List<RequestMethodDescriptor> list = annotations
+        List<MethodDescriptor> list = annotations
             .stream()
             .map(item -> item.accept(visitor, env))
             .filter(Objects::nonNull)
@@ -57,42 +57,42 @@ public class JaxRs2AnnotationProcessor extends AbstractProcessor {
         return Collections.singleton(Path.class.getName());
     }
 
-    private static class ServiceElementVisitor implements ElementVisitor<RequestMethodDescriptor, ProcessorEnvironment> {
+    private static class ServiceElementVisitor implements ElementVisitor<MethodDescriptor, ProcessorEnvironment> {
 
         final RequestMethodParser parser = new RequestMethodParser();
 
         @Override
-        public RequestMethodDescriptor visit(Element e, ProcessorEnvironment environment) {
+        public MethodDescriptor visit(Element e, ProcessorEnvironment environment) {
             return null;
         }
 
         @Override
-        public RequestMethodDescriptor visitPackage(PackageElement e, ProcessorEnvironment environment) {
+        public MethodDescriptor visitPackage(PackageElement e, ProcessorEnvironment environment) {
             return null;
         }
 
         @Override
-        public RequestMethodDescriptor visitType(TypeElement e, ProcessorEnvironment environment) {
+        public MethodDescriptor visitType(TypeElement e, ProcessorEnvironment environment) {
             return null;
         }
 
         @Override
-        public RequestMethodDescriptor visitVariable(VariableElement e, ProcessorEnvironment environment) {
+        public MethodDescriptor visitVariable(VariableElement e, ProcessorEnvironment environment) {
             return null;
         }
 
         @Override
-        public RequestMethodDescriptor visitExecutable(ExecutableElement e, ProcessorEnvironment environment) {
+        public MethodDescriptor visitExecutable(ExecutableElement e, ProcessorEnvironment environment) {
             return parser.parser(e, environment);
         }
 
         @Override
-        public RequestMethodDescriptor visitTypeParameter(TypeParameterElement e, ProcessorEnvironment environment) {
+        public MethodDescriptor visitTypeParameter(TypeParameterElement e, ProcessorEnvironment environment) {
             return null;
         }
 
         @Override
-        public RequestMethodDescriptor visitUnknown(Element e, ProcessorEnvironment environment) {
+        public MethodDescriptor visitUnknown(Element e, ProcessorEnvironment environment) {
             return null;
         }
     }

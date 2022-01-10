@@ -1,4 +1,4 @@
-package cn.procsl.ping.processor;
+package cn.procsl.ping.processor.v3;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

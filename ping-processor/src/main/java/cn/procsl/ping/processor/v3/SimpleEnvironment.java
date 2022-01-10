@@ -1,4 +1,4 @@
-package cn.procsl.ping.processor;
+package cn.procsl.ping.processor.v3;
 
 import lombok.NonNull;
 
@@ -7,11 +7,15 @@ import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.StandardLocation;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.Properties;
 
@@ -98,6 +102,26 @@ public class SimpleEnvironment implements ProcessorEnvironment {
      */
     @Override
     public String getWrapperType(TypeMirror realTypeName) {
+        return null;
+    }
+
+    @Override
+    public boolean isPublic(ExecutableElement element) {
+        return false;
+    }
+
+    @Override
+    public boolean isStatic(ExecutableElement element) {
+        return false;
+    }
+
+    @Override
+    public AnnotationMirror findAnnotationMirror(Element element, String name) {
+        return null;
+    }
+
+    @Override
+    public AnnotationMirror findAnnotationMirror(Element element, Class<? extends Annotation> name) {
         return null;
     }
 

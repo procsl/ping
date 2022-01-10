@@ -1,13 +1,13 @@
 package cn.procsl.ping.processor.v3.web.parser;
 
-import cn.procsl.ping.processor.v3.web.descriptor.RequestMethodDescriptor;
-import cn.procsl.ping.processor.v3.web.descriptor.RequestParameterDescriptor;
+import cn.procsl.ping.processor.v3.MethodDescriptor;
+import cn.procsl.ping.processor.v3.MethodParameterDescriptor;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import java.util.List;
 
-class ParameterDescriptorImpl implements RequestParameterDescriptor {
+class ParameterDescriptorImpl implements MethodParameterDescriptor {
 
     final MethodDescriptorImpl requestMethodDescriptor;
 
@@ -16,7 +16,7 @@ class ParameterDescriptorImpl implements RequestParameterDescriptor {
     }
 
     @Override
-    public RequestMethodDescriptor getMethodDescriptor() {
+    public MethodDescriptor getMethodDescriptor() {
         return requestMethodDescriptor;
     }
 

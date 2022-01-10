@@ -1,8 +1,8 @@
 package cn.procsl.ping.processor.v3.web.parser;
 
-import cn.procsl.ping.processor.v3.web.descriptor.RequestReturnDescriptor;
+import cn.procsl.ping.processor.v3.MethodReturnValueDescriptor;
 
-class ReturnDescriptorImpl implements RequestReturnDescriptor {
+class ReturnDescriptorImpl implements MethodReturnValueDescriptor {
 
     public ReturnDescriptorImpl(MethodDescriptorImpl methodDescriptor) {
 

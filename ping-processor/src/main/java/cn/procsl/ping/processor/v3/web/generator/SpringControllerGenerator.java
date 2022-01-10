@@ -1,8 +1,8 @@
 package cn.procsl.ping.processor.v3.web.generator;
 
-import cn.procsl.ping.processor.ProcessorEnvironment;
+import cn.procsl.ping.processor.v3.ProcessorEnvironment;
 import cn.procsl.ping.processor.v3.web.JavaSourceGenerator;
-import cn.procsl.ping.processor.v3.web.descriptor.RequestMethodDescriptor;
+import cn.procsl.ping.processor.v3.MethodDescriptor;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -10,7 +10,7 @@ import java.util.Collection;
 public class SpringControllerGenerator implements JavaSourceGenerator {
 
     @Override
-    public void generated(Collection<RequestMethodDescriptor> descriptors, ProcessorEnvironment environment) throws IOException {
+    public void generated(Collection<MethodDescriptor> descriptors, ProcessorEnvironment environment) throws IOException {
 
     }
 

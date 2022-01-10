@@ -1,9 +1,9 @@
 package cn.procsl.ping.processor.v3.web.parser;
 
-import cn.procsl.ping.processor.ProcessorEnvironment;
-import cn.procsl.ping.processor.v3.web.descriptor.RequestMethodDescriptor;
-import cn.procsl.ping.processor.v3.web.descriptor.RequestParameterDescriptor;
-import cn.procsl.ping.processor.v3.web.descriptor.RequestReturnDescriptor;
+import cn.procsl.ping.processor.v3.ProcessorEnvironment;
+import cn.procsl.ping.processor.v3.MethodDescriptor;
+import cn.procsl.ping.processor.v3.MethodParameterDescriptor;
+import cn.procsl.ping.processor.v3.MethodReturnValueDescriptor;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
@@ -14,12 +14,12 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.stream.Collectors;
 
-class MethodDescriptorImpl implements RequestMethodDescriptor {
+class MethodDescriptorImpl implements MethodDescriptor {
 
     private final ExecutableElement element;
     private final AnnotationMirror httpMethod;
     private final ParameterDescriptorImpl requestParameter;
-    private final RequestReturnDescriptor requestReturnDescriptor;
+    private final MethodReturnValueDescriptor requestReturnDescriptor;
 
     MethodDescriptorImpl(ExecutableElement element, ProcessorEnvironment environment) {
         this.element = element;
@@ -80,12 +80,12 @@ class MethodDescriptorImpl implements RequestMethodDescriptor {
     }
 
     @Override
-    public RequestParameterDescriptor getRequestParameterDescriptor() {
+    public MethodParameterDescriptor getRequestParameterDescriptor() {
         return this.requestParameter;
     }
 
     @Override
-    public RequestReturnDescriptor getRequestReturnDescriptor() {
+    public MethodReturnValueDescriptor getRequestReturnDescriptor() {
         return this.requestReturnDescriptor;
     }
 
