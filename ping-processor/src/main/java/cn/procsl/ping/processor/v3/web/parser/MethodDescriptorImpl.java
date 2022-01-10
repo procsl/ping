@@ -48,12 +48,7 @@ class MethodDescriptorImpl implements RequestMethodDescriptor {
             httpMethod = put;
             return;
         }
-        AnnotationMirror patch = environment.findAnnotationMirror(element, PATCH.class);
-        if (patch != null) {
-            httpMethod = patch;
-        } else {
-            httpMethod = null;
-        }
+        httpMethod = environment.findAnnotationMirror(element, PATCH.class);
     }
 
     @Override

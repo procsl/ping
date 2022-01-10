@@ -8,5 +8,4 @@ public interface ControllerDescriptor {
 
     List<RequestMethodDescriptor> getMethods();
 
-
 }
