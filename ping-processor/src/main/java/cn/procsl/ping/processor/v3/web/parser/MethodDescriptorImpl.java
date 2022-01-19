@@ -1,9 +1,8 @@
 package cn.procsl.ping.processor.v3.web.parser;
 
-import cn.procsl.ping.processor.v3.ProcessorEnvironment;
 import cn.procsl.ping.processor.v3.MethodDescriptor;
-import cn.procsl.ping.processor.v3.MethodParameterDescriptor;
 import cn.procsl.ping.processor.v3.MethodReturnValueDescriptor;
+import cn.procsl.ping.processor.v3.ProcessorEnvironment;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
@@ -78,16 +77,16 @@ class MethodDescriptorImpl implements MethodDescriptor {
         }
         return this.httpMethod.getAnnotationType().asElement().getSimpleName().toString();
     }
-
-    @Override
-    public MethodParameterDescriptor getRequestParameterDescriptor() {
-        return this.requestParameter;
-    }
-
-    @Override
-    public MethodReturnValueDescriptor getRequestReturnDescriptor() {
-        return this.requestReturnDescriptor;
-    }
+//
+//    @Override
+//    public MethodParameterDescriptor getRequestParameterDescriptor() {
+//        return this.requestParameter;
+//    }
+//
+//    @Override
+//    public MethodReturnValueDescriptor getRequestReturnDescriptor() {
+//        return this.requestReturnDescriptor;
+//    }
 
     @Override
     public String[] findConsumes() {

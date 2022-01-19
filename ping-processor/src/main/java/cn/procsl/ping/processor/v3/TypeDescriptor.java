@@ -3,7 +3,7 @@ package cn.procsl.ping.processor.v3;
 import javax.lang.model.element.TypeElement;
 import java.util.List;
 
-public interface TypeDescriptor<P extends MethodParameterDescriptor, R extends MethodReturnValueDescriptor> {
+public interface TypeDescriptor {
 
     String getPackageName();
 
@@ -13,6 +13,6 @@ public interface TypeDescriptor<P extends MethodParameterDescriptor, R extends M
 
     List<FieldDescriptor> getFields();
 
-    List<MethodDescriptor<P, R>> getMethods();
+    List<MethodDescriptor> getMethods();
 
 }
