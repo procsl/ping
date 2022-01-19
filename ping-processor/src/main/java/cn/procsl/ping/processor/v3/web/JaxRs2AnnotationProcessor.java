@@ -1,19 +1,17 @@
 package cn.procsl.ping.processor.v3.web;
 
-import cn.procsl.ping.processor.v3.JavaSourceGenerator;
-import cn.procsl.ping.processor.v3.MethodDescriptor;
-import cn.procsl.ping.processor.v3.ProcessorEnvironment;
-import cn.procsl.ping.processor.v3.SimpleEnvironment;
+import cn.procsl.ping.processor.v3.*;
 import cn.procsl.ping.processor.v3.web.generator.ParameterGenerator;
 import cn.procsl.ping.processor.v3.web.generator.ReturnGenerator;
 import cn.procsl.ping.processor.v3.web.generator.SpringControllerGenerator;
-import cn.procsl.ping.processor.v3.web.parser.RequestMethodParser;
+import cn.procsl.ping.processor.v3.web.parser.ServiceElementParser;
 import com.google.auto.service.AutoService;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.*;
+import javax.tools.Diagnostic;
 import javax.ws.rs.Path;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -36,17 +34,13 @@ public class JaxRs2AnnotationProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         SimpleEnvironment env = new SimpleEnvironment(this.processingEnv, roundEnv);
 
-        List<MethodDescriptor> list = annotations
-            .stream()
-            .map(item -> item.accept(visitor, env))
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
+        List<TypeDescriptor> list = annotations.stream().map(item -> item.accept(visitor, env)).filter(Objects::nonNull).collect(Collectors.toList());
 
         for (JavaSourceGenerator generator : generators) {
             try {
                 generator.generated(list, env);
             } catch (java.io.IOException e) {
-                e.printStackTrace();
+                env.getMessager().printMessage(Diagnostic.Kind.ERROR, e.getMessage());
             }
         }
         return true;
@@ -58,42 +52,42 @@ public class JaxRs2AnnotationProcessor extends AbstractProcessor {
         return Collections.singleton(Path.class.getName());
     }
 
-    private static class ServiceElementVisitor implements ElementVisitor<MethodDescriptor, ProcessorEnvironment> {
+    private static class ServiceElementVisitor implements ElementVisitor<TypeDescriptor, ProcessorEnvironment> {
 
-        final RequestMethodParser parser = new RequestMethodParser();
+        final ServiceElementParser parser = new ServiceElementParser();
 
         @Override
-        public MethodDescriptor visit(Element e, ProcessorEnvironment environment) {
+        public TypeDescriptor visit(Element e, ProcessorEnvironment processorEnvironment) {
             return null;
         }
 
         @Override
-        public MethodDescriptor visitPackage(PackageElement e, ProcessorEnvironment environment) {
+        public TypeDescriptor visitPackage(PackageElement e, ProcessorEnvironment processorEnvironment) {
             return null;
         }
 
         @Override
-        public MethodDescriptor visitType(TypeElement e, ProcessorEnvironment environment) {
+        public TypeDescriptor visitType(TypeElement e, ProcessorEnvironment processorEnvironment) {
+            return parser.parse(e, processorEnvironment);
+        }
+
+        @Override
+        public TypeDescriptor visitVariable(VariableElement e, ProcessorEnvironment processorEnvironment) {
             return null;
         }
 
         @Override
-        public MethodDescriptor visitVariable(VariableElement e, ProcessorEnvironment environment) {
+        public TypeDescriptor visitExecutable(ExecutableElement e, ProcessorEnvironment processorEnvironment) {
             return null;
         }
 
         @Override
-        public MethodDescriptor visitExecutable(ExecutableElement e, ProcessorEnvironment environment) {
-            return parser.parser(e, environment);
-        }
-
-        @Override
-        public MethodDescriptor visitTypeParameter(TypeParameterElement e, ProcessorEnvironment environment) {
+        public TypeDescriptor visitTypeParameter(TypeParameterElement e, ProcessorEnvironment processorEnvironment) {
             return null;
         }
 
         @Override
-        public MethodDescriptor visitUnknown(Element e, ProcessorEnvironment environment) {
+        public TypeDescriptor visitUnknown(Element e, ProcessorEnvironment processorEnvironment) {
             return null;
         }
     }

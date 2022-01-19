@@ -11,7 +11,7 @@ public interface MethodDescriptor {
 
     List<String> getThrows();
 
-    <P extends MethodParameterDescriptor> List<P> getRequestParameterDescriptor();
+    MethodParameterDescriptor getParameterDescriptor();
 
-    <R extends MethodReturnValueDescriptor> List<R> getRequestReturnDescriptor();
+    MethodReturnValueDescriptor getReturnDescriptor();
 }

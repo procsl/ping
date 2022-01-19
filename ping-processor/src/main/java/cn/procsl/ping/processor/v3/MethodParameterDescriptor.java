@@ -5,8 +5,6 @@ import java.util.List;
 
 public interface MethodParameterDescriptor {
 
-    MethodDescriptor getMethodDescriptor();
-
     List<? extends VariableElement> getParameters();
 
 }
