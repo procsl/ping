@@ -1,13 +1,13 @@
 package cn.procsl.ping.processor.v3;
 
-import javax.lang.model.element.Element;
+import javax.annotation.Nullable;
+import javax.lang.model.element.TypeElement;
 
-public interface FieldDescriptor {
-
-    String getName();
+public interface FieldDescriptor extends TypeNameDescriptor {
 
     String getFieldName();
 
-    Element getTarget();
+    @Nullable
+    TypeElement getTarget();
 
 }

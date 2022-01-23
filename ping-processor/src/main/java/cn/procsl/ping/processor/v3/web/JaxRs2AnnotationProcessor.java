@@ -3,7 +3,6 @@ package cn.procsl.ping.processor.v3.web;
 import cn.procsl.ping.processor.v3.*;
 import cn.procsl.ping.processor.v3.web.generator.ParameterGenerator;
 import cn.procsl.ping.processor.v3.web.generator.ReturnGenerator;
-import cn.procsl.ping.processor.v3.web.generator.SpringControllerGenerator;
 import cn.procsl.ping.processor.v3.web.parser.ServiceElementParser;
 import com.google.auto.service.AutoService;
 
@@ -14,7 +13,6 @@ import javax.lang.model.element.*;
 import javax.tools.Diagnostic;
 import javax.ws.rs.Path;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 生成 SpringController 类
@@ -27,14 +25,17 @@ public class JaxRs2AnnotationProcessor extends AbstractProcessor {
     final Collection<JavaSourceGenerator> generators;
 
     public JaxRs2AnnotationProcessor() {
-        generators = Arrays.asList(new SpringControllerGenerator(), new ParameterGenerator(), new ReturnGenerator());
+        generators = Arrays.asList(new AbstractJavaSourceGenerator(), new ParameterGenerator(), new ReturnGenerator());
     }
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         SimpleEnvironment env = new SimpleEnvironment(this.processingEnv, roundEnv);
 
-        List<TypeDescriptor> list = annotations.stream().map(item -> item.accept(visitor, env)).filter(Objects::nonNull).collect(Collectors.toList());
+        ArrayList<Descriptor> result = new ArrayList<>();
+        annotations.stream().map(item -> item.accept(visitor, env)).filter(Objects::nonNull).forEach(item -> {
+            item.accept(this.typeDescriptorIterable);
+        });
 
         for (JavaSourceGenerator generator : generators) {
             try {
@@ -91,4 +92,5 @@ public class JaxRs2AnnotationProcessor extends AbstractProcessor {
             return null;
         }
     }
+
 }

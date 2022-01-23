@@ -1,10 +1,17 @@
 package cn.procsl.ping.processor.v3;
 
-import javax.lang.model.element.VariableElement;
-import java.util.List;
+public interface MethodParameterDescriptor extends TypeNameDescriptor {
 
-public interface MethodParameterDescriptor {
+    /**
+     * 是否是原始类型
+     *
+     * @return 如果是新类型
+     */
+    boolean isNew();
 
-    List<? extends VariableElement> getParameters();
+    int getIndex();
+
+    String getParameterName();
+
 
 }

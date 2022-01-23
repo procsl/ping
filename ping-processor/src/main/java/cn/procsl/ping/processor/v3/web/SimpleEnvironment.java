@@ -1,5 +1,6 @@
-package cn.procsl.ping.processor.v3;
+package cn.procsl.ping.processor.v3.web;
 
+import cn.procsl.ping.processor.v3.ProcessorEnvironment;
 import lombok.NonNull;
 
 import javax.annotation.Nullable;

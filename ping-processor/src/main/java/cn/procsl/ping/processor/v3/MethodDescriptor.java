@@ -1,17 +1,17 @@
 package cn.procsl.ping.processor.v3;
 
-import javax.lang.model.element.ExecutableElement;
+import java.util.Collection;
 import java.util.List;
 
-public interface MethodDescriptor {
+public interface MethodDescriptor extends Descriptor {
 
     String getMethodName();
 
-    ExecutableElement getTargetElement();
+    List<TypeNameDescriptor> getThrows();
 
-    List<String> getThrows();
-
-    MethodParameterDescriptor getParameterDescriptor();
+    Collection<MethodParameterDescriptor> getParameterDescriptor();
 
     MethodReturnValueDescriptor getReturnDescriptor();
+
+    SourceCodeDescriptor getBody();
 }
