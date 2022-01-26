@@ -1,12 +1,11 @@
 package cn.procsl.ping.processor.v3;
 
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 
-public interface TargetVisitor<R, P> {
+public interface DescriptorVisitor<R, P> {
 
-    default R visitType(TypeElement e, Descriptor descriptor, P p) {
+    default R visitType(TypeDescriptor descriptor, P p) {
         return null;
     }
 

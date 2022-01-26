@@ -122,6 +122,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.casbin/jcasbin -->
+        <dependency>
+            <groupId>org.casbin</groupId>
+            <artifactId>jcasbin</artifactId>
+            <version>1.21.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>

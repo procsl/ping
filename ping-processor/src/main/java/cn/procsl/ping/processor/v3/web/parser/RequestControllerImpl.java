@@ -37,11 +37,6 @@ class RequestControllerImpl implements TypeDescriptor {
     }
 
     @Override
-    public TypeElement getTarget() {
-        return this.target;
-    }
-
-    @Override
     public List<FieldDescriptor> getFields() {
         return Collections.unmodifiableList(this.fieldDescriptors);
     }

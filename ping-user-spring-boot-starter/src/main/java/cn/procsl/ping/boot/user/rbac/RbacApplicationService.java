@@ -13,7 +13,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import javax.ws.rs.*;
+import javax.ws.rs.POST;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -22,7 +22,6 @@ import java.util.Optional;
  * @description RBAC模块之一， 用于管理角色
  */
 @Named("rbacApplicationService")
-@Path("roles")
 @NoArgsConstructor
 public class RbacApplicationService {
 
@@ -55,9 +54,7 @@ public class RbacApplicationService {
      * @param roleId 角色ID
      * @throws RbacException 如果删除失败
      */
-    @DELETE
-    @Path("{id}")
-    public void deleteRole(@PathParam(value = "id") @NotNull Long roleId) throws RbacException {
+    public void deleteRole(@NotNull Long roleId) throws RbacException {
         this.roleJpaRepository.deleteById(roleId);
     }
 
@@ -94,7 +91,6 @@ public class RbacApplicationService {
      * @param permissions 权限列表
      * @throws RbacException 如果修改失败，则抛出异常
      */
-    @PATCH
     public void changeRole(@NotNull Long id, @Size(max = 20) String name, @Size(max = 100) Collection<@Size(max = 100) String> permissions) throws RbacException {
         if (name != null) {
             this.changeRoleName(id, name);
@@ -110,9 +106,7 @@ public class RbacApplicationService {
      * @param id 角色ID
      * @return 返回角色信息
      */
-    @GET
-    @Path("{id}")
-    public Optional<Role> getById(@PathParam("id") Long id) {
+    public Optional<Role> getById(Long id) {
         return this.roleJpaRepository.findById(id);
     }
 
@@ -124,8 +118,7 @@ public class RbacApplicationService {
      * @param size  每页大小
      * @return 返回分页的角色对象
      */
-    @GET
-    public Page<Role> query(@DefaultValue("1") int page, @DefaultValue("10") int size, Sort.Direction order) {
+    public Page<Role> query(int page, int size, Sort.Direction order) {
         return this.roleJpaRepository.findAll(PageRequest.of(page, size, order, "name"));
     }
 

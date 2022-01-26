@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface TypeDescriptor extends TypeNameDescriptor {
 
+    <P, R> R accept(DescriptorVisitor<P, R> visitor);
+
     boolean isRootDescriptor();
 
     default Collection<String> getProps() {
