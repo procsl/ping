@@ -3,7 +3,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 
-    <changeSet id="create_u_role_table" author="user_module">
+    <changeSet id="create_user_table" author="user_module">
         <createTable tableName="u_role" remarks="RBAC模块角色表">
             <column name="id" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
@@ -13,9 +13,7 @@
                 <constraints nullable="false" unique="true" uniqueConstraintName="u_uk_role_name"/>
             </column>
         </createTable>
-    </changeSet>
 
-    <changeSet id="create_u_role_permission" author="user_module">
         <createTable tableName="u_role_permission" remarks="RBAC模块权限表">
             <column name="role_id" type="bigint">
                 <constraints references="u_role(id)" foreignKeyName="u_fk_role_id" referencedTableName="u_role"
@@ -23,6 +21,38 @@
             </column>
             <column name="name" type="varchar(128)" remarks="权限名称"/>
         </createTable>
+
+        <createTable tableName="u_account" remarks="用户账户表">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="user_id" type="bigint">
+                <!-- TODO 创建索引-->
+            </column>
+
+            <column name="name" type="varchar(15)" remarks="用户账户名">
+                <constraints nullable="false" unique="true" uniqueConstraintName="u_uk_account_name"/>
+            </column>
+
+            <column name="password" type="varchar(40)" remarks="用户密码"/>
+
+            <column name="created_by" type="bigint" remarks="创建人">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="datetime" remarks="创建时间">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="last_modified_by" type="bigint" remarks="最后修改人">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="datetime" remarks="最后修改时间">
+                <constraints nullable="false"/>
+            </column>
+
+        </createTable>
+
     </changeSet>
 
 
