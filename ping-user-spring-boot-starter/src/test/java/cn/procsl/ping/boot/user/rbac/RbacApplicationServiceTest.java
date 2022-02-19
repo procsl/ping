@@ -23,7 +23,7 @@ import java.util.Collections;
 public class RbacApplicationServiceTest {
 
     @Inject
-    RbacApplicationService rbacApplicationService;
+    AccessControlService rbacApplicationService;
 
     @Inject
     JpaRepository<Role, Long> roleJpaRepository;

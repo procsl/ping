@@ -1,6 +1,9 @@
 **/target
 **/jdbc.*
 
+logs/**
+logs
+
 ### STS ###
 .apt_generated
 .classpath

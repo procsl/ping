@@ -1,12 +1,6 @@
 package cn.procsl.ping.processor.v3.web.parser;
 
-import cn.procsl.ping.processor.v3.MethodDescriptor;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
-import java.lang.annotation.Annotation;
-
-class MethodDescriptorImpl implements MethodDescriptor {
+//class MethodDescriptorImpl implements MethodDescriptor {
 
 //    private final ExecutableElement element;
 //    private final AnnotationMirror httpMethod;
@@ -111,4 +105,4 @@ class MethodDescriptorImpl implements MethodDescriptor {
 //        return this.httpMethod != null;
 //    }
 
-}
+//}

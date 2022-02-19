@@ -53,6 +53,48 @@
 
         </createTable>
 
+        <createTable tableName="u_user">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true"/>
+            </column>
+
+            <column name="name" type="varchar(15)" remarks="用户姓名">
+                <constraints nullable="false" unique="true" uniqueConstraintName="u_uk_user_name"/>
+            </column>
+
+            <column name="gender" type="varchar(5)" remarks="用户性别: 男, 女, 未知"/>
+
+            <column name="remark" type="varchar(500)" remarks="用户签名"/>
+
+            <column name="created_by" type="bigint" remarks="创建人">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="datetime" remarks="创建时间">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="last_modified_by" type="bigint" remarks="最后修改人">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="datetime" remarks="最后修改时间">
+                <constraints nullable="false"/>
+            </column>
+
+        </createTable>
+
+        <createTable tableName="u_subject" remarks="主体表">
+            <column name="id">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="type" remarks="主体类型:user"/>
+            <column name="subject_id" remarks="主体"/>
+        </createTable>
+
+        <createTable tableName="u_subject_roles" remarks="主体角色关联表">
+            <column name="subject_id" remarks="主体ID"/>
+            <column name="roles_id" remarks="角色ID"/>
+        </createTable>
+
     </changeSet>
 
 

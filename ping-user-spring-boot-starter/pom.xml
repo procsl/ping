@@ -87,13 +87,6 @@
             </exclusions>
         </dependency>
 
-        <dependency>
-            <groupId>cn.procsl</groupId>
-            <artifactId>ping-processor-repo</artifactId>
-            <version>0.0.3-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-
         <!-- https://mvnrepository.com/artifact/javax.validation/validation-api -->
         <dependency>
             <groupId>javax.validation</groupId>
@@ -102,17 +95,10 @@
         </dependency>
 
         <dependency>
-            <groupId>cn.procsl</groupId>
-            <artifactId>ping-processor</artifactId>
-            <version>0.0.3-SNAPSHOT</version>
-            <scope>provided</scope>
-            <!--防止被打包进去-->
-        </dependency>
-
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
@@ -128,6 +114,33 @@
             <artifactId>jcasbin</artifactId>
             <version>1.21.0</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-hateoas</artifactId>
+            <version>1.6.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.procsl</groupId>
+            <artifactId>ping-processor</artifactId>
+            <version>0.0.3-SNAPSHOT</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-indexer</artifactId>
+            <optional>true</optional>
+        </dependency>
+
 
     </dependencies>
 
@@ -193,13 +206,6 @@
                     <artifactId>h2</artifactId>
                     <scope>test</scope>
                 </dependency>
-
-                <dependency>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-web</artifactId>
-                    <scope>test</scope>
-                </dependency>
-
             </dependencies>
         </profile>
 

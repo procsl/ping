@@ -69,7 +69,7 @@ public abstract class AbstractJavaSourceGenerator implements JavaSourceGenerator
 
     ParameterSpec buildMethodParameter(MethodParameterDescriptor item, ProcessorEnvironment environment) {
         String name = item.getParameterName();
-        Element target = item.getTarget();
+        Element target = null;//item.getTarget();
         TypeName type;
         if (target != null) {
             type = TypeName.get(target.asType());

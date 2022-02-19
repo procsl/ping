@@ -13,7 +13,6 @@
     <option name="ALTERNATIVE_JRE_PATH" />
     <option name="SHORTEN_COMMAND_LINE" value="ARGS_FILE" />
     <method v="2">
-      <option name="RunConfigurationTask" enabled="true" run_configuration_name="demo-debugger" run_configuration_type="ShConfigurationType" />
       <option name="RunConfigurationTask" enabled="true" run_configuration_name="processor-install" run_configuration_type="MavenRunConfiguration" />
       <option name="RunConfigurationTask" enabled="true" run_configuration_name="user-install" run_configuration_type="MavenRunConfiguration" />
       <option name="Make" enabled="true" />
@@ -23,9 +22,8 @@
     <module name="ping-admin-app" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="cn.procsl.ping.app.admin.AdminApplication" />
     <option name="DEBUG_MODE" value="true" />
-    <option name="VM_PARAMETERS" value="-ea -Dlog4j.skipJansi=false" />
+    <option name="VM_PARAMETERS" value="-Dlog4j.skipJansi=false -ea"/>
     <option name="ALTERNATIVE_JRE_PATH" />
-    <option name="SHORTEN_COMMAND_LINE" value="NONE" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

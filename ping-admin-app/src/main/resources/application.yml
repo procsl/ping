@@ -1,68 +1,68 @@
 #服务端口
 server:
-  port: 10000
+    port: 10000
 
 #服务名称
 spring:
-  application:
-    name: @project.artifactId@.@project.version@
+    application:
+        name: @project.artifactId@.@project.version@
 
 
-  jpa:
-    show-sql: true
-    generate-ddl: true
-
-    #jpa hibernate配置
-    properties:
-      hibernate:
-        format_sql: true
-        use_sql_comments: true
-
-    #hibernate配
-    hibernate:
-      use-new-id-generator-mappings: true
-      ddl-auto: update
-
-    # 取消视图级别的实体绑定
-    open-in-view: false
-
-  datasource:
-    type: com.zaxxer.hikari.HikariDataSource
-
-  data:
     jpa:
-      repositories:
-        bootstrap-mode: lazy
+        show-sql: true
+        generate-ddl: true
+
+        #jpa hibernate配置
+        properties:
+            hibernate:
+                format_sql: true
+                use_sql_comments: true
+
+        #hibernate配
+        hibernate:
+            use-new-id-generator-mappings: true
+            ddl-auto: update
+
+        # 取消视图级别的实体绑定
+        open-in-view: false
+
+    datasource:
+        type: com.zaxxer.hikari.HikariDataSource
+
+    data:
+        jpa:
+            repositories:
+                bootstrap-mode: lazy
 
 
-  profiles:
-    active: @profiles.active@
+    profiles:
+        active: @profiles.active@
 
 
-  #    liquibase配置
-  liquibase:
-    change-log: classpath*:/changelog/db.changelog-master.xml
-    enabled: true
+    #    liquibase配置
+    liquibase:
+        change-log: classpath*:/changelog/db.changelog-master.xml
+        enabled: true
 
 #      开启debug模式
 debug: false
 
 springdoc:
-  swagger-ui:
-    path: index.html
-  api-docs:
-    resolve-schema-properties: true
-  show-login-endpoint: true
-  show-actuator: true
+    swagger-ui:
+        path: index.html
+    api-docs:
+        resolve-schema-properties: true
+    show-login-endpoint: true
+    show-actuator: false
 
 
 
 # 管理节点
 management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-  endpoint:
-    shutdown:
-      enabled: true
+    endpoints:
+        web:
+            exposure:
+                include: "*"
+    endpoint:
+        shutdown:
+            enabled: true

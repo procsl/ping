@@ -1,8 +1,6 @@
 package cn.procsl.ping.processor.v3.web.parser;
 
-import cn.procsl.ping.processor.v3.MethodParameterDescriptor;
-
-class ParameterDescriptorImpl implements MethodParameterDescriptor {
+//class ParameterDescriptorImpl implements MethodParameterDescriptor {
 
 //    final MethodDescriptorImpl requestMethodDescriptor;
 //
@@ -20,4 +18,4 @@ class ParameterDescriptorImpl implements MethodParameterDescriptor {
 //        ExecutableElement target = this.requestMethodDescriptor.getTargetMethodElement();
 //        return target.getParameters();
 //    }
-}
+//}

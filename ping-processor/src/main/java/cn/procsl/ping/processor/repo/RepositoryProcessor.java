@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
+import static javax.tools.Diagnostic.Kind.ERROR;
 import static javax.tools.Diagnostic.Kind.WARNING;
 
 
@@ -118,6 +119,10 @@ public class RepositoryProcessor extends AbstractProcessor {
                     messager.printMessage(WARNING, "The element of the annotation label is not a class type: '" + str + "'", entity);
                     continue;
                 }
+                RepositoryCreator repo = entity.getAnnotation(RepositoryCreator.class);
+                if (repo == null) {
+                    continue;
+                }
 
                 String name = this.createPackageName((TypeElement) entity);
                 // 生成多继承源文件
@@ -127,7 +132,7 @@ public class RepositoryProcessor extends AbstractProcessor {
             }
 
         } catch (Exception e) {
-            messager.printMessage(WARNING, "The build of the source code failed:" + e.getClass().getName() + ":" + e.getMessage());
+            messager.printMessage(ERROR, "The build of the source code failed:" + e.getClass().getName() + ":" + e.getMessage());
             return false;
         }
         return true;
@@ -305,7 +310,7 @@ public class RepositoryProcessor extends AbstractProcessor {
             }
         }
 
-        return tmp + entity.getSimpleName() + repository + "Repository";
+        return tmp + entity.getSimpleName() + "Repository";
     }
 
     /**
@@ -333,7 +338,7 @@ public class RepositoryProcessor extends AbstractProcessor {
         }
 
         // 默认的包名
-        return "repository";
+        return entity.getEnclosingElement().toString();
     }
 
 

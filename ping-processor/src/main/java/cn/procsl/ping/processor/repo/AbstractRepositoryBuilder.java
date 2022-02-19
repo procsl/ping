@@ -81,7 +81,13 @@ public abstract class AbstractRepositoryBuilder implements RepositoryBuilder {
                 return arguments.get(0);
             }
         }
-//        ((DeclaredType)entity.getSuperclass()).getTypeArguments();
+
+        if (superClass.toString().startsWith("cn.procsl.ping.boot.user.config.AbstractAuditable") && superClass instanceof DeclaredType) {
+            List<? extends TypeMirror> arguments = ((DeclaredType) superClass).getTypeArguments();
+            if (!arguments.isEmpty()) {
+                return arguments.get(1);
+            }
+        }
 
         this.processingEnvironment.getMessager().printMessage(Diagnostic.Kind.WARNING, "Not fount @Id annotation", entity);
         return null;
