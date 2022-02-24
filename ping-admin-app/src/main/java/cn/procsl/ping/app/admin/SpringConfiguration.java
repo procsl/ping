@@ -12,7 +12,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Setter
 @Configuration(proxyBeanMethods = false)
 @Slf4j
-public class LoginConfiguration implements WebMvcConfigurer {
+public class SpringConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry corsRegistry) {
@@ -23,7 +23,7 @@ public class LoginConfiguration implements WebMvcConfigurer {
             //允许发起跨域访问的域名
             .allowedOrigins("http://localhost:10000")
             //允许跨域访问的方法
-            .allowedMethods("GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS")
+            .allowedMethods("GET", "HEAD", "POST", "PUT", "DELETE")
             //是否带上cookie信息
             .allowCredentials(true)
             .maxAge(3600)

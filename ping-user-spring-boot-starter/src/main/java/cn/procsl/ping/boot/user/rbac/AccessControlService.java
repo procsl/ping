@@ -38,6 +38,10 @@ public class AccessControlService {
      * @param permissions 权限
      */
     public Long createRole(@NotBlank @Size(max = 20) String name, @NotNull @Size(max = 100) Collection<@Size(max = 100) String> permissions) throws BusinessException {
+        if (this.repository.exists(Example.of(new Role(name)))) {
+            throw new BusinessException(401, "U04", "权限已存在");
+        }
+
         Role role = repository.save(new Role(name, permissions));
         return role.getId();
     }
@@ -109,7 +113,7 @@ public class AccessControlService {
             Set<String> set = roles.stream().map(Role::getName).collect(Collectors.toSet());
             HashSet<String> names = new HashSet<>(roleNames);
             names.removeAll(set);
-            throw new BusinessException(401, "U003", "角色不存在:" + String.join(",", names));
+            throw new BusinessException(401, "U003", "该角色不存在[ " + String.join(",", names) + " ]");
         }
 
         Subject subject = new Subject();
