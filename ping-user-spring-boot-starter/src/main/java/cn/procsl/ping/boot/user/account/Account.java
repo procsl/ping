@@ -1,6 +1,5 @@
 package cn.procsl.ping.boot.user.account;
 
-import cn.procsl.ping.processor.annotation.RepositoryCreator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +17,6 @@ import java.io.Serializable;
 @Setter
 @Entity
 @Table(name = "u_account")
-@RepositoryCreator
 @NoArgsConstructor
 @AllArgsConstructor
 public class Account extends AbstractPersistable<Long> implements Serializable {

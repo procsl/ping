@@ -5,16 +5,9 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.6.3</version>
-        <relativePath/>
-    </parent>
-
     <artifactId>ping-user-spring-boot-starter</artifactId>
     <groupId>cn.procsl</groupId>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.0.4-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Ping User SpringBoot Starter</name>
 
@@ -45,8 +38,8 @@
 
         <dependency>
             <groupId>cn.procsl</groupId>
-            <artifactId>ping-business-model</artifactId>
-            <version>0.0.3-SNAPSHOT</version>
+            <artifactId>ping-base</artifactId>
+            <version>0.0.4-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -122,12 +115,12 @@
             <version>1.6.6</version>
         </dependency>
 
-        <dependency>
-            <groupId>cn.procsl</groupId>
-            <artifactId>ping-processor</artifactId>
-            <version>0.0.3-SNAPSHOT</version>
-            <optional>true</optional>
-        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>cn.procsl</groupId>-->
+        <!--            <artifactId>ping-processor</artifactId>-->
+        <!--            <version>0.0.4-SNAPSHOT</version>-->
+        <!--            <optional>true</optional>-->
+        <!--        </dependency>-->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -144,6 +137,22 @@
 
 
     </dependencies>
+
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <!-- 从 Spring Boot 导入依赖管理 -->
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>2.6.3</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+
+    </dependencyManagement>
+
 
     <build>
         <finalName>${project.artifactId}-${project.version}</finalName>

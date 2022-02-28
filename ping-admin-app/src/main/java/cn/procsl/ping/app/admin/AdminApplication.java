@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.info.License;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 
 /**
  * starter
@@ -24,7 +25,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
         description = "Ping接口参考文档, 可用于指导生成测试用例, HTTP Client SDK"
     )
 )
-@SpringBootApplication(scanBasePackages = {"cn.procsl.ping"})
+@SpringBootApplication(scanBasePackages = {"cn.procsl.ping"}, exclude = ErrorMvcAutoConfiguration.class)
 public class AdminApplication {
 
     public static void main(String[] args) {

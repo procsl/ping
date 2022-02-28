@@ -19,21 +19,6 @@ public class AccountService {
     final JpaRepository<Account, Long> jpaRepository;
 
     /**
-     * 检查是否可添加账户
-     *
-     * @param userId 用户ID
-     * @param name   账户名
-     * @throws BusinessException 如果无法添加账户
-     */
-    public void canRegistered(@NotNull Long userId, @NotNull @Size(min = 5, max = 15) String name) throws BusinessException {
-
-        if (this.jpaRepository.exists(Example.of(new Account(name)))) {
-            throw new BusinessException(401, "U001", "账户已被注册");
-        }
-    }
-
-
-    /**
      * 注册账户
      *
      * @param userId   绑定的userId
@@ -41,7 +26,11 @@ public class AccountService {
      * @param password 账户密码
      */
     public void registered(@NotNull Long userId, @NotNull @Size(min = 5, max = 15) String name, @NotNull String password) {
-        this.canRegistered(userId, name);
+
+        if (this.jpaRepository.exists(Example.of(new Account(name)))) {
+            throw new BusinessException(401, "U001", "账户已被注册");
+        }
+
         Account account = new Account();
         account.setUserId(userId);
         account.setName(name);

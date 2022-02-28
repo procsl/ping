@@ -1,7 +1,6 @@
 package cn.procsl.ping.boot.user;
 
 
-import cn.procsl.ping.processor.annotation.RepositoryCreator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +17,6 @@ import java.io.Serializable;
 @Table(name = "u_user")
 @NoArgsConstructor
 @AllArgsConstructor
-@RepositoryCreator
 public class User extends AbstractPersistable<Long> implements Serializable {
 
     String name;

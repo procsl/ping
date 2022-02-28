@@ -1,6 +1,5 @@
 package cn.procsl.ping.boot.user.rbac;
 
-import cn.procsl.ping.processor.annotation.RepositoryCreator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +16,6 @@ import java.util.Set;
 @Entity
 @Table(name = "u_subject")
 @NoArgsConstructor
-@RepositoryCreator
 @AllArgsConstructor
 public class Subject extends AbstractPersistable<Long> {
 

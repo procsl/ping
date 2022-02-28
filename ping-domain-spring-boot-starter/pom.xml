@@ -3,19 +3,12 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.6.3</version>
-        <relativePath/>
-    </parent>
-
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>ping-domain-spring-boot-starter</artifactId>
     <name>Ping Domain SpringBoot Starter</name>
     <groupId>cn.procsl</groupId>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.0.4-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -56,9 +49,9 @@
         </dependency>
 
         <dependency>
-            <artifactId>ping-business-model</artifactId>
+            <artifactId>ping-base</artifactId>
             <groupId>cn.procsl</groupId>
-            <version>0.0.3-SNAPSHOT</version>
+            <version>0.0.4-SNAPSHOT</version>
         </dependency>
 
         <dependency>

@@ -3,6 +3,7 @@ package cn.procsl.ping.processor.repo;
 import cn.procsl.ping.processor.annotation.RepositoryCreator;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
+import lombok.NoArgsConstructor;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -49,6 +50,10 @@ public class RepositoryProcessor extends AbstractProcessor {
     private Map<String, RepositoryNamingStrategy> namingStrategy;
 
     private boolean init = true;
+
+    public RepositoryProcessor() {
+        System.out.println("hello world");
+    }
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {

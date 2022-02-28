@@ -7,7 +7,7 @@
     <groupId>cn.procsl</groupId>
     <artifactId>ping</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.0.4-SNAPSHOT</version>
 
     <properties>
         <java.version>11</java.version>
@@ -18,11 +18,11 @@
     </properties>
 
     <modules>
-        <module>ping-business-model</module>
-        <module>ping-user-spring-boot-starter</module>
-        <module>ping-admin-app</module>
         <module>ping-rest-spring-boot-starter</module>
         <module>ping-producer-spring-boot-starter</module>
+        <module>ping-domain-spring-boot-starter</module>
+        <module>ping-user-spring-boot-starter</module>
+        <module>ping-admin-app</module>
     </modules>
 
     <name>Ping Projects</name>
