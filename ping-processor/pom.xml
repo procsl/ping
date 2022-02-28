@@ -15,35 +15,33 @@
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
+        <spring.version>5.3.15</spring.version>
     </properties>
 
     <dependencies>
-
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.22</version>
-        </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.squareup/javapoet -->
         <dependency>
             <groupId>com.squareup</groupId>
             <artifactId>javapoet</artifactId>
             <version>1.13.0</version>
+            <optional>true</optional>
         </dependency>
 
         <!-- Annotation processor -->
         <dependency>
             <groupId>com.github.therapi</groupId>
             <artifactId>therapi-runtime-javadoc-scribe</artifactId>
-            <version>0.12.0</version>
+            <version>0.13.0</version>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
-            <version>5.3.14</version>
+            <version>${spring.version}</version>
             <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
@@ -51,19 +49,22 @@
             <artifactId>javax.servlet-api</artifactId>
             <version>4.0.1</version>
             <scope>compile</scope>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>5.3.14</version>
+            <version>${spring.version}</version>
             <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
             <version>3.28.0-GA</version>
+            <optional>true</optional>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.google.auto.service/auto-service -->
@@ -71,6 +72,7 @@
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service</artifactId>
             <version>1.0.1</version>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
@@ -78,6 +80,7 @@
             <artifactId>javax.ws.rs-api</artifactId>
             <version>2.1.1</version>
             <type>jar</type>
+            <optional>true</optional>
         </dependency>
 
 
@@ -93,19 +96,63 @@
             <groupId>cn.procsl</groupId>
             <artifactId>ping-business-model</artifactId>
             <version>0.0.3-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-webmvc-core</artifactId>
-            <version>1.6.3</version>
+            <version>1.6.6</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>spring-expression</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-web</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-aop</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-beans</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-context</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-core</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+            </exclusions>
+            <optional>true</optional>
+            <scope>provided</scope>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-common -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-common</artifactId>
-            <version>1.6.3</version>
+            <version>1.6.6</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>spring-web</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-context</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-core</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+            </exclusions>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
@@ -113,6 +160,7 @@
             <artifactId>javax.persistence-api</artifactId>
             <version>2.2</version>
             <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <dependency>

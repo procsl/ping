@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Validated
 @RequestMapping
-@Tag(name = "访问控制服务", description = "访问控制,权限相关接口")
+@Tag(name = "访问控制服务接口", description = "访问控制,权限相关接口")
 public class AccessControlController {
 
     final AccessControlService accessControlService;
@@ -25,5 +25,17 @@ public class AccessControlController {
     public Long createRole(@RequestBody @Validated CreateRoleDTO createRoleDTO) throws BusinessException {
         return this.accessControlService.createRole(createRoleDTO.getName(), createRoleDTO.getPermissions());
     }
+
+
+//    @Transactional(readOnly = true)
+//    @GetMapping("roles")
+//    @Operation(operationId = "queryRoles", description = "获取角色列表")
+//    public Page<RoleDTO> queryRoles(@RequestParam(defaultValue = "1", required = false) int _page,
+//                                    @RequestParam(defaultValue = "20", required = false) int _size,
+//                                    @RequestParam(defaultValue = "name", required = false) String[] _order_by) {
+//        Pageable pageable = PageRequest.of(_page, _size, Sort.by(_order_by));
+//        accessControlService.repository.findAll(Example.of(null), pageable);
+//        return null;
+//    }
 
 }
