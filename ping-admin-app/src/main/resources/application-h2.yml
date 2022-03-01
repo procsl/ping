@@ -20,3 +20,5 @@ spring:
       settings:
         trace: false
         web-allow-others: true
+        web-admin-password: 1234567
+

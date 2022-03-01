@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 @Data
 @Schema(description = "用户注册对象")
-public class UserRegisterDTO implements Serializable {
+public class RegisterUserDTO implements Serializable {
 
     @NotNull
     @NotBlank

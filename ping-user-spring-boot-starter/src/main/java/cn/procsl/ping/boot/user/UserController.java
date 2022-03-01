@@ -28,7 +28,7 @@ public class UserController {
     @PostMapping("users")
     @ResponseStatus(code = HttpStatus.CREATED, reason = "创建成功")
     @Operation(operationId = "userRegistered", description = "用户注册")
-    public HttpEntity<Long> register(@RequestBody @Validated UserRegisterDTO register) throws URISyntaxException, BusinessException {
+    public HttpEntity<Long> register(@RequestBody @Validated RegisterUserDTO register) throws URISyntaxException, BusinessException {
         Long id = this.userService.registered(register.getUserName(), register.getGender(), register.getAccountName(), register.getPassword(), Collections.emptyList());
         URI url = new URI("https://api.procsl.cn/user/" + id);
         return ResponseEntity.created(url).body(id);
