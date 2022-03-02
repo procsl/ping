@@ -2,7 +2,7 @@ package cn.procsl.ping.boot.rest.exception.resolver;
 
 import cn.procsl.ping.boot.rest.config.RestWebProperties;
 import cn.procsl.ping.boot.rest.exception.ExceptionCode;
-import cn.procsl.ping.business.exception.BusinessException;
+import cn.procsl.ping.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.ModelAndView;

@@ -13,6 +13,15 @@ public class JavaCommentResolver {
 
     final List<String> arrays;
 
+    public JavaCommentResolver(String comment) {
+        this.comment = comment;
+        if (comment == null || comment.isBlank()) {
+            arrays = Collections.emptyList();
+            return;
+        }
+        this.arrays = Arrays.stream(comment.split("\n")).filter(item -> !item.isEmpty()).map(String::trim).collect(Collectors.toList());
+    }
+
     public List<String> findTags(String key) {
         ArrayList<String> list = new ArrayList<>();
         for (String array : arrays) {
@@ -50,15 +59,6 @@ public class JavaCommentResolver {
 
     public String getDescription() {
         return this.findOndTag("@description");
-    }
-
-    public JavaCommentResolver(String comment) {
-        this.comment = comment;
-        if (comment == null || comment.isBlank()) {
-            arrays = Collections.emptyList();
-            return;
-        }
-        this.arrays = Arrays.stream(comment.split("\n")).filter(item -> !item.isEmpty()).map(String::trim).collect(Collectors.toList());
     }
 
     public String getGeneralComment() {

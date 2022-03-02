@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.user.rbac;
 
-import cn.procsl.ping.business.exception.BusinessException;
+import cn.procsl.ping.exception.BusinessException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

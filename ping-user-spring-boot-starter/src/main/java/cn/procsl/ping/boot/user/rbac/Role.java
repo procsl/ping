@@ -29,6 +29,15 @@ public class Role extends AbstractPersistable<Long> implements Serializable {
     @CollectionTable(name = "u_role_permission")
     Set<Permission> permissions;
 
+    public Role(String name) {
+        this.name = name;
+    }
+
+    public Role(String name, Collection<String> permissions) {
+        this.name = name;
+        this.changePermissions(permissions);
+    }
+
     public void changePermissions(Collection<String> permissions) {
 
         if (this.permissions == null) {
@@ -41,14 +50,5 @@ public class Role extends AbstractPersistable<Long> implements Serializable {
         for (String permission : permissions) {
             this.permissions.add(new Permission(permission));
         }
-    }
-
-    public Role(String name) {
-        this.name = name;
-    }
-
-    public Role(String name, Collection<String> permissions) {
-        this.name = name;
-        this.changePermissions(permissions);
     }
 }

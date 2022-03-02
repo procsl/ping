@@ -2,7 +2,7 @@ package cn.procsl.ping.boot.user;
 
 import cn.procsl.ping.boot.user.account.AccountService;
 import cn.procsl.ping.boot.user.rbac.AccessControlService;
-import cn.procsl.ping.business.exception.BusinessException;
+import cn.procsl.ping.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Indexed;

@@ -1,24 +1,24 @@
 spring:
-  #数据源配置
-  datasource:
-    url: jdbc:h2:file:@project.basedir@/target/data/app;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false;FILE_LOCK=NO;IGNORECASE=TRUE;CASE_INSENSITIVE_IDENTIFIERS=TRUE;
-    username: root
-    password: 123456
-    driver-class-name: org.h2.Driver
+    #数据源配置
+    datasource:
+        url: jdbc:h2:file:@project.basedir@/target/data/app;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false;FILE_LOCK=NO;IGNORECASE=TRUE;CASE_INSENSITIVE_IDENTIFIERS=TRUE;
+        username: root
+        password: 123456
+        driver-class-name: org.h2.Driver
 
-  #dev环境使用H2数据库
-  jpa:
-    database: h2
-    database-platform: org.hibernate.dialect.H2Dialect
+    #dev环境使用H2数据库
+    jpa:
+        database: h2
+        database-platform: org.hibernate.dialect.H2Dialect
 
 
-  #h2数据库配置
-  h2:
-    console:
-      enabled: true
-      path: /h2
-      settings:
-        trace: false
-        web-allow-others: true
-        web-admin-password: 1234567
+    #h2数据库配置
+    h2:
+        console:
+            enabled: true
+            path: /h2
+            settings:
+                trace: false
+                web-allow-others: true
+                web-admin-password: 1234567
 

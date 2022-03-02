@@ -1,7 +1,7 @@
 package cn.procsl.ping.boot.user.rbac;
 
 
-import cn.procsl.ping.business.exception.BusinessException;
+import cn.procsl.ping.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Example;
 import org.springframework.data.jpa.repository.JpaRepository;

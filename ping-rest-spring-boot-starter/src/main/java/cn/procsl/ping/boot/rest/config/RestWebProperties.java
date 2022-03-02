@@ -17,31 +17,28 @@ import java.util.Set;
 public class RestWebProperties {
 
     public final static String modelKey = RestWebProperties.class.getName() + "Key";
-    private boolean wrapper = true;
-    private String rootName = "root";
-    private boolean writeXmlDeclaration = true;
-    private boolean indentOutput = true;
     /**
      * 支持的元媒体类型
      */
     Set<MetaMediaType> metaMediaTypes = Collections.singleton(MetaMediaType.json);
-
     /**
      * 是否启用自定义媒体类型
      */
     RepresentationStrategy representationStrategy = RepresentationStrategy.system_mime;
-
     /**
      * 如果不为null 则生成 诸如 application/vnd.api+json 的格式
      * <p>
      * 自定义媒体类型
      */
     String mimeSubtype = "vnd.api";
-
     /**
      * 是否启用版本管理
      */
     boolean enableVersion = true;
+    private boolean wrapper = true;
+    private String rootName = "root";
+    private boolean writeXmlDeclaration = true;
+    private boolean indentOutput = true;
 
     /**
      * 表征媒体类型

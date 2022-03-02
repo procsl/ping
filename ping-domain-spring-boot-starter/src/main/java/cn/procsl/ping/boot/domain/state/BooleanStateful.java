@@ -1,0 +1,29 @@
+package cn.procsl.ping.boot.domain.state;
+
+import javax.persistence.Transient;
+import java.io.Serializable;
+
+/**
+ * bool类型状态化接口
+ *
+ * @param <ID> 实体ID
+ */
+public interface BooleanStateful<ID extends Serializable> extends Stateful<ID, Boolean> {
+
+    boolean ENABLE_STATE = true;
+
+    boolean DISABLE_STATE = !ENABLE_STATE;
+
+
+    default void disable() {
+        setState(!ENABLE_STATE);
+    }
+
+    default void enable() {
+        setState(ENABLE_STATE);
+    }
+
+    @Transient
+    boolean isEnable();
+
+}

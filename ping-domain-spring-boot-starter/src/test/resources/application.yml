@@ -1,26 +1,26 @@
 #通用配置
 spring:
-  jpa:
-    show-sql: true
-    generate-ddl: true
-
-    #jpa hibernate配置
-    properties:
-      hibernate:
-        format_sql: true
-        use_sql_comments: true
-    hibernate:
-      use-new-id-generator-mappings: true
-      ddl-auto: update
-
-  data:
     jpa:
-      repositories:
-        bootstrap-mode: lazy
-  profiles:
-    active: @profiles.active@
+        show-sql: true
+        generate-ddl: true
+
+        #jpa hibernate配置
+        properties:
+            hibernate:
+                format_sql: true
+                use_sql_comments: true
+        hibernate:
+            use-new-id-generator-mappings: true
+            ddl-auto: update
+
+    data:
+        jpa:
+            repositories:
+                bootstrap-mode: lazy
+    profiles:
+        active: @profiles.active@
 ping:
-  domain:
-    module-prefix: # 用于测试
-      domain: dt
-      user: u
+    domain:
+        module-prefix: # 用于测试
+            domain: dt
+            user: u
