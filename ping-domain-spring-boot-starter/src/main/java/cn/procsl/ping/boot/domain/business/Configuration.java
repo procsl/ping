@@ -2,7 +2,7 @@ package cn.procsl.ping.boot.domain.business;
 
 import java.io.Serializable;
 
-public interface SystemConfiguration<ID extends Serializable> extends Serializable {
+public interface Configuration<ID extends Serializable> extends Serializable {
 
     String getName();
 

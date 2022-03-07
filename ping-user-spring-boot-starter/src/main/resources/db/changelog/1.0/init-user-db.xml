@@ -1,7 +1,7 @@
 <databaseChangeLog
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 
     <changeSet id="create_user_table" author="user_module">
         <createTable tableName="u_role" remarks="RBAC模块角色表">
@@ -86,13 +86,32 @@
             <column name="id">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="type" remarks="主体类型:user"/>
-            <column name="subject_id" remarks="主体"/>
+            <column name="type" remarks="主体类型:user">
+                <constraints nullable="false"/>
+            </column>
+            <column name="subject_id" remarks="主体">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
 
         <createTable tableName="u_subject_roles" remarks="主体角色关联表">
-            <column name="subject_id" remarks="主体ID"/>
-            <column name="roles_id" remarks="角色ID"/>
+            <column name="subject_id" remarks="主体ID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="roles_id" remarks="角色ID">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="u_configure" remarks="系统信息配置表">
+            <column name="id">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(20)" remarks="配置项名称">
+                <constraints unique="true" uniqueConstraintName="u_uk_configure" nullable="false"/>
+            </column>
+            <column name="config_text" type="varchar(100)" remarks="配置项内容"/>
+            <column name="description" type="varchar(500)" remarks="配置项描述"/>
         </createTable>
 
     </changeSet>

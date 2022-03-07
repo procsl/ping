@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.user.config;
+package cn.procsl.ping.boot;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

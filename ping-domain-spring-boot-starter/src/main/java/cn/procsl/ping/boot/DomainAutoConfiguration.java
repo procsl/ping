@@ -1,11 +1,9 @@
-package cn.procsl.ping.boot.domain.config;
+package cn.procsl.ping.boot;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateProperties;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -14,11 +12,10 @@ import org.springframework.context.annotation.Configuration;
  * @author procsl
  * @date 2020/03/21
  */
+@Slf4j
 @Configuration
 @ConditionalOnMissingBean(DomainAutoConfiguration.class)
-@EnableConfigurationProperties({HibernateProperties.class})
 @AutoConfigureBefore(JpaBaseConfiguration.class)
-@Slf4j
 public class DomainAutoConfiguration {
 
 
