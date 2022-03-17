@@ -1,6 +1,5 @@
 package cn.procsl.ping.boot.domain;
 
-import cn.procsl.ping.boot.domain.support.executor.DomainRepositoryFactoryBean;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -14,8 +13,6 @@ import org.springframework.data.repository.config.BootstrapMode;
  */
 @SpringBootApplication(scanBasePackages = "cn.procsl.ping.boot.domain")
 @EnableJpaRepositories(
-    basePackages = "cn.procsl.ping.boot.domain.domain.repository",
-    repositoryFactoryBeanClass = DomainRepositoryFactoryBean.class,
     bootstrapMode = BootstrapMode.LAZY
 )
 @EntityScan(basePackages = "cn.procsl.ping.boot.domain.domain.entity")

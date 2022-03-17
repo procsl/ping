@@ -1,31 +1,18 @@
 package cn.procsl.ping.boot.user;
 
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.data.jpa.domain.AbstractPersistable;
-
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import java.io.Serializable;
 
-@Getter
-@Setter
-@Entity
-@Table(name = "u_user")
-@NoArgsConstructor
-@AllArgsConstructor
-public class User extends AbstractPersistable<Long> implements Serializable {
+public interface User extends Serializable {
 
-    String name;
+    String getName();
 
-    /**
-     * 男, 女, 保密, 未设置的
-     */
-    String gender;
+    Gender getGender();
 
-    String remark;
+    String getRemark();
+
+
+    enum Gender {
+        man, woman, unknown, unset
+    }
 
 }

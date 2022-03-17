@@ -3,6 +3,7 @@ package cn.procsl.ping.boot.user.rbac;
 
 import cn.procsl.ping.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Example;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Indexed;
@@ -27,23 +28,25 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AccessControlService {
 
-    final JpaRepository<Subject, Long> subjectRepository;
+    final JpaRepository<SubjectEntity, Long> subjectRepository;
 
-    final RoleRepository repository;
+    final RoleRepository roleRepository;
 
     /**
      * 创建角色
      *
-     * @param name        角色名称
-     * @param permissions 权限
+     * @param role 角色信息
+     * @return
+     * @throws BusinessException
      */
-    public Long createRole(@NotBlank @Size(max = 20) String name, @NotNull @Size(max = 100) Collection<@Size(max = 100) String> permissions) throws BusinessException {
-        if (this.repository.exists(Example.of(new Role(name)))) {
-            throw new BusinessException(401, "U04", "权限已存在");
+    public Long createRole(@NotNull Role role) throws BusinessException {
+        if (this.roleRepository.exists(Example.of(RoleEntity.builder().name(role.getName()).build()))) {
+            throw new BusinessException("权限名称已存在");
         }
 
-        Role role = repository.save(new Role(name, permissions));
-        return role.getId();
+        RoleEntity entity = new RoleEntity();
+        BeanUtils.copyProperties(role, entity, "id");
+        return roleRepository.save(entity).getId();
     }
 
     /**
@@ -53,7 +56,7 @@ public class AccessControlService {
      * @throws BusinessException 如果删除失败
      */
     public void deleteRole(@NotNull Long roleId) throws BusinessException {
-        this.repository.deleteById(roleId);
+        this.roleRepository.deleteById(roleId);
     }
 
     /**
@@ -64,9 +67,9 @@ public class AccessControlService {
      * @throws BusinessException 如果修改失败，则抛出异常
      */
     public void changeRolePermissions(@NotNull Long id, @NotNull @Size(max = 100) Collection<@Max(100) String> permissions) throws BusinessException {
-        Role role = this.repository.getById(id);
+        RoleEntity role = this.roleRepository.getById(id);
         role.changePermissions(permissions);
-        this.repository.save(role);
+        this.roleRepository.save(role);
     }
 
     /**
@@ -75,72 +78,35 @@ public class AccessControlService {
      * @throws BusinessException 如果修改失败，则抛出异常
      */
     public void changeRoleName(@NotNull Long id, @NotBlank @Size(max = 20) String name) throws BusinessException {
-        Role role = this.repository.getById(id);
+        RoleEntity role = this.roleRepository.getById(id);
         role.setName(name);
-        this.repository.save(role);
+        this.roleRepository.save(role);
     }
-
-    /**
-     * 修改角色信息
-     *
-     * @param id          角色ID
-     * @param name        角色名称
-     * @param permissions 权限列表
-     * @throws BusinessException 如果修改失败，则抛出异常
-     */
-    public void changeRole(@NotNull Long id, @Size(max = 20) String name, @Size(max = 100) Collection<@Size(max = 100) String> permissions) throws BusinessException {
-        if (name != null) {
-            this.changeRoleName(id, name);
-        }
-        if (permissions != null) {
-            this.changeRolePermissions(id, permissions);
-        }
-    }
-
 
     /**
      * 分配角色
      *
-     * @param userId    用户ID
-     * @param roleNames 角色名称
+     * @param subject 目标对象信息
      * @throws BusinessException 如果角色不存在
      */
-    public void grant(@NotNull Long userId, @NotNull Collection<String> roleNames) throws BusinessException {
-        Set<Role> roles = this.repository.findRolesByNameIn(roleNames);
+    public void grant(@NotNull Subject<String> subject) throws BusinessException {
+        Set<RoleEntity> roles = this.roleRepository.findRolesByNameIn(subject.getRoles());
 
         // 角色数量不同, 检测具体的角色并报错
-        if (roles.size() < roleNames.size()) {
-            Set<String> set = roles.stream().map(Role::getName).collect(Collectors.toSet());
-            HashSet<String> names = new HashSet<>(roleNames);
+        if (roles.size() < subject.getRoles().size()) {
+            Set<String> set = roles.stream().map(RoleEntity::getName).collect(Collectors.toSet());
+            HashSet<String> names = new HashSet<>(subject.getRoles());
             names.removeAll(set);
-            throw new BusinessException(401, "U003", "该角色不存在[ " + String.join(",", names) + " ]");
+            throw new BusinessException("该角色不存在[ {} ]", String.join(",", names));
         }
 
-        Subject subject = new Subject();
-        subject.setSubjectId(userId);
-        subject.setRoles(roles);
-        subject.setType("user");
-        this.subjectRepository.save(subject);
+        Example<SubjectEntity> example = Example.of(SubjectEntity.builder().type(subject.getType()).subjectId(subject.getSubjectId()).build());
+        Optional<SubjectEntity> option = this.subjectRepository.findOne(example);
+        SubjectEntity entity = option.orElseGet(SubjectEntity::new);
+        BeanUtils.copyProperties(subject, entity, "id", "roles");
+        entity.setRoles(roles);
+        this.subjectRepository.save(entity);
     }
 
-    /**
-     * 撤销角色
-     *
-     * @param userId    指定的用户ID
-     * @param roleNames 角色名称
-     * @throws BusinessException 如果撤销失败
-     */
-    public void revoke(@NotNull Long userId, @NotNull Collection<String> roleNames) throws BusinessException {
-
-        Optional<Subject> subject = this.subjectRepository.findOne(Example.of(new Subject(userId, "user", null)));
-
-        subject.ifPresent(item -> {
-            Set<Role> roles = this.repository.findRolesByNameIn(roleNames);
-            item.getRoles().removeAll(roles);
-            this.subjectRepository.save(item);
-        });
-
-        subject.orElseThrow(() -> new BusinessException(401, "U004", "授权对象不存在"));
-    }
 
 }

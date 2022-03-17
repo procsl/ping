@@ -1,13 +1,12 @@
 package cn.procsl.ping.boot.user.sys;
 
 import cn.procsl.ping.boot.domain.business.Configuration;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
 @Getter
@@ -16,12 +15,17 @@ import javax.persistence.Table;
 @Table(name = "u_configure")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Configure extends AbstractPersistable<Long> implements Configuration<Long> {
+@Builder
+public class ConfigurationEntity extends AbstractPersistable<Long> implements Configuration {
 
-    String name;
+    String key;
 
     String configText;
 
+    @Enumerated(EnumType.STRING)
+    ConfigurationType type;
+
     String description;
+
 
 }

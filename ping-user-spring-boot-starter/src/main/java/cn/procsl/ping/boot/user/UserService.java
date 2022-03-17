@@ -1,40 +1,26 @@
 package cn.procsl.ping.boot.user;
 
-import cn.procsl.ping.boot.user.account.AccountService;
-import cn.procsl.ping.boot.user.rbac.AccessControlService;
 import cn.procsl.ping.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Indexed;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
-import java.util.Collection;
-import java.util.Collections;
 
 @Indexed
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
-    final AccessControlService accessControlService;
+    final JpaRepository<UserEntity, Long> jpaRepository;
 
-    final AccountService accountService;
-
-    final JpaRepository<User, Long> jpaRepository;
-
-    public Long registered(@NotNull String userName, @NotNull String gender, @NotNull String accountName, @NotNull String password, @NotNull Collection<String> roleNames) throws BusinessException {
-        User user = new User();
-        user.setName(userName);
-        user.setGender(gender);
-        this.jpaRepository.save(user);
-        this.accountService.registered(user.getId(), accountName, password);
-        this.accessControlService.grant(user.getId(), roleNames);
-        return user.getId();
-    }
-
-    public void quickRegistered(String userName, String password) {
-        this.registered(userName, "未知", userName, password, Collections.emptyList());
+    public Long registered(@NotNull User user) throws BusinessException {
+        UserEntity entity = new UserEntity();
+        BeanUtils.copyProperties(user, entity);
+        this.jpaRepository.save(entity);
+        return entity.getId();
     }
 
 }

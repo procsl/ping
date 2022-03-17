@@ -17,11 +17,9 @@ public class BusinessException extends RuntimeException implements ErrorEntity {
 
     String code;
 
-    public BusinessException(Integer httpStatus, String code, String format, Object... arguments) {
+    public BusinessException(String format, Object... arguments) {
         // TODO 这里应该用占位符的, 先写着
         super(format, null, false, false);
-        this.httpStatus = httpStatus;
-        this.code = code;
     }
 
     public static <T> T ifNotFound(T entity, @NonNull String message) {

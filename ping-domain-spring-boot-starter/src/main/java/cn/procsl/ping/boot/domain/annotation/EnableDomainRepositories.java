@@ -1,6 +1,5 @@
 package cn.procsl.ping.boot.domain.annotation;
 
-import cn.procsl.ping.boot.domain.support.executor.DomainRepositoryFactoryBean;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.annotation.AliasFor;
@@ -43,8 +42,8 @@ public @interface EnableDomainRepositories {
     @AliasFor(annotation = EnableJpaRepositories.class, attribute = "queryLookupStrategy")
     QueryLookupStrategy.Key queryLookupStrategy() default QueryLookupStrategy.Key.CREATE_IF_NOT_FOUND;
 
-    @AliasFor(annotation = EnableJpaRepositories.class, attribute = "repositoryFactoryBeanClass")
-    Class<?> repositoryFactoryBeanClass() default DomainRepositoryFactoryBean.class;
+//    @AliasFor(annotation = EnableJpaRepositories.class, attribute = "repositoryFactoryBeanClass")
+//    Class<?> repositoryFactoryBeanClass() default DomainRepositoryFactoryBean.class;
 
     @AliasFor(annotation = EnableJpaRepositories.class, attribute = "repositoryBaseClass")
     Class<?> repositoryBaseClass() default DefaultRepositoryBaseClass.class;
