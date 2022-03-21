@@ -7,8 +7,6 @@ public interface Subject<R extends Serializable> extends Serializable {
 
     Long getSubjectId();
 
-    String getType();
-
     Set<R> getRoles();
 
 

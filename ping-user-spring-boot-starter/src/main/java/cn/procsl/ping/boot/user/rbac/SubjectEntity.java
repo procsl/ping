@@ -19,8 +19,6 @@ public class SubjectEntity extends AbstractPersistable<Long> implements Subject<
 
     Long subjectId;
 
-    String type;
-
     @OneToMany
     Set<RoleEntity> roles;
 

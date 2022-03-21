@@ -16,7 +16,7 @@ public class UserService {
 
     final JpaRepository<UserEntity, Long> jpaRepository;
 
-    public Long registered(@NotNull User user) throws BusinessException {
+    public Long register(@NotNull User user) throws BusinessException {
         UserEntity entity = new UserEntity();
         BeanUtils.copyProperties(user, entity);
         this.jpaRepository.save(entity);

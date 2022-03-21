@@ -1,10 +1,7 @@
 package cn.procsl.ping.boot.user.account;
 
 import cn.procsl.ping.boot.domain.state.Stateful;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 import javax.persistence.Entity;
@@ -21,6 +18,7 @@ import javax.persistence.Table;
 @Table(name = "u_account")
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class AccountEntity extends AbstractPersistable<Long> implements Account, Stateful<AccountStatus> {
 
     Long userId;

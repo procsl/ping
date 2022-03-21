@@ -86,24 +86,25 @@ public class AccessControlService {
     /**
      * 分配角色
      *
-     * @param subject 目标对象信息
+     * @param subjectId 目标对象信息
+     * @param roleNames 角色名称
      * @throws BusinessException 如果角色不存在
      */
-    public void grant(@NotNull Subject<String> subject) throws BusinessException {
-        Set<RoleEntity> roles = this.roleRepository.findRolesByNameIn(subject.getRoles());
+    public void grant(@NotNull Long subjectId, @NotNull Collection<String> roleNames) throws BusinessException {
+        Set<RoleEntity> roles = this.roleRepository.findRolesByNameIn(roleNames);
 
         // 角色数量不同, 检测具体的角色并报错
-        if (roles.size() < subject.getRoles().size()) {
+        if (roles.size() < roleNames.size()) {
             Set<String> set = roles.stream().map(RoleEntity::getName).collect(Collectors.toSet());
-            HashSet<String> names = new HashSet<>(subject.getRoles());
+            HashSet<String> names = new HashSet<>(roleNames);
             names.removeAll(set);
             throw new BusinessException("该角色不存在[ {} ]", String.join(",", names));
         }
 
-        Example<SubjectEntity> example = Example.of(SubjectEntity.builder().type(subject.getType()).subjectId(subject.getSubjectId()).build());
+        Example<SubjectEntity> example = Example.of(SubjectEntity.builder().subjectId(subjectId).build());
         Optional<SubjectEntity> option = this.subjectRepository.findOne(example);
         SubjectEntity entity = option.orElseGet(SubjectEntity::new);
-        BeanUtils.copyProperties(subject, entity, "id", "roles");
+        entity.setSubjectId(subjectId);
         entity.setRoles(roles);
         this.subjectRepository.save(entity);
     }
