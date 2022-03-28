@@ -1,6 +1,5 @@
-package cn.procsl.ping.boot.user.api.dto;
+package cn.procsl.ping.boot.user;
 
-import cn.procsl.ping.boot.user.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;

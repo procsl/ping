@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.user.sys;
+package cn.procsl.ping.boot.sys;
 
 
 import cn.procsl.ping.boot.domain.business.Configuration;

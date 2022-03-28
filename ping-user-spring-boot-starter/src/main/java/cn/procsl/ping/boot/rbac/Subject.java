@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.user.rbac;
+package cn.procsl.ping.boot.rbac;
 
 import java.io.Serializable;
 import java.util.Set;

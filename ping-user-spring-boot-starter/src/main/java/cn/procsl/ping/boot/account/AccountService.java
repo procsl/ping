@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.user.account;
+package cn.procsl.ping.boot.account;
 
 import cn.procsl.ping.exception.BusinessException;
 import lombok.RequiredArgsConstructor;

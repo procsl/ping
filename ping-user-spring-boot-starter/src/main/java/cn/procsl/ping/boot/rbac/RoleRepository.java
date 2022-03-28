@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.user.rbac;
+package cn.procsl.ping.boot.rbac;
 
 
 import org.springframework.data.jpa.repository.JpaRepository;

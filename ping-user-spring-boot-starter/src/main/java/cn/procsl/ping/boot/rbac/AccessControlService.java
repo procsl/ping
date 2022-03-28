@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.user.rbac;
+package cn.procsl.ping.boot.rbac;
 
 
 import cn.procsl.ping.exception.BusinessException;

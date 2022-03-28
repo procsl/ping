@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.user.account;
+package cn.procsl.ping.boot.account;
 
 public enum AccountStatus {
 
