@@ -1,13 +1,28 @@
 package cn.procsl.ping.boot.rbac;
 
+import cn.procsl.ping.processor.annotation.RepositoryCreator;
+import lombok.*;
+import org.springframework.data.jpa.domain.AbstractPersistable;
+
+import javax.persistence.Entity;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Set;
 
-public interface Subject<R extends Serializable> extends Serializable {
+@Getter
+@Setter
+@Entity
+@Table(name = "u_subject")
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@RepositoryCreator
+public class Subject extends AbstractPersistable<Long> implements Serializable {
 
-    Long getSubjectId();
+    Long subjectId;
 
-    Set<R> getRoles();
-
+    @OneToMany
+    Set<Role> roles;
 
 }

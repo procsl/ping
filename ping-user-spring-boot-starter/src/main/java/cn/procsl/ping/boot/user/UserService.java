@@ -1,9 +1,5 @@
 package cn.procsl.ping.boot.user;
 
-import cn.procsl.ping.boot.account.AccountEntity;
-import cn.procsl.ping.boot.account.AccountService;
-import cn.procsl.ping.boot.rbac.AccessControlService;
-import cn.procsl.ping.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,27 +17,25 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class UserService {
 
-    final AccountService accountService;
+    final AccountFacade accountFacade;
 
-    final AccessControlService accessControlService;
+    final AccessControlFacade accessControlFacade;
 
-    final Set<String> defaultRegisterRoleNames;
+    final ConfigFacade configFacade;
 
-    final JpaRepository<UserEntity, Long> jpaRepository;
-
-    protected Long create(@NotNull User user) throws BusinessException {
-        UserEntity entity = new UserEntity();
-        BeanUtils.copyProperties(user, entity);
-        this.jpaRepository.save(entity);
-        return entity.getId();
-    }
+    final JpaRepository<User, Long> jpaRepository;
 
     @Transactional
     public void register(@NotNull @RequestBody @Validated RegisterUserDTO userDTO) {
-        Long userId = this.create(userDTO);
-        AccountEntity account = AccountEntity.builder().name(userDTO.getAccount()).password(userDTO.getPassword()).userId(userId).build();
-        Long accountId = accountService.create(account);
-        accessControlService.grant(accountId, defaultRegisterRoleNames);
+        Long accountId = accountFacade.create(userDTO.getAccount(), userDTO.getPassword());
+
+        User entity = new User();
+        BeanUtils.copyProperties(userDTO, entity);
+        entity.setAccountId(accountId);
+        this.jpaRepository.save(entity);
+
+        final Set<String> defaultRegisterRoleNames = configFacade.getDefaultRoles();
+        accessControlFacade.grant(entity.getId(), defaultRegisterRoleNames);
     }
 
 

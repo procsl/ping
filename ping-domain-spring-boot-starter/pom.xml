@@ -145,6 +145,12 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>cn.procsl</groupId>
+            <artifactId>ping-processor</artifactId>
+            <version>0.0.4-SNAPSHOT</version>
+        </dependency>
+
     </dependencies>
 
     <dependencyManagement>
@@ -153,7 +159,7 @@
                 <!-- 从 Spring Boot 导入依赖管理 -->
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>2.6.3</version>
+                <version>2.6.7</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -168,7 +174,7 @@
                 <directory>${project.basedir}/src/test/resources</directory>
                 <excludes>
                     <!--先排除application开头的配置文件-->
-                    <exclude>application-*.yml</exclude>
+                    <exclude>application-*.properties</exclude>
                 </excludes>
             </testResource>
 
@@ -180,8 +186,8 @@
                 <filtering>true</filtering>
                 <includes>
                     <!--引入所需环境的配置文件-->
-                    <include>application.yml</include>
-                    <include>application-${profiles.active}.yml</include>
+                    <include>application.properties</include>
+                    <include>application-${profiles.active}.properties</include>
                 </includes>
             </testResource>
         </testResources>

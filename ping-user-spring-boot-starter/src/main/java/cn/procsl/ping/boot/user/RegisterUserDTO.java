@@ -7,11 +7,12 @@ import lombok.Setter;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 
 @Getter
 @Setter
 @Schema(name = "用户注册DTO")
-public class RegisterUserDTO implements User {
+public class RegisterUserDTO implements Serializable {
 
     @NotNull @NotBlank @Size(min = 5, max = 20)
     @Schema(defaultValue = "用户注册姓名")
@@ -25,7 +26,6 @@ public class RegisterUserDTO implements User {
     @Schema(defaultValue = "用户密码")
     String password;
 
-    @NotNull
     @Schema(defaultValue = "用户性别")
     Gender gender;
 

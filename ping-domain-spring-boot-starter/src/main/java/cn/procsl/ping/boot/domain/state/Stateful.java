@@ -10,7 +10,8 @@ import java.io.Serializable;
  */
 public interface Stateful<S extends Serializable> {
 
-    S getStatus();
+    S getState();
 
-    void setStatus(S status);
+    void setState(S status);
+
 }

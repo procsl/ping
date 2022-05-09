@@ -9,8 +9,8 @@ import java.util.Collection;
 import java.util.Set;
 
 @Repository
-public interface RoleRepository extends JpaRepository<RoleEntity, Long>, JpaSpecificationExecutor {
+public interface RoleRepository extends JpaRepository<Role, Long>, JpaSpecificationExecutor<Role> {
 
-    Set<RoleEntity> findRolesByNameIn(Collection<String> roleNames);
+    Set<Role> findRolesByNameIn(Collection<String> roleNames);
 
 }

@@ -33,6 +33,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
+            <optional>true</optional>
             <scope>provided</scope>
         </dependency>
 
@@ -57,34 +58,18 @@
         <dependency>
             <groupId>javax.persistence</groupId>
             <artifactId>javax.persistence-api</artifactId>
-            <version>2.2</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-            <version>2.1.1</version>
-            <type>jar</type>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>javassist</artifactId>
-                    <groupId>org.javassist</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/javax.validation/validation-api -->
         <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
-            <version>2.0.1.Final</version>
         </dependency>
 
         <dependency>
@@ -95,9 +80,16 @@
         </dependency>
 
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-test-autoconfigure</artifactId>
+            <scope>test</scope>
+            <optional>true</optional>
+        </dependency>
+
+
+        <dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
-            <version>4.7.1</version>
             <optional>true</optional>
             <scope>provided</scope>
         </dependency>
@@ -112,7 +104,7 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-hateoas</artifactId>
-            <version>1.6.6</version>
+            <version>1.6.7</version>
         </dependency>
 
         <dependency>
@@ -124,13 +116,18 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-indexer</artifactId>
-            <version>5.3.15</version>
             <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>cn.procsl</groupId>
             <artifactId>ping-domain-spring-boot-starter</artifactId>
+            <version>0.0.4-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.procsl</groupId>
+            <artifactId>ping-processor</artifactId>
             <version>0.0.4-SNAPSHOT</version>
         </dependency>
 
@@ -144,7 +141,7 @@
                 <!-- 从 Spring Boot 导入依赖管理 -->
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>2.6.3</version>
+                <version>2.6.7</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -173,8 +170,8 @@
                 <filtering>true</filtering>
                 <includes>
                     <!--引入所需环境的配置文件-->
-                    <include>application.yml</include>
-                    <include>application-${profiles.active}.yml</include>
+                    <include>application.properties</include>
+                    <include>application-${profiles.active}.properties</include>
                 </includes>
             </testResource>
         </testResources>
@@ -228,7 +225,6 @@
                 <dependency>
                     <groupId>mysql</groupId>
                     <artifactId>mysql-connector-java</artifactId>
-                    <version>8.0.18</version>
                     <scope>test</scope>
                 </dependency>
 
@@ -236,7 +232,6 @@
                 <dependency>
                     <groupId>com.zaxxer</groupId>
                     <artifactId>HikariCP</artifactId>
-                    <version>5.0.0</version>
                     <scope>test</scope>
                 </dependency>
 
@@ -244,108 +239,108 @@
         </profile>
 
 
-        <!--        <profile>-->
-        <!--            <id>native</id>-->
+        <profile>
+            <id>native</id>
 
-        <!--            <dependencies>-->
+            <dependencies>
 
-        <!--                <dependency>-->
-        <!--                    <groupId>org.springframework.experimental</groupId>-->
-        <!--                    <artifactId>spring-native</artifactId>-->
-        <!--                    <version>0.10.5</version>-->
-        <!--                </dependency>-->
+                <dependency>
+                    <groupId>org.springframework.experimental</groupId>
+                    <artifactId>spring-native</artifactId>
+                    <version>0.10.5</version>
+                </dependency>
 
-        <!--                &lt;!&ndash; https://mvnrepository.com/artifact/org.springframework.experimental/spring-native-configuration &ndash;&gt;-->
-        <!--                <dependency>-->
-        <!--                    <groupId>org.springframework.experimental</groupId>-->
-        <!--                    <artifactId>spring-native-configuration</artifactId>-->
-        <!--                    <version>0.10.5</version>-->
-        <!--                </dependency>-->
+                <!-- https://mvnrepository.com/artifact/org.springframework.experimental/spring-native-configuration -->
+                <dependency>
+                    <groupId>org.springframework.experimental</groupId>
+                    <artifactId>spring-native-configuration</artifactId>
+                    <version>0.10.5</version>
+                </dependency>
 
-        <!--            </dependencies>-->
+            </dependencies>
 
-        <!--            <build>-->
-        <!--                <plugins>-->
-        <!--                    <plugin>-->
-        <!--                        <groupId>org.springframework.experimental</groupId>-->
-        <!--                        <artifactId>spring-aot-maven-plugin</artifactId>-->
-        <!--                        <version>0.10.5</version>-->
-        <!--                        <executions>-->
-        <!--                            &lt;!&ndash;                            <execution>&ndash;&gt;-->
-        <!--                            &lt;!&ndash;                                <id>test-generate</id>&ndash;&gt;-->
-        <!--                            &lt;!&ndash;                                <goals>&ndash;&gt;-->
-        <!--                            &lt;!&ndash;                                    <goal>test-generate</goal>&ndash;&gt;-->
-        <!--                            &lt;!&ndash;                                </goals>&ndash;&gt;-->
-        <!--                            &lt;!&ndash;                            </execution>&ndash;&gt;-->
-        <!--                            <execution>-->
-        <!--                                <id>generate</id>-->
-        <!--                                <goals>-->
-        <!--                                    <goal>generate</goal>-->
-        <!--                                </goals>-->
-        <!--                            </execution>-->
-        <!--                        </executions>-->
-        <!--                    </plugin>-->
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.experimental</groupId>
+                        <artifactId>spring-aot-maven-plugin</artifactId>
+                        <version>0.10.5</version>
+                        <executions>
+                            <!--                            <execution>-->
+                            <!--                                <id>test-generate</id>-->
+                            <!--                                <goals>-->
+                            <!--                                    <goal>test-generate</goal>-->
+                            <!--                                </goals>-->
+                            <!--                            </execution>-->
+                            <execution>
+                                <id>generate</id>
+                                <goals>
+                                    <goal>generate</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
 
-        <!--                    <plugin>-->
-        <!--                        <groupId>org.graalvm.buildtools</groupId>-->
-        <!--                        <artifactId>native-maven-plugin</artifactId>-->
-        <!--                        <version>0.9.4</version>-->
-        <!--                        <executions>-->
-        <!--                            &lt;!&ndash;                            <execution>&ndash;&gt;-->
-        <!--                            &lt;!&ndash;                                <id>test-native</id>&ndash;&gt;-->
-        <!--                            &lt;!&ndash;                                <goals>&ndash;&gt;-->
-        <!--                            &lt;!&ndash;                                    <goal>test</goal>&ndash;&gt;-->
-        <!--                            &lt;!&ndash;                                </goals>&ndash;&gt;-->
-        <!--                            &lt;!&ndash;                                <phase>test</phase>&ndash;&gt;-->
-        <!--                            &lt;!&ndash;                            </execution>&ndash;&gt;-->
-        <!--                            <execution>-->
-        <!--                                <id>build-native</id>-->
-        <!--                                <goals>-->
-        <!--                                    <goal>build</goal>-->
-        <!--                                </goals>-->
-        <!--                                <phase>package</phase>-->
-        <!--                            </execution>-->
-        <!--                        </executions>-->
-        <!--                        <configuration>-->
-        <!--                            <buildArgs combine.children="append">-->
-        <!--                                <buildArg>&#45;&#45;verbose</buildArg>-->
-        <!--                            </buildArgs>-->
-        <!--                        </configuration>-->
-        <!--                    </plugin>-->
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <version>0.9.4</version>
+                        <executions>
+                            <!--                            <execution>-->
+                            <!--                                <id>test-native</id>-->
+                            <!--                                <goals>-->
+                            <!--                                    <goal>test</goal>-->
+                            <!--                                </goals>-->
+                            <!--                                <phase>test</phase>-->
+                            <!--                            </execution>-->
+                            <execution>
+                                <id>build-native</id>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                                <phase>package</phase>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <buildArgs combine.children="append">
+                                <buildArg>--verbose</buildArg>
+                            </buildArgs>
+                        </configuration>
+                    </plugin>
 
-        <!--                    <plugin>-->
-        <!--                        <groupId>org.springframework.experimental</groupId>-->
-        <!--                        <artifactId>spring-aot-maven-plugin</artifactId>-->
-        <!--                        <version>0.10.5</version>-->
-        <!--                        <executions>-->
-        <!--                            &lt;!&ndash;                            <execution>&ndash;&gt;-->
-        <!--                            &lt;!&ndash;                                <id>test-generate</id>&ndash;&gt;-->
-        <!--                            &lt;!&ndash;                                <goals>&ndash;&gt;-->
-        <!--                            &lt;!&ndash;                                    <goal>test-generate</goal>&ndash;&gt;-->
-        <!--                            &lt;!&ndash;                                </goals>&ndash;&gt;-->
-        <!--                            &lt;!&ndash;                            </execution>&ndash;&gt;-->
-        <!--                            <execution>-->
-        <!--                                <id>generate</id>-->
-        <!--                                <goals>-->
-        <!--                                    <goal>generate</goal>-->
-        <!--                                </goals>-->
-        <!--                            </execution>-->
-        <!--                        </executions>-->
-        <!--                    </plugin>-->
+                    <plugin>
+                        <groupId>org.springframework.experimental</groupId>
+                        <artifactId>spring-aot-maven-plugin</artifactId>
+                        <version>0.10.5</version>
+                        <executions>
+                            <!--                            <execution>-->
+                            <!--                                <id>test-generate</id>-->
+                            <!--                                <goals>-->
+                            <!--                                    <goal>test-generate</goal>-->
+                            <!--                                </goals>-->
+                            <!--                            </execution>-->
+                            <execution>
+                                <id>generate</id>
+                                <goals>
+                                    <goal>generate</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
 
-        <!--                    &lt;!&ndash; Avoid a clash between Spring Boot repackaging and native-maven-plugin &ndash;&gt;-->
-        <!--                    <plugin>-->
-        <!--                        <groupId>org.springframework.boot</groupId>-->
-        <!--                        <artifactId>spring-boot-maven-plugin</artifactId>-->
-        <!--                        &lt;!&ndash;                        <configuration>&ndash;&gt;-->
-        <!--                        &lt;!&ndash;                            <classifier>exec</classifier>&ndash;&gt;-->
-        <!--                        &lt;!&ndash;                        </configuration>&ndash;&gt;-->
-        <!--                    </plugin>-->
+                    <!-- Avoid a clash between Spring Boot repackaging and native-maven-plugin -->
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <!--                        <configuration>-->
+                        <!--                            <classifier>exec</classifier>-->
+                        <!--                        </configuration>-->
+                    </plugin>
 
-        <!--                </plugins>-->
-        <!--            </build>-->
+                </plugins>
+            </build>
 
-        <!--        </profile>-->
+        </profile>
 
 
     </profiles>
