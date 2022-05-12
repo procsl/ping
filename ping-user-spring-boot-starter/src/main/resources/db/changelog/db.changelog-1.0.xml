@@ -106,17 +106,17 @@
             </column>
         </createTable>
 
-        <createTable tableName="u_configure" remarks="系统信息配置表">
+        <createTable tableName="u_config" remarks="系统信息配置表">
             <column name="id" type="bigint">
                 <constraints primaryKey="true"/>
             </column>
             <column name="key" type="varchar(20)" remarks="配置项标识符">
-                <constraints unique="true" uniqueConstraintName="u_uk_configure" nullable="false"/>
+                <constraints unique="true" uniqueConstraintName="u_uk_config" nullable="false"/>
             </column>
             <column name="type" type="varchar(10)" remarks="配置项类型"/>
-            <column name="config_text" type="varchar(100)" remarks="配置项内容"/>
+            <column name="content" type="varchar(100)" remarks="配置项内容"/>
             <column name="description" type="varchar(500)" remarks="配置项描述"/>
-            <column name="version" type="bigint" remarks="乐观锁">
+            <column name="version" type="bigint" remarks="版本号">
                 <constraints nullable="false"/>
             </column>
         </createTable>

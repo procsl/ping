@@ -2,27 +2,24 @@ package cn.procsl.ping.boot.system;
 
 import cn.procsl.ping.processor.annotation.RepositoryCreator;
 import lombok.*;
-import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Version;
 import java.io.Serializable;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "u_configure")
+@Table(name = "u_config")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @RepositoryCreator
 public class Config extends AbstractPersistable<Long> implements Serializable {
 
-    @UniqueElements
     String key;
 
-    String text;
-
-    @Enumerated(EnumType.STRING)
-    ConfigType type;
+    String content;
 
     String description;
 
@@ -31,11 +28,10 @@ public class Config extends AbstractPersistable<Long> implements Serializable {
 
 
     @Builder
-    public Config(Long id, String key, String text, ConfigType type, String description, Long version) {
+    public Config(Long id, String key, String content, String description, Long version) {
         this.setId(id);
         this.key = key;
-        this.text = text;
-        this.type = type;
+        this.content = content;
         this.description = description;
         this.version = version;
     }

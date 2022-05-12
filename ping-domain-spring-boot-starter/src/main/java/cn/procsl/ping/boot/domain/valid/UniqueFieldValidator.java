@@ -8,7 +8,6 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 
 import javax.persistence.Entity;
-import javax.persistence.EntityManager;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.lang.reflect.Method;
@@ -40,14 +39,12 @@ public class UniqueFieldValidator implements ConstraintValidator<UniqueField, Ob
         }
 
         this.unique = uniqueField;
-        EntityManager entityManager;
         if (uniqueField.useSpringEntityManager()) {
-            entityManager = ContextHolder.getApplicationContext().getBean(EntityManager.class);
+            this.checker = ContextHolder.getApplicationContext().getBean(UniqueChecker.class);
         } else {
-            entityManager = ContextHolder.getEntityManager();
+            this.checker = new UniqueChecker(ContextHolder.getEntityManager());
         }
 
-        this.checker = new UniqueChecker(entityManager);
     }
 
     /**

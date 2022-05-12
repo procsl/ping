@@ -2,6 +2,7 @@ package cn.procsl.ping.boot.domain.valid;
 
 import cn.procsl.ping.boot.domain.DomainApplication;
 import cn.procsl.ping.boot.domain.utils.ContextHolder;
+import com.github.javafaker.Faker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -21,7 +22,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 import java.util.Collections;
-import java.util.Random;
+import java.util.Locale;
 import java.util.Set;
 
 @Slf4j
@@ -46,18 +47,10 @@ class UniqueFieldValidatorTest {
 
     Long gid;
 
-    String key = "唯一" + getRandomString();
 
-    static String getRandomString() {
-        String str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        Random random = new Random();
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 3; i++) {
-            int number = random.nextInt(62);
-            sb.append(str.charAt(number));
-        }
-        return sb.toString();
-    }
+    Faker faker = new Faker(Locale.CHINA);
+
+    String key = faker.name().fullName();
 
     @BeforeEach
     void setUp() {
@@ -181,5 +174,4 @@ class UniqueFieldValidatorTest {
             }
         }, "测试异常");
     }
-
 }

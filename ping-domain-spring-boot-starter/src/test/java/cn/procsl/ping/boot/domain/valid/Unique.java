@@ -4,10 +4,8 @@ import cn.procsl.ping.processor.annotation.RepositoryCreator;
 import lombok.*;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Set;
 
@@ -25,6 +23,7 @@ public class Unique extends AbstractPersistable<Long> implements Serializable {
     String column;
 
     @ElementCollection
+    @CollectionTable(name = "dt_unique_size")
     Set<String> size;
 
     public Unique(String column) {

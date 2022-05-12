@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.domain.jpa;
 
+import lombok.NonNull;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -40,12 +41,12 @@ public class AbstractDomainAuditable<U, PK extends Serializable> extends Abstrac
     private Date lastModifiedDate;
 
     @Override
-    public Optional<U> getCreatedBy() {
+    public @NonNull Optional<U> getCreatedBy() {
         return Optional.ofNullable(createdBy);
     }
 
     @Override
-    public Optional<LocalDateTime> getCreatedDate() {
+    public @NonNull Optional<LocalDateTime> getCreatedDate() {
         return null == createdDate ? Optional.empty()
             : Optional.of(LocalDateTime.ofInstant(createdDate.toInstant(), ZoneId.systemDefault()));
     }
@@ -56,12 +57,12 @@ public class AbstractDomainAuditable<U, PK extends Serializable> extends Abstrac
     }
 
     @Override
-    public Optional<U> getLastModifiedBy() {
+    public @NonNull Optional<U> getLastModifiedBy() {
         return Optional.ofNullable(lastModifiedBy);
     }
 
     @Override
-    public Optional<LocalDateTime> getLastModifiedDate() {
+    public @NonNull Optional<LocalDateTime> getLastModifiedDate() {
         return null == lastModifiedDate ? Optional.empty()
             : Optional.of(LocalDateTime.ofInstant(lastModifiedDate.toInstant(), ZoneId.systemDefault()));
     }

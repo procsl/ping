@@ -1,6 +1,8 @@
 package cn.procsl.ping.boot;
 
 import cn.procsl.ping.boot.domain.utils.ContextHolder;
+import cn.procsl.ping.boot.domain.valid.UniqueChecker;
+import cn.procsl.ping.boot.domain.valid.UniqueService;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -10,9 +12,12 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.repository.config.BootstrapMode;
+
+import javax.persistence.EntityManager;
 
 /**
  * 自动配置 用于注册加载时依赖注入和包扫描
@@ -31,6 +36,11 @@ public class DomainAutoConfiguration implements ApplicationContextAware {
     @Override
     public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
         ContextHolder.setApplicationContext(applicationContext);
+    }
+
+    @Bean
+    public UniqueService uniqueService(EntityManager entityManager) {
+        return new UniqueChecker(entityManager);
     }
 
 }

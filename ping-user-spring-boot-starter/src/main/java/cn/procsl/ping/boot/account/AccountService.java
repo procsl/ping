@@ -32,7 +32,8 @@ public class AccountService {
      */
     @Transactional
     public Long create(
-        @NotBlank @UniqueField(entity = Account.class, fieldName = "name", message = "账户已被注册") String name,
+        @NotBlank
+        @UniqueField(entity = Account.class, fieldName = "name", message = "账户已被注册") String name,
         @NotBlank String password
     ) throws BusinessException {
         return jpaRepository.save(new Account(name, password)).getId();

@@ -7,10 +7,8 @@ import org.springframework.stereotype.Indexed;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.constraints.NotNull;
-import java.util.Set;
 
 @Indexed
 @Service
@@ -21,12 +19,10 @@ public class UserService {
 
     final AccessControlFacade accessControlFacade;
 
-    final ConfigFacade configFacade;
-
     final JpaRepository<User, Long> jpaRepository;
 
     @Transactional
-    public void register(@NotNull @RequestBody @Validated RegisterUserDTO userDTO) {
+    public void register(@NotNull @Validated RegisterDTO userDTO) {
         Long accountId = accountFacade.create(userDTO.getAccount(), userDTO.getPassword());
 
         User entity = new User();
@@ -34,8 +30,7 @@ public class UserService {
         entity.setAccountId(accountId);
         this.jpaRepository.save(entity);
 
-        final Set<String> defaultRegisterRoleNames = configFacade.getDefaultRoles();
-        accessControlFacade.grant(entity.getId(), defaultRegisterRoleNames);
+        accessControlFacade.grantDefaultRoles(entity.getId());
     }
 
 

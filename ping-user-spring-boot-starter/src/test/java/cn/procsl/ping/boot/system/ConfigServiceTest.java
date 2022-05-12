@@ -1,7 +1,7 @@
 package cn.procsl.ping.boot.system;
 
 import cn.procsl.ping.boot.user.UserApplication;
-import cn.procsl.ping.exception.BusinessException;
+import com.github.javafaker.Faker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -11,12 +11,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.ConstraintViolationException;
+import java.util.List;
+import java.util.Locale;
+
 @Slf4j
-@RequiredArgsConstructor
 @Transactional
+@RequiredArgsConstructor
 @SpringBootTest(classes = UserApplication.class, webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 class ConfigServiceTest {
 
@@ -26,29 +31,33 @@ class ConfigServiceTest {
 
     @Autowired
     JpaRepository<Config, Long> jpaRepository;
-    private Long gid;
+
+    Faker faker = new Faker(Locale.CHINA);
+
+    Long gid;
+    ConfigDTO gdto;
 
 
     @BeforeEach
     @Transactional
     void setUp() {
-        Config config = Config.builder().key("test-1").type(ConfigType.key_value).text("test=222").description("我是测试配置1").build();
-        this.gid = this.configService.create(config);
+        this.gdto = new ConfigDTO(faker.name().fullName(), faker.address().fullAddress(), faker.address().secondaryAddress());
+        this.gid = this.configService.add(gdto);
     }
 
     @Test
     @Transactional
     @DisplayName("创建配置项")
     @Rollback
-    void create() {
-        Config config = Config.builder().key("test").type(ConfigType.key_value).text("test=1111").description("我是测试配置").build();
-        Long id = this.configService.create(config);
+    void testCreate() {
+        ConfigDTO dto = new ConfigDTO(faker.name().fullName(), faker.address().fullAddress(), faker.address().secondaryAddress());
+        Long id = this.configService.add(dto);
 
         Config configure = jpaRepository.getById(id);
         Assertions.assertNotNull(configure);
-        Assertions.assertEquals(config.getKey(), configure.getKey());
-        Assertions.assertEquals(config.getText(), configure.getText());
-        Assertions.assertEquals(config.getDescription(), configure.getDescription());
+        Assertions.assertEquals(dto.getKey(), configure.getKey());
+        Assertions.assertEquals(dto.getContent(), configure.getContent());
+        Assertions.assertEquals(dto.getDescription(), configure.getDescription());
     }
 
     @Test
@@ -56,25 +65,45 @@ class ConfigServiceTest {
     @DisplayName("创建配置项:重复配置key")
     @Rollback
     void createRepeat() {
-        Assertions.assertThrows(BusinessException.class, () -> {
-            Config config = Config.builder().key("test").type(ConfigType.key_value).text("test=1111").description("我是测试配置").build();
-            this.configService.create(config);
-            config = Config.builder().key("test").type(ConfigType.key_value).text("test=1111").description("我是测试配置").build();
-            this.configService.create(config);
+        Assertions.assertThrows(ConstraintViolationException.class, () -> {
+            ConfigDTO dto = new ConfigDTO(faker.name().fullName(), faker.address().fullAddress(), faker.address().secondaryAddress());
+            this.configService.add(dto);
+            this.configService.add(dto);
             this.jpaRepository.flush();
-        }, "配置项名称已存在");
+        });
+    }
+
+
+    @Test
+    @DisplayName("修改配置项")
+    void change() {
+        ConfigDTO dto = new ConfigDTO(faker.name().fullName(), faker.address().fullAddress(), faker.address().secondaryAddress());
+        configService.edit(gid, dto);
+        List<Config> all = this.jpaRepository.findAll();
+        Assertions.assertEquals(1, all.size());
+        Assertions.assertEquals(all.get(0).getKey(), dto.getKey());
+        Assertions.assertEquals(all.get(0).getDescription(), dto.getDescription());
+        Assertions.assertEquals(all.get(0).getContent(), dto.getContent());
     }
 
     @Test
-    void changeConfigure() {
-        log.info("hello ");
+    @Transactional
+    @DisplayName("删除配置项")
+    @Rollback
+    void delete() {
+        this.configService.delete(gid);
+        Assertions.assertThrows(JpaObjectRetrievalFailureException.class, () -> this.jpaRepository.getById(gid));
     }
 
     @Test
-    void deleteConfigure() {
-    }
+    @Transactional
+    @DisplayName("获取配置项")
+    @Rollback
+    void getConfig() {
+        String config = this.configService.getConfig(gdto.getKey());
+        Assertions.assertEquals(config, gdto.getContent());
 
-    @Test
-    void getConfigByKey() {
+        String config1 = this.configService.getConfig(faker.animal().name());
+        Assertions.assertNull(config1);
     }
 }

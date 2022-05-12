@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.rbac;
 
+import cn.procsl.ping.processor.annotation.RepositoryCreator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,6 +23,7 @@ import java.util.Set;
 @Table(name = "u_role")
 @NoArgsConstructor
 @AllArgsConstructor
+@RepositoryCreator
 public class Role extends AbstractPersistable<Long> implements Serializable {
 
     protected static Set<String> empty = Collections.emptySet();
@@ -41,6 +43,10 @@ public class Role extends AbstractPersistable<Long> implements Serializable {
         this.changePermissions(permissions);
     }
 
+    public static Permission createPermission(String permission) {
+        return new Permission(permission);
+    }
+
     public void changePermissions(Collection<String> permissions) {
 
         if (this.permissions == null) {
@@ -51,7 +57,7 @@ public class Role extends AbstractPersistable<Long> implements Serializable {
             this.permissions.clear();
         }
         for (String permission : permissions) {
-            this.permissions.add(new Permission(permission));
+            this.permissions.add(createPermission(permission));
         }
     }
 }

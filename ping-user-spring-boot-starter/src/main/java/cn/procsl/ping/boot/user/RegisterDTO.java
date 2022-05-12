@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @Schema(name = "用户注册DTO")
-public class RegisterUserDTO implements Serializable {
+public class RegisterDTO implements Serializable {
 
     @NotNull @NotBlank @Size(min = 5, max = 20)
     @Schema(defaultValue = "用户注册姓名")
