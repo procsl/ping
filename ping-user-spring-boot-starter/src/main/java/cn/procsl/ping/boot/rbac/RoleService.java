@@ -2,7 +2,7 @@ package cn.procsl.ping.boot.rbac;
 
 
 import cn.procsl.ping.boot.domain.valid.UniqueField;
-import cn.procsl.ping.boot.domain.valid.UniqueService;
+import cn.procsl.ping.boot.domain.valid.UniqueValidation;
 import cn.procsl.ping.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Example;
@@ -13,7 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.persistence.criteria.*;
+import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.*;
@@ -35,7 +38,9 @@ public class RoleService {
 
     final JpaSpecificationExecutor<Role> specificationExecutor;
 
-    final UniqueService uniqueService;
+    final JpaSpecificationExecutor<Subject> subjectJpaSpecificationExecutor;
+
+    final UniqueValidation uniqueValidation;
 
     /**
      * 创建角色
@@ -46,8 +51,7 @@ public class RoleService {
      * @throws BusinessException 如果创建失败
      */
     @Transactional
-    public Long createRole(@NotNull @UniqueField(entity = Role.class, fieldName = "name", message = "角色已存在") String name,
-                           @NotNull @Size(max = 100) Collection<@NotBlank @Size(max = 200) String> permissions) throws BusinessException {
+    public Long createRole(@NotNull @UniqueField(entity = Role.class, fieldName = "name", message = "角色已存在") String name, @NotNull @Size(max = 100) Collection<@NotBlank @Size(max = 200) String> permissions) throws BusinessException {
         Role entity = new Role(name, permissions);
         return roleRepository.save(entity).getId();
     }
@@ -83,8 +87,8 @@ public class RoleService {
      * @throws BusinessException 如果修改失败，则抛出异常
      */
     @Transactional
-    public void changeRoleName(@NotNull Long id, @NotBlank @Size(max = 20) String name) throws BusinessException {
-        uniqueService.valid(Role.class, id, "name", name, "角色已存在");
+    public void changeRoleName(@NotNull Long id, @NotBlank @Size(max = 20) String name) throws ConstraintViolationException {
+        uniqueValidation.valid(Role.class, id, "name", name, "角色已存在");
         Role role = this.roleRepository.getById(id);
         role.setName(name);
         this.roleRepository.save(role);
@@ -99,7 +103,13 @@ public class RoleService {
      */
     @Transactional
     public void grant(@NotNull Long subjectId, @NotNull Collection<String> roleNames) throws BusinessException {
-        List<Role> roles = this.specificationExecutor.findAll((root, query, cb) -> cb.in(root.get("name").in(roleNames)));
+        List<Role> roles = this.specificationExecutor.findAll((root, query, cb) -> {
+            CriteriaBuilder.In<String> in = cb.in(root.get("name"));
+            for (String name : roleNames) {
+                in.value(name);
+            }
+            return in;
+        });
 
         // 角色数量不同, 检测具体的角色并报错
         if (roles.size() < roleNames.size()) {
@@ -109,13 +119,36 @@ public class RoleService {
             throw new BusinessException("该角色不存在[ {} ]", String.join(",", names));
         }
 
-        Example<Subject> example = Example.of(Subject.builder().subjectId(subjectId).build());
+        Example<Subject> example = Example.of(Subject.builder().subject(subjectId).build());
         Optional<Subject> option = this.subjectRepository.findOne(example);
         Subject entity = option.orElseGet(Subject::new);
-        entity.setSubjectId(subjectId);
+        entity.setSubject(subjectId);
         entity.addRoles(roles);
         this.subjectRepository.save(entity);
     }
 
+    /**
+     * 判断指定 subject 是否具有某种权限
+     *
+     * @param subject    目标subject
+     * @param permission 权限
+     * @return 如果存在该权限
+     */
+    public boolean hasPermission(@NotNull Long subject, @NotEmpty String permission) {
+        long result = this.subjectJpaSpecificationExecutor.count(
+                (root, query, cb) -> {
+                    Join<Subject, Role> join = root.join("roles", JoinType.INNER);
+                    SetJoin<Role, Permission> joinPermissions = join.joinSet("permissions", JoinType.INNER);
+
+                    Predicate condition1 = cb.equal(root.get("subject"), subject);
+                    Predicate condition2 = cb.equal(joinPermissions.get("name"), permission);
+                    return cb.and(condition1, condition2);
+                });
+        return result > 0;
+    }
+
+    public boolean hasRole(Long subject, String role) {
+        return false;
+    }
 
 }

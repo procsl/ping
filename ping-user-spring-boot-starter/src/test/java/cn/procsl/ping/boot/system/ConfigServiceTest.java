@@ -46,6 +46,7 @@ class ConfigServiceTest {
     }
 
     @Test
+    public
     @Transactional
     @DisplayName("创建配置项")
     @Rollback
@@ -61,6 +62,7 @@ class ConfigServiceTest {
     }
 
     @Test
+    public
     @Transactional
     @DisplayName("创建配置项:重复配置key")
     @Rollback
@@ -75,6 +77,7 @@ class ConfigServiceTest {
 
 
     @Test
+    public
     @DisplayName("修改配置项")
     void change() {
         ConfigDTO dto = new ConfigDTO(faker.name().fullName(), faker.address().fullAddress(), faker.address().secondaryAddress());
@@ -87,6 +90,7 @@ class ConfigServiceTest {
     }
 
     @Test
+    public
     @Transactional
     @DisplayName("删除配置项")
     @Rollback
@@ -96,6 +100,7 @@ class ConfigServiceTest {
     }
 
     @Test
+    public
     @Transactional
     @DisplayName("获取配置项")
     @Rollback

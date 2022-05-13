@@ -1,22 +1,23 @@
 package cn.procsl.ping.boot.domain.valid;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.data.domain.Persistable;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.validation.ConstraintViolationException;
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
-public class UniqueChecker implements UniqueService {
+public class UniqueValidationImpl implements UniqueValidation {
 
     private final EntityManager entityManager;
 
@@ -45,20 +46,20 @@ public class UniqueChecker implements UniqueService {
     }
 
     @Override
-    public void valid(@NonNull Class<?> entity) throws ConstraintViolationException {
-//        if (entity.isAssignableFrom(Persistable.class)) {
-//            throw new IllegalArgumentException(entity.getName() + "is not a entity");
-//        }
-//
+    public void valid(Class<? extends Persistable<? extends Serializable>> entity, Serializable id, String field, Object filedValue, String message) throws ConstraintViolationException {
 
-//        Optional<?> dbid = this.query((Class<? extends Persistable<?>>) entity, uniqueFieldName, uniqueData);
-//        if (ObjectUtils.isEmpty(id)) {
-//            return;
-//        }
-//        if (ObjectUtils.nullSafeEquals(dbid, id)) {
-//            return;
-//        }
-//        throw new ConstraintViolationException(message, null);
+        if (entity.isAssignableFrom(Persistable.class)) {
+            throw new IllegalArgumentException(entity.getName() + "is not a entity");
+        }
+
+        Optional<?> optional = this.query(entity, field, filedValue);
+        if (optional.isEmpty()) {
+            return;
+        }
+        // TODO
+        if (ObjectUtils.nullSafeEquals(optional.get(), id)) {
+            return;
+        }
+        throw new ConstraintViolationException(message, null);
     }
-
 }

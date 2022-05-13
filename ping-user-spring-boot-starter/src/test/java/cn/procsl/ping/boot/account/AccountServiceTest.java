@@ -41,6 +41,7 @@ class AccountServiceTest {
     }
 
     @Test
+    public
     @DisplayName("测试创建用户账户")
     @Transactional
     @Rollback
@@ -56,6 +57,7 @@ class AccountServiceTest {
     }
 
     @Test
+    public
     @DisplayName("测试创建用户账户:已存在账户")
     @Transactional
     @Rollback
@@ -72,6 +74,7 @@ class AccountServiceTest {
     }
 
     @Test
+    public
     @DisplayName("测试登录用户账户:正常登录")
     @Transactional
     @Rollback
@@ -83,6 +86,7 @@ class AccountServiceTest {
     }
 
     @Test
+    public
     @DisplayName("测试登录用户账户:密码错误")
     @Transactional
     @Rollback
@@ -97,6 +101,7 @@ class AccountServiceTest {
     }
 
     @Test
+    public
     @DisplayName("测试登录用户账户:账户不存在")
     @Transactional
     @Rollback
@@ -111,6 +116,7 @@ class AccountServiceTest {
     }
 
     @Test
+    public
     @DisplayName("测试登录用户账户:账户已被禁用")
     @Transactional
     @Rollback
@@ -127,6 +133,7 @@ class AccountServiceTest {
     }
 
     @Test
+    public
     @Rollback
     @Transactional
     @DisplayName("测试禁用账户")
@@ -143,6 +150,7 @@ class AccountServiceTest {
     }
 
     @Test
+    public
     @Rollback
     @Transactional
     @DisplayName("测试启用账户")

@@ -19,7 +19,7 @@ public class UniqueFieldValidator implements ConstraintValidator<UniqueField, Ob
 
     UniqueField unique;
     Entity entity;
-    UniqueChecker checker;
+    UniqueValidationImpl checker;
 
     static String toUpperCaseFirstOne(String s) {
         if (Character.isUpperCase(s.charAt(0))) {
@@ -40,9 +40,9 @@ public class UniqueFieldValidator implements ConstraintValidator<UniqueField, Ob
 
         this.unique = uniqueField;
         if (uniqueField.useSpringEntityManager()) {
-            this.checker = ContextHolder.getApplicationContext().getBean(UniqueChecker.class);
+            this.checker = ContextHolder.getApplicationContext().getBean(UniqueValidationImpl.class);
         } else {
-            this.checker = new UniqueChecker(ContextHolder.getEntityManager());
+            this.checker = new UniqueValidationImpl(ContextHolder.getEntityManager());
         }
 
     }

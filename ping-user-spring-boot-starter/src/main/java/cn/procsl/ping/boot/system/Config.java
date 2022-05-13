@@ -4,6 +4,7 @@ import cn.procsl.ping.processor.annotation.RepositoryCreator;
 import lombok.*;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Version;
@@ -17,6 +18,7 @@ import java.io.Serializable;
 @RepositoryCreator
 public class Config extends AbstractPersistable<Long> implements Serializable {
 
+    @Column(unique = true)
     String key;
 
     String content;

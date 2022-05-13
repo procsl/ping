@@ -71,6 +71,7 @@ class UniqueFieldValidatorTest {
     }
 
     @Test
+    public
     @DisplayName("UniqueField单元测试:entity")
     @Rollback
     @Transactional
@@ -95,6 +96,7 @@ class UniqueFieldValidatorTest {
     }
 
     @Test
+    public
     @DisplayName("UniqueField单元测试:DTO")
     @Rollback
     @Transactional
@@ -125,6 +127,7 @@ class UniqueFieldValidatorTest {
     }
 
     @Test
+    public
     @DisplayName("UniqueField单元测试:method")
     @Rollback
     @Transactional

@@ -23,6 +23,7 @@ class TableTest {
     JpaRepository<Table, Long> jpaRepository;
 
     @Test
+    public
     @Transactional
     void insert() {
         try {

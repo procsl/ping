@@ -16,7 +16,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @DisplayName("商品服务单元测试")
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {ProducerApplication.class})
-class ProductServiceTest {
+public class ProductServiceTest {
 
     @Autowired
     ProductService productService;
@@ -25,6 +25,7 @@ class ProductServiceTest {
     JpaRepository<Product, Long> jpaRepository;
 
     @Test
+    public
     @DisplayName("商品发布测试")
     void publish() {
         productService.publish(1L);

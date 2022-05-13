@@ -7,16 +7,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Persistable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 @Slf4j
 @RequiredArgsConstructor
 @SpringBootTest(classes = DomainApplication.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
-class UniqueCheckerTest {
+class UniqueValidationImplTest {
 
     @Autowired
-    UniqueService uniqueService;
+    UniqueValidation uniqueValidation;
 
     @Autowired
     JpaRepository<Unique, Long> jpaRepository;
@@ -28,10 +27,8 @@ class UniqueCheckerTest {
     }
 
     @Test
+    public
     void valid() {
-//         new Unique("test");
-        Class<? extends Persistable<?>> clazz = Unique.class;
-//        this.uniqueService.valid(clazz, unique.getId(), "column", unique, "已存在");
-        this.uniqueService.valid(null);
+        this.uniqueValidation.valid(Unique.class, unique.getId(), "column", unique.getColumn(), "已存在");
     }
 }

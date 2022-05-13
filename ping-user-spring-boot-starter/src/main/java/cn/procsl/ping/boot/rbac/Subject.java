@@ -22,10 +22,14 @@ import java.util.Set;
 @RepositoryCreator
 public class Subject extends AbstractPersistable<Long> implements Serializable {
 
-    Long subjectId;
+    Long subject;
 
     @OneToMany
     Set<Role> roles;
+
+    public Subject(Long subject) {
+        this.subject = subject;
+    }
 
     void addRoles(Collection<Role> roles) {
         if (this.roles == null) {

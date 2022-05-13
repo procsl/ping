@@ -9,7 +9,7 @@ import static org.hamcrest.CoreMatchers.is;
 @QuarkusTest
 public class GreetingResourceTest {
 
-    @Test
+    @Test public
     public void testHelloEndpoint() {
         given()
             .when().get("/echo")

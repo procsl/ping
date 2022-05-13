@@ -1,8 +1,8 @@
 package cn.procsl.ping.boot;
 
 import cn.procsl.ping.boot.domain.utils.ContextHolder;
-import cn.procsl.ping.boot.domain.valid.UniqueChecker;
-import cn.procsl.ping.boot.domain.valid.UniqueService;
+import cn.procsl.ping.boot.domain.valid.UniqueValidation;
+import cn.procsl.ping.boot.domain.valid.UniqueValidationImpl;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -39,8 +39,8 @@ public class DomainAutoConfiguration implements ApplicationContextAware {
     }
 
     @Bean
-    public UniqueService uniqueService(EntityManager entityManager) {
-        return new UniqueChecker(entityManager);
+    public UniqueValidation uniqueValidation(EntityManager entityManager) {
+        return new UniqueValidationImpl(entityManager);
     }
 
 }

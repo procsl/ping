@@ -92,7 +92,7 @@
                 <constraints primaryKey="true"/>
             </column>
 
-            <column name="subject_id" type="bigint" remarks="主体">
+            <column name="subject" type="bigint" remarks="主体">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -114,7 +114,7 @@
                 <constraints unique="true" uniqueConstraintName="u_uk_config" nullable="false"/>
             </column>
             <column name="type" type="varchar(10)" remarks="配置项类型"/>
-            <column name="content" type="varchar(100)" remarks="配置项内容"/>
+            <column name="content" type="text" remarks="配置项内容"/>
             <column name="description" type="varchar(500)" remarks="配置项描述"/>
             <column name="version" type="bigint" remarks="版本号">
                 <constraints nullable="false"/>

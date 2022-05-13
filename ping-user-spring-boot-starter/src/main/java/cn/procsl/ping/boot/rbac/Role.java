@@ -1,10 +1,7 @@
 package cn.procsl.ping.boot.rbac;
 
 import cn.procsl.ping.processor.annotation.RepositoryCreator;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 import javax.persistence.CollectionTable;
@@ -38,6 +35,7 @@ public class Role extends AbstractPersistable<Long> implements Serializable {
         this(name, empty);
     }
 
+    @Builder
     public Role(String name, Collection<String> permissions) {
         this.name = name;
         this.changePermissions(permissions);

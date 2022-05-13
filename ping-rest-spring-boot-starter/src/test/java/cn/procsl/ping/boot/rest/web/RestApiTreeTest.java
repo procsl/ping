@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 public class RestApiTreeTest {
 
     @Test
+    public
     public void test() {
         MediaType mime = new MediaType("application", "api.ping+xml", StandardCharsets.UTF_8);
         log.info(mime.toString());
