@@ -16,7 +16,7 @@ import java.util.Locale;
 @Slf4j
 @RequiredArgsConstructor
 @SpringBootTest(classes = DomainApplication.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
-class TableTest {
+public class TableTest {
 
     Faker faker = new Faker(Locale.CHINA);
     @Autowired

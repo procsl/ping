@@ -28,7 +28,7 @@ import java.util.Set;
 @Slf4j
 @RequiredArgsConstructor
 @SpringBootTest(classes = DomainApplication.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
-class UniqueFieldValidatorTest {
+public class UniqueFieldValidatorTest {
 
     @Autowired
     JpaRepository<Unique, Long> jpaRepository;
@@ -71,11 +71,10 @@ class UniqueFieldValidatorTest {
     }
 
     @Test
-    public
     @DisplayName("UniqueField单元测试:entity")
     @Rollback
     @Transactional
-    void isValid() {
+    public void isValid() {
         Assertions.assertThrows(ConstraintViolationException.class, () -> {
             try {
                 log.debug("Test is running");
@@ -96,11 +95,10 @@ class UniqueFieldValidatorTest {
     }
 
     @Test
-    public
     @DisplayName("UniqueField单元测试:DTO")
     @Rollback
     @Transactional
-    void isValidDTO() {
+    public void isValidDTO() {
         {
             UniqueDTO dto = new UniqueDTO(key);
             Set<ConstraintViolation<UniqueDTO>> errors = this.validator.validate(dto);
@@ -127,11 +125,10 @@ class UniqueFieldValidatorTest {
     }
 
     @Test
-    public
     @DisplayName("UniqueField单元测试:method")
     @Rollback
     @Transactional
-    void isValidMethod() {
+    public void isValidMethod() {
         Assertions.assertThrows(ConstraintViolationException.class, () -> {
             try {
                 this.service.create(key);

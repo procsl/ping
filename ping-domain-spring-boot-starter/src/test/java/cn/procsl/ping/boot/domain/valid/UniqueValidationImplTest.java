@@ -12,7 +12,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 @Slf4j
 @RequiredArgsConstructor
 @SpringBootTest(classes = DomainApplication.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
-class UniqueValidationImplTest {
+public class UniqueValidationImplTest {
 
     @Autowired
     UniqueValidation uniqueValidation;
@@ -27,8 +27,7 @@ class UniqueValidationImplTest {
     }
 
     @Test
-    public
-    void valid() {
+    public void valid() {
         this.uniqueValidation.valid(Unique.class, unique.getId(), "column", unique.getColumn(), "已存在");
     }
 }

@@ -48,7 +48,7 @@
 
         <dependency>
             <groupId>cn.procsl</groupId>
-            <artifactId>ping-user-spring-boot-starter</artifactId>
+            <artifactId>ping-infra-spring-boot-starter</artifactId>
             <version>0.0.4-SNAPSHOT</version>
         </dependency>
 
@@ -199,6 +199,17 @@
 
         </plugins>
 
+        <pluginManagement>
+            <plugins>
+                <!-- 必须显式的声明测试插件，否则无法执行测试 -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.0.0-M5</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
     </build>
 
 
@@ -221,131 +232,27 @@
 
         </profile>
 
-        <!--        <profile>-->
-        <!--            <id>native</id>-->
+        <profile>
+            <id>native</id>
 
-        <!--            <dependencies>-->
+            <dependencies>
 
-        <!--                <dependency>-->
-        <!--                    <groupId>org.springframework.experimental</groupId>-->
-        <!--                    <artifactId>spring-native</artifactId>-->
-        <!--                    <version>0.10.5</version>-->
-        <!--                </dependency>-->
+                <dependency>
+                    <groupId>org.springframework.experimental</groupId>
+                    <artifactId>spring-native</artifactId>
+                    <version>0.10.5</version>
+                </dependency>
 
-        <!--                <dependency>-->
-        <!--                    <groupId>org.springframework.experimental</groupId>-->
-        <!--                    <artifactId>spring-native-configuration</artifactId>-->
-        <!--                    <version>0.10.5</version>-->
-        <!--                </dependency>-->
+                <dependency>
+                    <groupId>org.springframework.experimental</groupId>
+                    <artifactId>spring-native-configuration</artifactId>
+                    <version>0.10.5</version>
+                </dependency>
 
-        <!--            </dependencies>-->
+            </dependencies>
 
-        <!--            <build>-->
-        <!--                <plugins>-->
-        <!--                    <plugin>-->
-        <!--                        <groupId>org.springframework.experimental</groupId>-->
-        <!--                        <artifactId>spring-aot-maven-plugin</artifactId>-->
-        <!--                        <version>0.10.5</version>-->
-        <!--                        <executions>-->
-        <!--                            <execution>-->
-        <!--                                <id>test-generate</id>-->
-        <!--                                <goals>-->
-        <!--                                    <goal>test-generate</goal>-->
-        <!--                                </goals>-->
-        <!--                            </execution>-->
-        <!--                            <execution>-->
-        <!--                                <id>generate</id>-->
-        <!--                                <goals>-->
-        <!--                                    <goal>generate</goal>-->
-        <!--                                </goals>-->
-        <!--                            </execution>-->
-        <!--                        </executions>-->
-        <!--                    </plugin>-->
 
-        <!--                    <plugin>-->
-        <!--                        <groupId>org.graalvm.buildtools</groupId>-->
-        <!--                        <artifactId>native-maven-plugin</artifactId>-->
-        <!--                        <version>0.9.4</version>-->
-        <!--                        <executions>-->
-        <!--                            <execution>-->
-        <!--                                <id>test-native</id>-->
-        <!--                                <goals>-->
-        <!--                                    <goal>test</goal>-->
-        <!--                                </goals>-->
-        <!--                                <phase>test</phase>-->
-        <!--                            </execution>-->
-        <!--                            <execution>-->
-        <!--                                <id>build-native</id>-->
-        <!--                                <goals>-->
-        <!--                                    <goal>build</goal>-->
-        <!--                                </goals>-->
-        <!--                                <phase>package</phase>-->
-        <!--                            </execution>-->
-        <!--                        </executions>-->
-        <!--                        <configuration>-->
-        <!--                            <buildArgs>-->
-        <!--                                <buildArg>&#45;&#45;verbose</buildArg>-->
-        <!--                                <buildArg>-->
-        <!--                                    -H:+ReportExceptionStackTraces-->
-        <!--                                </buildArg>-->
-        <!--                            </buildArgs>-->
-        <!--                        </configuration>-->
-        <!--                    </plugin>-->
-
-        <!--                    <plugin>-->
-        <!--                        <groupId>org.springframework.experimental</groupId>-->
-        <!--                        <artifactId>spring-aot-maven-plugin</artifactId>-->
-        <!--                        <version>0.10.5</version>-->
-        <!--                        <executions>-->
-        <!--                            <execution>-->
-        <!--                                <id>test-generate</id>-->
-        <!--                                <goals>-->
-        <!--                                    <goal>test-generate</goal>-->
-        <!--                                </goals>-->
-        <!--                            </execution>-->
-        <!--                            <execution>-->
-        <!--                                <id>generate</id>-->
-        <!--                                <goals>-->
-        <!--                                    <goal>generate</goal>-->
-        <!--                                </goals>-->
-        <!--                            </execution>-->
-        <!--                        </executions>-->
-        <!--                    </plugin>-->
-
-        <!--                    &lt;!&ndash; Avoid a clash between Spring Boot repackaging and native-maven-plugin &ndash;&gt;-->
-        <!--                    <plugin>-->
-        <!--                        <groupId>org.springframework.boot</groupId>-->
-        <!--                        <artifactId>spring-boot-maven-plugin</artifactId>-->
-        <!--                        <configuration>-->
-        <!--                            <image>-->
-        <!--                                <builder>paketobuildpacks/builder:tiny</builder>-->
-        <!--                                <env>-->
-        <!--                                    <BP_BOOT_NATIVE_IMAGE>1</BP_BOOT_NATIVE_IMAGE>-->
-        <!--                                    <BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>-->
-        <!--                                </env>-->
-        <!--                            </image>-->
-
-        <!--                            &lt;!&ndash;                            <classifier>exec</classifier>&ndash;&gt;-->
-        <!--                            <mainClass>cn.procsl.ping.app.admin.AdminApplication</mainClass>-->
-        <!--                            &lt;!&ndash;                            <layout>jar</layout>&ndash;&gt;-->
-        <!--                        </configuration>-->
-        <!--                        <executions>-->
-        <!--                            <execution>-->
-        <!--                                <id>build-image</id>-->
-        <!--                                <goals>-->
-        <!--                                    <goal>build-image</goal>-->
-        <!--                                </goals>-->
-        <!--                                <configuration>-->
-        <!--                                    <classifier>exec</classifier>-->
-        <!--                                </configuration>-->
-        <!--                            </execution>-->
-        <!--                        </executions>-->
-        <!--                    </plugin>-->
-
-        <!--                </plugins>-->
-        <!--            </build>-->
-
-        <!--        </profile>-->
+        </profile>
 
         <profile>
             <id>mysql8</id>

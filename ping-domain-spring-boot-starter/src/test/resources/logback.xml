@@ -22,7 +22,7 @@
     </appender>
 
     <!-- 设置日志输出级别 -->
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="CONSOLE"/>
     </root>
 
@@ -34,7 +34,7 @@
     <logger name="org.springframework.test" level="INFO"/>
     <logger name="org.hibernate.hql.internal.ast.QueryTranslatorImpl" level="INFO"/>
     <logger name="org.hibernate.hql.internal.ast.util.JoinProcessor" level="INFO"/>
-    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE"/>
-    <logger name="org.hibernate.type.descriptor.sql.BasicExtractor" level="TRACE"/>
+    <!--    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE"/>-->
+    <!--    <logger name="org.hibernate.type.descriptor.sql.BasicExtractor" level="TRACE"/>-->
 
 </configuration>

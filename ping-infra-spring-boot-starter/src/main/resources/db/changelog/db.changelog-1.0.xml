@@ -1,0 +1,127 @@
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+
+    <changeSet id="create_user_table" author="user_module">
+        <createTable tableName="i_role" remarks="RBAC模块角色表">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="name" type="varchar(20)" remarks="角色名称">
+                <constraints nullable="false" unique="true" uniqueConstraintName="i_uk_role_name"/>
+            </column>
+
+        </createTable>
+
+
+        <createTable tableName="i_role_permission" remarks="RBAC模块权限表">
+            <column name="role_id" type="bigint">
+                <constraints references="i_role(id)" foreignKeyName="i_fk_role_id" referencedTableName="i_role"
+                             referencedColumnNames="id"/>
+            </column>
+            <column name="name" type="varchar(128)" remarks="权限名称"/>
+        </createTable>
+
+        <createTable tableName="i_account" remarks="用户账户表">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="name" type="varchar(30)" remarks="用户账户名">
+                <constraints nullable="false" unique="true" uniqueConstraintName="i_uk_account_name"/>
+            </column>
+
+            <column name="password" type="varchar(40)" remarks="用户密码"/>
+
+            <column name="state" type="varchar(10)" remarks="用户状态"/>
+
+            <!--            <column name="created_by" type="bigint" remarks="创建人">-->
+            <!--                <constraints nullable="false"/>-->
+            <!--            </column>-->
+            <!--            <column name="created_date" type="datetime" remarks="创建时间">-->
+            <!--                <constraints nullable="false"/>-->
+            <!--            </column>-->
+
+            <!--            <column name="last_modified_by" type="bigint" remarks="最后修改人">-->
+            <!--                <constraints nullable="false"/>-->
+            <!--            </column>-->
+            <!--            <column name="last_modified_date" type="datetime" remarks="最后修改时间">-->
+            <!--                <constraints nullable="false"/>-->
+            <!--            </column>-->
+
+        </createTable>
+
+        <createTable tableName="i_user">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true"/>
+            </column>
+
+            <column name="account_id" type="bigint" remarks="用户账户ID">
+                <constraints nullable="false" unique="true" uniqueConstraintName="i_uk_user_account"/>
+            </column>
+
+            <column name="name" type="varchar(15)" remarks="用户姓名">
+                <constraints nullable="false" unique="true" uniqueConstraintName="i_uk_user_name"/>
+            </column>
+
+            <column name="gender" type="varchar(10)" remarks="用户性别: 男, 女, 未知"/>
+
+            <column name="remark" type="varchar(500)" remarks="用户签名"/>
+
+            <!--            <column name="created_by" type="bigint" remarks="创建人">-->
+            <!--                <constraints nullable="false"/>-->
+            <!--            </column>-->
+            <!--            <column name="created_date" type="datetime" remarks="创建时间">-->
+            <!--                <constraints nullable="false"/>-->
+            <!--            </column>-->
+
+            <!--            <column name="last_modified_by" type="bigint" remarks="最后修改人">-->
+            <!--                <constraints nullable="false"/>-->
+            <!--            </column>-->
+            <!--            <column name="last_modified_date" type="datetime" remarks="最后修改时间">-->
+            <!--                <constraints nullable="false"/>-->
+            <!--            </column>-->
+
+        </createTable>
+
+        <createTable tableName="i_subject" remarks="主体表">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true"/>
+            </column>
+
+            <column name="subject" type="bigint" remarks="主体">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="i_subject_roles" remarks="主体角色关联表">
+            <column name="subject_id" type="bigint" remarks="主体ID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="roles_id" type="bigint" remarks="角色ID">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="i_config" remarks="系统信息配置表">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="key" type="varchar(20)" remarks="配置项标识符">
+                <constraints unique="true" uniqueConstraintName="i_uk_config" nullable="false"/>
+            </column>
+            <column name="type" type="varchar(10)" remarks="配置项类型"/>
+            <column name="content" type="text" remarks="配置项内容"/>
+            <column name="description" type="varchar(500)" remarks="配置项描述"/>
+            <column name="version" type="bigint" remarks="版本号">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+    </changeSet>
+
+
+</databaseChangeLog>

@@ -68,7 +68,8 @@
             </option>
         </MavenSettings>
         <method v="2">
-            <option name="Maven.BeforeRunTask" enabled="true" file="$PROJECT_DIR$/ping-user-spring-boot-starter/pom.xml"
+            <option name="Maven.BeforeRunTask" enabled="true"
+                    file="$PROJECT_DIR$/ping-infra-spring-boot-starter/pom.xml"
                     goal="clean install"/>
         </method>
     </configuration>
