@@ -8,17 +8,16 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.repository.config.BootstrapMode;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import static cn.procsl.ping.boot.infra.UserAutoConfiguration.base_path;
+import static cn.procsl.ping.boot.infra.UserAutoConfiguration.domain_path;
 
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnMissingBean({UserAutoConfiguration.class})
 @RequiredArgsConstructor
-@EntityScan(basePackages = {base_path + "user", base_path + "account", base_path + "rbac", base_path + "conf"})
+@EntityScan(basePackages = domain_path)
 @EnableTransactionManagement
-@EnableJpaRepositories(basePackages = {base_path + "user", base_path + "account", base_path + "rbac", base_path + "conf"}, bootstrapMode = BootstrapMode.LAZY)
+@EnableJpaRepositories(basePackages = domain_path, bootstrapMode = BootstrapMode.LAZY)
 public class UserAutoConfiguration {
 
-    final static String base_path = "cn.procsl.ping.boot.infra.";
-
+    final static String domain_path = "cn.procsl.ping.boot.infra.domain";
 
 }

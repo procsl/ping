@@ -30,7 +30,7 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
 
-            <column name="name" type="varchar(30)" remarks="用户账户名">
+            <column name="name" type="varchar(50)" remarks="用户账户名">
                 <constraints nullable="false" unique="true" uniqueConstraintName="i_uk_account_name"/>
             </column>
 
@@ -63,7 +63,7 @@
                 <constraints nullable="false" unique="true" uniqueConstraintName="i_uk_user_account"/>
             </column>
 
-            <column name="name" type="varchar(15)" remarks="用户姓名">
+            <column name="name" type="varchar(50)" remarks="用户姓名">
                 <constraints nullable="false" unique="true" uniqueConstraintName="i_uk_user_name"/>
             </column>
 
