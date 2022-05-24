@@ -36,6 +36,7 @@
         <dependency>
             <groupId>com.querydsl</groupId>
             <artifactId>querydsl-jpa</artifactId>
+            <version>${querydsl.version}</version>
         </dependency>
 
         <dependency>
@@ -156,6 +157,7 @@
             <groupId>com.speedment.jpastreamer</groupId>
             <artifactId>jpastreamer-core</artifactId>
             <version>${jpa-streamer-version}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>

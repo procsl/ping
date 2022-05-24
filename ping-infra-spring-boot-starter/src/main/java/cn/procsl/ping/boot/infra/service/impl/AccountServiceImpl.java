@@ -18,8 +18,8 @@ import java.util.Optional;
 
 @Indexed
 @Service
-@RequiredArgsConstructor
 @Validated
+@RequiredArgsConstructor
 class AccountServiceImpl implements AccountService {
 
     final JpaRepository<Account, Long> jpaRepository;

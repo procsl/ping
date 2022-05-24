@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.infra.web.user;
+package cn.procsl.ping.admin.web.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

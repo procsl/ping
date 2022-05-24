@@ -141,10 +141,17 @@
         </dependency>
 
         <dependency>
-            <groupId>cn.procsl</groupId>
-            <artifactId>ping-rest-spring-boot-starter</artifactId>
-            <version>0.0.4-SNAPSHOT</version>
+            <groupId>com.querydsl</groupId>
+            <artifactId>querydsl-apt</artifactId>
+            <version>${querydsl.version}</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>guava</artifactId>
+                    <groupId>com.google.guava</groupId>
+                </exclusion>
+            </exclusions>
+            <classifier>jpa</classifier>
         </dependency>
 
     </dependencies>
