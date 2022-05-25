@@ -12,8 +12,6 @@ public class UserVO implements Serializable {
 
     String name;
 
-    String account;
-
     Gender gender;
 
     String remark;

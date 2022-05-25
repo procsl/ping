@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDTO implements Serializable {
+public class RegisterDTO implements Serializable {
 
     @NotBlank @Size(min = 5, max = 50) String account;
 

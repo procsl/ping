@@ -1,9 +1,12 @@
 package cn.procsl.ping.admin.web.user;
 
+import cn.procsl.ping.admin.MarkPageable;
+import cn.procsl.ping.admin.web.FormatPage;
 import cn.procsl.ping.boot.infra.domain.account.QAccount;
 import cn.procsl.ping.boot.infra.domain.user.QUser;
 import cn.procsl.ping.boot.infra.domain.user.User;
 import cn.procsl.ping.boot.infra.service.UserService;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.QBean;
@@ -12,11 +15,9 @@ import com.querydsl.jpa.JPQLQueryFactory;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Indexed;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -34,37 +35,37 @@ public class UserController {
 
     final JPQLQueryFactory queryFactory;
 
+    final static QUser quser = QUser.user;
+
     @PostMapping("users")
     @Operation(description = "创建用户")
-    public Long register(@Validated @RequestBody UserDTO userDTO) {
-        return this.userService.register(userDTO.getAccount(), userDTO.getPassword());
+    public Long register(@Validated @RequestBody RegisterDTO registerDTO) {
+        return this.userService.register(registerDTO.getAccount(), registerDTO.getPassword());
     }
 
     @GetMapping("users/{id}")
     @Operation(description = "获取用户信息")
     @Transactional(readOnly = true)
-    public User getById(@PathVariable Long id) {
-        return jpaRepository.getById(id);
+    public UserDetailsVO getById(@PathVariable Long id) {
+        QBean<UserDetailsVO> projections = Projections.bean(UserDetailsVO.class, quser.id, quser.name, quser.gender, quser.remark, QAccount.account.name.as("account"));
+        return queryFactory.select(projections).from(quser).innerJoin(QAccount.account).on(quser.accountId.eq(QAccount.account.id)).where(quser.id.eq(id)).fetchFirst();
     }
 
+    @MarkPageable
     @GetMapping("users")
     @Transactional(readOnly = true)
     @Operation(description = "获取用户列表")
-    public Page<UserVO> findUsers(@PageableDefault Pageable pageable) {
-        QUser quser = QUser.user;
-        QAccount qaccount = QAccount.account;
-        QBean<UserVO> projections = Projections.bean(UserVO.class, quser.id, quser.name, quser.gender, quser.remark, qaccount.name.as("account"));
+    public FormatPage<UserVO> findUsers(Pageable pageable, @ParameterObject UserVO user) {
 
-        JPQLQuery<UserVO> query = queryFactory.select(projections)
-                .from(quser)
-                .innerJoin(qaccount).on(quser.accountId.eq(qaccount.id))
-                .limit(pageable.getPageSize())
-                .offset(pageable.getOffset())
-                .orderBy(quser.id.desc());
+        QBean<UserVO> projections = Projections.bean(UserVO.class, quser.id, quser.name, quser.gender, quser.remark);
+
+        BooleanBuilder builder = new BooleanBuilder();
+
+        JPQLQuery<UserVO> query = queryFactory.select(projections).from(quser).limit(pageable.getPageSize()).offset(pageable.getOffset()).orderBy(quser.id.desc());
 
         QueryResults<UserVO> results = query.fetchResults();
 
-        return new PageImpl<>(results.getResults(), pageable, results.getTotal());
+        return new FormatPage<>(results.getResults(), pageable, results.getTotal());
     }
 
 
