@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
+import javax.annotation.Nullable;
 import javax.persistence.CollectionTable;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -56,6 +57,17 @@ public class Role extends AbstractPersistable<Long> implements Serializable {
         }
         for (String permission : permissions) {
             this.permissions.add(createPermission(permission));
+        }
+    }
+
+    public void change(@Nullable String name, @Nullable Collection<String> permissions) {
+        boolean bool = name == null || name.isEmpty();
+        if (!bool) {
+            this.name = name;
+        }
+
+        if (permissions != null) {
+            this.changePermissions(permissions);
         }
     }
 }

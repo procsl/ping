@@ -1,19 +1,13 @@
 package cn.procsl.ping.admin.web.user;
 
-import cn.procsl.ping.boot.infra.domain.user.Gender;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import java.io.Serializable;
-
 @Data
-public class UserVO implements Serializable {
+public class UserVO extends UserPropDTO {
 
+    @Schema(description = "用户ID")
     Long id;
 
-    String name;
-
-    Gender gender;
-
-    String remark;
 
 }

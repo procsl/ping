@@ -5,7 +5,7 @@ import lombok.*;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 import javax.persistence.Entity;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Collection;
@@ -24,7 +24,7 @@ public class Subject extends AbstractPersistable<Long> implements Serializable {
 
     Long subject;
 
-    @OneToMany
+    @ManyToMany
     Set<Role> roles;
 
     public Subject(Long subject) {

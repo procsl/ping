@@ -1,6 +1,7 @@
 package cn.procsl.ping.boot.infra;
 
 import cn.procsl.ping.boot.infra.domain.rbac.AccessControlService;
+import cn.procsl.ping.boot.infra.domain.user.RegisterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -18,7 +19,14 @@ import static cn.procsl.ping.boot.infra.UserAutoConfiguration.domain_path;
 @EntityScan(basePackages = domain_path)
 @EnableTransactionManagement
 @EnableJpaRepositories(basePackages = domain_path, bootstrapMode = BootstrapMode.LAZY)
-@ComponentScan(basePackages = {"cn.procsl.ping.boot.infra.service", "cn.procsl.ping.boot.infra.adapter"}, basePackageClasses = AccessControlService.class)
+@ComponentScan(
+        basePackages = {
+                "cn.procsl.ping.boot.infra.service",
+                "cn.procsl.ping.boot.infra.adapter"},
+        basePackageClasses = {
+                AccessControlService.class,
+                RegisterService.class
+        })
 public class UserAutoConfiguration {
 
     final static String domain_path = "cn.procsl.ping.boot.infra.domain";

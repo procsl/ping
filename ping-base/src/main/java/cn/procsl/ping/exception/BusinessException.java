@@ -13,9 +13,9 @@ public class BusinessException extends RuntimeException implements ErrorEntity {
 
     final static String MESSAGE_TEMPLATE = "[%s] not found!";
 
-    Integer httpStatus;
+    Integer httpStatus = 501;
 
-    String code;
+    String code = "000";
 
     public BusinessException(String format, Object... arguments) {
         // TODO 这里应该用占位符的, 先写着

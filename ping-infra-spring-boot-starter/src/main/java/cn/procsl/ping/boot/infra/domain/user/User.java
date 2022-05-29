@@ -41,4 +41,10 @@ public class User extends AbstractPersistable<Long> implements Serializable {
         this.accountId = accountId;
         this.gender = Gender.unknown;
     }
+
+    public void updateSelf(String name, Gender gender, String remark) {
+        this.name = name;
+        this.gender = gender;
+        this.remark = remark;
+    }
 }

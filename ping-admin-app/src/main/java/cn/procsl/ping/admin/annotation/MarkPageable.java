@@ -1,4 +1,4 @@
-package cn.procsl.ping.admin;
+package cn.procsl.ping.admin.annotation;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Parameter(in = ParameterIn.QUERY, description = "基于从1开始的分页 (1..N)", name = "${spring.data.web.pageable.page-parameter:offset}", schema = @Schema(type = "integer", defaultValue = "1"))
 @Parameter(in = ParameterIn.QUERY, description = "每页大小", name = "${spring.data.web.pageable.size-parameter:size}", schema = @Schema(type = "integer", defaultValue = "10"))
-@Parameter(in = ParameterIn.QUERY, description = "Sorting criteria in the format: property,(asc|desc). " + "Default sort order is ascending. " + "Multiple sort criteria are supported.", name = "sort", array = @ArraySchema(schema = @Schema(type = "String", example = "id")))
+@Parameter(in = ParameterIn.QUERY, description = "指定排序字段, 格式为: property,(asc|desc)", name = "sort", array = @ArraySchema(schema = @Schema(type = "String", example = "id")))
 @Parameter(name = "pageable", hidden = true)
 public @interface MarkPageable {
 

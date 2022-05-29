@@ -1,9 +1,9 @@
 package cn.procsl.ping.boot.infra.service.impl;
 
 import cn.procsl.ping.boot.infra.InfraApplication;
+import cn.procsl.ping.boot.infra.domain.user.RegisterService;
 import cn.procsl.ping.boot.infra.domain.user.User;
 import cn.procsl.ping.boot.infra.service.AccountService;
-import cn.procsl.ping.boot.infra.service.UserService;
 import com.github.jsonzou.jmockdata.JMockData;
 import com.github.jsonzou.jmockdata.MockConfig;
 import org.junit.jupiter.api.Assertions;
@@ -18,7 +18,7 @@ public class UserServiceImplTest {
 
 
     @Autowired
-    UserService userService;
+    RegisterService userService;
 
     @Autowired
     AccountService accountService;
@@ -38,20 +38,6 @@ public class UserServiceImplTest {
 
         Long id = accountService.authenticate(account, password);
         User user = this.jpaRepository.getById(id);
-        Assertions.assertNotNull(user);
-
-    }
-
-    @Test
-    @DisplayName("测试用户登录")
-    public void login() {
-        MockConfig config = new MockConfig();
-        config.setEnabledPrivate(true);
-        String account = JMockData.mock(String.class);
-        String password = JMockData.mock(String.class);
-        userService.register(account, password);
-
-        User user = userService.login(account, password);
         Assertions.assertNotNull(user);
 
     }

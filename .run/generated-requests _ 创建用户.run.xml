@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="generated-requests" type="HttpClient.HttpRequestRunConfigurationType"
+                   factoryName="HTTP Request" environment="dev"
+                   path="$APPLICATION_CONFIG_DIR$/scratches/generated-requests.http" requestIdentifier="创建用户"
+                   runType="运行单个请求">
+        <method v="2"/>
+    </configuration>
+</component>

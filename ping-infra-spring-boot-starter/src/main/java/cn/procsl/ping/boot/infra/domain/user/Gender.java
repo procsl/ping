@@ -3,15 +3,15 @@ package cn.procsl.ping.boot.infra.domain.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(defaultValue = "用户性别")
+@Schema(description = "用户性别")
 public enum Gender {
 
-    @Schema(defaultValue = "男")
+    @Schema(description = "男")
     man,
 
-    @Schema(defaultValue = "女")
+    @Schema(description = "女")
     woman,
 
-    @Schema(defaultValue = "未知")
+    @Schema(description = "未知")
     unknown,
 }

@@ -1,6 +1,8 @@
 package cn.procsl.ping.admin.web;
 
+import cn.procsl.ping.admin.utils.QueryBuilder;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.querydsl.core.QueryResults;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.NonNull;
 import org.springframework.data.domain.PageImpl;
@@ -17,9 +19,19 @@ import java.util.List;
 public class FormatPage<T> extends PageImpl<T> {
 
 
-    public FormatPage(List<T> content, Pageable pageable, long total) {
+    private FormatPage(List<T> content, Pageable pageable, long total) {
         super(content, pageable, total);
     }
+
+    public static <T> FormatPage<T> page(List<T> content, Pageable pageable, long total) {
+        return new FormatPage<>(content, pageable, total);
+    }
+
+    public static <T> FormatPage<T> page(QueryBuilder<T> query, Pageable pageable) {
+        QueryResults<T> result = query.build(pageable).fetchResults();
+        return new FormatPage<>(result.getResults(), pageable, result.getTotal());
+    }
+
 
     public FormatPage(List<T> content) {
         super(content);
