@@ -14,11 +14,11 @@ import javax.validation.constraints.Size;
 @RequiredArgsConstructor
 public class RegisterService {
 
-    final AuthenticateService authenticateService;
-
     final AuthorizedService authorizedService;
 
     final JpaRepository<User, Long> jpaRepository;
+
+    final JpaRepository<Account, Long> accountRepository;
 
     /**
      * 用户注册, 用户名称默认为账户名称
@@ -27,10 +27,12 @@ public class RegisterService {
      * @param password 用户密码
      * @throws BusinessException 如果注册失败
      */
-    public Long register(@NotBlank @Size(min = 5, max = 20) String account, @NotBlank @Size(min = 5, max = 20) String password) throws BusinessException {
-        Long accountId = authenticateService.create(account, password);
-        User user = this.jpaRepository.save(new User(account, accountId));
-        authorizedService.grantDefaultRoles(user.getId());
+    public Long register(@NotBlank @Size(min = 5, max = 20) String account,
+                         @NotBlank @Size(min = 5, max = 20) String password) throws BusinessException {
+        User user = User.creator(account, account, password);
+        this.accountRepository.save(user.getAccount());
+        this.jpaRepository.save(user);
+        this.authorizedService.grantDefaultRoles(user.getId());
         return user.getId();
     }
 

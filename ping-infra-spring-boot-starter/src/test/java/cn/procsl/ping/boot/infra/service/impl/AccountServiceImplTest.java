@@ -1,9 +1,9 @@
 package cn.procsl.ping.boot.infra.service.impl;
 
 import cn.procsl.ping.boot.infra.InfraApplication;
-import cn.procsl.ping.boot.infra.domain.account.Account;
-import cn.procsl.ping.boot.infra.domain.account.AccountStatus;
-import cn.procsl.ping.boot.infra.service.AccountService;
+import cn.procsl.ping.boot.infra.domain.user.Account;
+import cn.procsl.ping.boot.infra.domain.user.AccountState;
+import cn.procsl.ping.boot.infra.domain.user.AuthenticateService;
 import cn.procsl.ping.boot.infra.service.ConfigService;
 import cn.procsl.ping.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
@@ -17,8 +17,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.ConstraintViolationException;
-
 @Slf4j
 @DisplayName("用户账户服务单元测试")
 @Transactional
@@ -30,7 +28,7 @@ public class AccountServiceImplTest {
     ConfigService configService;
 
     @Autowired
-    AccountService accountService;
+    AuthenticateService authenticateService;
 
     @Autowired
     JpaRepository<Account, Long> jpaRepository;
@@ -42,7 +40,7 @@ public class AccountServiceImplTest {
     public void setUp() {
         String name = "account@foxmail.com";
         String password = "1234567";
-        this.gid = this.accountService.create(name, password);
+        this.gid = this.jpaRepository.save(Account.create(name, password)).getId();
     }
 
     @Test
@@ -52,28 +50,13 @@ public class AccountServiceImplTest {
     public void create() {
         String name = "program_chen@foxmail.com";
         String password = "1234567";
-        Long id = this.accountService.create(name, password);
+        Long id = this.jpaRepository.save(Account.create(name, password)).getId();
+        assert id != null;
         Account account = this.jpaRepository.getById(id);
         Assertions.assertEquals(account.getName(), name);
         Assertions.assertEquals(account.getPassword(), password);
         Assertions.assertTrue(account.isEnable());
         log.info("测试成功");
-    }
-
-    @Test
-    @DisplayName("测试创建用户账户:已存在账户")
-    @Transactional
-    @Rollback
-    public void createAccountExists() {
-        Assertions.assertThrows(ConstraintViolationException.class, () -> {
-            Account entity = this.jpaRepository.getById(gid);
-            try {
-                this.accountService.create(entity.getName(), "any");
-            } catch (Exception e) {
-                log.error("打印异常:", e);
-                throw e;
-            }
-        });
     }
 
     @Test
@@ -83,7 +66,7 @@ public class AccountServiceImplTest {
     public void check() {
         Assertions.assertNotNull(gid);
         Account account = this.jpaRepository.getById(gid);
-        Long id = this.accountService.authenticate(account.getName(), account.getPassword());
+        Long id = this.authenticateService.authenticate(account.getName(), account.getPassword());
         Assertions.assertEquals(id, account.getId());
     }
 
@@ -95,7 +78,7 @@ public class AccountServiceImplTest {
         Assertions.assertNotNull(gid);
         Account account = this.jpaRepository.getById(gid);
 
-        Assertions.assertThrows(BusinessException.class, () -> this.accountService.authenticate(account.getName(), "987654321"), "密码错误");
+        Assertions.assertThrows(BusinessException.class, () -> this.authenticateService.authenticate(account.getName(), "987654321"), "密码错误");
 
     }
 
@@ -107,7 +90,7 @@ public class AccountServiceImplTest {
         Assertions.assertNotNull(gid);
         Account account = this.jpaRepository.getById(gid);
 
-        Assertions.assertThrows(BusinessException.class, () -> this.accountService.authenticate("NotFountAccount", account.getPassword()), "账户不存在");
+        Assertions.assertThrows(BusinessException.class, () -> this.authenticateService.authenticate("NotFountAccount", account.getPassword()), "账户不存在");
 
     }
 
@@ -121,7 +104,7 @@ public class AccountServiceImplTest {
         account.disabled();
         this.jpaRepository.save(account);
 
-        Assertions.assertThrows(BusinessException.class, () -> this.accountService.authenticate(account.getName(), account.getPassword()), "账户已被禁用");
+        Assertions.assertThrows(BusinessException.class, () -> this.authenticateService.authenticate(account.getName(), account.getPassword()), "账户已被禁用");
 
     }
 
@@ -132,12 +115,12 @@ public class AccountServiceImplTest {
     public void disable() {
         {
             Account account = this.jpaRepository.getById(gid);
-            Assertions.assertEquals(account.getState(), AccountStatus.enable);
+            Assertions.assertEquals(account.getState(), AccountState.enable);
         }
         {
-            this.accountService.disable(gid);
             Account account = this.jpaRepository.getById(gid);
-            Assertions.assertEquals(account.getState(), AccountStatus.disable);
+            account.disabled();
+            Assertions.assertEquals(account.getState(), AccountState.disable);
         }
     }
 
@@ -148,17 +131,17 @@ public class AccountServiceImplTest {
     public void enable() {
         {
             Account account = this.jpaRepository.getById(gid);
-            Assertions.assertEquals(account.getState(), AccountStatus.enable);
+            Assertions.assertEquals(account.getState(), AccountState.enable);
         }
         {
-            this.accountService.disable(gid);
             Account account = this.jpaRepository.getById(gid);
-            Assertions.assertEquals(account.getState(), AccountStatus.disable);
+            account.disabled();
+            Assertions.assertEquals(account.getState(), AccountState.disable);
         }
         {
-            this.accountService.enable(gid);
             Account account = this.jpaRepository.getById(gid);
-            Assertions.assertEquals(account.getState(), AccountStatus.enable);
+            account.enabled();
+            Assertions.assertEquals(account.getState(), AccountState.enable);
         }
     }
 

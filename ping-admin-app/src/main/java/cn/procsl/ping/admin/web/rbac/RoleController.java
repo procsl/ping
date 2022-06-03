@@ -13,8 +13,6 @@ import com.querydsl.core.types.QBean;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.JPQLQueryFactory;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -25,10 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import java.util.Collection;
 
 @Indexed
 @RestController
@@ -64,31 +59,19 @@ public class RoleController {
     @Transactional
     @PatchMapping("/v1/roles/{id}")
     @Operation(summary = "修改指定角色信息")
-    public void change(@PathVariable("id") Long id, @RequestBody @Validated @NotNull RoleNameDTO name) throws BusinessException {
-        uniqueValidator.valid(Role.class, id, "name", name.getName(), "角色已存在");
+    public void change(@PathVariable("id") Long id, @RequestBody @NotNull RoleDetailsDTO details) throws BusinessException {
+        uniqueValidator.valid(Role.class, id, "name", details.getName(), "角色已存在");
         Role role = this.roleRepository.getById(id);
-        role.change(name.getName(), null);
+        role.change(details.getName(), details.getPermissions());
     }
 
     @Transactional
     @GetMapping("/v1/roles/{id}")
     @Operation(summary = "获取指定角色信息")
-    public RoleDetailsDTO findById(@PathVariable("id") Long id) throws BusinessException {
+    public RoleDetailsDTO getById(@PathVariable("id") Long id) throws BusinessException {
         Role role = this.roleRepository.getById(id);
         return new RoleDetailsDTO(role);
     }
-
-    @Transactional
-    @Operation(summary = "修改角色权限")
-    @PatchMapping("/v1/roles/{id}/permissions")
-    @Parameter(name = "id", description = "角色ID")
-    public void change(@PathVariable("id") Long id,
-                       @RequestBody @Validated @Schema(description = "权限列表") @NotNull @Size(max = 100)
-                       Collection<@NotBlank @Size(max = 200) String> permissions) throws BusinessException {
-        Role role = this.roleRepository.getById(id);
-        role.changePermissions(permissions);
-    }
-
 
     @MarkPageable
     @Transactional(readOnly = true)

@@ -1,13 +1,10 @@
-package cn.procsl.ping.boot.infra.domain.account;
+package cn.procsl.ping.boot.infra.domain.user;
 
 import cn.procsl.ping.boot.domain.state.Stateful;
 import cn.procsl.ping.exception.BusinessException;
 import cn.procsl.ping.processor.annotation.RepositoryCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 import javax.persistence.Entity;
@@ -19,15 +16,15 @@ import javax.persistence.Table;
  * 用户账户
  */
 @Getter
-@Setter
+@Setter(value = AccessLevel.PACKAGE)
 @Entity
 @Table(name = "i_account")
 @NoArgsConstructor
 @AllArgsConstructor
 @RepositoryCreator
-public class Account extends AbstractPersistable<Long> implements Stateful<AccountStatus> {
+public class Account extends AbstractPersistable<Long> implements Stateful<AccountState> {
 
-    @Schema(description = "用户姓名")
+    @Schema(description = "账户名称")
     String name;
 
     @Schema(description = "用户姓名")
@@ -35,30 +32,35 @@ public class Account extends AbstractPersistable<Long> implements Stateful<Accou
 
     @Enumerated(value = EnumType.STRING)
     @Schema(description = "账户状态")
-    AccountStatus state;
+    AccountState state;
 
     public static Account create(String name, String password) {
-        return new Account(name, password, AccountStatus.enable);
+        return new Account(name, password, AccountState.enable);
     }
 
     public void enabled() {
-        this.state = AccountStatus.enable;
+        this.state = AccountState.enable;
     }
 
     public boolean isDisabled() {
-        return AccountStatus.enable == state;
+        return AccountState.enable == state;
     }
+
+    public void stateSetting(AccountState state) {
+        this.setState(state);
+    }
+
 
     public boolean checkPassword(String password) {
         return this.password.equals(password);
     }
 
     public boolean isEnable() {
-        return state == AccountStatus.enable;
+        return state == AccountState.enable;
     }
 
     public void disabled() {
-        this.state = AccountStatus.disable;
+        this.state = AccountState.disable;
     }
 
     public void authenticate(String password) throws BusinessException {

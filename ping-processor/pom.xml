@@ -38,6 +38,7 @@
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service</artifactId>
             <version>1.0.1</version>
+            <scope>compile</scope>
         </dependency>
 
 

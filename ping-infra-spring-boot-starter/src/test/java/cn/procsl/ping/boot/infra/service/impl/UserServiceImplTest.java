@@ -1,9 +1,9 @@
 package cn.procsl.ping.boot.infra.service.impl;
 
 import cn.procsl.ping.boot.infra.InfraApplication;
+import cn.procsl.ping.boot.infra.domain.user.AuthenticateService;
 import cn.procsl.ping.boot.infra.domain.user.RegisterService;
 import cn.procsl.ping.boot.infra.domain.user.User;
-import cn.procsl.ping.boot.infra.service.AccountService;
 import com.github.jsonzou.jmockdata.JMockData;
 import com.github.jsonzou.jmockdata.MockConfig;
 import org.junit.jupiter.api.Assertions;
@@ -16,12 +16,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 @SpringBootTest(classes = InfraApplication.class, webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 public class UserServiceImplTest {
 
-
     @Autowired
     RegisterService userService;
 
     @Autowired
-    AccountService accountService;
+    AuthenticateService authenticateService;
 
     @Autowired
     JpaRepository<User, Long> jpaRepository;
@@ -36,7 +35,7 @@ public class UserServiceImplTest {
         Long userId = userService.register(account, password);
         Assertions.assertNotNull(userId);
 
-        Long id = accountService.authenticate(account, password);
+        Long id = authenticateService.authenticate(account, password);
         User user = this.jpaRepository.getById(id);
         Assertions.assertNotNull(user);
 

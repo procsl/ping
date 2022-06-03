@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.info.License;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
-import org.springframework.hateoas.config.EnableHypermediaSupport;
 
 import static cn.procsl.ping.admin.AdminApplication.apache;
 import static cn.procsl.ping.admin.AdminApplication.desc;
@@ -18,7 +17,7 @@ import static cn.procsl.ping.admin.AdminApplication.desc;
  * @author procsl
  * @date 2020/04/26
  */
-@EnableHypermediaSupport(type = {EnableHypermediaSupport.HypermediaType.HAL})
+//@EnableHypermediaSupport(type = {EnableHypermediaSupport.HypermediaType.HAL})
 @SpringBootApplication(scanBasePackages = {"cn.procsl.ping.admin"}, exclude = ErrorMvcAutoConfiguration.class)
 @OpenAPIDefinition(info = @Info(title = "接口文档", version = "1.0", license = @License(url = apache, name = "Apache License 2.0"), description = desc))
 public class AdminApplication {

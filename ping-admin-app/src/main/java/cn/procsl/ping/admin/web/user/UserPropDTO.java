@@ -2,12 +2,16 @@ package cn.procsl.ping.admin.web.user;
 
 import cn.procsl.ping.boot.infra.domain.user.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserPropDTO implements Serializable {
 
     @NotEmpty

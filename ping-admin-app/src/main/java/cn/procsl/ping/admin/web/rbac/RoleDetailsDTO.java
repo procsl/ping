@@ -24,4 +24,8 @@ public class RoleDetailsDTO extends RoleNameDTO {
         this.permissions = role.getPermissions().stream().map(Permission::getName).collect(Collectors.toSet());
     }
 
+    public RoleDetailsDTO(String name, Collection<String> permissions) {
+        super(name);
+        this.permissions = permissions;
+    }
 }

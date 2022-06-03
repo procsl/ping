@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.infra.domain.account;
 
+import cn.procsl.ping.boot.infra.domain.user.Account;
 import cn.procsl.ping.exception.BusinessException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;

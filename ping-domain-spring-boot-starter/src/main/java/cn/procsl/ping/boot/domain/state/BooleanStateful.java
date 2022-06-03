@@ -11,6 +11,7 @@ public interface BooleanStateful extends Stateful<Boolean> {
 
     boolean DISABLE_STATE = !ENABLE_STATE;
 
+    void setState(Boolean state);
 
     default void disable() {
         setState(!ENABLE_STATE);

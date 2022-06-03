@@ -33,10 +33,6 @@ public class FormatPage<T> extends PageImpl<T> {
     }
 
 
-    public FormatPage(List<T> content) {
-        super(content);
-    }
-
     @Override
     @JsonIgnore
     @Schema(hidden = true)
@@ -50,8 +46,14 @@ public class FormatPage<T> extends PageImpl<T> {
     }
 
     @Override
-    @Schema(example = "10", description = "每页大小")
+    @Schema(example = "10", description = "每页大小", hidden = true)
+    @JsonIgnore
     public int getSize() {
+        return super.getSize();
+    }
+
+    @Schema(example = "10", description = "每页大小")
+    public int getLimit() {
         return super.getSize();
     }
 

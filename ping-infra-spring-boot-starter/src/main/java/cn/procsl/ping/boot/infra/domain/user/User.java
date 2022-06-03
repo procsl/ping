@@ -8,10 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 
 @Getter
@@ -33,13 +30,16 @@ public class User extends AbstractPersistable<Long> implements Serializable {
     String remark;
 
     @Schema(defaultValue = "用户账户ID")
-    Long accountId;
+    @OneToOne
+    Account account;
 
 
-    public User(String name, Long accountId) {
-        this.name = name;
-        this.accountId = accountId;
-        this.gender = Gender.unknown;
+    public static User creator(String name, String account, String password) {
+        User user = new User();
+        user.name = name;
+        user.gender = Gender.unknown;
+        user.account = Account.create(account, password);
+        return user;
     }
 
     public void updateSelf(String name, Gender gender, String remark) {

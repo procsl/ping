@@ -12,6 +12,4 @@ public interface Stateful<S extends Serializable> {
 
     S getState();
 
-    void setState(S status);
-
 }
