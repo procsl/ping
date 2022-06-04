@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.infra;
 
+import cn.procsl.ping.boot.infra.domain.conf.ConfigOptionService;
 import cn.procsl.ping.boot.infra.domain.rbac.AccessControlService;
 import cn.procsl.ping.boot.infra.domain.user.RegisterService;
 import lombok.RequiredArgsConstructor;
@@ -20,12 +21,11 @@ import static cn.procsl.ping.boot.infra.UserAutoConfiguration.domain_path;
 @EnableTransactionManagement
 @EnableJpaRepositories(basePackages = domain_path, bootstrapMode = BootstrapMode.LAZY)
 @ComponentScan(
-        basePackages = {
-                "cn.procsl.ping.boot.infra.service",
-                "cn.procsl.ping.boot.infra.adapter"},
+        basePackages = {"cn.procsl.ping.boot.infra.adapter"},
         basePackageClasses = {
                 AccessControlService.class,
-                RegisterService.class
+                RegisterService.class,
+                ConfigOptionService.class
         })
 public class UserAutoConfiguration {
 

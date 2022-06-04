@@ -4,7 +4,6 @@ import cn.procsl.ping.boot.infra.InfraApplication;
 import cn.procsl.ping.boot.infra.domain.user.Account;
 import cn.procsl.ping.boot.infra.domain.user.AccountState;
 import cn.procsl.ping.boot.infra.domain.user.AuthenticateService;
-import cn.procsl.ping.boot.infra.service.ConfigService;
 import cn.procsl.ping.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -22,10 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @SpringBootTest(classes = InfraApplication.class, webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 public class AccountServiceImplTest {
-
-
-    @Autowired
-    ConfigService configService;
 
     @Autowired
     AuthenticateService authenticateService;

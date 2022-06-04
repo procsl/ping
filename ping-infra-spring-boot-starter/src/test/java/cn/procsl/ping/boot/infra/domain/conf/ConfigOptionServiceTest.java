@@ -1,8 +1,6 @@
-package cn.procsl.ping.boot.infra.service.impl;
+package cn.procsl.ping.boot.infra.domain.conf;
 
 import cn.procsl.ping.boot.infra.InfraApplication;
-import cn.procsl.ping.boot.infra.domain.conf.Config;
-import cn.procsl.ping.boot.infra.service.ConfigService;
 import com.github.javafaker.Faker;
 import com.github.jsonzou.jmockdata.JMockData;
 import lombok.extern.slf4j.Slf4j;
@@ -17,26 +15,23 @@ import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityNotFoundException;
-import javax.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.Locale;
 
 @Slf4j
 @DisplayName("配置项服务测试")
 @SpringBootTest(classes = InfraApplication.class, webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-class ConfigServiceImplTest {
-
+public class ConfigOptionServiceTest {
 
     @Autowired
-    ConfigService configService;
+    ConfigOptionService configOptionService;
 
     @Autowired
     JpaRepository<Config, Long> jpaRepository;
 
     Faker faker = new Faker(Locale.CHINA);
 
-    Long gid;
+    private Long gid;
 
     @BeforeEach
     @Transactional
@@ -44,7 +39,7 @@ class ConfigServiceImplTest {
         String key = JMockData.mock(String.class);
         String content = JMockData.mock(String.class);
         String desc = JMockData.mock(String.class);
-        gid = this.configService.add(key, content, desc);
+        this.gid = this.jpaRepository.save(Config.creator(key, content, desc)).getId();
     }
 
     @Test
@@ -55,7 +50,7 @@ class ConfigServiceImplTest {
         String key = JMockData.mock(String.class);
         String content = JMockData.mock(String.class);
         String desc = JMockData.mock(String.class);
-        Long id = configService.add(key, content, desc);
+        Long id = configOptionService.put(key, content, desc);
 
         Config configure = jpaRepository.getById(id);
         Assertions.assertNotNull(configure);
@@ -63,51 +58,37 @@ class ConfigServiceImplTest {
         Assertions.assertEquals(content, configure.getContent());
         Assertions.assertEquals(desc, configure.getDescription());
 
-        this.configService.add(JMockData.mock(String.class), null, desc);
-        this.configService.add(JMockData.mock(String.class), "", desc);
-        this.configService.add(JMockData.mock(String.class), null, null);
-        this.configService.add(JMockData.mock(String.class), JMockData.mock(String.class), null);
-        this.configService.add(JMockData.mock(String.class), JMockData.mock(String.class), "");
+        this.configOptionService.put(JMockData.mock(String.class), null, desc);
+        this.configOptionService.put(JMockData.mock(String.class), "", desc);
+        this.configOptionService.put(JMockData.mock(String.class), null, null);
+        this.configOptionService.put(JMockData.mock(String.class), JMockData.mock(String.class), null);
+        this.configOptionService.put(JMockData.mock(String.class), JMockData.mock(String.class), "");
         this.jpaRepository.flush();
     }
 
+
     @Test
     @Transactional
-    @DisplayName("创建配置项:重复配置key")
     @Rollback
-    public void createRepeat() {
-        Assertions.assertThrows(ConstraintViolationException.class, () -> {
-            String key = JMockData.mock(String.class);
-            String content = JMockData.mock(String.class);
-            String desc = JMockData.mock(String.class);
-            this.configService.add(key, content, desc);
-            this.configService.add(key, content, desc);
-            this.configService.add(key, content, desc);
-            this.jpaRepository.flush();
-        });
-    }
-
-
-    @Test
     @DisplayName("修改配置项")
     public void change() {
         String key = JMockData.mock(String.class);
         String content = JMockData.mock(String.class);
         String desc = JMockData.mock(String.class);
-        configService.edit(gid, key, content, desc);
+        Config config = this.jpaRepository.getById(gid);
+        config.edit(key, content, desc);
         List<Config> all = this.jpaRepository.findAll();
         Assertions.assertEquals(1, all.size());
         Assertions.assertEquals(all.get(0).getKey(), key);
         Assertions.assertEquals(all.get(0).getDescription(), desc);
         Assertions.assertEquals(all.get(0).getContent(), content);
 
-        configService.edit(gid, key, null, desc);
-        configService.edit(gid, key, "", desc);
-        configService.edit(gid, key, content, null);
-        configService.edit(gid, key, content, "");
-        configService.edit(gid, JMockData.mock(String.class), content, "");
-        configService.edit(gid, JMockData.mock(String.class), JMockData.mock(String.class), "");
-        Assertions.assertThrows(EntityNotFoundException.class, () -> configService.edit(JMockData.mock(Long.class), JMockData.mock(String.class), JMockData.mock(String.class), ""));
+        config.edit(key, null, desc);
+        config.edit(key, "", desc);
+        config.edit(key, content, null);
+        config.edit(key, content, "");
+        config.edit(JMockData.mock(String.class), content, "");
+        config.edit(JMockData.mock(String.class), JMockData.mock(String.class), "");
     }
 
     @Test
@@ -115,7 +96,7 @@ class ConfigServiceImplTest {
     @DisplayName("删除配置项")
     @Rollback
     public void delete() {
-        this.configService.delete(gid);
+        this.jpaRepository.deleteById(gid);
         Assertions.assertThrows(JpaObjectRetrievalFailureException.class, () -> this.jpaRepository.getById(gid));
     }
 
@@ -127,10 +108,11 @@ class ConfigServiceImplTest {
 
         Config entity = this.jpaRepository.getById(gid);
 
-        String config = this.configService.getConfig(entity.getKey());
+        String config = this.configOptionService.get(entity.getKey());
         Assertions.assertEquals(config, entity.getContent());
 
-        String config1 = this.configService.getConfig(faker.animal().name());
+        String config1 = this.configOptionService.get(faker.animal().name());
         Assertions.assertNull(config1);
     }
+
 }

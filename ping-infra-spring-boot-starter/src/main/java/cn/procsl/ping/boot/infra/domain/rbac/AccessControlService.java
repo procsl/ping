@@ -68,7 +68,7 @@ public class AccessControlService {
         Optional<Subject> option = this.subjectJpaSpecificationExecutor.findOne((root, query, cb) -> cb.equal(root.get("subject"), subject));
         Subject entity = option.orElseGet(Subject::new);
         entity.setSubject(subject);
-        entity.addRoles(roles);
+        entity.putRoles(roles);
         this.subjectRepository.save(entity);
     }
 

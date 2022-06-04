@@ -5,9 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Indexed;
 import org.springframework.stereotype.Service;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import org.springframework.validation.annotation.Validated;
 
 @Indexed
 @Service
@@ -27,8 +25,8 @@ public class RegisterService {
      * @param password 用户密码
      * @throws BusinessException 如果注册失败
      */
-    public Long register(@NotBlank @Size(min = 5, max = 20) String account,
-                         @NotBlank @Size(min = 5, max = 20) String password) throws BusinessException {
+    @Validated
+    public Long register(String account, String password) throws BusinessException {
         User user = User.creator(account, account, password);
         this.accountRepository.save(user.getAccount());
         this.jpaRepository.save(user);

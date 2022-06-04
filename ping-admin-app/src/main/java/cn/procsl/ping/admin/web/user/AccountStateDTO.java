@@ -7,7 +7,7 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 
 @Data
-public class StateDTO implements Stateful<AccountState> {
+public class AccountStateDTO implements Stateful<AccountState> {
 
     @NotNull
     AccountState state;

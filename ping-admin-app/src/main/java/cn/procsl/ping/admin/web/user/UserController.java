@@ -4,6 +4,7 @@ import cn.procsl.ping.admin.annotation.MarkPageable;
 import cn.procsl.ping.admin.utils.QueryBuilder;
 import cn.procsl.ping.admin.web.FormatPage;
 import cn.procsl.ping.boot.infra.domain.user.*;
+import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.QBean;
 import com.querydsl.jpa.JPQLQuery;
@@ -41,20 +42,6 @@ public class UserController {
         return this.userRegisterService.register(registerDTO.getAccount(), registerDTO.getPassword());
     }
 
-    @GetMapping("/v1/users/{id}")
-    @Operation(summary = "获取用户信息")
-    @Transactional(readOnly = true)
-    public UserDetailsVO getById(@PathVariable Long id) {
-        QBean<UserDetailsVO> projections = Projections.bean(UserDetailsVO.class,
-                quser.id, quser.name, quser.gender, quser.remark,
-                QAccount.account.name.as("account"));
-        return queryFactory
-                .select(projections)
-                .from(quser)
-                .innerJoin(qaccount).on(quser.account.id.eq(qaccount.id))
-                .where(quser.id.eq(id)).fetchFirst();
-    }
-
     @Transactional
     @PatchMapping("/v1/users/{id}")
     @Operation(summary = "更新用户信息")
@@ -67,14 +54,18 @@ public class UserController {
     @GetMapping("/v1/users")
     @Transactional(readOnly = true)
     @Operation(summary = "获取用户列表")
-    public FormatPage<UserVO> findUsers(Pageable pageable, @RequestParam(required = false) String name, @RequestParam(required = false) Gender gender) {
+    public FormatPage<UserDetailsVO> findUsers(Pageable pageable, @RequestParam(required = false) String name, @RequestParam(required = false) String account, @RequestParam(required = false) Gender gender) {
 
-        QBean<UserVO> projections = Projections.bean(UserVO.class, quser.id, quser.name, quser.gender, quser.remark);
-        JPQLQuery<UserVO> query = queryFactory.select(projections).from(quser);
+        Expression<AccountVO> accountProjection = Projections.bean(AccountVO.class, qaccount.name, qaccount.state).as("account");
+        QBean<UserDetailsVO> projections = Projections.bean(UserDetailsVO.class, quser.id, quser.name, quser.gender, quser.remark, accountProjection);
+
+        JPQLQuery<UserDetailsVO> query = queryFactory.select(projections).from(quser)
+                .innerJoin(qaccount).on(quser.account.id.eq(qaccount.id));
 
         val builder = QueryBuilder
                 .builder(query)
                 .and(name, () -> quser.name.like(String.format("%%%s%%", name)))
+                .and(account, () -> qaccount.name.like(String.format("%%%s%%", account)))
                 .and(gender != null, () -> quser.gender.eq(gender));
 
         return FormatPage.page(builder, pageable);

@@ -6,14 +6,12 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Indexed;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotBlank;
 import java.util.Optional;
 
 @Indexed
 @Service
-@Validated
 @RequiredArgsConstructor
 public class AuthenticateService {
 

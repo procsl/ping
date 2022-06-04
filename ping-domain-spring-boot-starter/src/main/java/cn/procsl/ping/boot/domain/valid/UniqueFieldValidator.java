@@ -72,14 +72,14 @@ public class UniqueFieldValidator implements ConstraintValidator<UniqueField, Ob
             Optional<?> option = checker.query(unique.entity(), unique.fieldName(), data);
             result.set(option.isEmpty());
             option.ifPresent(id -> result.set(ObjectUtils.nullSafeEquals(id, tid)));
+            if (!result.get()) {
+                message(context, unique.targetName().isEmpty() ? unique.fieldName() : unique.targetName());
+            }
         } else {
             Optional<?> option = checker.query(unique.entity(), unique.fieldName(), target);
             result.set(option.isEmpty());
         }
 
-        if (!result.get()) {
-            message(context, unique.fieldName());
-        }
         return result.get();
     }
 

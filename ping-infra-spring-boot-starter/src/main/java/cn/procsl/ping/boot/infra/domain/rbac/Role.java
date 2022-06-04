@@ -1,6 +1,7 @@
 package cn.procsl.ping.boot.infra.domain.rbac;
 
 import cn.procsl.ping.processor.annotation.RepositoryCreator;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,7 +22,7 @@ import java.util.Set;
 @Setter
 @Entity(name = "role")
 @Table(name = "i_role")
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @RepositoryCreator
 public class Role extends AbstractPersistable<Long> implements Serializable {
 

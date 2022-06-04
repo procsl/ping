@@ -25,6 +25,8 @@ public @interface UniqueField {
 
     String fieldName();
 
+    String targetName() default "";
+
     Class<? extends Persistable<? extends Serializable>> entity();
 
     boolean useSpringEntityManager() default true;

@@ -23,7 +23,7 @@ public final class QueryBuilder<T> {
         this.builder = new BooleanBuilder();
     }
 
-    public static final <T> QueryBuilder<T> builder(JPQLQuery<T> query) {
+    public static <T> QueryBuilder<T> builder(JPQLQuery<T> query) {
         return new QueryBuilder<>(query);
     }
 
@@ -130,9 +130,22 @@ public final class QueryBuilder<T> {
             if (context == null) {
                 return null;
             }
-            String name = expr.getMetadata().getName();
-            if (!name.equals(context.getProperty())) {
-                return null;
+
+            if (context.getProperty().contains(".")) {
+                String[] array = context.getProperty().split("\\.");
+                if (array.length != 2) {
+                    return null;
+                }
+                boolean bool = array[0].equals(expr.getRoot().getMetadata().getName())
+                        && array[1].equals(expr.getMetadata().getName());
+                if (!bool) {
+                    return null;
+                }
+            } else {
+                String name = expr.getMetadata().getName();
+                if (!name.equals(context.getProperty())) {
+                    return null;
+                }
             }
 
             boolean bool = (expr instanceof PathImpl && Comparable.class.isAssignableFrom(expr.getType()))
@@ -148,6 +161,7 @@ public final class QueryBuilder<T> {
             if (bool) {
                 @SuppressWarnings("unchecked")
                 val con = (Expression<? extends Comparable<?>>) expr;
+                log.debug("add sort property:[{}]", context.getProperty());
                 return con;
             }
             return null;

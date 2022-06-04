@@ -33,10 +33,10 @@ public class Subject extends AbstractPersistable<Long> implements Serializable {
 
     public Subject(Long subject, Collection<Role> roles) {
         this.subject = subject;
-        this.addRoles(roles);
+        this.putRoles(roles);
     }
 
-    void addRoles(Collection<Role> roles) {
+    void putRoles(Collection<Role> roles) {
         if (this.roles == null) {
             this.roles = new HashSet<>(roles);
         } else {

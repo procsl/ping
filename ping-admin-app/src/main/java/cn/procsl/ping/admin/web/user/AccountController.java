@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Indexed
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "account", description = "账户模块接口")
+@Tag(name = "users")
 public class AccountController {
 
     final JpaRepository<User, Long> userRepository;
@@ -25,7 +25,7 @@ public class AccountController {
     @Transactional
     @PatchMapping("/v1/users/{id}/account")
     @Operation(summary = "修改指定用户的账户状态")
-    public void accountStatusSetting(@PathVariable Long id, @Validated @RequestBody StateDTO state) {
+    public void accountStatusSetting(@PathVariable Long id, @Validated @RequestBody AccountStateDTO state) {
         userRepository
                 .getById(id)
                 .getAccount().

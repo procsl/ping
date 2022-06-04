@@ -21,7 +21,7 @@ import java.util.Collection;
 @Indexed
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "access", description = "访问控制模块接口")
+@Tag(name = "users")
 public class AccessController {
 
     final AccessControlService accessControlService;

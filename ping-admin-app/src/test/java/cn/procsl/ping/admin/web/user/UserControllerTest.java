@@ -75,19 +75,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void getById() throws Exception {
-        mockMvc.perform(get("/v1/users/{id}", gid.get()).accept(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(jsonPath("$.account").isNotEmpty())
-                .andExpect(jsonPath("$.name").isNotEmpty())
-                .andExpect(jsonPath("$.gender").isNotEmpty())
-                .andExpect(jsonPath("$.id").isNotEmpty())
-                .andExpect(jsonPath("$.remark").hasJsonPath());
-    }
-
-    @Test
-    void update() throws Exception {
+    public void update() throws Exception {
         UserPropDTO prop = new UserPropDTO(Faker.instance().name().username(), Gender.man, "这是备注");
         val builder =
                 patch("/v1/users/{id}", gid.get())
@@ -100,7 +88,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void findUsers() throws Exception {
+    public void findUsers() throws Exception {
         val builder =
                 get("/v1/users")
                         .param("limit", "1")
@@ -111,6 +99,13 @@ public class UserControllerTest {
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(jsonPath("$.content").isNotEmpty())
                 .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content[*].id").isNotEmpty())
+                .andExpect(jsonPath("$.content[*].name").isNotEmpty())
+                .andExpect(jsonPath("$.content[*].gender").isNotEmpty())
+                .andExpect(jsonPath("$.content[*].remark").isNotEmpty())
+                .andExpect(jsonPath("$.content[*].account").isNotEmpty())
+                .andExpect(jsonPath("$.content[*].account.name").isNotEmpty())
+                .andExpect(jsonPath("$.content[*].account.state").isNotEmpty())
                 .andExpect(jsonPath("$.limit").value("1"))
                 .andExpect(jsonPath("$.empty").value("false"))
                 .andDo(print());

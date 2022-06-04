@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Version;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @Getter
@@ -28,10 +29,13 @@ public class Config extends AbstractPersistable<Long> implements Serializable {
     @Version
     Long version;
 
-    public Config(String key, String content, String description) {
-        this.key = key;
-        this.content = content;
-        this.description = description;
+
+    public static Config creator(@NotNull String key, String content, String description) {
+        Config config = new Config();
+        config.key = key;
+        config.content = content;
+        config.description = description;
+        return config;
     }
 
     public void edit(@NonNull String key, String content, String description) {
@@ -45,4 +49,5 @@ public class Config extends AbstractPersistable<Long> implements Serializable {
     public void setId(Long id) {
         super.setId(id);
     }
+
 }
