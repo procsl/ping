@@ -19,7 +19,7 @@ public class BusinessException extends RuntimeException implements ErrorEntity {
 
     public BusinessException(String format, Object... arguments) {
         // TODO 这里应该用占位符的, 先写着
-        super(format, null, false, false);
+        super(format, null, true, false);
     }
 
     public static <T> T ifNotFound(T entity, @NonNull String message) {

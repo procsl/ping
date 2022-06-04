@@ -1,4 +1,4 @@
-package cn.procsl.ping.admin.web.account;
+package cn.procsl.ping.admin.web.user;
 
 import cn.procsl.ping.boot.domain.state.Stateful;
 import cn.procsl.ping.boot.infra.domain.user.AccountState;

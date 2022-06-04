@@ -2,6 +2,7 @@ package cn.procsl.ping.boot.infra.domain.rbac;
 
 import cn.procsl.ping.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Indexed;
@@ -15,10 +16,11 @@ import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Indexed
 @Service
-@RequiredArgsConstructor
 @Validated
+@RequiredArgsConstructor
 public class AccessControlService {
 
     final JpaRepository<Subject, Long> subjectRepository;
@@ -38,6 +40,7 @@ public class AccessControlService {
     @Transactional
     public void grant(@NotNull Long subject, @NotNull Collection<String> roleNames) throws BusinessException {
 
+        log.debug("subject is {}, role name is {}.", subject, roleNames);
         if (roleNames.isEmpty()) {
             save(subject, Collections.emptyList());
             return;
@@ -51,11 +54,11 @@ public class AccessControlService {
 
         // 角色数量不同, 检测具体的角色并报错
         if (roles.size() < roleNames.size()) {
-            // TODO 优化
-            Set<String> set = roles.stream().map(Role::getName).collect(Collectors.toSet());
-            HashSet<String> names = new HashSet<>(roleNames);
-            names.removeAll(set);
-            throw new BusinessException("角色不存在");
+            Set<String> dbRoles = roles.stream().map(Role::getName).collect(Collectors.toSet());
+            Set<String> params = roleNames.stream().filter(item -> !dbRoles.contains(item)).collect(Collectors.toSet());
+            if (!params.isEmpty()) {
+                throw new BusinessException(String.format("角色不存在: [%s]", String.join(",", params)));
+            }
         }
 
         save(subject, roles);

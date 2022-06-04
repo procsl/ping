@@ -3,11 +3,7 @@ package cn.procsl.ping.admin.web.user;
 import cn.procsl.ping.admin.annotation.MarkPageable;
 import cn.procsl.ping.admin.utils.QueryBuilder;
 import cn.procsl.ping.admin.web.FormatPage;
-import cn.procsl.ping.boot.infra.domain.account.QAccount;
-import cn.procsl.ping.boot.infra.domain.user.Gender;
-import cn.procsl.ping.boot.infra.domain.user.QUser;
-import cn.procsl.ping.boot.infra.domain.user.RegisterService;
-import cn.procsl.ping.boot.infra.domain.user.User;
+import cn.procsl.ping.boot.infra.domain.user.*;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.QBean;
 import com.querydsl.jpa.JPQLQuery;
@@ -55,7 +51,7 @@ public class UserController {
         return queryFactory
                 .select(projections)
                 .from(quser)
-                .innerJoin(qaccount).on(quser.accountId.eq(qaccount.id))
+                .innerJoin(qaccount).on(quser.account.id.eq(qaccount.id))
                 .where(quser.id.eq(id)).fetchFirst();
     }
 

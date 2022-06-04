@@ -11,6 +11,8 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * 用户账户
@@ -25,13 +27,16 @@ import javax.persistence.Table;
 public class Account extends AbstractPersistable<Long> implements Stateful<AccountState> {
 
     @Schema(description = "账户名称")
+    @NotBlank
     String name;
 
-    @Schema(description = "用户姓名")
+    @Schema(description = "账户密码")
+    @NotBlank
     String password;
 
     @Enumerated(value = EnumType.STRING)
     @Schema(description = "账户状态")
+    @NotNull
     AccountState state;
 
     public static Account create(String name, String password) {

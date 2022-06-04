@@ -182,6 +182,24 @@
         <plugins>
 
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <generatedSourcesDirectory>
+                        ${project.build.directory}/generated-sources/java
+                    </generatedSourcesDirectory>
+                    <!--保留参数名称-->
+                    <compilerVersion>${compiler.version}</compilerVersion>
+                    <compilerArgs>
+                        <arg>-g</arg>
+                        <arg>-Xlint</arg>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>2.5.6</version>
@@ -217,7 +235,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <apiDocsUrl>http://localhost:10000/v3/api-docs</apiDocsUrl>
+                    <apiDocsUrl>http://localhost:${server.port}/v3/api-docs</apiDocsUrl>
                     <outputFileName>openapi.json</outputFileName>
                     <outputDir>${project.build.directory}/spring-doc</outputDir>
                     <skip>false</skip>
@@ -338,50 +356,5 @@
 
 
     </profiles>
-
-    <!--    <repositories>-->
-    <!--        <repository>-->
-    <!--            <id>spring-milestones</id>-->
-    <!--            <name>Spring Milestones</name>-->
-    <!--            <url>https://repo.spring.io/milestone</url>-->
-    <!--        </repository>-->
-    <!--        <repository>-->
-    <!--            <id>spring-snapshots</id>-->
-    <!--            <name>Spring Snapshots</name>-->
-    <!--            <url>https://repo.spring.io/snapshot</url>-->
-    <!--            &lt;!&ndash;            <snapshots>&ndash;&gt;-->
-    <!--            &lt;!&ndash;                <enabled>true</enabled>&ndash;&gt;-->
-    <!--            &lt;!&ndash;            </snapshots>&ndash;&gt;-->
-    <!--        </repository>-->
-
-    <!--        <repository>-->
-    <!--            <id>spring-release</id>-->
-    <!--            <name>Spring release</name>-->
-    <!--            <url>https://repo.spring.io/release</url>-->
-    <!--        </repository>-->
-
-    <!--    </repositories>-->
-    <!--    <pluginRepositories>-->
-    <!--        <pluginRepository>-->
-    <!--            <id>spring-milestones</id>-->
-    <!--            <name>Spring Milestones</name>-->
-    <!--            <url>https://repo.spring.io/milestone</url>-->
-    <!--        </pluginRepository>-->
-    <!--        <pluginRepository>-->
-    <!--            <id>spring-snapshots</id>-->
-    <!--            <name>Spring Snapshots</name>-->
-    <!--            <url>https://repo.spring.io/snapshot</url>-->
-    <!--            &lt;!&ndash;            <snapshots>&ndash;&gt;-->
-    <!--            &lt;!&ndash;                <enabled>true</enabled>&ndash;&gt;-->
-    <!--            &lt;!&ndash;            </snapshots>&ndash;&gt;-->
-    <!--        </pluginRepository>-->
-
-    <!--        <pluginRepository>-->
-    <!--            <id>spring-release</id>-->
-    <!--            <name>Spring release</name>-->
-    <!--            <url>https://repo.spring.io/release</url>-->
-    <!--        </pluginRepository>-->
-    <!--    </pluginRepositories>-->
-
 
 </project>

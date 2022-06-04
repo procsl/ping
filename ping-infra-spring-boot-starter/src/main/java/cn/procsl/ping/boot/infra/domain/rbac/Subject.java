@@ -1,7 +1,9 @@
 package cn.procsl.ping.boot.infra.domain.rbac;
 
 import cn.procsl.ping.processor.annotation.RepositoryCreator;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 import javax.persistence.Entity;
@@ -17,8 +19,6 @@ import java.util.Set;
 @Entity
 @Table(name = "i_subject")
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @RepositoryCreator
 public class Subject extends AbstractPersistable<Long> implements Serializable {
 
@@ -29,6 +29,11 @@ public class Subject extends AbstractPersistable<Long> implements Serializable {
 
     public Subject(Long subject) {
         this.subject = subject;
+    }
+
+    public Subject(Long subject, Collection<Role> roles) {
+        this.subject = subject;
+        this.addRoles(roles);
     }
 
     void addRoles(Collection<Role> roles) {

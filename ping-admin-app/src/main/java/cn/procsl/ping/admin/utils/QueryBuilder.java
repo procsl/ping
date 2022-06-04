@@ -5,6 +5,7 @@ import com.querydsl.core.types.*;
 import com.querydsl.core.types.dsl.*;
 import com.querydsl.jpa.JPQLQuery;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
@@ -145,7 +146,9 @@ public final class QueryBuilder<T> {
                     || expr instanceof TimePath;
 
             if (bool) {
-                return (Expression<? extends Comparable<?>>) expr;
+                @SuppressWarnings("unchecked")
+                val con = (Expression<? extends Comparable<?>>) expr;
+                return con;
             }
             return null;
 

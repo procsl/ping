@@ -159,7 +159,7 @@ public class AccessControlServiceTest {
     @DisplayName("测试角色判断")
     public void hasRole() {
         log.info("开始测试:创建角色");
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 10; i++) {
             String roleName = JMockData.mock(String.class, config);
             List<String> pers = getPermissions();
             repository.save(new Role(roleName, pers));
