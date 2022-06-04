@@ -2,7 +2,7 @@ package cn.procsl.ping.boot.infra.adapter.user;
 
 import cn.procsl.ping.boot.infra.domain.conf.ConfigOptionService;
 import cn.procsl.ping.boot.infra.domain.rbac.AccessControlService;
-import cn.procsl.ping.boot.infra.domain.user.AuthorizedService;
+import cn.procsl.ping.boot.infra.domain.user.RoleSettingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Indexed;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ import java.util.Collections;
 @Indexed
 @Service
 @RequiredArgsConstructor
-class AuthorizedServiceAdapter implements AuthorizedService {
+class RoleSettingServiceAdapter implements RoleSettingService {
 
     public static final String DEFAULT_ROLES_CONFIG_KEY = "默认角色";
     final AccessControlService accessControlService;

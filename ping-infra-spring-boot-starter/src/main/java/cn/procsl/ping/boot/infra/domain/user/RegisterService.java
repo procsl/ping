@@ -12,7 +12,7 @@ import org.springframework.validation.annotation.Validated;
 @RequiredArgsConstructor
 public class RegisterService {
 
-    final AuthorizedService authorizedService;
+    final RoleSettingService roleSettingService;
 
     final JpaRepository<User, Long> jpaRepository;
 
@@ -30,7 +30,7 @@ public class RegisterService {
         User user = User.creator(account, account, password);
         this.accountRepository.save(user.getAccount());
         this.jpaRepository.save(user);
-        this.authorizedService.grantDefaultRoles(user.getId());
+        this.roleSettingService.grantDefaultRoles(user.getId());
         return user.getId();
     }
 

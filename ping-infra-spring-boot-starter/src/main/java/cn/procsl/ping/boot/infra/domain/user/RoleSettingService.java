@@ -3,7 +3,7 @@ package cn.procsl.ping.boot.infra.domain.user;
 import javax.validation.constraints.NotNull;
 import java.util.Collection;
 
-public interface AuthorizedService {
+public interface RoleSettingService {
 
     /**
      * 访问控制模块 授权用户角色
