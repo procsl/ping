@@ -34,7 +34,7 @@
                 <constraints nullable="false" unique="true" uniqueConstraintName="i_uk_account_name"/>
             </column>
 
-            <column name="password" type="varchar(40)" remarks="用户密码"/>
+            <column name="password" type="varchar(80)" remarks="用户密码"/>
 
             <column name="state" type="varchar(10)" remarks="用户状态"/>
 

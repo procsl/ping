@@ -1,4 +1,4 @@
-package cn.procsl.ping.admin.web.conf;
+package cn.procsl.ping.admin.web.config;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

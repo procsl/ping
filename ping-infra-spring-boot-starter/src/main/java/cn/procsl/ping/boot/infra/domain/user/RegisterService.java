@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.infra.domain.user;
 
+import cn.procsl.ping.boot.domain.service.PasswordEncoderService;
 import cn.procsl.ping.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,6 +19,8 @@ public class RegisterService {
 
     final JpaRepository<Account, Long> accountRepository;
 
+    final PasswordEncoderService passwordEncoderService;
+
     /**
      * 用户注册, 用户名称默认为账户名称
      *
@@ -27,6 +30,7 @@ public class RegisterService {
      */
     @Validated
     public Long register(String account, String password) throws BusinessException {
+        password = passwordEncoderService.encode(password);
         User user = User.creator(account, account, password);
         this.accountRepository.save(user.getAccount());
         this.jpaRepository.save(user);

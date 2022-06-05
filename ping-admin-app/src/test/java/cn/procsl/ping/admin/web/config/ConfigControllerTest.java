@@ -1,4 +1,4 @@
-package cn.procsl.ping.admin.web.conf;
+package cn.procsl.ping.admin.web.config;
 
 import cn.procsl.ping.admin.AdminApplication;
 import com.fasterxml.jackson.databind.json.JsonMapper;

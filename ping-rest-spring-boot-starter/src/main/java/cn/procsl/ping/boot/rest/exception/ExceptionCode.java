@@ -11,14 +11,20 @@ import java.io.Serializable;
  */
 @Getter
 @Setter
-@NoArgsConstructor
 @ToString
-@EqualsAndHashCode
 @SkipFilter
+@EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor
 public class ExceptionCode implements Serializable {
 
     private String code;
 
     private String message;
+
+
+    public static ExceptionCode builder(String code, String message) {
+        return new ExceptionCode(code, message);
+    }
 
 }

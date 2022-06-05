@@ -3,8 +3,6 @@ package cn.procsl.ping.boot.infra.service.impl;
 import cn.procsl.ping.boot.infra.InfraApplication;
 import cn.procsl.ping.boot.infra.domain.user.Account;
 import cn.procsl.ping.boot.infra.domain.user.AccountState;
-import cn.procsl.ping.boot.infra.domain.user.AuthenticateService;
-import cn.procsl.ping.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,9 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @SpringBootTest(classes = InfraApplication.class, webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 public class AccountServiceImplTest {
-
-    @Autowired
-    AuthenticateService authenticateService;
 
     @Autowired
     JpaRepository<Account, Long> jpaRepository;
@@ -52,55 +47,6 @@ public class AccountServiceImplTest {
         Assertions.assertEquals(account.getPassword(), password);
         Assertions.assertTrue(account.isEnable());
         log.info("测试成功");
-    }
-
-    @Test
-    @DisplayName("测试登录用户账户:正常登录")
-    @Transactional
-    @Rollback
-    public void check() {
-        Assertions.assertNotNull(gid);
-        Account account = this.jpaRepository.getById(gid);
-        Long id = this.authenticateService.authenticate(account.getName(), account.getPassword());
-        Assertions.assertEquals(id, account.getId());
-    }
-
-    @Test
-    @DisplayName("测试登录用户账户:密码错误")
-    @Transactional
-    @Rollback
-    public void checkAccountPasswordError() {
-        Assertions.assertNotNull(gid);
-        Account account = this.jpaRepository.getById(gid);
-
-        Assertions.assertThrows(BusinessException.class, () -> this.authenticateService.authenticate(account.getName(), "987654321"), "密码错误");
-
-    }
-
-    @Test
-    @DisplayName("测试登录用户账户:账户不存在")
-    @Transactional
-    @Rollback
-    public void checkAccountNotFound() {
-        Assertions.assertNotNull(gid);
-        Account account = this.jpaRepository.getById(gid);
-
-        Assertions.assertThrows(BusinessException.class, () -> this.authenticateService.authenticate("NotFountAccount", account.getPassword()), "账户不存在");
-
-    }
-
-    @Test
-    @DisplayName("测试登录用户账户:账户已被禁用")
-    @Transactional
-    @Rollback
-    public void checkAccountDisable() {
-        Assertions.assertNotNull(gid);
-        Account account = this.jpaRepository.getById(gid);
-        account.disabled();
-        this.jpaRepository.save(account);
-
-        Assertions.assertThrows(BusinessException.class, () -> this.authenticateService.authenticate(account.getName(), account.getPassword()), "账户已被禁用");
-
     }
 
     @Test

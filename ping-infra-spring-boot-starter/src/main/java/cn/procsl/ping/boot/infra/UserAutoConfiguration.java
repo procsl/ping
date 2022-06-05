@@ -3,6 +3,7 @@ package cn.procsl.ping.boot.infra;
 import cn.procsl.ping.boot.infra.domain.conf.ConfigOptionService;
 import cn.procsl.ping.boot.infra.domain.rbac.AccessControlService;
 import cn.procsl.ping.boot.infra.domain.user.RegisterService;
+import cn.procsl.ping.boot.infra.domain.user.UserLoadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -23,6 +24,7 @@ import static cn.procsl.ping.boot.infra.UserAutoConfiguration.domain_path;
 @ComponentScan(
         basePackages = {"cn.procsl.ping.boot.infra.adapter"},
         basePackageClasses = {
+                UserLoadService.class,
                 AccessControlService.class,
                 RegisterService.class,
                 ConfigOptionService.class

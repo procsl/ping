@@ -1,6 +1,7 @@
 package cn.procsl.ping.boot.rest.web;
 
 import cn.procsl.ping.boot.rest.exception.NotFoundException;
+import lombok.NonNull;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.util.WebUtils;
 
@@ -22,7 +23,7 @@ public class RestDispatcherServlet extends DispatcherServlet {
     }
 
     @Override
-    protected void noHandlerFound(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    protected void noHandlerFound(HttpServletRequest request, @NonNull HttpServletResponse response) throws Exception {
         throw new NotFoundException(request.getMethod(), getRequestUri(request));
     }
 

@@ -17,7 +17,7 @@ import java.util.Collection;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "setting", description = "系统设置模块")
-public class SettingController {
+public class RoleSettingController {
 
     final RoleSettingService roleSettingService;
 

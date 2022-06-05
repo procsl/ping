@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Indexed;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -26,14 +27,16 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "users", description = "用户管理模块接口")
 public class UserController {
 
+    final static QUser quser = QUser.user;
+
     final static QAccount qaccount = QAccount.account;
 
     final JpaRepository<User, Long> jpaRepository;
 
     final JPQLQueryFactory queryFactory;
-
-    final static QUser quser = QUser.user;
     final RegisterService userRegisterService;
+
+    final PasswordEncoder passwordEncoder;
 
     @Transactional
     @PostMapping("/v1/users")

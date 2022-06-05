@@ -1,4 +1,4 @@
-package cn.procsl.ping.admin.web.conf;
+package cn.procsl.ping.admin.web.config;
 
 import cn.procsl.ping.admin.annotation.MarkPageable;
 import cn.procsl.ping.admin.utils.QueryBuilder;
