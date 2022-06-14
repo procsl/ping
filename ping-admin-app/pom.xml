@@ -23,11 +23,6 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>cn.procsl</groupId>
-            <artifactId>ping-web-spring-boot-starter</artifactId>
-            <version>0.0.4-SNAPSHOT</version>
-        </dependency>
 
         <dependency>
             <groupId>org.springdoc</groupId>

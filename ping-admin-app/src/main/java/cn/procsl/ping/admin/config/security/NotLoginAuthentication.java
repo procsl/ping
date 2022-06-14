@@ -1,6 +1,6 @@
 package cn.procsl.ping.admin.config.security;
 
-import cn.procsl.ping.boot.web.exception.ExceptionCode;
+import cn.procsl.ping.admin.exception.ExceptionCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

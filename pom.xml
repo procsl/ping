@@ -18,7 +18,6 @@
     </properties>
 
     <modules>
-        <module>ping-web-spring-boot-starter</module>
         <module>ping-producer-spring-boot-starter</module>
         <module>ping-domain-spring-boot-starter</module>
         <module>ping-infra-spring-boot-starter</module>

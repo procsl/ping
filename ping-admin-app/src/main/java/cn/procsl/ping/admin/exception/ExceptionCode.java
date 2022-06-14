@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.web.exception;
+package cn.procsl.ping.admin.exception;
 
 import lombok.*;
 
