@@ -18,11 +18,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 import static com.github.jsonzou.jmockdata.JMockData.mock;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -67,7 +65,7 @@ public class AccessControllerTest {
 
             Collection<Long> permission = null;
             // TODO
-            RoleDetailsDTO role = new RoleDetailsDTO(mock(String.class, config),permission );
+            RoleDetailsDTO role = new RoleDetailsDTO(mock(String.class, config), permission);
             mockMvc.perform(
                             post("/v1/roles")
                                     .contentType(APPLICATION_JSON)

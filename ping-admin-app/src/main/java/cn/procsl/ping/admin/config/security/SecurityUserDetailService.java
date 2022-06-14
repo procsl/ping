@@ -1,6 +1,5 @@
 package cn.procsl.ping.admin.config.security;
 
-import cn.procsl.ping.admin.config.security.SessionUserDetails;
 import cn.procsl.ping.boot.infra.domain.user.User;
 import cn.procsl.ping.boot.infra.domain.user.UserSpecification;
 import lombok.RequiredArgsConstructor;

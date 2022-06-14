@@ -22,6 +22,9 @@ public class HttpPermission extends Permission {
 
     @NotBlank String resource;
 
+    public static Permission create(@NonNull String httpMethod, @NonNull String url) {
+        return new HttpPermission(httpMethod.toUpperCase(), url);
+    }
 
     @Transient
     public String getHttpMethod() {
@@ -31,10 +34,6 @@ public class HttpPermission extends Permission {
     @Transient
     public String getUrl() {
         return this.getResource();
-    }
-
-    public static Permission create(@NonNull String httpMethod, @NonNull String url) {
-        return new HttpPermission(httpMethod.toUpperCase(), url);
     }
 
     public boolean isDynamicURI() {

@@ -29,9 +29,9 @@ public abstract class Permission extends AbstractPersistable<Long> implements Se
 
     public abstract String getOption();
 
-    public abstract String getResource();
-
     public abstract void setOption(String option);
+
+    public abstract String getResource();
 
     public abstract void setResource(String resource);
 

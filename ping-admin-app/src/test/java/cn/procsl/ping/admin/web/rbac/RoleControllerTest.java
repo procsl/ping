@@ -14,12 +14,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
-import static com.github.jsonzou.jmockdata.JMockData.mock;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -112,8 +109,8 @@ public class RoleControllerTest {
     @Test
     void getById() throws Exception {
         mockMvc.perform(
-                get("/v1/roles/{id}", gid.get()).accept(APPLICATION_JSON)
-                        .session(LoginUtils.toLogin(mockMvc))
+                        get("/v1/roles/{id}", gid.get()).accept(APPLICATION_JSON)
+                                .session(LoginUtils.toLogin(mockMvc))
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))

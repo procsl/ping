@@ -21,9 +21,8 @@ import java.util.stream.Collectors;
 
 class HttpPermissionMatcher implements PermissionMatcher {
 
-    final Map<String, List<HttpPermission>> permissions;
-
     final static PathPatternParser parser = PathPatternParser.defaultInstance;
+    final Map<String, List<HttpPermission>> permissions;
 
     public HttpPermissionMatcher(@NonNull Collection<HttpPermission> permissions) {
         this.permissions = permissions.stream().collect(Collectors.groupingBy(Permission::getOption));

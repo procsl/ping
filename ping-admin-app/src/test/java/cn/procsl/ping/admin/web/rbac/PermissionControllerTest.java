@@ -11,14 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -29,14 +26,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class PermissionControllerTest {
 
     @Autowired
-    private WebApplicationContext context;
-
-    @Autowired
     MockMvc mockMvc;
-
     JsonMapper jsonMapper = new JsonMapper();
-
     AtomicLong gid = new AtomicLong();
+    @Autowired
+    private WebApplicationContext context;
 
     @BeforeEach
     public void setUp() throws Exception {

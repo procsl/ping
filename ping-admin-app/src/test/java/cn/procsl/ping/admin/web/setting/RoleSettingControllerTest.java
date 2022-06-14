@@ -54,8 +54,8 @@ public class RoleSettingControllerTest {
     @Test
     public void getDefaultRoles() throws Exception {
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/setting/default-roles")
-                        .session(LoginUtils.toLogin(mockMvc))
+                        MockMvcRequestBuilders.get("/v1/setting/default-roles")
+                                .session(LoginUtils.toLogin(mockMvc))
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))

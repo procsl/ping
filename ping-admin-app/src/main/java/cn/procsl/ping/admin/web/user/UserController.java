@@ -1,9 +1,11 @@
 package cn.procsl.ping.admin.web.user;
 
-import cn.procsl.ping.admin.web.MarkPageable;
 import cn.procsl.ping.admin.utils.QueryBuilder;
 import cn.procsl.ping.admin.web.FormatPage;
-import cn.procsl.ping.boot.infra.domain.user.*;
+import cn.procsl.ping.admin.web.MarkPageable;
+import cn.procsl.ping.boot.infra.domain.user.Gender;
+import cn.procsl.ping.boot.infra.domain.user.User;
+import cn.procsl.ping.boot.infra.domain.user.UserRegisterService;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.QBean;
