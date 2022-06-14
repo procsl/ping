@@ -1,8 +1,11 @@
 package cn.procsl.ping.admin.listener;
 
 import cn.procsl.ping.boot.infra.domain.conf.ConfigOptionService;
+import cn.procsl.ping.boot.infra.domain.rbac.AccessControlService;
+import cn.procsl.ping.boot.infra.domain.rbac.HttpPermission;
+import cn.procsl.ping.boot.infra.domain.rbac.Permission;
 import cn.procsl.ping.boot.infra.domain.rbac.Role;
-import cn.procsl.ping.boot.infra.domain.user.RegisterService;
+import cn.procsl.ping.boot.infra.domain.user.UserRegisterService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +19,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 @Slf4j
 @Indexed
@@ -25,11 +29,17 @@ public class AdminStartedListener implements ApplicationListener<ApplicationRead
 
     final String account = "admin";
     final String password = "123456";
-    final RegisterService registerService;
+
+    final String roleName = "系统管理员角色";
+    final UserRegisterService userRegisterService;
 
     final ConfigOptionService configOptionService;
 
     final JpaRepository<Role, Long> roleJpaRepository;
+
+    final AccessControlService accessControlService;
+
+    final JpaRepository<Permission, Long> permissionJpaRepository;
 
     @Override
     @Transactional
@@ -40,13 +50,23 @@ public class AdminStartedListener implements ApplicationListener<ApplicationRead
             log.info("系统默认数据已于[{}]初始化完成", init);
             return;
         }
-        log.info("创建默认角色:{}", "系统管理员角色");
-        Role role = new Role("系统管理员角色");
-        roleJpaRepository.save(role);
+        log.info("创建默认角色:{}", roleName);
+
+        List<Permission> permissions = List.of(
+                HttpPermission.create("GET", "/**"),
+                HttpPermission.create("POST", "/**"),
+                HttpPermission.create("DELETE", "/**"),
+                HttpPermission.create("PATCH", "/**"),
+                HttpPermission.create("PUT", "/**")
+        );
+        Role role = new Role(roleName);
+        role.addPermissions(permissions);
+        this.permissionJpaRepository.saveAll(permissions);
+        this.roleJpaRepository.save(role);
 
         log.info("注册默认账户:{}", account);
-        this.registerService.register(account, password);
-
+        Long id = this.userRegisterService.register(account, password);
+        this.accessControlService.grant(id, List.of(roleName));
         this.configOptionService.put("初始化系统数据", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date()));
     }
 

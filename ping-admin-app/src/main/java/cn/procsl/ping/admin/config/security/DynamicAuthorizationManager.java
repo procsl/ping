@@ -1,7 +1,10 @@
 package cn.procsl.ping.admin.config.security;
 
-import cn.procsl.ping.boot.infra.domain.rbac.AccessControlService;
+import cn.procsl.ping.admin.service.PermissionMatcher;
+import cn.procsl.ping.boot.infra.domain.rbac.Permission;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.core.Authentication;
@@ -9,14 +12,15 @@ import org.springframework.security.web.access.intercept.RequestAuthorizationCon
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Indexed;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.Optional;
 import java.util.function.Supplier;
 
+@Slf4j
 @Indexed
 @Component
 @RequiredArgsConstructor
 public class DynamicAuthorizationManager implements AuthorizationManager<RequestAuthorizationContext> {
-
-    final AccessControlService accessControlService;
 
     final AuthorizationDecision accessDenied = new AuthorizationDecision(false);
 
@@ -24,7 +28,21 @@ public class DynamicAuthorizationManager implements AuthorizationManager<Request
 
     @Override
     public AuthorizationDecision check(Supplier<Authentication> authentication, RequestAuthorizationContext context) {
-        return context.getRequest().getMethod().equals("GET") ? accessAllow : accessDenied;
+
+        val matcher = (PermissionMatcher) context.getRequest().getSession().getAttribute("dynamic-url-matcher");
+        if (matcher == null) {
+            return accessDenied;
+        }
+
+        Optional<Permission> option = matcher.matcher(context.getRequest());
+        if (option.isEmpty()) {
+            return accessDenied;
+        }
+
+        SessionUserDetails sessionUserDetails = (SessionUserDetails) authentication.get().getPrincipal();
+        HttpServletRequest request = context.getRequest();
+        log.debug("用户[{}] 拥有 {} 权限, 允许访问:[{} {}]", sessionUserDetails.getUsername(), option.get(), request.getMethod(), request.getRequestURI());
+        return accessAllow;
     }
 
 }

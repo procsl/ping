@@ -11,6 +11,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -43,6 +44,10 @@ public class Subject extends AbstractPersistable<Long> implements Serializable {
             this.roles.clear();
             this.roles.addAll(roles);
         }
+    }
+
+    public Set<Role> getRoles() {
+        return Collections.unmodifiableSet(roles);
     }
 
 }

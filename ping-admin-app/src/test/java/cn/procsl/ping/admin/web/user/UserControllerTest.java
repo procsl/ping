@@ -2,6 +2,7 @@ package cn.procsl.ping.admin.web.user;
 
 
 import cn.procsl.ping.admin.AdminApplication;
+import cn.procsl.ping.admin.web.LoginUtils;
 import cn.procsl.ping.boot.infra.domain.user.Gender;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.github.javafaker.Faker;
@@ -49,6 +50,7 @@ public class UserControllerTest {
                         post("/v1/users")
                                 .contentType(APPLICATION_JSON)
                                 .content(jsonMapper.writeValueAsString(user))
+                                .session(LoginUtils.toLogin(mockMvc))
                 )
                 .andDo(result -> {
                     String str = result.getResponse().getContentAsString();
@@ -64,6 +66,7 @@ public class UserControllerTest {
                         post("/v1/users")
                                 .contentType(APPLICATION_JSON)
                                 .content(jsonMapper.writeValueAsString(user))
+                                .session(LoginUtils.toLogin(mockMvc))
                 )
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().contentType(APPLICATION_JSON))
@@ -81,6 +84,7 @@ public class UserControllerTest {
                 patch("/v1/users/{id}", gid.get())
                         .content(jsonMapper.writeValueAsString(prop))
                         .contentType(APPLICATION_JSON)
+                        .session(LoginUtils.toLogin(mockMvc))
                         .accept(APPLICATION_JSON);
 
         mockMvc.perform(builder)
@@ -93,6 +97,7 @@ public class UserControllerTest {
                 get("/v1/users")
                         .param("limit", "1")
                         .param("sort", "id", "desc")
+                        .session(LoginUtils.toLogin(mockMvc))
                         .accept(APPLICATION_JSON);
 
         mockMvc.perform(builder).andExpect(status().isOk())

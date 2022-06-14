@@ -1,10 +1,11 @@
 package cn.procsl.ping.admin.web.rbac;
 
 
-import cn.procsl.ping.admin.annotation.MarkPageable;
 import cn.procsl.ping.admin.utils.QueryBuilder;
 import cn.procsl.ping.admin.web.FormatPage;
+import cn.procsl.ping.admin.web.MarkPageable;
 import cn.procsl.ping.boot.domain.valid.UniqueValidator;
+import cn.procsl.ping.boot.infra.domain.rbac.Permission;
 import cn.procsl.ping.boot.infra.domain.rbac.QRole;
 import cn.procsl.ping.boot.infra.domain.rbac.Role;
 import cn.procsl.ping.exception.BusinessException;
@@ -24,14 +25,17 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Indexed
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "roles", description = "角色权限管理模块")
+@Tag(name = "roles", description = "角色管理模块")
 public class RoleController {
 
     final JpaRepository<Role, Long> roleRepository;
+
+    final JpaRepository<Permission, Long> permissionJpaRepository;
 
     final UniqueValidator uniqueValidator;
 
@@ -43,9 +47,10 @@ public class RoleController {
     @Transactional
     @PostMapping("/v1/roles")
     @Operation(summary = "创建角色")
-    public Long create(@Validated @RequestBody RoleDetailsDTO role) throws BusinessException {
-        uniqueValidator.valid(Role.class, null, "name", role.getName(), "角色已存在");
-        Role entity = new Role(role.getName(), role.getPermissions());
+    public Long create(@Validated @RequestBody RoleDetailsDTO roleDetails) throws BusinessException {
+        uniqueValidator.valid(Role.class, null, "name", roleDetails.getName(), "角色已存在");
+        List<Permission> permissions = this.permissionJpaRepository.findAllById(roleDetails.getPermissions());
+        Role entity = new Role(roleDetails.getName(), permissions);
         return roleRepository.save(entity).getId();
     }
 
@@ -62,7 +67,8 @@ public class RoleController {
     public void change(@PathVariable("id") Long id, @RequestBody @NotNull RoleDetailsDTO details) throws BusinessException {
         uniqueValidator.valid(Role.class, id, "name", details.getName(), "角色已存在");
         Role role = this.roleRepository.getById(id);
-        role.change(details.getName(), details.getPermissions());
+        List<Permission> permissions = this.permissionJpaRepository.findAllById(details.getPermissions());
+        role.change(details.getName(), permissions);
     }
 
     @Transactional

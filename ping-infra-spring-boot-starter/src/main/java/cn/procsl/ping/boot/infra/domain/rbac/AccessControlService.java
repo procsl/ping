@@ -8,18 +8,21 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Indexed;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 
-import javax.persistence.criteria.*;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Predicate;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+
 
 @Slf4j
 @Indexed
 @Service
-@Validated
 @RequiredArgsConstructor
 public class AccessControlService {
 
@@ -28,7 +31,6 @@ public class AccessControlService {
     final JpaSpecificationExecutor<Role> roleJpaSpecificationExecutor;
 
     final JpaSpecificationExecutor<Subject> subjectJpaSpecificationExecutor;
-
 
     /**
      * 分配角色
@@ -73,32 +75,13 @@ public class AccessControlService {
     }
 
     /**
-     * 判断指定 subject 是否具有某种权限
-     *
-     * @param subject    目标subject
-     * @param permission 权限
-     * @return 如果存在该权限
-     */
-    @Transactional(readOnly = true)
-    public boolean hasPermission(@NotNull Long subject, @NotEmpty String permission) {
-        long result = this.subjectJpaSpecificationExecutor.count((root, query, cb) -> {
-            Join<Subject, Role> join = root.join("roles", JoinType.INNER);
-            SetJoin<Role, Permission> joinPermissions = join.joinSet("permissions", JoinType.INNER);
-
-            Predicate condition1 = cb.equal(root.get("subject"), subject);
-            Predicate condition2 = cb.equal(joinPermissions.get("name"), permission);
-            return cb.and(condition1, condition2);
-        });
-        return result > 0;
-    }
-
-    /**
      * 判断是否存在角色
      *
      * @param subject 目标
      * @param role    角色名称
      * @return 如果存在角色返回true
      */
+    @Transactional(readOnly = true)
     public boolean hasRole(@NotNull Long subject, @NotEmpty String role) {
         long result = this.subjectJpaSpecificationExecutor.count((root, query, cb) -> {
             Join<Subject, Role> join = root.join("roles", JoinType.INNER);
@@ -107,6 +90,47 @@ public class AccessControlService {
             return cb.and(condition1, condition2);
         });
         return result > 0;
+    }
+
+    /**
+     * @param subject 目标对象
+     * @return 加载指定subject的所有权限
+     */
+    @Transactional(readOnly = true)
+    public Collection<Permission> loadPermissions(Long subject) {
+        Collection<Role> roles = this.loadRoles(subject);
+        HashSet<Permission> hashset = new HashSet<>();
+        for (Role role : roles) {
+            hashset.addAll(role.getPermissions());
+        }
+        return Collections.unmodifiableCollection(hashset);
+    }
+
+    /**
+     * 加载权限, 并转换
+     *
+     * @param subject 目标对象
+     * @param convert 转换器
+     * @param <T>     转换类型
+     * @return 返回被转换后的类型
+     */
+    @Transactional(readOnly = true)
+    public <T> Collection<T> loadPermissions(Long subject, Function<Permission, T> convert) {
+        Collection<Permission> tmp = this.loadPermissions(subject);
+        return tmp.stream().map(convert).filter(Objects::nonNull).collect(Collectors.toUnmodifiableList());
+    }
+
+    /**
+     * @param subject 目标对象
+     * @return 加载所有角色
+     */
+    @Transactional(readOnly = true)
+    public Collection<Role> loadRoles(Long subject) {
+        Optional<Subject> entity = this.subjectJpaSpecificationExecutor.findOne((root, query, cb) -> cb.equal(root.get("subject"), subject));
+        if (entity.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return entity.get().getRoles();
     }
 
 }

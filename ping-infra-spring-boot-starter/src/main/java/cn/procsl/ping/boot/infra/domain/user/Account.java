@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.infra.domain.user;
 
-import cn.procsl.ping.boot.domain.state.Stateful;
+import cn.procsl.ping.boot.domain.jpa.state.Stateful;
 import cn.procsl.ping.exception.BusinessException;
 import cn.procsl.ping.processor.annotation.RepositoryCreator;
 import io.swagger.v3.oas.annotations.media.Schema;

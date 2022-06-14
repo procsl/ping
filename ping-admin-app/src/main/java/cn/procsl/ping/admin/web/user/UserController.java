@@ -1,6 +1,6 @@
 package cn.procsl.ping.admin.web.user;
 
-import cn.procsl.ping.admin.annotation.MarkPageable;
+import cn.procsl.ping.admin.web.MarkPageable;
 import cn.procsl.ping.admin.utils.QueryBuilder;
 import cn.procsl.ping.admin.web.FormatPage;
 import cn.procsl.ping.boot.infra.domain.user.*;
@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Indexed;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -34,15 +33,14 @@ public class UserController {
     final JpaRepository<User, Long> jpaRepository;
 
     final JPQLQueryFactory queryFactory;
-    final RegisterService userRegisterService;
 
-    final PasswordEncoder passwordEncoder;
+    final UserRegisterService userUserRegisterService;
 
     @Transactional
     @PostMapping("/v1/users")
     @Operation(summary = "创建用户", description = "创建用户时, 用户账户默认为用户昵称, 用户昵称可通过后期修改完成, 用户账户不可修改")
     public Long register(@Validated @RequestBody RegisterDTO registerDTO) {
-        return this.userRegisterService.register(registerDTO.getAccount(), registerDTO.getPassword());
+        return this.userUserRegisterService.register(registerDTO.getAccount(), registerDTO.getPassword());
     }
 
     @Transactional
@@ -57,7 +55,9 @@ public class UserController {
     @GetMapping("/v1/users")
     @Transactional(readOnly = true)
     @Operation(summary = "获取用户列表")
-    public FormatPage<UserDetailsVO> findUsers(Pageable pageable, @RequestParam(required = false) String name, @RequestParam(required = false) String account, @RequestParam(required = false) Gender gender) {
+    public FormatPage<UserDetailsVO> findUsers(Pageable pageable, @RequestParam(required = false) String name,
+                                               @RequestParam(required = false) String account,
+                                               @RequestParam(required = false) Gender gender) {
 
         Expression<AccountVO> accountProjection = Projections.bean(AccountVO.class, qaccount.name, qaccount.state).as("account");
         QBean<UserDetailsVO> projections = Projections.bean(UserDetailsVO.class, quser.id, quser.name, quser.gender, quser.remark, accountProjection);

@@ -1,6 +1,7 @@
 package cn.procsl.ping.admin.web.rbac;
 
 import cn.procsl.ping.admin.AdminApplication;
+import cn.procsl.ping.admin.web.LoginUtils;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.github.javafaker.Faker;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -36,11 +38,14 @@ public class RoleControllerTest {
 
     @BeforeEach
     public void beforeEach() throws Exception {
-        RoleDetailsDTO role = new RoleDetailsDTO(Faker.instance().name().fullName(), Arrays.stream(mock(String[].class)).collect(Collectors.toList()));
+        Collection<Long> permission = null;
+        // TODO
+        RoleDetailsDTO role = new RoleDetailsDTO(Faker.instance().name().fullName(), permission);
         mockMvc.perform(
                         post("/v1/roles")
                                 .contentType(APPLICATION_JSON)
                                 .content(jsonMapper.writeValueAsString(role))
+                                .session(LoginUtils.toLogin(mockMvc))
                 )
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().contentType(APPLICATION_JSON))
@@ -54,11 +59,14 @@ public class RoleControllerTest {
 
     @Test
     void create() throws Exception {
-        RoleDetailsDTO role = new RoleDetailsDTO(Faker.instance().name().fullName(), Arrays.stream(mock(String[].class)).collect(Collectors.toList()));
+        // TODO
+        Collection<Long> permission = null;
+        RoleDetailsDTO role = new RoleDetailsDTO(Faker.instance().name().fullName(), permission);
         mockMvc.perform(
                         post("/v1/roles")
                                 .contentType(APPLICATION_JSON)
                                 .content(jsonMapper.writeValueAsString(role))
+                                .session(LoginUtils.toLogin(mockMvc))
                 )
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().contentType(APPLICATION_JSON))
@@ -70,7 +78,9 @@ public class RoleControllerTest {
 
     @Test
     void delete() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.delete("/v1/roles/{id}", gid.get()))
+        mockMvc.perform(MockMvcRequestBuilders.delete("/v1/roles/{id}", gid.get())
+                        .session(LoginUtils.toLogin(mockMvc))
+                )
                 .andExpect(status().is2xxSuccessful());
     }
 
@@ -81,15 +91,19 @@ public class RoleControllerTest {
                         patch("/v1/roles/{id}", gid.get())
                                 .contentType(APPLICATION_JSON)
                                 .content(jsonMapper.writeValueAsString(role))
+                                .session(LoginUtils.toLogin(mockMvc))
                 )
                 .andExpect(status().is2xxSuccessful());
 
-        role.setPermissions(Arrays.stream(mock(String[].class)).collect(Collectors.toList()));
+        // Arrays.stream(mock(String[].class)).collect(Collectors.toList())
+        // TOTO
+        role.setPermissions(null);
         role.setName(null);
         mockMvc.perform(
                         patch("/v1/roles/{id}", gid.get())
                                 .contentType(APPLICATION_JSON)
                                 .content(jsonMapper.writeValueAsString(role))
+                                .session(LoginUtils.toLogin(mockMvc))
                 )
                 .andExpect(status().is2xxSuccessful());
 
@@ -97,7 +111,10 @@ public class RoleControllerTest {
 
     @Test
     void getById() throws Exception {
-        mockMvc.perform(get("/v1/roles/{id}", gid.get()).accept(APPLICATION_JSON))
+        mockMvc.perform(
+                get("/v1/roles/{id}", gid.get()).accept(APPLICATION_JSON)
+                        .session(LoginUtils.toLogin(mockMvc))
+                )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(jsonPath("$.name").isNotEmpty())
@@ -112,6 +129,7 @@ public class RoleControllerTest {
                 get("/v1/roles")
                         .param("limit", "1")
                         .param("sort", "id", "desc")
+                        .session(LoginUtils.toLogin(mockMvc))
                         .accept(APPLICATION_JSON);
 
         mockMvc.perform(builder).andExpect(status().isOk())

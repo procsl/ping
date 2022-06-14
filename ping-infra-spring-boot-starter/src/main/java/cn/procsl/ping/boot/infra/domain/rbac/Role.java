@@ -8,60 +8,53 @@ import lombok.Setter;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 import javax.annotation.Nullable;
-import javax.persistence.CollectionTable;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
-@Entity(name = "role")
+@Entity
+@RepositoryCreator
 @Table(name = "i_role")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@RepositoryCreator
 public class Role extends AbstractPersistable<Long> implements Serializable {
-
-    protected static Set<String> empty = Collections.emptySet();
 
     String name;
 
-    @ElementCollection
-    @CollectionTable(name = "i_role_permission")
-    Set<Permission> permissions;
+    @ManyToMany
+    List<Permission> permissions;
 
     public Role(String name) {
-        this(name, empty);
+        this(name, new ArrayList<>());
     }
 
-    public Role(String name, Collection<String> permissions) {
+    public Role(String name, Collection<Permission> permissions) {
         this.name = name;
         this.changePermissions(permissions);
     }
 
-    public static Permission createPermission(String permission) {
-        return new Permission(permission);
-    }
-
-    public void changePermissions(Collection<String> permissions) {
+    public void changePermissions(Collection<Permission> permissions) {
+        if (permissions == null) {
+            this.permissions.clear();
+            return;
+        }
 
         if (this.permissions == null) {
-            this.permissions = new HashSet<>(permissions.size());
+            this.permissions = new ArrayList<>(permissions.size());
         }
 
         if (!this.permissions.isEmpty()) {
             this.permissions.clear();
         }
-        for (String permission : permissions) {
-            this.permissions.add(createPermission(permission));
-        }
+        this.permissions.addAll(permissions);
     }
 
-    public void change(@Nullable String name, @Nullable Collection<String> permissions) {
+    public void change(@Nullable String name, @Nullable Collection<Permission> permissions) {
         boolean bool = name == null || name.isEmpty();
         if (!bool) {
             this.name = name;
@@ -71,4 +64,19 @@ public class Role extends AbstractPersistable<Long> implements Serializable {
             this.changePermissions(permissions);
         }
     }
+
+    public void addPermission(Permission permission) {
+        if (this.permissions == null) {
+            this.permissions = new ArrayList<>();
+        }
+        this.permissions.add(permission);
+    }
+
+    public void addPermissions(Collection<Permission> permissions) {
+        if (this.permissions == null) {
+            this.permissions = new ArrayList<>();
+        }
+        this.permissions.addAll(permissions);
+    }
+
 }

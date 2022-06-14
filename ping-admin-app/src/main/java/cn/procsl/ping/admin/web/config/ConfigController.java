@@ -1,6 +1,6 @@
 package cn.procsl.ping.admin.web.config;
 
-import cn.procsl.ping.admin.annotation.MarkPageable;
+import cn.procsl.ping.admin.web.MarkPageable;
 import cn.procsl.ping.admin.utils.QueryBuilder;
 import cn.procsl.ping.admin.web.FormatPage;
 import cn.procsl.ping.boot.infra.domain.conf.Config;

@@ -22,7 +22,20 @@
                 <constraints references="i_role(id)" foreignKeyName="i_fk_role_id" referencedTableName="i_role"
                              referencedColumnNames="id"/>
             </column>
-            <column name="name" type="varchar(128)" remarks="权限名称"/>
+            <column name="permission_id" type="bigint" remarks="权限ID"/>
+        </createTable>
+
+        <createTable tableName="i_permission" remarks="用户权限表">
+            <column name="id" type="bigint" remarks="ID">
+                <constraints primaryKey="true"/>
+            </column>
+
+            <column name="option" type="varchar(20)" remarks="权限操作"/>
+            <column name="resource" type="varchar(500)" remarks="权限资源"/>
+
+            <column name="type" type="varchar(10)" remarks="权限类型">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
 
         <createTable tableName="i_account" remarks="用户账户表">

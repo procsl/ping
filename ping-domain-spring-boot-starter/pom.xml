@@ -177,6 +177,7 @@
     </dependencies>
 
     <dependencyManagement>
+
         <dependencies>
             <dependency>
                 <!-- 从 Spring Boot 导入依赖管理 -->

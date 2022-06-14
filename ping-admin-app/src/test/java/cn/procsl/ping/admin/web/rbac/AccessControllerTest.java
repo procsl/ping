@@ -1,6 +1,7 @@
 package cn.procsl.ping.admin.web.rbac;
 
 import cn.procsl.ping.admin.AdminApplication;
+import cn.procsl.ping.admin.web.LoginUtils;
 import cn.procsl.ping.admin.web.user.RegisterDTO;
 import cn.procsl.ping.admin.web.user.UserController;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -56,17 +58,21 @@ public class AccessControllerTest {
                             post("/v1/users")
                                     .contentType(APPLICATION_JSON)
                                     .content(jsonMapper.writeValueAsString(user))
+                                    .session(LoginUtils.toLogin(mockMvc))
                     )
                     .andDo(result -> {
                         String str = result.getResponse().getContentAsString();
                         uid.add(str);
                     });
 
-            RoleDetailsDTO role = new RoleDetailsDTO(mock(String.class, config), Arrays.stream(mock(String[].class)).collect(Collectors.toList()));
+            Collection<Long> permission = null;
+            // TODO
+            RoleDetailsDTO role = new RoleDetailsDTO(mock(String.class, config),permission );
             mockMvc.perform(
                             post("/v1/roles")
                                     .contentType(APPLICATION_JSON)
                                     .content(jsonMapper.writeValueAsString(role))
+                                    .session(LoginUtils.toLogin(mockMvc))
                     )
                     .andExpect(status().is2xxSuccessful())
                     .andExpect(content().contentType(APPLICATION_JSON))
@@ -95,6 +101,7 @@ public class AccessControllerTest {
                         post("/v1/users/{id}/roles", gid.get())
                                 .contentType(APPLICATION_JSON)
                                 .content(json)
+                                .session(LoginUtils.toLogin(mockMvc))
                 )
                 .andExpect(status().is2xxSuccessful());
     }
@@ -102,7 +109,9 @@ public class AccessControllerTest {
     @Test
     void findSubjects() throws Exception {
         this.grant();
-        mockMvc.perform(get("/v1/users/{id}/roles", gid.get()).accept(APPLICATION_JSON))
+        mockMvc.perform(get("/v1/users/{id}/roles", gid.get())
+                        .session(LoginUtils.toLogin(mockMvc))
+                        .accept(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray())

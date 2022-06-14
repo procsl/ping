@@ -1,23 +1,51 @@
 package cn.procsl.ping.boot.infra.domain.rbac;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import cn.procsl.ping.processor.annotation.RepositoryCreator;
+import lombok.*;
+import org.springframework.data.jpa.domain.AbstractPersistable;
+import org.springframework.util.ObjectUtils;
 
-import javax.persistence.Embeddable;
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.function.Function;
 
 /**
  * 权限值对象
  */
-@Data
-@Embeddable
-@NoArgsConstructor
-@AllArgsConstructor
-public class Permission implements Serializable {
+@Setter
+@Getter
+@Entity
+@RepositoryCreator
+@Table(name = "i_permission")
+@DiscriminatorColumn(name = "type")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+public abstract class Permission extends AbstractPersistable<Long> implements Serializable {
 
-    /**
-     * 权限名称
-     */
-    String name;
+    @Override
+    public @NonNull String toString() {
+        return String.format("[%s: %s]", getOption(), getResource());
+    }
+
+    public abstract String getOption();
+
+    public abstract String getResource();
+
+    public abstract void setOption(String option);
+
+    public abstract void setResource(String resource);
+
+    public boolean matcher(String option, String resource) {
+        return ObjectUtils.nullSafeEquals(option, this.getOption()) && ObjectUtils.nullSafeEquals(resource, this.getResource());
+    }
+
+    public boolean matcher(Function<Permission, Boolean> function) {
+        return function.apply(this);
+    }
+
+    public void update(String option, String resource) {
+        this.setOption(option);
+        this.setResource(resource);
+    }
 }
+

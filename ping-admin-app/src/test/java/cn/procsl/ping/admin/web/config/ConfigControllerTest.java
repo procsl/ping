@@ -1,6 +1,7 @@
 package cn.procsl.ping.admin.web.config;
 
 import cn.procsl.ping.admin.AdminApplication;
+import cn.procsl.ping.admin.web.LoginUtils;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -37,6 +38,7 @@ public class ConfigControllerTest {
                         MockMvcRequestBuilders.put("/v1/configs")
                                 .contentType(APPLICATION_JSON)
                                 .content(jsonMapper.writeValueAsString(config))
+                                .session(LoginUtils.toLogin(mockMvc))
                 )
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().contentType(APPLICATION_JSON))

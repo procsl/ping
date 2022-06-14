@@ -1,6 +1,7 @@
 package cn.procsl.ping.admin.web.setting;
 
 import cn.procsl.ping.admin.AdminApplication;
+import cn.procsl.ping.admin.web.LoginUtils;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.github.jsonzou.jmockdata.JMockData;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,7 @@ public class RoleSettingControllerTest {
                 MockMvcRequestBuilders.patch("/v1/setting/default-roles")
                         .contentType(APPLICATION_JSON)
                         .content(jsonMapper.writeValueAsString(data))
+                        .session(LoginUtils.toLogin(mockMvc))
         );
     }
 
@@ -44,13 +46,17 @@ public class RoleSettingControllerTest {
                         MockMvcRequestBuilders.patch("/v1/setting/default-roles")
                                 .contentType(APPLICATION_JSON)
                                 .content(jsonMapper.writeValueAsString(data))
+                                .session(LoginUtils.toLogin(mockMvc))
                 )
                 .andExpect(status().is2xxSuccessful());
     }
 
     @Test
     public void getDefaultRoles() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/v1/setting/default-roles"))
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/v1/setting/default-roles")
+                        .session(LoginUtils.toLogin(mockMvc))
+                )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(jsonPath("$").isNotEmpty())

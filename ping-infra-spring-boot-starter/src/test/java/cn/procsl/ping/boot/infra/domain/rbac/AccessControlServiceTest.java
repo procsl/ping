@@ -6,7 +6,6 @@ import com.github.javafaker.Faker;
 import com.github.jsonzou.jmockdata.JMockData;
 import com.github.jsonzou.jmockdata.MockConfig;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,20 +37,41 @@ public class AccessControlServiceTest {
     @Autowired
     JpaRepository<Subject, Long> subjectLongJpaRepository;
 
+    @Autowired
+    JpaRepository<Permission, Long> permissionLongJpaRepository;
+
     Faker faker = new Faker(Locale.CHINA);
     Long gid;
-    List<String> permissions;
+    List<Permission> permissions;
     MockConfig config;
 
     @BeforeEach
     @Transactional
     @DisplayName("初始化")
     void setUp() {
-        val permissions = Arrays.asList("读取", "写入", "查询", "按钮", "查看", "页面");
-        this.gid = repository.save(new Role(Faker.instance().name().username(), permissions)).getId();
+        List<Permission> permissions = Arrays.asList(
+                HttpPermission.create("post", "/1"),
+                HttpPermission.create("get", "/1"),
+                HttpPermission.create("patch", "/3"),
+                HttpPermission.create("put", "/4"),
+                HttpPermission.create("delete", "/5"),
+                new PagePermission("读取", "销售页面"),
+                new PagePermission("写入", "数据库"),
+                new PagePermission("修改", "个人资料"),
+                new PagePermission("删除", "管理页面")
+        );
         this.permissions = new ArrayList<>(permissions);
-        this.permissions.addAll(Arrays.asList(JMockData.mock(String[].class)));
+//        {
+//            PagePermission mack = JMockData.mock(PagePermission.class);
+//            log.info("mack:{}", mack);
+//            log.info("class:{}", mack.getClass().getName());
+//            this.permissions.add(mack);
+//        }
+
+        this.permissionLongJpaRepository.saveAll(this.permissions);
+        this.gid = repository.save(new Role(Faker.instance().name().username(), permissions)).getId();
         this.config = new MockConfig().longRange(1, Long.MAX_VALUE).intRange(0, this.permissions.size());
+
     }
 
 
@@ -64,6 +84,7 @@ public class AccessControlServiceTest {
         Long subject = JMockData.mock(Long.class, config);
         log.info("Subject ID = {}", subject);
 
+        log.info("all permissions:{}", this.permissions);
         List<Role> allRoles = this.repository.findAll();
         log.info("全部角色列表为:{}", allRoles);
 
@@ -90,78 +111,12 @@ public class AccessControlServiceTest {
     }
 
     @Test
-    @DisplayName("测试权限判断")
-    public void hasPermission() {
-        log.info("创建多个角色");
-        repository.save(new Role(JMockData.mock(String.class, config), getPermissions()));
-        repository.save(new Role(JMockData.mock(String.class, config), getPermissions()));
-        repository.save(new Role(JMockData.mock(String.class, config), getPermissions()));
-        repository.save(new Role(JMockData.mock(String.class, config), getPermissions()));
-        repository.save(new Role(JMockData.mock(String.class, config), getPermissions()));
-        repository.save(new Role(JMockData.mock(String.class, config), getPermissions()));
-        repository.save(new Role(JMockData.mock(String.class, config), getPermissions()));
-        repository.save(new Role(JMockData.mock(String.class, config), getPermissions()));
-
-        List<String> perms = getPermissions();
-        repository.save(new Role("测试角色", perms));
-
-        List<Role> allRoles = this.repository.findAll();
-        List<String> allRoleNames = allRoles.stream().map(Role::getName).collect(Collectors.toList());
-        log.info("所有角色:{}", allRoleNames);
-        log.info("-------------------------------");
-
-        for (Role role : allRoles) {
-            log.info("[{}] 对应的权限为:{}", role.getName(), role.getPermissions().stream().map(Permission::getName).collect(Collectors.toList()));
-        }
-        log.info("-------------------------------");
-        long id = JMockData.mock(Long.class, config);
-
-        log.info("测试当前subject无任何一项权限:{}", perms);
-        for (String permission : perms) {
-            log.info("测试没有权限:[{}]", permission);
-            Assertions.assertFalse(this.accessControlService.hasPermission(id, permission));
-        }
-        log.info("-------------------------------");
-
-        log.info("测试当前subject无任何一项权限:{}", this.permissions);
-        for (String permission : this.permissions) {
-            log.info("测试没有权限:[{}]", permission);
-            Assertions.assertFalse(this.accessControlService.hasPermission(id, permission));
-        }
-        log.info("-------------------------------");
-
-        Optional<Role> role = this.repository.findOne(Example.of(new Role("测试角色")));
-        Assertions.assertTrue(role.isPresent());
-
-        log.info("开始授权角色:[{}] 角色:[{}] 权限为:{} ", id, role.get().getName(), role.get().getPermissions().stream().map(Permission::getName).collect(Collectors.toList()));
-        this.accessControlService.grant(id, Collections.singleton("测试角色"));
-        log.info("-------------------------------");
-
-        log.info("测试当前subject:{} 所有权限:{} 拥有的权限:{}", id, this.permissions, perms);
-        for (String permission : perms) {
-            log.info("测试具有权限:[{}]", permission);
-            Assertions.assertTrue(this.accessControlService.hasPermission(id, permission));
-        }
-        log.info("-------------------------------");
-
-        HashSet<String> differences = new HashSet<>(this.permissions);
-        perms.forEach(differences::remove);
-
-        log.info("当前subject[{}]无任何一项其他权限:所有权限:{} 拥有的权限:{} 未拥有的权限:{}", id, this.permissions, perms, differences);
-        for (String permission : differences) {
-            log.info("测试没有权限:[{}]", permission);
-            Assertions.assertFalse(this.accessControlService.hasPermission(id, permission));
-        }
-
-    }
-
-    @Test
     @DisplayName("测试角色判断")
     public void hasRole() {
         log.info("开始测试:创建角色");
         for (int i = 0; i < 10; i++) {
             String roleName = JMockData.mock(String.class, config);
-            List<String> pers = getPermissions();
+            List<Permission> pers = getPermissions();
             repository.save(new Role(roleName, pers));
             log.info("创建角色:{} permissions = {}", roleName, getPermissions());
         }
@@ -193,7 +148,7 @@ public class AccessControlServiceTest {
 
     }
 
-    List<String> getPermissions() {
+    List<Permission> getPermissions() {
 
         Integer index1 = JMockData.mock(Integer.class, config);
         Integer index2 = JMockData.mock(Integer.class, config);
