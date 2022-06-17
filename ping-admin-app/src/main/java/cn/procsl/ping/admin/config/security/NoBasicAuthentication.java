@@ -1,6 +1,6 @@
 package cn.procsl.ping.admin.config.security;
 
-import cn.procsl.ping.boot.rest.exception.ExceptionCode;
+import cn.procsl.ping.admin.error.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.InitializingBean;
@@ -37,6 +37,6 @@ public class NoBasicAuthentication implements AuthenticationEntryPoint, Initiali
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        this.message = objectMapper.writeValueAsBytes(ExceptionCode.builder("401000", HttpStatus.UNAUTHORIZED.getReasonPhrase()));
+        this.message = objectMapper.writeValueAsBytes(ErrorCode.builder("401000", HttpStatus.UNAUTHORIZED.getReasonPhrase()));
     }
 }

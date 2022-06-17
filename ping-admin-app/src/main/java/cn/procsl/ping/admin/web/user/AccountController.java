@@ -1,6 +1,6 @@
 package cn.procsl.ping.admin.web.user;
 
-import cn.procsl.ping.boot.infra.domain.user.User;
+import cn.procsl.ping.boot.base.domain.user.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

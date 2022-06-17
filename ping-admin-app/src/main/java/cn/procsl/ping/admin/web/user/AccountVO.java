@@ -1,6 +1,6 @@
 package cn.procsl.ping.admin.web.user;
 
-import cn.procsl.ping.boot.infra.domain.user.AccountState;
+import cn.procsl.ping.boot.base.domain.user.AccountState;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

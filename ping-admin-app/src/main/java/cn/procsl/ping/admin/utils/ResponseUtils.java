@@ -1,8 +1,7 @@
 package cn.procsl.ping.admin.utils;
 
-import cn.procsl.ping.boot.rest.exception.ExceptionCode;
+import cn.procsl.ping.admin.error.ErrorCode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.InvalidMediaTypeException;
@@ -21,7 +20,7 @@ public final class ResponseUtils {
 
     final static JsonMapper jsonMapper = new JsonMapper();
 
-    final static XmlMapper xmlMapper = new XmlMapper();
+    //    final static XmlMapper xmlMapper = new XmlMapper();
     private static String template =
             " <!doctype html>" +
                     " <html lang=\"en\">" +
@@ -44,7 +43,7 @@ public final class ResponseUtils {
 
     static void createResponse(MediaType mediaType, HttpServletResponse response, HttpStatus httpStatus, String code, String message) {
 
-        ExceptionCode error = new ExceptionCode(String.format("%s%s", httpStatus.value(), code), message);
+        ErrorCode error = new ErrorCode(String.format("%s%s", httpStatus.value(), code), message);
 
         try {
 
@@ -54,11 +53,11 @@ public final class ResponseUtils {
                 return;
             }
 
-            if (mediaType.includes(MediaType.APPLICATION_XML)) {
-                byte[] encode = xmlMapper.writeValueAsBytes(error);
-                response.getOutputStream().write(encode);
-                return;
-            }
+//            if (mediaType.includes(MediaType.APPLICATION_XML)) {
+//                byte[] encode = xmlMapper.writeValueAsBytes(error);
+//                response.getOutputStream().write(encode);
+//                return;
+//            }
 
             if (mediaType.includes(MediaType.TEXT_HTML)) {
                 byte[] encode = getHtml(error);
@@ -73,7 +72,7 @@ public final class ResponseUtils {
 
     }
 
-    static byte[] getHtml(ExceptionCode error) throws IOException {
+    static byte[] getHtml(ErrorCode error) throws IOException {
         String html = template;
         html = html.replaceAll("\\{\\{title}}", "错误");
         html = html.replaceAll("\\{\\{body\\}\\}", error.getMessage());

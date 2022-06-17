@@ -3,7 +3,7 @@ package cn.procsl.ping.admin.web.user;
 
 import cn.procsl.ping.admin.AdminApplication;
 import cn.procsl.ping.admin.web.LoginUtils;
-import cn.procsl.ping.boot.infra.domain.user.Gender;
+import cn.procsl.ping.boot.base.domain.user.Gender;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.github.javafaker.Faker;
 import com.github.jsonzou.jmockdata.MockConfig;

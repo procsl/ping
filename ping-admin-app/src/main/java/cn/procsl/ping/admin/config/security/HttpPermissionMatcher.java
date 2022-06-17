@@ -1,8 +1,8 @@
 package cn.procsl.ping.admin.config.security;
 
 import cn.procsl.ping.admin.service.PermissionMatcher;
-import cn.procsl.ping.boot.infra.domain.rbac.HttpPermission;
-import cn.procsl.ping.boot.infra.domain.rbac.Permission;
+import cn.procsl.ping.boot.base.domain.rbac.HttpPermission;
+import cn.procsl.ping.boot.base.domain.rbac.Permission;
 import lombok.NonNull;
 import lombok.val;
 import org.springframework.beans.BeansException;

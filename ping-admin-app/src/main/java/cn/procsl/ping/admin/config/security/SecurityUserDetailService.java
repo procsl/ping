@@ -1,7 +1,7 @@
 package cn.procsl.ping.admin.config.security;
 
-import cn.procsl.ping.boot.infra.domain.user.User;
-import cn.procsl.ping.boot.infra.domain.user.UserSpecification;
+import cn.procsl.ping.boot.base.domain.user.User;
+import cn.procsl.ping.boot.base.domain.user.UserSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;

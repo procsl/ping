@@ -1,6 +1,6 @@
 package cn.procsl.ping.admin.web.rbac;
 
-import cn.procsl.ping.boot.infra.domain.rbac.Permission;
+import cn.procsl.ping.boot.base.domain.rbac.Permission;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;

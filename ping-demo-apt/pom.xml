@@ -3,113 +3,23 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <groupId>cn.procsl</groupId>
     <packaging>jar</packaging>
-    <version>0.0.4-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.6.7</version>
-        <relativePath/>
+        <artifactId>ping</artifactId>
+        <groupId>cn.procsl</groupId>
+        <version>0.0.4-SNAPSHOT</version>
     </parent>
 
     <artifactId>ping-demo-apt</artifactId>
-    <name>Ping Demo APT</name>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    <name>Ping APT Processor Demo</name>
 
     <dependencies>
-
-        <dependency>
-            <groupId>io.swagger.core.v3</groupId>
-            <artifactId>swagger-annotations</artifactId>
-            <version>2.1.12</version>
-            <scope>provided</scope>
-        </dependency>
-
         <dependency>
             <groupId>cn.procsl</groupId>
-            <artifactId>ping-processor-restful</artifactId>
-            <version>0.0.4-SNAPSHOT</version>
+            <artifactId>ping-domain-starter</artifactId>
         </dependency>
-
-        <dependency>
-            <artifactId>ping-domain-spring-boot-starter</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>javassist</artifactId>
-                    <groupId>org.javassist</groupId>
-                </exclusion>
-            </exclusions>
-            <groupId>cn.procsl</groupId>
-            <version>0.0.4-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-            <version>2.1.1</version>
-            <type>jar</type>
-        </dependency>
-
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
-            <version>1.18.24</version>
-        </dependency>
-
-        <!-- slf4j核心包-->
-        <!--        <dependency>-->
-        <!--            <groupId>org.slf4j</groupId>-->
-        <!--            <artifactId>slf4j-api</artifactId>-->
-        <!--            <version>1.7.30</version>-->
-        <!--        </dependency>-->
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-            <version>1.7.32</version>
-        </dependency>
-
-        <!--需要使用log4j2的AsyncLogger需要包含disruptor-->
-        <!--        <dependency>-->
-        <!--            <groupId>com.lmax</groupId>-->
-        <!--            <artifactId>disruptor</artifactId>-->
-        <!--            <version>3.2.0</version>-->
-        <!--        </dependency>-->
-
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
-                <configuration>
-                    <source>11</source>
-                    <target>11</target>
-                    <generatedSourcesDirectory>${project.build.directory}/generated-sources/java
-                    </generatedSourcesDirectory>
-                    <!--保留参数名称-->
-                    <compilerVersion>11</compilerVersion>
-                    <compilerArgs>
-                        <arg>-g</arg>
-                        <arg>-Xlint</arg>
-                        <arg>-parameters</arg>
-                        <arg>-Aquerydsl.useGetters=true</arg>
-                    </compilerArgs>
-                    <showWarnings>true</showWarnings>
-                    <showDeprecation>true</showDeprecation>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
 
 </project>

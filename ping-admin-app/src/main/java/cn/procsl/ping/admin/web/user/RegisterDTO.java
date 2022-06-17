@@ -1,7 +1,7 @@
 package cn.procsl.ping.admin.web.user;
 
+import cn.procsl.ping.boot.base.domain.user.Account;
 import cn.procsl.ping.boot.domain.valid.UniqueField;
-import cn.procsl.ping.boot.infra.domain.user.Account;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

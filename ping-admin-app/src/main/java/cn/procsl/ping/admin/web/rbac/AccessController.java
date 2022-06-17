@@ -1,8 +1,8 @@
 package cn.procsl.ping.admin.web.rbac;
 
-import cn.procsl.ping.boot.infra.domain.rbac.AccessControlService;
-import cn.procsl.ping.boot.infra.domain.rbac.QRole;
-import cn.procsl.ping.boot.infra.domain.rbac.QSubject;
+import cn.procsl.ping.boot.base.domain.rbac.AccessControlService;
+import cn.procsl.ping.boot.base.domain.rbac.QRole;
+import cn.procsl.ping.boot.base.domain.rbac.QSubject;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPQLQueryFactory;
 import io.swagger.v3.oas.annotations.Operation;

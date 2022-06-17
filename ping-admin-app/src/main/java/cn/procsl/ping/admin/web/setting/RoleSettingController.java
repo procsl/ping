@@ -1,6 +1,6 @@
 package cn.procsl.ping.admin.web.setting;
 
-import cn.procsl.ping.boot.infra.domain.user.RoleSettingService;
+import cn.procsl.ping.boot.base.domain.user.RoleSettingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

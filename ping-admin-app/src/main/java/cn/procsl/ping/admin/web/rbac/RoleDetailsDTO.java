@@ -1,7 +1,7 @@
 package cn.procsl.ping.admin.web.rbac;
 
-import cn.procsl.ping.boot.infra.domain.rbac.Permission;
-import cn.procsl.ping.boot.infra.domain.rbac.Role;
+import cn.procsl.ping.boot.base.domain.rbac.Permission;
+import cn.procsl.ping.boot.base.domain.rbac.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;

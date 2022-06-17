@@ -1,6 +1,7 @@
 package cn.procsl.ping.demo.domain.entity;
 
-import cn.procsl.ping.boot.domain.base.tree.model.AdjacencyNode;
+
+import cn.procsl.ping.boot.domain.jpa.tree.AdjacencyNode;
 
 import javax.persistence.*;
 import java.io.Serializable;

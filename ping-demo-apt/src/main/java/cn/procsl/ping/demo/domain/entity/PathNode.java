@@ -1,6 +1,6 @@
 package cn.procsl.ping.demo.domain.entity;
 
-import cn.procsl.ping.boot.domain.base.tree.model.AdjacencyPathNode;
+import cn.procsl.ping.boot.domain.jpa.tree.AdjacencyPathNode;
 
 import javax.persistence.Embeddable;
 

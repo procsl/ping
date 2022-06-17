@@ -1,7 +1,7 @@
 package cn.procsl.ping.admin.config.security;
 
 import cn.procsl.ping.admin.service.PermissionMatcher;
-import cn.procsl.ping.boot.infra.domain.rbac.Permission;
+import cn.procsl.ping.boot.base.domain.rbac.Permission;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;

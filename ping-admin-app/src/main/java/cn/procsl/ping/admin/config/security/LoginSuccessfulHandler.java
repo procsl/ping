@@ -1,8 +1,8 @@
 package cn.procsl.ping.admin.config.security;
 
-import cn.procsl.ping.boot.infra.domain.rbac.AccessControlService;
-import cn.procsl.ping.boot.infra.domain.rbac.HttpPermission;
-import cn.procsl.ping.boot.infra.domain.rbac.Permission;
+import cn.procsl.ping.boot.base.domain.rbac.AccessControlService;
+import cn.procsl.ping.boot.base.domain.rbac.HttpPermission;
+import cn.procsl.ping.boot.base.domain.rbac.Permission;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;

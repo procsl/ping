@@ -1,6 +1,6 @@
 package cn.procsl.ping.admin.service;
 
-import cn.procsl.ping.boot.infra.domain.rbac.Permission;
+import cn.procsl.ping.boot.base.domain.rbac.Permission;
 import org.springframework.context.ApplicationContextAware;
 
 import javax.servlet.http.HttpServletRequest;

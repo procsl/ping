@@ -1,6 +1,6 @@
 package cn.procsl.ping.admin.config.security;
 
-import cn.procsl.ping.admin.exception.ExceptionCode;
+import cn.procsl.ping.admin.error.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +37,7 @@ public class NotLoginAuthentication implements AuthenticationEntryPoint, Initial
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        message = objectMapper.writeValueAsBytes(ExceptionCode.builder("401000", "你尚未登录,请登录"));
+        message = objectMapper.writeValueAsBytes(ErrorCode.builder("401000", "你尚未登录,请登录"));
     }
 
 }

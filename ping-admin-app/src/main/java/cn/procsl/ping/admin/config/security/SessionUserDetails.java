@@ -1,6 +1,6 @@
 package cn.procsl.ping.admin.config.security;
 
-import cn.procsl.ping.boot.infra.domain.user.User;
+import cn.procsl.ping.boot.base.domain.user.User;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;

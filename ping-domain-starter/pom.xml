@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>ping</artifactId>
+        <groupId>cn.procsl</groupId>
+        <version>0.0.4-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>ping-domain-starter</artifactId>
+    <name>Ping Domain SpringBoot Starter</name>
+    <packaging>jar</packaging>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>cn.procsl</groupId>
+            <artifactId>ping-processor-apt</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.querydsl</groupId>
+            <artifactId>querydsl-jpa</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.speedment.jpastreamer</groupId>
+            <artifactId>jpastreamer-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.speedment.jpastreamer.integration.spring</groupId>
+            <artifactId>spring-boot-jpastreamer-autoconfigure</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.wenhao</groupId>
+            <artifactId>jpa-spec</artifactId>
+        </dependency>
+
+    </dependencies>
+
+</project>
