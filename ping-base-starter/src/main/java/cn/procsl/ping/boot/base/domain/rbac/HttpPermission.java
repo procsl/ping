@@ -18,7 +18,7 @@ public class HttpPermission extends Permission {
 
     final static java.util.regex.Pattern dynamic = java.util.regex.Pattern.compile("[*{}?]+");
 
-    @Pattern(regexp = "(GET|POST|DELETE|PATCH|PUT)", message = "仅支持[{regexp}]方法") @NotBlank String option;
+    @Pattern(regexp = "(GET|POST|DELETE|PATCH|PUT)", message = "仅支持[{regexp}]方法") @NotBlank String operate;
 
     @NotBlank String resource;
 
@@ -28,7 +28,7 @@ public class HttpPermission extends Permission {
 
     @Transient
     public String getHttpMethod() {
-        return this.getOption();
+        return this.getOperate();
     }
 
     @Transient

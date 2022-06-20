@@ -42,7 +42,7 @@ public class ConfigController {
     @Operation(summary = "编辑配置项")
     @PatchMapping("/v1/configs/{id}")
     public void edit(@PathVariable Long id, @RequestBody @Validated ConfigDTO config) throws BusinessException {
-        this.jpaRepository.getById(id).edit(config.getKey(), config.getContent(), config.getDescription());
+        this.jpaRepository.getReferenceById(id).edit(config.getKey(), config.getContent(), config.getDescription());
     }
 
     @Transactional
@@ -73,13 +73,13 @@ public class ConfigController {
     @GetMapping("/v1/configs")
     @Transactional(readOnly = true)
     @Operation(summary = "获取配置内容")
-    public FormatPage<ConfigVO> findConfig(Pageable pageable, @RequestParam(required = false) String key) {
-        QBean<ConfigVO> select = Projections.bean(ConfigVO.class, qconfig.id, qconfig.key, qconfig.content, qconfig.description);
+    public FormatPage<ConfigVO> findConfig(Pageable pageable, @RequestParam(required = false) String name) {
+        QBean<ConfigVO> select = Projections.bean(ConfigVO.class, qconfig.id, qconfig.name, qconfig.content, qconfig.description);
 
         JPQLQuery<ConfigVO> query = this.queryFactory.select(select).from(qconfig);
 
         QueryBuilder<ConfigVO> builder = QueryBuilder.builder(query)
-                .and(key, () -> qconfig.key.like(String.format("%%%s%%", key)));
+                .and(name, () -> qconfig.name.like(String.format("%%%s%%", name)));
 
         return FormatPage.page(builder, pageable);
     }

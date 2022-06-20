@@ -20,7 +20,7 @@ import java.io.Serializable;
 public class Config extends AbstractPersistable<Long> implements Serializable {
 
     @Column(unique = true)
-    String key;
+    String name;
 
     String content;
 
@@ -32,14 +32,14 @@ public class Config extends AbstractPersistable<Long> implements Serializable {
 
     public static Config creator(@NotNull String key, String content, String description) {
         Config config = new Config();
-        config.key = key;
+        config.name = key;
         config.content = content;
         config.description = description;
         return config;
     }
 
     public void edit(@NonNull String key, String content, String description) {
-        this.key = key;
+        this.name = key;
         this.content = content;
         this.description = description;
     }

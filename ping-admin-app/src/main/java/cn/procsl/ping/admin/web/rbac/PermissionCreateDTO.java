@@ -11,6 +11,6 @@ public class PermissionCreateDTO extends PermissionUpdateDTO {
     @NotNull PermissionType type;
 
     public Permission convert() {
-        return type.factory.apply(option, resource);
+        return type.factory.apply(operate, resource);
     }
 }

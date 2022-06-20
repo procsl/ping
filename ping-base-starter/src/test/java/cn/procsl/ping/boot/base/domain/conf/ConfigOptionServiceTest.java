@@ -52,9 +52,9 @@ public class ConfigOptionServiceTest {
         String desc = JMockData.mock(String.class);
         Long id = configOptionService.put(key, content, desc);
 
-        Config configure = jpaRepository.getById(id);
+        Config configure = jpaRepository.getReferenceById(id);
         Assertions.assertNotNull(configure);
-        Assertions.assertEquals(key, configure.getKey());
+        Assertions.assertEquals(key, configure.getName());
         Assertions.assertEquals(content, configure.getContent());
         Assertions.assertEquals(desc, configure.getDescription());
 
@@ -75,11 +75,11 @@ public class ConfigOptionServiceTest {
         String key = JMockData.mock(String.class);
         String content = JMockData.mock(String.class);
         String desc = JMockData.mock(String.class);
-        Config config = this.jpaRepository.getById(gid);
+        Config config = this.jpaRepository.getReferenceById(gid);
         config.edit(key, content, desc);
         List<Config> all = this.jpaRepository.findAll();
         Assertions.assertEquals(1, all.size());
-        Assertions.assertEquals(all.get(0).getKey(), key);
+        Assertions.assertEquals(all.get(0).getName(), key);
         Assertions.assertEquals(all.get(0).getDescription(), desc);
         Assertions.assertEquals(all.get(0).getContent(), content);
 
@@ -97,7 +97,7 @@ public class ConfigOptionServiceTest {
     @Rollback
     public void delete() {
         this.jpaRepository.deleteById(gid);
-        Assertions.assertThrows(JpaObjectRetrievalFailureException.class, () -> this.jpaRepository.getById(gid));
+        Assertions.assertThrows(JpaObjectRetrievalFailureException.class, () -> this.jpaRepository.getReferenceById(gid));
     }
 
     @Test
@@ -106,9 +106,9 @@ public class ConfigOptionServiceTest {
     @Rollback
     public void getConfig() {
 
-        Config entity = this.jpaRepository.getById(gid);
+        Config entity = this.jpaRepository.getReferenceById(gid);
 
-        String config = this.configOptionService.get(entity.getKey());
+        String config = this.configOptionService.get(entity.getName());
         Assertions.assertEquals(config, entity.getContent());
 
         String config1 = this.configOptionService.get(faker.animal().name());

@@ -27,29 +27,29 @@ public class ConfigOptionService {
     /**
      * 添加配置项
      *
-     * @param key     配置项的key
+     * @param name    配置项的key
      * @param content 配置项的内容
      */
-    public Long put(@NotNull String key, String content) {
-        return this.put(key, content, null);
+    public Long put(@NotNull String name, String content) {
+        return this.put(name, content, null);
     }
 
-    public Long put(@NotNull String key, String content, String desc) {
-        Optional<Config> option = this.jpaSpecificationExecutor.findOne((Specification<Config>) (root, query, cb) -> cb.equal(root.get("key"), key));
-        option.ifPresent(item -> item.edit(key, content, desc));
-        Config config = option.orElseGet(() -> Config.creator(key, content, desc));
+    public Long put(@NotNull String name, String content, String desc) {
+        Optional<Config> option = this.jpaSpecificationExecutor.findOne((Specification<Config>) (root, query, cb) -> cb.equal(root.get("name"), name));
+        option.ifPresent(item -> item.edit(name, content, desc));
+        Config config = option.orElseGet(() -> Config.creator(name, content, desc));
         return this.jpaRepository.save(config).getId();
     }
 
     /**
      * 获取配置内容
      *
-     * @param key 指定的配置项Key
+     * @param name 指定的配置项name
      * @return 如果配置项不存在或者为空, 则返回 null
      */
     @Nullable
-    public String get(@NotEmpty String key) {
-        Optional<Config> config = this.jpaSpecificationExecutor.findOne((Specification<Config>) (root, query, cb) -> cb.equal(root.get("key"), key));
+    public String get(@NotEmpty String name) {
+        Optional<Config> config = this.jpaSpecificationExecutor.findOne((root, query, cb) -> cb.equal(root.get("name"), name));
         return config.map(Config::getContent).orElse(null);
     }
 }

@@ -17,12 +17,12 @@
         </createTable>
 
 
-        <createTable tableName="i_role_permission" remarks="RBAC模块权限表">
+        <createTable tableName="i_role_permissions" remarks="RBAC模块权限表">
             <column name="role_id" type="bigint">
                 <constraints references="i_role(id)" foreignKeyName="i_fk_role_id" referencedTableName="i_role"
                              referencedColumnNames="id"/>
             </column>
-            <column name="permission_id" type="bigint" remarks="权限ID"/>
+            <column name="permissions_id" type="bigint" remarks="权限ID"/>
         </createTable>
 
         <createTable tableName="i_permission" remarks="用户权限表">
@@ -30,7 +30,7 @@
                 <constraints primaryKey="true"/>
             </column>
 
-            <column name="option" type="varchar(20)" remarks="权限操作"/>
+            <column name="operate" type="varchar(20)" remarks="权限操作"/>
             <column name="resource" type="varchar(500)" remarks="权限资源"/>
 
             <column name="type" type="varchar(10)" remarks="权限类型">
@@ -123,11 +123,11 @@
             <column name="id" type="bigint">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="key" type="varchar(20)" remarks="配置项标识符">
+            <column name="name" type="varchar(20)" remarks="配置项标识符">
                 <constraints unique="true" uniqueConstraintName="i_uk_config" nullable="false"/>
             </column>
             <column name="type" type="varchar(10)" remarks="配置项类型"/>
-            <column name="content" type="text" remarks="配置项内容"/>
+            <column name="content" type="varchar(1000)" remarks="配置项内容"/>
             <column name="description" type="varchar(500)" remarks="配置项描述"/>
             <column name="version" type="bigint" remarks="版本号">
                 <constraints nullable="false"/>

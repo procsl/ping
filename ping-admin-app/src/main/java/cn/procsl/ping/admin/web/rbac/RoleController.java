@@ -66,7 +66,7 @@ public class RoleController {
     @Operation(summary = "修改指定角色信息")
     public void change(@PathVariable("id") Long id, @RequestBody @NotNull RoleDetailsDTO details) throws BusinessException {
         uniqueValidator.valid(Role.class, id, "name", details.getName(), "角色已存在");
-        Role role = this.roleRepository.getById(id);
+        Role role = this.roleRepository.getReferenceById(id);
         List<Permission> permissions = this.permissionJpaRepository.findAllById(details.getPermissions());
         role.change(details.getName(), permissions);
     }
@@ -75,7 +75,7 @@ public class RoleController {
     @GetMapping("/v1/roles/{id}")
     @Operation(summary = "获取指定角色信息")
     public RoleDetailsDTO getById(@PathVariable("id") Long id) throws BusinessException {
-        Role role = this.roleRepository.getById(id);
+        Role role = this.roleRepository.getReferenceById(id);
         return new RoleDetailsDTO(role);
     }
 

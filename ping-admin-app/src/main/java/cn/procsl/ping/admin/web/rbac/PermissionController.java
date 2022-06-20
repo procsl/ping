@@ -52,20 +52,21 @@ public class PermissionController {
     @PatchMapping("/v1/permissions/{id}")
     @Operation(summary = "更新权限")
     public void update(@PathVariable Long id, @Validated @RequestBody PermissionUpdateDTO permission) throws BusinessException {
-        permissionJpaRepository.getById(id).update(permission.getOption(), permission.getResource());
+        permissionJpaRepository.getReferenceById(id).update(permission.getOperate(), permission.getResource());
     }
 
     @MarkPageable
     @Transactional(readOnly = true)
     @Operation(summary = "查询角色权限")
     @GetMapping("/v1/permissions")
-    public FormatPage<PermissionVO> findPermissions(Pageable pageable, @RequestParam(required = false) String resource, @RequestParam(required = false) PermissionType type) {
-        QBean<PermissionVO> details = Projections.bean(PermissionVO.class, qpermission.id, qpermission.option, qpermission.resource);
+    public FormatPage<PermissionVO> findPermissions(Pageable pageable, @RequestParam(required = false) String resource,
+                                                    @RequestParam(required = false) PermissionType type) {
+        QBean<PermissionVO> details = Projections.bean(PermissionVO.class, qpermission.id, qpermission.operate, qpermission.resource);
 
         val from = type != null ? type.query : this.qpermission;
         JPQLQuery<PermissionVO> query = this.queryFactory.select(details).from(from);
 
-        val builder = QueryBuilder.builder(query).and(resource, () -> qpermission.option.like(String.format("%%%s%%", resource)));
+        val builder = QueryBuilder.builder(query).and(resource, () -> qpermission.operate.like(String.format("%%%s%%", resource)));
 
         return FormatPage.page(builder, pageable);
     }

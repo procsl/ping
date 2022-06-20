@@ -8,7 +8,7 @@ import java.io.Serializable;
 @Data
 public class PermissionUpdateDTO implements Serializable {
 
-    @NotBlank String option;
+    @NotBlank String operate;
     @NotBlank String resource;
 
 }

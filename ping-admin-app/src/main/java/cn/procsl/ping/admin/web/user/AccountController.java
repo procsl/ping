@@ -27,7 +27,7 @@ public class AccountController {
     @Operation(summary = "修改指定用户的账户状态")
     public void accountStatusSetting(@PathVariable Long id, @Validated @RequestBody AccountStateDTO state) {
         userRepository
-                .getById(id)
+                .getReferenceById(id)
                 .getAccount().
                 stateSetting(state.getState());
     }

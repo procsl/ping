@@ -25,7 +25,7 @@ class HttpPermissionMatcher implements PermissionMatcher {
     final Map<String, List<HttpPermission>> permissions;
 
     public HttpPermissionMatcher(@NonNull Collection<HttpPermission> permissions) {
-        this.permissions = permissions.stream().collect(Collectors.groupingBy(Permission::getOption));
+        this.permissions = permissions.stream().collect(Collectors.groupingBy(Permission::getOperate));
     }
 
 

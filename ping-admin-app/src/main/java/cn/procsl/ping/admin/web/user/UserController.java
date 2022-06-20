@@ -47,7 +47,7 @@ public class UserController {
     @PatchMapping("/v1/users/{id}")
     @Operation(summary = "更新用户信息")
     public void update(@PathVariable Long id, @Validated @RequestBody UserPropDTO userPropDTO) {
-        User user = this.jpaRepository.getById(id);
+        User user = this.jpaRepository.getReferenceById(id);
         user.updateSelf(userPropDTO.getName(), userPropDTO.getGender(), userPropDTO.getRemark());
     }
 

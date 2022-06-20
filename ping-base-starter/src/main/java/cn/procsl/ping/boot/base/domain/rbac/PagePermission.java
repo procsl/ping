@@ -18,7 +18,7 @@ import javax.validation.constraints.NotBlank;
 public class PagePermission extends Permission {
 
     @NotBlank
-    protected String option;
+    protected String operate;
 
     @NotBlank
     protected String resource;

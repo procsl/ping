@@ -13,7 +13,7 @@ public class ProductService {
 
     @Transactional
     public void publish(Long productId) {
-        jpaRepository.getById(productId);
+        jpaRepository.getReferenceById(productId);
     }
 
 }

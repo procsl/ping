@@ -62,7 +62,9 @@ public class AdminStartupListener implements ApplicationListener<ApplicationRead
         Role role = new Role(roleName);
         role.addPermissions(permissions);
         this.permissionJpaRepository.saveAll(permissions);
+        this.roleJpaRepository.flush();
         this.roleJpaRepository.save(role);
+        this.roleJpaRepository.flush();
 
         log.info("注册默认账户:{}", account);
         Long id = this.userRegisterService.register(account, password);

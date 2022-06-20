@@ -84,7 +84,7 @@ public class UniqueFieldValidatorTest {
                 EntityManager entityManager = ContextHolder.getEntityManager();
                 Assertions.assertNotNull(entityManager);
                 Unique unique = entityManager.find(Unique.class, gid);
-                Unique jpaUnique = jpaRepository.getById(gid);
+                Unique jpaUnique = jpaRepository.getReferenceById(gid);
                 Assertions.assertEquals(jpaUnique, unique);
             } catch (Exception e) {
                 log.error("校验输出:", e);

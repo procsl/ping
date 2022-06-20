@@ -42,7 +42,7 @@ public class AccountServiceImplTest {
         String password = "1234567";
         Long id = this.jpaRepository.save(Account.create(name, password)).getId();
         assert id != null;
-        Account account = this.jpaRepository.getById(id);
+        Account account = this.jpaRepository.getReferenceById(id);
         Assertions.assertEquals(account.getName(), name);
         Assertions.assertEquals(account.getPassword(), password);
         Assertions.assertTrue(account.isEnable());
@@ -55,11 +55,11 @@ public class AccountServiceImplTest {
     @DisplayName("测试禁用账户")
     public void disable() {
         {
-            Account account = this.jpaRepository.getById(gid);
+            Account account = this.jpaRepository.getReferenceById(gid);
             Assertions.assertEquals(account.getState(), AccountState.enable);
         }
         {
-            Account account = this.jpaRepository.getById(gid);
+            Account account = this.jpaRepository.getReferenceById(gid);
             account.disabled();
             Assertions.assertEquals(account.getState(), AccountState.disable);
         }
@@ -71,16 +71,16 @@ public class AccountServiceImplTest {
     @DisplayName("测试启用账户")
     public void enable() {
         {
-            Account account = this.jpaRepository.getById(gid);
+            Account account = this.jpaRepository.getReferenceById(gid);
             Assertions.assertEquals(account.getState(), AccountState.enable);
         }
         {
-            Account account = this.jpaRepository.getById(gid);
+            Account account = this.jpaRepository.getReferenceById(gid);
             account.disabled();
             Assertions.assertEquals(account.getState(), AccountState.disable);
         }
         {
-            Account account = this.jpaRepository.getById(gid);
+            Account account = this.jpaRepository.getReferenceById(gid);
             account.enabled();
             Assertions.assertEquals(account.getState(), AccountState.enable);
         }
