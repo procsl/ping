@@ -11,11 +11,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>ping-demo-graalvm</artifactId>
+    <name>Ping Demo GraalVM</name>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <graalvm.version>21.0.0</graalvm.version>
+        <graalvm.version>21.2.0</graalvm.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <start-class>cn.procsl.ping.graalvm.DemoApplication</start-class>
     </properties>
@@ -107,43 +108,44 @@
                             </BP_BOOT_NATIVE_IMAGE_BUILD_ARGUMENTS>
                         </env>
                     </image>
+                    <classifier>exec</classifier>
                 </configuration>
             </plugin>
         </plugins>
     </build>
 
     <profiles>
-        <profile>
-            <id>native</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.graalvm.nativeimage</groupId>
-                        <artifactId>native-image-maven-plugin</artifactId>
-                        <version>${graalvm.version}</version>
-                        <configuration>
-                            <mainClass>cn.procsl.ping.graalvm.DemoApplication</mainClass>
-                            <buildArgs>
-                                -H:+ReportExceptionStackTraces
-                                -Dspring.native.remove-yaml-support=true
-                                -Dspring.graal.remove-unused-autoconfig=true
-                                -Dspring.spel.ignore=true
-                                -Dspring.native.verbose=true
-                                -O3
-                            </buildArgs>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>native-image</goal>
-                                </goals>
-                                <phase>package</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
+        <!--        <profile>-->
+        <!--            <id>native</id>-->
+        <!--            <build>-->
+        <!--                <plugins>-->
+        <!--                    <plugin>-->
+        <!--                        <groupId>org.graalvm.nativeimage</groupId>-->
+        <!--                        <artifactId>native-image-maven-plugin</artifactId>-->
+        <!--                        <version>${graalvm.version}</version>-->
+        <!--                        <configuration>-->
+        <!--                            <mainClass>cn.procsl.ping.graalvm.DemoApplication</mainClass>-->
+        <!--                            <buildArgs>-->
+        <!--                                -H:+ReportExceptionStackTraces-->
+        <!--                                -Dspring.native.remove-yaml-support=true-->
+        <!--                                -Dspring.graal.remove-unused-autoconfig=true-->
+        <!--                                -Dspring.spel.ignore=true-->
+        <!--                                -Dspring.native.verbose=true-->
+        <!--                                -O3-->
+        <!--                            </buildArgs>-->
+        <!--                        </configuration>-->
+        <!--                        <executions>-->
+        <!--                            <execution>-->
+        <!--                                <goals>-->
+        <!--                                    <goal>native-image</goal>-->
+        <!--                                </goals>-->
+        <!--                                <phase>package</phase>-->
+        <!--                            </execution>-->
+        <!--                        </executions>-->
+        <!--                    </plugin>-->
+        <!--                </plugins>-->
+        <!--            </build>-->
+        <!--        </profile>-->
     </profiles>
 
 </project>

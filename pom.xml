@@ -7,27 +7,828 @@
     <groupId>cn.procsl</groupId>
     <artifactId>ping</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.4-SNAPSHOT</version>
 
     <properties>
         <java.version>11</java.version>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-        <maven.compiler.compilerVersion>11</maven.compiler.compilerVersion>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.compilerVersion>${java.version}</maven.compiler.compilerVersion>
+        <compiler.version>${java.version}</compiler.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <springboot.version>2.7.0</springboot.version>
+        <querydsl.version>5.0.0</querydsl.version>
+        <springdoc.version>1.6.9</springdoc.version>
+        <jpa-streamer-version>1.0.2</jpa-streamer-version>
+        <server.port>10000</server.port>
+        <native.version>0.12.0</native.version>
     </properties>
 
     <modules>
-        <module>ping-domain-spring-boot-starter</module>
-        <module>ping-business-model</module>
-        <module>ping-processor-domain</module>
-        <module>ping-user-spring-boot-starter</module>
+        <module>ping-common</module>
         <module>ping-admin-app</module>
-        <module>ping-rest-spring-boot-starter</module>
-        <module>ping-producer-spring-boot-starter</module>
-        <!--        <module>ping-processor-api</module>-->
+        <module>ping-producer-starter</module>
+        <module>ping-domain-starter</module>
+        <module>ping-base-starter</module>
+        <module>ping-spring-dependencies</module>
     </modules>
 
-    <name>ping</name>
+    <name>Ping General Business Project</name>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.javafaker</groupId>
+            <artifactId>javafaker</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.jsonzou</groupId>
+            <artifactId>jmockdata</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.querydsl</groupId>
+            <artifactId>querydsl-apt</artifactId>
+            <classifier>jpa</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <dependencyManagement>
+
+        <dependencies>
+            <dependency>
+                <!-- 从 Spring Boot 导入依赖管理 -->
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${springboot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>1.5.1.Final</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-webmvc-core</artifactId>
+                <version>${springdoc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-ui</artifactId>
+                <version>${springdoc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-javadoc</artifactId>
+                <version>${springdoc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-common</artifactId>
+                <version>${springdoc.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.procsl</groupId>
+                <artifactId>ping-processor-apt</artifactId>
+                <version>${project.version}</version>
+                <optional>true</optional>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.procsl</groupId>
+                <artifactId>ping-domain-starter</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.procsl</groupId>
+                <artifactId>ping-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.procsl</groupId>
+                <artifactId>ping-base-starter</artifactId>
+                <version>0.0.4-SNAPSHOT</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.javafaker</groupId>
+                <artifactId>javafaker</artifactId>
+                <version>1.0.2</version>
+                <scope>test</scope>
+                <optional>true</optional>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.jsonzou</groupId>
+                <artifactId>jmockdata</artifactId>
+                <version>4.3.0</version>
+                <scope>test</scope>
+                <optional>true</optional>
+            </dependency>
+
+            <dependency>
+                <groupId>com.querydsl</groupId>
+                <artifactId>querydsl-apt</artifactId>
+                <version>${querydsl.version}</version>
+                <classifier>jpa</classifier>
+                <scope>compile</scope>
+                <optional>true</optional>
+            </dependency>
+
+            <dependency>
+                <groupId>com.querydsl</groupId>
+                <artifactId>querydsl-jpa</artifactId>
+                <version>${querydsl.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.inject</groupId>
+                <artifactId>javax.inject</artifactId>
+                <version>1</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.ws.rs</groupId>
+                <artifactId>javax.ws.rs-api</artifactId>
+                <version>2.1.1</version>
+                <type>jar</type>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>2.2.0</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.casbin</groupId>
+                <artifactId>jcasbin</artifactId>
+                <version>1.22.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.speedment.jpastreamer</groupId>
+                <artifactId>jpastreamer-core</artifactId>
+                <version>${jpa-streamer-version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.speedment.jpastreamer.integration.spring</groupId>
+                <artifactId>spring-boot-jpastreamer-autoconfigure</artifactId>
+                <version>${jpa-streamer-version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.wenhao</groupId>
+                <artifactId>jpa-spec</artifactId>
+                <version>3.2.5</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.squareup</groupId>
+                <artifactId>javapoet</artifactId>
+                <version>1.13.0</version>
+                <optional>true</optional>
+            </dependency>
+
+            <dependency>
+                <groupId>org.javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>3.29.0-GA</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.auto.service</groupId>
+                <artifactId>auto-service</artifactId>
+                <version>1.0.1</version>
+                <scope>compile</scope>
+                <optional>true</optional>
+            </dependency>
+
+        </dependencies>
+
+    </dependencyManagement>
+
+
+    <build>
+        <finalName>${project.artifactId}-${project.version}</finalName>
+
+        <testResources>
+            <testResource>
+                <directory>${project.basedir}/src/test/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**</include>
+                </includes>
+            </testResource>
+        </testResources>
+
+        <resources>
+            <resource>
+                <directory>${project.basedir}/src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**</include>
+                </includes>
+            </resource>
+        </resources>
+
+        <pluginManagement>
+
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.10.1</version>
+                    <configuration>
+                        <generatedSourcesDirectory>
+                            ${project.build.directory}/generated-sources/java
+                        </generatedSourcesDirectory>
+                        <compilerVersion>${compiler.version}</compilerVersion>
+                        <verbose>true</verbose>
+                        <showWarnings>true</showWarnings>
+                        <fork>true</fork>
+                        <!--保留参数名称-->
+                        <maxmem>2048m</maxmem>
+                        <compilerArgs>
+                            <arg>-g</arg>
+                            <arg>-Xlint:unchecked</arg>
+                            <arg>-Xlint:deprecation</arg>
+                            <arg>-parameters</arg>
+                        </compilerArgs>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${springboot.version}</version>
+                    <executions>
+                        <execution>
+                            <id>repackage</id>
+                            <goals>
+                                <goal>repackage</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!-- 必须显式的声明测试插件，否则无法执行测试 -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.0.0-M7</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.owasp</groupId>
+                    <artifactId>dependency-check-maven</artifactId>
+                    <version>6.5.2</version>
+                    <configuration>
+                        <skipProvidedScope>true</skipProvidedScope>
+                    </configuration>
+
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.hibernate.orm.tooling</groupId>
+                    <artifactId>hibernate-enhance-maven-plugin</artifactId>
+                    <version>6.1.0.Final</version>
+                    <executions>
+                        <execution>
+                            <configuration>
+                                <failOnError>true</failOnError>
+                                <enableLazyInitialization>true</enableLazyInitialization>
+                                <enableDirtyTracking>true</enableDirtyTracking>
+                                <enableAssociationManagement>true</enableAssociationManagement>
+                                <enableExtendedEnhancement>false</enableExtendedEnhancement>
+                            </configuration>
+                            <goals>
+                                <goal>enhance</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+            </plugins>
+
+        </pluginManagement>
+
+
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.hibernate.orm.tooling</groupId>
+                <artifactId>hibernate-enhance-maven-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+
+        </plugins>
+
+    </build>
+
+    <profiles>
+        <profile>
+            <id>springboot</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-validation</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-data-jpa</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-autoconfigure</artifactId>
+                    <scope>compile</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-web</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-actuator</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-test</artifactId>
+                    <scope>test</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-context-indexer</artifactId>
+                    <optional>true</optional>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-security</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.springframework.hateoas</groupId>
+                    <artifactId>spring-hateoas</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.springframework.security</groupId>
+                    <artifactId>spring-security-test</artifactId>
+                    <scope>test</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-configuration-processor</artifactId>
+                    <optional>true</optional>
+                    <scope>provided</scope>
+                </dependency>
+
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>h2</id>
+            <properties>
+                <database.type>h2</database.type>
+            </properties>
+
+            <dependencies>
+                <dependency>
+                    <groupId>com.h2database</groupId>
+                    <artifactId>h2</artifactId>
+                </dependency>
+            </dependencies>
+
+        </profile>
+
+        <profile>
+            <id>mysql8</id>
+            <properties>
+                <database.type>mysql8</database.type>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>postgresql</id>
+            <properties>
+                <database.type>postgresql</database.type>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>dependency-check</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.owasp</groupId>
+                        <artifactId>dependency-check-maven</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+
+            <id>native</id>
+
+            <dependencies>
+                <dependency>
+                    <groupId>org.springframework.experimental</groupId>
+                    <artifactId>spring-native</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework.experimental</groupId>
+                    <artifactId>spring-aot</artifactId>
+                </dependency>
+
+                <!--                <dependency>-->
+                <!--                    <groupId>org.graalvm.buildtools</groupId>-->
+                <!--                    <artifactId>junit-platform-native</artifactId>-->
+                <!--                    <version>${junit.platform.native.version}</version>-->
+                <!--                    <scope>test</scope>-->
+                <!--                </dependency>-->
+
+            </dependencies>
+
+
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.springframework.experimental</groupId>
+                        <artifactId>spring-native</artifactId>
+                        <version>${native.version}</version>
+                    </dependency>
+
+                    <dependency>
+                        <groupId>org.springframework.experimental</groupId>
+                        <artifactId>spring-aot</artifactId>
+                        <version>${native.version}</version>
+                        <scope>provided</scope>
+                    </dependency>
+
+                    <dependency>
+                        <groupId>org.jboss.logging</groupId>
+                        <artifactId>jboss-logging-annotations</artifactId>
+                        <version>2.2.1.Final</version>
+                    </dependency>
+
+                </dependencies>
+
+            </dependencyManagement>
+
+            <repositories>
+                <repository>
+                    <id>spring-release</id>
+                    <name>Spring release</name>
+                    <url>https://repo.spring.io/release</url>
+                </repository>
+
+            </repositories>
+
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>spring-release</id>
+                    <name>Spring release</name>
+                    <url>https://repo.spring.io/release</url>
+                </pluginRepository>
+
+                <pluginRepository>
+                    <id>graalvm-native-build-tools-snapshots</id>
+                    <name>GraalVM native-build-tools Snapshots</name>
+                    <url>https://raw.githubusercontent.com/graalvm/native-build-tools/snapshots</url>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </pluginRepository>
+
+            </pluginRepositories>
+
+            <build>
+
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.springframework.experimental</groupId>
+                            <artifactId>spring-aot-maven-plugin</artifactId>
+                            <version>${native.version}</version>
+                            <executions>
+                                <execution>
+                                    <id>generate</id>
+                                    <goals>
+                                        <goal>generate</goal>
+                                    </goals>
+                                </execution>
+                                <execution>
+                                    <id>test-generate</id>
+                                    <goals>
+                                        <goal>test-generate</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-dependency-plugin</artifactId>
+                            <version>3.3.0</version>
+                            <executions>
+                                <execution>
+                                    <id>unpack-dependencies</id>
+                                    <phase>package</phase>
+                                    <goals>
+                                        <goal>unpack-dependencies</goal>
+                                    </goals>
+                                    <configuration>
+                                        <excludeScope>system</excludeScope>
+                                        <excludes>META-INF/*.SF</excludes>
+                                        <excludes>META-INF/*.DSA</excludes>
+                                        <excludes>META-INF/*.RSA</excludes>
+                                        <excludeGroupIds>junit,org.mockito,org.hamcrest</excludeGroupIds>
+                                        <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                                    </configuration>
+                                </execution>
+                            </executions>
+                        </plugin>
+
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-shade-plugin</artifactId>
+                            <version>3.2.4</version>
+
+                            <executions>
+                                <execution>
+                                    <phase>package</phase>
+                                    <goals>
+                                        <goal>shade</goal>
+                                    </goals>
+                                    <configuration>
+                                        <shadedArtifactAttached>true</shadedArtifactAttached>
+                                        <minimizeJar>true</minimizeJar>
+                                        <filters>
+                                            <filter>
+                                                <artifact>*:*</artifact>
+                                                <excludes>
+                                                    <exclude>META-INF/*.SF</exclude>
+                                                    <exclude>META-INF/*.DSA</exclude>
+                                                    <exclude>META-INF/*.RSA</exclude>
+                                                </excludes>
+                                            </filter>
+                                        </filters>
+                                    </configuration>
+                                </execution>
+                            </executions>
+                        </plugin>
+
+                        <plugin>
+                            <groupId>org.graalvm.buildtools</groupId>
+                            <artifactId>native-maven-plugin</artifactId>
+                            <version>0.9.11</version>
+                            <extensions>true</extensions>
+
+                            <configuration>
+                                <skip>false</skip>
+                                <useArgFile>false</useArgFile>
+                                <buildArgs>
+                                    <buildArg>--no-fallback</buildArg>
+                                    <buildArg>-H:+ReportExceptionStackTraces</buildArg>
+                                    <buildArg>--verbose</buildArg>
+                                    <buildArg>
+                                        --initialize-at-run-time=org.hibernate.validator.internal.util.Contracts
+                                    </buildArg>
+                                    <buildArg>
+                                        -H:+PrintAnalysisCallTree
+                                    </buildArg>
+                                    <buildArg>
+                                        -H:Log=registerResource:3
+                                    </buildArg>
+                                    <buildArg>--report-unsupported-elements-at-runtime</buildArg>
+                                    <buildArg>--link-at-build-time</buildArg>
+                                    <buildArg>
+                                        -H:ReportAnalysisForbiddenType=org.hibernate.validator.internal.util.Contracts
+                                    </buildArg>
+                                </buildArgs>
+
+                                <classpath>
+                                    <param>
+                                        ${project.build.directory}/${project.artifactId}-${project.version}-shaded.jar
+                                    </param>
+                                </classpath>
+
+                            </configuration>
+
+                            <executions>
+                                <execution>
+                                    <id>build-native</id>
+                                    <goals>
+                                        <goal>build</goal>
+                                    </goals>
+                                    <phase>package</phase>
+                                </execution>
+                                <execution>
+                                    <id>test-native</id>
+                                    <goals>
+                                        <goal>test</goal>
+                                    </goals>
+                                    <phase>test</phase>
+                                </execution>
+                            </executions>
+
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+
+        </profile>
+
+        <profile>
+            <id>openapi</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.springdoc</groupId>
+                    <artifactId>springdoc-openapi-webmvc-core</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.springdoc</groupId>
+                    <artifactId>springdoc-openapi-ui</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.springdoc</groupId>
+                    <artifactId>springdoc-openapi-javadoc</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.springdoc</groupId>
+                    <artifactId>springdoc-openapi-common</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.querydsl</groupId>
+                    <artifactId>querydsl-apt</artifactId>
+                    <classifier>jpa</classifier>
+                    <optional>true</optional>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>io.github.classgraph</groupId>
+                            <artifactId>classgraph</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+            </dependencies>
+
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.springdoc</groupId>
+                            <artifactId>springdoc-openapi-maven-plugin</artifactId>
+                            <version>1.3</version>
+                            <executions>
+                                <execution>
+                                    <id>integration-test</id>
+                                    <goals>
+                                        <goal>generate</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+
+                            <configuration>
+                                <apiDocsUrl>http://localhost:${server.port}/v3/api-docs</apiDocsUrl>
+                                <outputFileName>openapi.json</outputFileName>
+                                <outputDir>${project.build.directory}/spring-doc</outputDir>
+                                <skip>false</skip>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+
+        </profile>
+
+    </profiles>
+
+    <url>https://www.procsl.cn</url>
+
+    <distributionManagement>
+        <site>
+            <id>ping-admin</id>
+            <url>https://github.com/procsl/ping</url>
+        </site>
+    </distributionManagement>
+
+
+    <description>
+        Ping项目, 基于DDD思想设计
+    </description>
+
 
 </project>

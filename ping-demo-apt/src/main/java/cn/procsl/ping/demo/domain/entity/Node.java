@@ -1,6 +1,7 @@
 package cn.procsl.ping.demo.domain.entity;
 
-import cn.procsl.ping.boot.domain.business.tree.model.AdjacencyNode;
+import cn.procsl.ping.boot.domain.jpa.tree.AdjacencyNode;
+import lombok.NonNull;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -52,7 +53,7 @@ public class Node extends User<PathNode> {
      * @param parent 指定的父节点
      */
     @Override
-    public void changeParent(AdjacencyNode<String, PathNode> parent) {
+    public void changeParent(@NonNull AdjacencyNode<String, PathNode> parent) {
 
     }
 }
