@@ -10,7 +10,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.metamodel.Metamodel;
 import java.util.Map;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class JpaStreamStupidConfig {
 
     @Autowired

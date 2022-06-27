@@ -1,25 +1,7 @@
 <component name="ProjectRunConfigurationManager">
     <configuration default="false" name="native-image-admin" type="MavenRunConfiguration" factoryName="Maven">
         <MavenSettings>
-            <option name="myGeneralSettings">
-                <MavenGeneralSettings>
-                    <option name="alwaysUpdateSnapshots" value="false"/>
-                    <option name="checksumPolicy" value="NOT_SET"/>
-                    <option name="failureBehavior" value="NOT_SET"/>
-                    <option name="localRepository" value="$PROJECT_DIR$/../../r"/>
-                    <option name="mavenHome" value="$PROJECT_DIR$/../../Program Files/Apache/maven/apache-maven-3.8.1"/>
-                    <option name="nonRecursive" value="false"/>
-                    <option name="outputLevel" value="INFO"/>
-                    <option name="pluginUpdatePolicy" value="DEFAULT"/>
-                    <option name="printErrorStackTraces" value="true"/>
-                    <option name="showDialogWithAdvancedSettings" value="false"/>
-                    <option name="threads"/>
-                    <option name="useMavenConfig" value="false"/>
-                    <option name="usePluginRegistry" value="false"/>
-                    <option name="userSettingsFile" value=""/>
-                    <option name="workOffline" value="false"/>
-                </MavenGeneralSettings>
-            </option>
+            <option name="myGeneralSettings"/>
             <option name="myRunnerSettings">
                 <MavenRunnerSettings>
                     <option name="delegateBuildToMaven" value="false"/>
@@ -34,7 +16,7 @@
                                    value="%Path%;D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\bin\Hostx64\x64"/>
                         </map>
                     </option>
-                    <option name="jreName" value="graalvm-ee-java11-21.3.0"/>
+                    <option name="jreName" value="graalvm-11"/>
                     <option name="mavenProperties">
                         <map/>
                     </option>
@@ -69,8 +51,7 @@
         </MavenSettings>
         <method v="2">
             <option name="Maven.BeforeRunTask" enabled="true"
-                    file="$PROJECT_DIR$/ping-infra-spring-boot-starter/pom.xml"
-                    goal="clean install"/>
+                    file="$PROJECT_DIR$/ping-infra-spring-boot-starter/pom.xml" goal="clean install"/>
         </method>
     </configuration>
 </component>

@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest(classes = DomainApplication.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @Rollback
 @Transactional
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class OverrideableProcessorTest {
 
     @Autowired

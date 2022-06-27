@@ -26,7 +26,7 @@ import java.util.List;
 @SpringBootTest(classes = DomainApplication.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @Rollback
 @Transactional
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class JpaSpecTest {
 
     @Autowired

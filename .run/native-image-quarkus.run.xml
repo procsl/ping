@@ -1,25 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-    <configuration default="false" name="native-image-quarkus"
-                   type="MavenRunConfiguration"
-                   factoryName="Maven">
+    <configuration default="false" name="native-image-quarkus" type="MavenRunConfiguration" factoryName="Maven">
         <MavenSettings>
             <option name="myGeneralSettings"/>
-            <option name="myRunnerSettings">
-                <MavenRunnerSettings>
-                    <option name="delegateBuildToMaven" value="false"/>
-                    <option name="environmentProperties">
-                        <map/>
-                    </option>
-                    <option name="jreName" value="graalvm-ce-java11-21.1.0"/>
-                    <option name="mavenProperties">
-                        <map/>
-                    </option>
-                    <option name="passParentEnv" value="true"/>
-                    <option name="runMavenInBackground" value="true"/>
-                    <option name="skipTests" value="true"/>
-                    <option name="vmOptions" value=""/>
-                </MavenRunnerSettings>
-            </option>
+            <option name="myRunnerSettings"/>
             <option name="myRunnerParameters">
                 <MavenRunnerParameters>
                     <option name="profiles">

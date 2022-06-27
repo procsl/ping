@@ -26,7 +26,7 @@ import javax.persistence.EntityManager;
  * @date 2020/03/21
  */
 @Slf4j
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnMissingBean(DomainAutoConfiguration.class)
 @AutoConfigureBefore(JpaBaseConfiguration.class)
 @EnableJpaRepositories(bootstrapMode = BootstrapMode.LAZY, basePackages = "cn.procsl.ping.boot.domain")
