@@ -30,6 +30,7 @@
         <module>ping-producer-starter</module>
         <module>ping-domain-starter</module>
         <module>ping-base-starter</module>
+        <module>ping-processor-apt</module>
         <module>ping-spring-dependencies</module>
     </modules>
 
@@ -815,6 +816,39 @@
         </profile>
 
     </profiles>
+
+    <repositories>
+        <repository>
+            <id>spring</id>
+            <url>https://maven.aliyun.com/repository/spring</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>public</id>
+            <url>https://maven.aliyun.com/repository/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>maven2</id>
+            <url>https://maven.aliyun.com/repository/maven2</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <url>https://www.procsl.cn</url>
 
