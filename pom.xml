@@ -7,7 +7,7 @@
     <groupId>cn.procsl</groupId>
     <artifactId>ping</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.4-SNAPSHOT</version>
+    <version>0.0.5-SNAPSHOT</version>
 
     <properties>
         <java.version>11</java.version>
@@ -166,7 +166,7 @@
             <dependency>
                 <groupId>cn.procsl</groupId>
                 <artifactId>ping-base-starter</artifactId>
-                <version>0.0.4-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
 
             <dependency>
