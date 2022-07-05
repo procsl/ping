@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Indexed;
@@ -34,11 +35,15 @@ public class PermissionController {
 
     final QPermission qpermission = QPermission.permission;
 
+    final MapStructMapper mapStructMapper = Mappers.getMapper(MapStructMapper.class);
+
     @Transactional
     @PostMapping("/v1/permissions")
     @Operation(summary = "创建权限")
-    public Long create(@Validated @RequestBody PermissionCreateDTO permission) throws BusinessException {
-        return permissionJpaRepository.save(permission.convert()).getId();
+    public PermissionVO create(@Validated @RequestBody PermissionCreateDTO permission) throws BusinessException {
+        Permission entity = permission.convert();
+        permissionJpaRepository.save(entity);
+        return this.mapStructMapper.mapper(entity);
     }
 
     @Transactional

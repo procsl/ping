@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Indexed;
@@ -43,15 +44,18 @@ public class RoleController {
 
     final QRole qrole = QRole.role;
 
+    final MapStructMapper mapStructMapper = Mappers.getMapper(MapStructMapper.class);
+
 
     @Transactional
     @PostMapping("/v1/roles")
     @Operation(summary = "创建角色")
-    public Long create(@Validated @RequestBody RoleDetailsDTO roleDetails) throws BusinessException {
+    public RoleVO create(@Validated @RequestBody RoleDetailsDTO roleDetails) throws BusinessException {
         uniqueValidator.valid(Role.class, null, "name", roleDetails.getName(), "角色已存在");
         List<Permission> permissions = this.permissionJpaRepository.findAllById(roleDetails.getPermissions());
         Role entity = new Role(roleDetails.getName(), permissions);
-        return roleRepository.save(entity).getId();
+        roleRepository.save(entity);
+        return mapStructMapper.mapper(entity);
     }
 
     @Transactional
