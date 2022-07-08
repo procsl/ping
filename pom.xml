@@ -7,7 +7,7 @@
     <groupId>cn.procsl</groupId>
     <artifactId>ping</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.4-SNAPSHOT</version>
+    <version>0.0.5-SNAPSHOT</version>
 
     <properties>
         <java.version>11</java.version>
@@ -26,9 +26,9 @@
     </properties>
 
     <modules>
-        <module>ping-producer-starter</module>
-        <module>ping-common-starter</module>
-        <module>ping-admin-starter</module>
+        <module>ping-producer</module>
+        <module>ping-common</module>
+        <module>ping-admin</module>
         <module>ping-processor</module>
     </modules>
 
@@ -169,19 +169,19 @@
 
             <dependency>
                 <groupId>cn.procsl</groupId>
-                <artifactId>ping-common-starter</artifactId>
+                <artifactId>ping-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>cn.procsl</groupId>
-                <artifactId>ping-admin-starter</artifactId>
+                <artifactId>ping-admin</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>cn.procsl</groupId>
-                <artifactId>ping-producer-starter</artifactId>
+                <artifactId>ping-producer</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

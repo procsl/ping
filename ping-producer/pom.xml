@@ -2,33 +2,24 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <artifactId>ping</artifactId>
         <groupId>cn.procsl</groupId>
         <version>0.0.5-SNAPSHOT</version>
     </parent>
 
-    <modelVersion>4.0.0</modelVersion>
-    <artifactId>ping-processor</artifactId>
-    <name>Ping 注解处理器模块</name>
+    <artifactId>ping-producer</artifactId>
+    <packaging>jar</packaging>
+    <name>Ping 商品模块</name>
 
     <dependencies>
-
-        <dependency>
-            <groupId>com.squareup</groupId>
-            <artifactId>javapoet</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.javassist</groupId>
-            <artifactId>javassist</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>cn.procsl</groupId>
-            <artifactId>ping-common</artifactId>
+            <artifactId>ping-processor</artifactId>
         </dependency>
-
     </dependencies>
 
 </project>
