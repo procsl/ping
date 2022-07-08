@@ -18,6 +18,7 @@ public class UserPropDTO implements Serializable {
     @Schema(description = "用户昵称")
     String name;
 
+    @Schema(description = "用户性别")
     Gender gender;
 
     @Schema(description = "用户备注")

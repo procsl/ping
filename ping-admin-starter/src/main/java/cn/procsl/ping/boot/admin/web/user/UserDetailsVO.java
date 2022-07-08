@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserDetailsVO extends UserVO {
 
-    @Schema(description = "用户账户")
+    @Schema(description = "用户账户信息")
     AccountVO account;
 
 }

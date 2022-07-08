@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.common.error;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.io.Serializable;
@@ -14,10 +15,13 @@ import java.io.Serializable;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "错误信息描述")
 public class ErrorCode implements Serializable {
 
+    @Schema(description = "错误信息编码", example = "E001")
     private String code;
 
+    @Schema(description = "错误信息", example = "系统内部错误")
     private String message;
 
 
