@@ -1,8 +1,0 @@
-#服务端口
-server:
-    port: 10000
-
-#服务名称
-spring:
-    application:
-        name: @project.artifactId@.@project.version@

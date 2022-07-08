@@ -26,15 +26,13 @@
     </properties>
 
     <modules>
-        <module>ping-common</module>
-        <module>ping-admin-app</module>
         <module>ping-producer-starter</module>
-        <module>ping-domain-starter</module>
-        <module>ping-base-starter</module>
-        <module>ping-spring-dependencies</module>
+        <module>ping-common-starter</module>
+        <module>ping-admin-starter</module>
+        <module>ping-processor</module>
     </modules>
 
-    <name>Ping General Business Project</name>
+    <name>Ping 父模块</name>
 
     <dependencies>
 
@@ -164,27 +162,27 @@
 
             <dependency>
                 <groupId>cn.procsl</groupId>
-                <artifactId>ping-processor-apt</artifactId>
+                <artifactId>ping-processor</artifactId>
                 <version>${project.version}</version>
                 <optional>true</optional>
             </dependency>
 
             <dependency>
                 <groupId>cn.procsl</groupId>
-                <artifactId>ping-domain-starter</artifactId>
+                <artifactId>ping-common-starter</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>cn.procsl</groupId>
-                <artifactId>ping-common</artifactId>
+                <artifactId>ping-admin-starter</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>cn.procsl</groupId>
-                <artifactId>ping-base-starter</artifactId>
-                <version>0.0.4-SNAPSHOT</version>
+                <artifactId>ping-producer-starter</artifactId>
+                <version>${project.version}</version>
             </dependency>
 
             <dependency>
