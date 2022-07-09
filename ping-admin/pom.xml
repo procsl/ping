@@ -24,7 +24,7 @@
 
         <dependency>
             <groupId>cn.procsl</groupId>
-            <artifactId>ping-processor</artifactId>
+            <artifactId>ping-apt</artifactId>
         </dependency>
 
     </dependencies>

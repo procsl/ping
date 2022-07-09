@@ -9,7 +9,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>ping-processor</artifactId>
+    <artifactId>ping-apt</artifactId>
     <name>Ping 注解处理器模块</name>
 
     <dependencies>

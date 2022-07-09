@@ -29,7 +29,7 @@
         <module>ping-producer</module>
         <module>ping-common</module>
         <module>ping-admin</module>
-        <module>ping-processor</module>
+        <module>ping-apt</module>
     </modules>
 
     <name>Ping 父模块</name>
@@ -162,7 +162,7 @@
 
             <dependency>
                 <groupId>cn.procsl</groupId>
-                <artifactId>ping-processor</artifactId>
+                <artifactId>ping-apt</artifactId>
                 <version>${project.version}</version>
                 <optional>true</optional>
             </dependency>
