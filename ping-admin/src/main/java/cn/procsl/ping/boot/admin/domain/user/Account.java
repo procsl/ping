@@ -1,8 +1,8 @@
 package cn.procsl.ping.boot.admin.domain.user;
 
 import cn.procsl.ping.boot.common.error.BusinessException;
+import cn.procsl.ping.boot.common.jpa.RepositoryCreator;
 import cn.procsl.ping.boot.common.jpa.state.Stateful;
-import cn.procsl.ping.processor.annotation.RepositoryCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.springframework.data.jpa.domain.AbstractPersistable;

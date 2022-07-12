@@ -13,6 +13,7 @@ import org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.repository.config.BootstrapMode;
@@ -29,8 +30,9 @@ import javax.persistence.EntityManager;
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnMissingBean(CommonAutoConfiguration.class)
 @AutoConfigureBefore(JpaBaseConfiguration.class)
-@EnableJpaRepositories(bootstrapMode = BootstrapMode.LAZY, basePackages = "cn.procsl.ping.boot.domain")
-@EntityScan(basePackages = "cn.procsl.ping.boot.domain")
+@EnableJpaRepositories(bootstrapMode = BootstrapMode.LAZY, basePackages = "cn.procsl.ping.boot.common.jpa")
+@EntityScan(basePackages = "cn.procsl.ping.boot.common.jpa")
+@ComponentScan(basePackages = "cn.procsl.ping.boot.common")
 public class CommonAutoConfiguration implements ApplicationContextAware {
 
     @Override

@@ -1,8 +1,6 @@
 package cn.procsl.ping.boot.admin.web.rbac;
 
-import cn.procsl.ping.boot.admin.domain.rbac.HttpPermission;
-import cn.procsl.ping.boot.admin.domain.rbac.PagePermission;
-import cn.procsl.ping.boot.admin.domain.rbac.Permission;
+import cn.procsl.ping.boot.admin.domain.rbac.*;
 import com.querydsl.core.types.dsl.EntityPathBase;
 
 import java.util.function.BiFunction;

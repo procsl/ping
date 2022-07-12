@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.admin.domain.conf;
 
-import cn.procsl.ping.processor.annotation.RepositoryCreator;
+import cn.procsl.ping.boot.common.jpa.RepositoryCreator;
 import lombok.*;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 

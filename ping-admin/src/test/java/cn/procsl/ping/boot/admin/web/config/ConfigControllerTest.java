@@ -57,6 +57,7 @@ public class ConfigControllerTest {
                         MockMvcRequestBuilders.patch("/v1/configs/{id}", gid.get())
                                 .contentType(APPLICATION_JSON)
                                 .content(jsonMapper.writeValueAsString(config))
+                                .session(LoginUtils.toLogin(mockMvc))
                 )
                 .andExpect(status().is2xxSuccessful());
 
@@ -69,6 +70,7 @@ public class ConfigControllerTest {
                         MockMvcRequestBuilders.put("/v1/configs")
                                 .contentType(APPLICATION_JSON)
                                 .content(jsonMapper.writeValueAsString(config))
+                                .session(LoginUtils.toLogin(mockMvc))
                 )
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().contentType(APPLICATION_JSON))
@@ -80,20 +82,29 @@ public class ConfigControllerTest {
 
     @Test
     public void delete() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.delete("/v1/configs/{id}", gid.get()))
+        mockMvc.perform(
+                        MockMvcRequestBuilders.delete("/v1/configs/{id}", gid.get())
+                                .session(LoginUtils.toLogin(mockMvc))
+                )
                 .andExpect(status().is2xxSuccessful());
     }
 
     @Test
     public void getConfig() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/v1/configs/{key}", "key"))
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get("/v1/configs/{key}", "key")
+                                .session(LoginUtils.toLogin(mockMvc))
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").value("test1"));
     }
 
     @Test
     public void findConfig() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/v1/configs"))
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get("/v1/configs")
+                                .session(LoginUtils.toLogin(mockMvc))
+                )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(jsonPath("$.content").isNotEmpty())

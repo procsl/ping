@@ -1,6 +1,5 @@
 package cn.procsl.ping.boot.common.validator;
 
-import cn.procsl.ping.processor.annotation.RepositoryCreator;
 import lombok.*;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
@@ -14,7 +13,6 @@ import java.util.Set;
 @Entity
 @Table(name = "dt_unique")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@RepositoryCreator
 @AllArgsConstructor
 @UniqueField(entity = Unique.class, fieldName = "column", useSpringEntityManager = false)
 public class Unique extends AbstractPersistable<Long> implements Serializable {

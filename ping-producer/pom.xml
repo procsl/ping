@@ -20,6 +20,12 @@
             <groupId>cn.procsl</groupId>
             <artifactId>ping-apt</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>cn.procsl</groupId>
+            <artifactId>ping-common</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

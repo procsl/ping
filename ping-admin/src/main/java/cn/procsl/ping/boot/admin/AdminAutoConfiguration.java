@@ -2,6 +2,7 @@ package cn.procsl.ping.boot.admin;
 
 import cn.procsl.ping.boot.admin.domain.conf.ConfigOptionService;
 import cn.procsl.ping.boot.admin.domain.rbac.AccessControlService;
+import cn.procsl.ping.boot.admin.domain.user.RoleSettingService;
 import cn.procsl.ping.boot.admin.domain.user.UserRegisterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -12,23 +13,27 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.repository.config.BootstrapMode;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import static cn.procsl.ping.boot.admin.AdminAutoConfiguration.domain_path;
-
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnMissingBean({AdminAutoConfiguration.class})
 @RequiredArgsConstructor
-@EntityScan(basePackages = domain_path)
 @EnableTransactionManagement
-@EnableJpaRepositories(basePackages = domain_path, bootstrapMode = BootstrapMode.LAZY)
-@ComponentScan(
-        basePackages = {"cn.procsl.ping.boot.base.adapter"},
+@EntityScan(basePackages = "cn.procsl.ping.boot.admin.domain")
+@EnableJpaRepositories(basePackages = "cn.procsl.ping.boot.admin.domain", bootstrapMode = BootstrapMode.LAZY)
+@ComponentScan(basePackages = {
+        "cn.procsl.ping.boot.admin.web",
+        "cn.procsl.ping.boot.admin.service",
+        "cn.procsl.ping.boot.admin.listener",
+        "cn.procsl.ping.boot.admin.adapter"
+},
         basePackageClasses = {
+                ConfigOptionService.class,
                 AccessControlService.class,
-                UserRegisterService.class,
-                ConfigOptionService.class
-        })
+                RoleSettingService.class,
+                UserRegisterService.class
+        }
+
+)
 public class AdminAutoConfiguration {
 
-    final static String domain_path = "cn.procsl.ping.boot.base.domain";
 
 }

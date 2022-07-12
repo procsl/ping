@@ -2,9 +2,9 @@ package cn.procsl.ping.boot.admin.web.rbac;
 
 import cn.procsl.ping.boot.admin.domain.rbac.Permission;
 import cn.procsl.ping.boot.admin.domain.rbac.QPermission;
-import cn.procsl.ping.boot.admin.web.FormatPage;
 import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.common.utils.QueryBuilder;
+import cn.procsl.ping.boot.common.web.FormatPage;
 import cn.procsl.ping.boot.common.web.MarkPageable;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.QBean;

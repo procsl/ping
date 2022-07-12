@@ -1,10 +1,8 @@
 package cn.procsl.ping.boot.admin.web.user;
 
-import cn.procsl.ping.boot.admin.domain.user.Gender;
-import cn.procsl.ping.boot.admin.domain.user.User;
-import cn.procsl.ping.boot.admin.domain.user.UserRegisterService;
-import cn.procsl.ping.boot.admin.web.FormatPage;
+import cn.procsl.ping.boot.admin.domain.user.*;
 import cn.procsl.ping.boot.common.utils.QueryBuilder;
+import cn.procsl.ping.boot.common.web.FormatPage;
 import cn.procsl.ping.boot.common.web.MarkPageable;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;

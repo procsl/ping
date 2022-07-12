@@ -4,6 +4,7 @@ import cn.procsl.ping.boot.admin.domain.conf.ConfigOptionService;
 import cn.procsl.ping.boot.admin.domain.rbac.AccessControlService;
 import cn.procsl.ping.boot.admin.domain.user.RoleSettingService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Indexed;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -13,6 +14,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 @Indexed
+@Slf4j
 @Service
 @RequiredArgsConstructor
 class RoleSettingServiceAdapter implements RoleSettingService {
@@ -38,7 +40,8 @@ class RoleSettingServiceAdapter implements RoleSettingService {
 
     @Override
     public void defaultRoleSetting(Collection<String> roles) {
-        configService.put(DEFAULT_ROLES_CONFIG_KEY, String.join(",", roles));
+        throw new UnsupportedOperationException("错误");
+//        configService.put(DEFAULT_ROLES_CONFIG_KEY, String.join(",", roles));
     }
 
 

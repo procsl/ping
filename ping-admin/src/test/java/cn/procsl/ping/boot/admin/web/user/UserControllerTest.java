@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.concurrent.atomic.AtomicLong;
@@ -26,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Slf4j
+@Rollback
 @AutoConfigureMockMvc
 @SpringBootTest(classes = TestAdminApplication.class, webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 public class UserControllerTest {
@@ -52,10 +54,13 @@ public class UserControllerTest {
                                 .content(jsonMapper.writeValueAsString(user))
                                 .session(LoginUtils.toLogin(mockMvc))
                 )
+                .andExpect(status().is2xxSuccessful())
                 .andDo(result -> {
                     String str = result.getResponse().getContentAsString();
+                    log.debug("响应体为:{}", str);
                     gid.set(Long.parseLong(str));
-                });
+                })
+                .andExpect(status().is2xxSuccessful());
         log.info("BeforeEach is end!");
     }
 

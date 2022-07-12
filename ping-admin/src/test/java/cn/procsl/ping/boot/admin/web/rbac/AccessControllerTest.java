@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.github.jsonzou.jmockdata.JMockData;
 import com.github.jsonzou.jmockdata.MockConfig;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -63,9 +63,26 @@ public class AccessControllerTest {
                         uid.add(str);
                     });
 
-            Collection<Long> permission = null;
-            // TODO
-            RoleDetailsDTO role = new RoleDetailsDTO(mock(String.class, config), permission);
+            List<Long> pid = new ArrayList<>();
+            {
+                val permission = JMockData.mock(PermissionCreateDTO.class);
+                permission.setType(PermissionType.page);
+                mockMvc.perform(
+                                post("/v1/permissions")
+                                        .contentType(APPLICATION_JSON)
+                                        .content(jsonMapper.writeValueAsString(permission))
+                                        .session(LoginUtils.toLogin(mockMvc))
+                        )
+                        .andExpect(status().is2xxSuccessful())
+                        .andDo(result -> {
+                            String str = result.getResponse().getContentAsString();
+                            PermissionVO permissionVO = this.jsonMapper.readValue(str, PermissionVO.class);
+                            log.info("PermissionVO:{}", permissionVO);
+                            pid.add(permissionVO.getId());
+                        });
+            }
+
+            RoleDetailsDTO role = new RoleDetailsDTO(mock(String.class, config), pid);
             mockMvc.perform(
                             post("/v1/roles")
                                     .contentType(APPLICATION_JSON)
@@ -124,4 +141,6 @@ public class AccessControllerTest {
                     }
                 });
     }
+
+
 }

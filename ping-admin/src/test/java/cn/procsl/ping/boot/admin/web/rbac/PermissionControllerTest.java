@@ -51,7 +51,9 @@ public class PermissionControllerTest {
                 .andExpect(status().is2xxSuccessful())
                 .andDo(result -> {
                     String str = result.getResponse().getContentAsString();
-                    gid.set(Long.parseLong(str));
+                    PermissionVO permissionVO = this.jsonMapper.readValue(str, PermissionVO.class);
+                    log.info("PermissionVO:{}", permissionVO);
+                    gid.set(permissionVO.getId());
                 });
 
     }
