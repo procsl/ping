@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Locale;
 
 @Slf4j
+@Transactional
 @DisplayName("配置项服务测试")
 @SpringBootTest(classes = TestAdminApplication.class, webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 public class ConfigServiceTest {

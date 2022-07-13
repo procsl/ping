@@ -40,8 +40,7 @@ class RoleSettingServiceAdapter implements RoleSettingService {
 
     @Override
     public void defaultRoleSetting(Collection<String> roles) {
-        throw new UnsupportedOperationException("错误");
-//        configService.put(DEFAULT_ROLES_CONFIG_KEY, String.join(",", roles));
+        configService.put(DEFAULT_ROLES_CONFIG_KEY, String.join(",", roles));
     }
 
 
