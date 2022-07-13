@@ -49,7 +49,7 @@ public class RoleControllerTest {
 
 
     @Test
-    void create() throws Exception {
+    public void create() throws Exception {
         // TODO
         Collection<Long> permission = null;
         RoleDetailsDTO role = new RoleDetailsDTO(Faker.instance().name().fullName(), permission);
@@ -60,12 +60,12 @@ public class RoleControllerTest {
     }
 
     @Test
-    void delete() throws Exception {
+    public void delete() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete("/v1/roles/{id}", gid.get()).session(LoginUtils.toLogin(mockMvc))).andExpect(status().is2xxSuccessful());
     }
 
     @Test
-    void change() throws Exception {
+    public void change() throws Exception {
         RoleDetailsDTO role = new RoleDetailsDTO(Faker.instance().name().fullName(), null);
         mockMvc.perform(patch("/v1/roles/{id}", gid.get()).contentType(APPLICATION_JSON).content(jsonMapper.writeValueAsString(role)).session(LoginUtils.toLogin(mockMvc))).andExpect(status().is2xxSuccessful());
 
