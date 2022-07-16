@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -31,15 +32,19 @@ public class RoleSettingControllerTest {
     MockMvc mockMvc;
 
     JsonMapper jsonMapper = new JsonMapper();
+    MockHttpSession session;
 
     @BeforeEach
     public void setUp() throws Exception {
+
+        this.session = LoginUtils.toLogin(mockMvc);
+
         val data = JMockData.mock(String[].class);
         mockMvc.perform(
                 MockMvcRequestBuilders.patch("/v1/setting/default-roles")
-                        .contentType(APPLICATION_JSON)
-                        .content(jsonMapper.writeValueAsString(data))
-                        .session(LoginUtils.toLogin(mockMvc))
+                                      .contentType(APPLICATION_JSON)
+                                      .session(session)
+                                      .content(jsonMapper.writeValueAsString(data))
         );
     }
 
@@ -47,25 +52,25 @@ public class RoleSettingControllerTest {
     public void defaultRoleSetting() throws Exception {
         val data = JMockData.mock(String[].class);
         mockMvc.perform(
-                        MockMvcRequestBuilders.patch("/v1/setting/default-roles")
-                                .contentType(APPLICATION_JSON)
-                                .content(jsonMapper.writeValueAsString(data))
-                                .session(LoginUtils.toLogin(mockMvc))
-                )
-                .andExpect(status().is2xxSuccessful());
+                       MockMvcRequestBuilders.patch("/v1/setting/default-roles")
+                                             .contentType(APPLICATION_JSON)
+                                             .content(jsonMapper.writeValueAsString(data))
+                                             .session(session)
+               )
+               .andExpect(status().is2xxSuccessful());
     }
 
     @Test
     public void getDefaultRoles() throws Exception {
         mockMvc.perform(
-                        MockMvcRequestBuilders.get("/v1/setting/default-roles")
-                                .session(LoginUtils.toLogin(mockMvc))
-                )
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(jsonPath("$").isNotEmpty())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[*]").isNotEmpty());
+                       MockMvcRequestBuilders.get("/v1/setting/default-roles")
+                                             .session(session)
+               )
+               .andExpect(status().isOk())
+               .andExpect(content().contentType(APPLICATION_JSON))
+               .andExpect(jsonPath("$").isNotEmpty())
+               .andExpect(jsonPath("$").isArray())
+               .andExpect(jsonPath("$[*]").isNotEmpty());
 
     }
 }

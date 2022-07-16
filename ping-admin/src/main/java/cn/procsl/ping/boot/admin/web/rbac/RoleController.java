@@ -68,7 +68,8 @@ public class RoleController {
     @Transactional
     @PatchMapping("/v1/roles/{id}")
     @Operation(summary = "修改指定角色信息")
-    public void change(@PathVariable("id") Long id, @RequestBody @NotNull RoleDetailsDTO details) throws BusinessException {
+    public void change(@PathVariable("id") Long id, @Validated @RequestBody @NotNull RoleDetailsDTO details)
+            throws BusinessException {
         uniqueValidator.valid(Role.class, id, "name", details.getName(), "角色已存在");
         Role role = this.roleRepository.getReferenceById(id);
         List<Permission> permissions = this.permissionJpaRepository.findAllById(details.getPermissions());
