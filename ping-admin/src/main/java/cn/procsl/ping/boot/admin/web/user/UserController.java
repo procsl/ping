@@ -55,14 +55,22 @@ public class UserController {
     @GetMapping("/v1/users")
     @Transactional(readOnly = true)
     @Operation(summary = "获取用户列表")
-    public FormatPage<UserDetailsVO> findUsers(Pageable pageable, @RequestParam(required = false) String name, @RequestParam(required = false) String account, @RequestParam(required = false) Gender gender) {
+    public FormatPage<UserDetailsVO> findUsers(Pageable pageable, @RequestParam(required = false) String name,
+                                               @RequestParam(required = false) String account,
+                                               @RequestParam(required = false) Gender gender) {
 
-        Expression<AccountVO> accountProjection = Projections.bean(AccountVO.class, qaccount.name, qaccount.state).as("account");
-        QBean<UserDetailsVO> projections = Projections.bean(UserDetailsVO.class, quser.id, quser.name, quser.gender, quser.remark, accountProjection);
+        Expression<AccountVO> accountProjection = Projections.bean(AccountVO.class, qaccount.name, qaccount.state)
+                                                             .as("account");
+        QBean<UserDetailsVO> projections = Projections.bean(UserDetailsVO.class, quser.id, quser.name, quser.gender,
+                quser.remark, accountProjection);
 
-        JPQLQuery<UserDetailsVO> query = queryFactory.select(projections).from(quser).innerJoin(qaccount).on(quser.account.id.eq(qaccount.id));
+        JPQLQuery<UserDetailsVO> query = queryFactory.select(projections).from(quser).innerJoin(qaccount)
+                                                     .on(quser.account.id.eq(qaccount.id));
 
-        val builder = QueryBuilder.builder(query).and(name, () -> quser.name.like(String.format("%%%s%%", name))).and(account, () -> qaccount.name.like(String.format("%%%s%%", account))).and(gender != null, () -> quser.gender.eq(gender));
+        val builder = QueryBuilder.builder(query)
+                                  .and(name, () -> quser.name.like(String.format("%%%s%%", name)))
+                                  .and(account, () -> qaccount.name.like(String.format("%%%s%%", account)))
+                                  .and(gender != null, () -> quser.gender.eq(gender));
 
         return FormatPage.page(builder, pageable);
     }

@@ -94,7 +94,8 @@ public class UniqueFieldValidator implements ConstraintValidator<UniqueField, Ob
 
     void message(ConstraintValidatorContext context, String property) {
         context.disableDefaultConstraintViolation();
-        context.buildConstraintViolationWithTemplate(unique.message()).addPropertyNode(property).addConstraintViolation();
+        context.buildConstraintViolationWithTemplate(unique.message()).addPropertyNode(property)
+               .addConstraintViolation();
     }
 
 }

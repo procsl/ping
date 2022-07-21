@@ -21,9 +21,13 @@
         </dependency>
 
         <dependency>
+            <groupId>cn.procsl</groupId>
+            <artifactId>ping-product</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
-            <version>4.11.0</version>
         </dependency>
 
     </dependencies>
@@ -71,7 +75,7 @@
                         <groupId>org.graalvm.buildtools</groupId>
                         <artifactId>native-maven-plugin</artifactId>
                         <configuration>
-                            <mainClass>cn.procsl.ping.admin.AdminApplication</mainClass>
+                            <mainClass>cn.procsl.ping.app.DistributeApplication</mainClass>
                         </configuration>
                     </plugin>
 

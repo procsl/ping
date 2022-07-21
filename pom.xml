@@ -26,7 +26,7 @@
     </properties>
 
     <modules>
-        <module>ping-producer</module>
+        <module>ping-product</module>
         <module>ping-common</module>
         <module>ping-admin</module>
         <module>ping-apt</module>
@@ -131,7 +131,7 @@
                 <groupId>org.mapstruct</groupId>
                 <artifactId>mapstruct-processor</artifactId>
                 <version>${mapstruct.version}</version>
-                <scope>compile</scope>
+                <scope>provided</scope>
                 <optional>true</optional>
             </dependency>
 
@@ -164,6 +164,7 @@
                 <groupId>cn.procsl</groupId>
                 <artifactId>ping-apt</artifactId>
                 <version>${project.version}</version>
+                <scope>provided</scope>
                 <optional>true</optional>
             </dependency>
 
@@ -181,7 +182,7 @@
 
             <dependency>
                 <groupId>cn.procsl</groupId>
-                <artifactId>ping-producer</artifactId>
+                <artifactId>ping-product</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -206,7 +207,7 @@
                 <artifactId>querydsl-apt</artifactId>
                 <version>${querydsl.version}</version>
                 <classifier>jpa</classifier>
-                <scope>compile</scope>
+                <scope>provided</scope>
                 <optional>true</optional>
             </dependency>
 
