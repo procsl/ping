@@ -3,6 +3,7 @@ package cn.procsl.ping.boot.admin.auth;
 import cn.procsl.ping.boot.common.web.ResponseUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
@@ -19,11 +20,14 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class PermissionAccessDeniedHandler implements AccessDeniedHandler {
 
+    @Value("${server.error.path:/error}")
+    String url;
 
     @Override
-    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+    public void handle(HttpServletRequest request, HttpServletResponse response,
+                       AccessDeniedException accessDeniedException) throws IOException, ServletException {
         log.info("拒绝访问:[{} {}]", request.getMethod(), request.getRequestURI());
-        ResponseUtils.forbidden(request, response, "001", "无权限,拒绝访问");
+        ResponseUtils.forbiddenError(request, response, url, "001", "无权限,拒绝访问");
     }
 
 }
