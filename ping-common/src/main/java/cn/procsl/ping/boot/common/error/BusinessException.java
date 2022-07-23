@@ -1,7 +1,6 @@
 package cn.procsl.ping.boot.common.error;
 
-import cn.procsl.ping.boot.common.web.ErrorEntity;
-import lombok.NonNull;
+import lombok.Getter;
 
 /**
  * 业务异常
@@ -11,42 +10,19 @@ import lombok.NonNull;
  */
 public class BusinessException extends RuntimeException implements ErrorEntity {
 
-    final static String MESSAGE_TEMPLATE = "[%s] not found!";
-
+    @Getter
     Integer httpStatus = 501;
 
-    String code = "000";
+    @Getter
+    String code = "001";
 
     public BusinessException(String format, Object... arguments) {
-        // TODO 这里应该用占位符的, 先写着
-        super(format, null, true, true);
+        super(String.format(format, arguments), null, true, true);
     }
 
-    public static <T> T ifNotFound(T entity, @NonNull String message) {
-        if (entity == null) {
-            throw new IllegalArgumentException(String.format(MESSAGE_TEMPLATE, message));
-        }
-        return entity;
-    }
-
-    public static <T> void ifNotFoundOnlyThrow(T entity, @NonNull String message) {
-        if (entity == null) {
-            throw new IllegalArgumentException(String.format(MESSAGE_TEMPLATE, message));
-        }
-    }
-
-    @Override
-    public Integer httpStatus() {
-        return httpStatus;
-    }
-
-    @Override
-    public String code() {
-        return code;
-    }
-
-    @Override
-    public String message() {
-        return super.getMessage();
+    public BusinessException(String code, Integer httpStatus, String format, Object... arguments) {
+        super(String.format(format, arguments), null, true, true);
+        this.code = code;
+        this.httpStatus = httpStatus;
     }
 }

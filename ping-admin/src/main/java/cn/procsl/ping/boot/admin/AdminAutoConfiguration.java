@@ -1,7 +1,6 @@
 package cn.procsl.ping.boot.admin;
 
 import cn.procsl.ping.boot.admin.auth.DynamicAuthorizationManager;
-import cn.procsl.ping.boot.admin.auth.PermissionAccessDeniedHandler;
 import cn.procsl.ping.boot.admin.domain.conf.ConfigOptionService;
 import cn.procsl.ping.boot.admin.domain.rbac.AccessControlService;
 import cn.procsl.ping.boot.admin.domain.user.RoleSettingService;
@@ -55,7 +54,7 @@ public class AdminAutoConfiguration implements ApplicationContextAware {
     protected ApplicationContext context;
 
     @Value("${server.error.path:/error}")
-    String url;
+    String error;
 
     @Bean
     @ConditionalOnMissingBean
@@ -77,8 +76,12 @@ public class AdminAutoConfiguration implements ApplicationContextAware {
         http.exceptionHandling()
             .authenticationEntryPoint(
                     (request, response, authException) ->
-                            ResponseUtils.unauthorizedError(request, response, url, "E002", "你尚未登录,请登录"))
-            .accessDeniedHandler(this.context.getBean(PermissionAccessDeniedHandler.class));
+                            ResponseUtils.unauthorizedError(request, response,
+                                    error, "E002", "你尚未登录,请登录"))
+            .accessDeniedHandler(
+                    (request, response, accessDeniedException) -> ResponseUtils.forbiddenError(request, response, error,
+                            "001", "无权限,拒绝访问")
+            );
 
         http.formLogin().disable();
         http.httpBasic().disable();

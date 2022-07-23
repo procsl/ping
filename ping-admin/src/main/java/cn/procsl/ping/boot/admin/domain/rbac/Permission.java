@@ -36,7 +36,8 @@ public abstract class Permission extends AbstractPersistable<Long> implements Se
     public abstract void setResource(String resource);
 
     public boolean matcher(String option, String resource) {
-        return ObjectUtils.nullSafeEquals(option, this.getOperate()) && ObjectUtils.nullSafeEquals(resource, this.getResource());
+        return ObjectUtils.nullSafeEquals(option, this.getOperate()) && ObjectUtils.nullSafeEquals(resource,
+                this.getResource());
     }
 
     public boolean matcher(Function<Permission, Boolean> function) {
@@ -47,5 +48,9 @@ public abstract class Permission extends AbstractPersistable<Long> implements Se
         this.setOperate(option);
         this.setResource(resource);
     }
+
+    @Transient
+    public abstract String getType();
+
 }
 

@@ -7,9 +7,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.*;
+import org.springframework.security.authentication.AuthenticationTrustResolver;
+import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Indexed;
 import org.springframework.validation.annotation.Validated;
@@ -26,13 +30,15 @@ import java.io.IOException;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "session", description = "用户会话信息管理")
+@RestControllerAdvice
 public class SessionController {
-
-    final AuthenticationManager authenticationManager;
 
     final AuthenticationTrustResolver authenticationTrustResolver = new AuthenticationTrustResolverImpl();
 
     final AuthenticationProcessing authenticationProcessing;
+
+    @Value("${server.error.path:/error}")
+    String url;
 
     @ResponseBody
     @GetMapping("/v1/session")
@@ -42,7 +48,7 @@ public class SessionController {
         if (authentication.isAuthenticated() && authentication.getPrincipal() instanceof SessionUserDetails) {
             return (SessionUserDetails) authentication.getPrincipal();
         }
-        throw new BusinessException("用户尚未登录,请登录");
+        throw new BusinessException("E002", HttpStatus.UNAUTHORIZED.value(), "尚未登录,请登录");
     }
 
     @ResponseBody
@@ -71,14 +77,15 @@ public class SessionController {
         if (ObjectUtils.nullSafeEquals(tmp.getUsername(), details.getAccount())) {
             return tmp;
         }
-        throw new BusinessException("系统已登录其他用户, 请注销后登录");
+        throw new BusinessException("E003", HttpStatus.CONFLICT.value(), "当前系统已登录其他用户, 请注销当前用户后登录");
     }
 
+
     @ResponseBody
-    @ExceptionHandler(value = BadCredentialsException.class)
+    @ExceptionHandler(value = AuthenticationException.class)
     @ResponseStatus(code = HttpStatus.UNAUTHORIZED)
-    public ErrorCode BadCredentialsExceptionHandler(BadCredentialsException badCredentialsException) {
-        return ErrorCode.builder("E002", "账户或密码错误");
+    public ErrorCode AuthenticationExceptionHandler(AuthenticationException e) {
+        return ErrorCode.builder("E001", "账户或密码错误");
     }
 
 }

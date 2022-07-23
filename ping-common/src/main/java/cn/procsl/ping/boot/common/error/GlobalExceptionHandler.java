@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
 
 @Slf4j
@@ -30,6 +32,15 @@ public class GlobalExceptionHandler {
 //            return ErrorCode.builder(resolver.code(), resolver.message());
 //        }
         return getDefaultErrorCode(e);
+    }
+
+    @ResponseBody
+    @ExceptionHandler(value = BusinessException.class)
+    public ErrorCode BusinessExceptionHandler(HttpServletRequest request, HttpServletResponse response,
+                                              BusinessException businessException) {
+        response.setStatus(businessException.getHttpStatus());
+        return ErrorCode.builder(businessException.getHttpStatus() + businessException.getCode(),
+                businessException.getMessage());
     }
 
     @ResponseBody

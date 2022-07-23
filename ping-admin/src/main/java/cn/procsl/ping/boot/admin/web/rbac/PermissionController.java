@@ -6,9 +6,6 @@ import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.common.utils.QueryBuilder;
 import cn.procsl.ping.boot.common.web.FormatPage;
 import cn.procsl.ping.boot.common.web.MarkPageable;
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.QBean;
-import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.JPQLQueryFactory;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -70,16 +67,17 @@ public class PermissionController {
     public FormatPage<PermissionVO> findPermissions(Pageable pageable,
                                                     @RequestParam(required = false) String resource,
                                                     @RequestParam(required = false) PermissionType type) {
-        val from = type != null ? type.query : this.qpermission;
-        QBean<PermissionVO> details = Projections.bean(PermissionVO.class, from);
-
-        JPQLQuery<PermissionVO> query = this.queryFactory.select(details).from(from);
+        val query = this.queryFactory.select(qpermission).from(qpermission);
 
         val builder = QueryBuilder
                 .builder(query)
-                .and(resource, () -> qpermission.operate.like(String.format("%%%s%%", resource)));
+                .and(resource, () -> qpermission.operate.like(String.format("%%%s%%", resource)))
+                .and(type != null, () -> {
+                    assert type != null;
+                    return qpermission.instanceOf(type.getType());
+                });
 
-        return FormatPage.page(builder, pageable);
+        return FormatPage.page(builder, pageable).convert(this.mapStructMapper::mapper);
     }
 
 }

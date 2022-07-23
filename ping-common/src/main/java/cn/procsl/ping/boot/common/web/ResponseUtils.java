@@ -31,7 +31,6 @@ public final class ResponseUtils {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         request.setAttribute(RequestDispatcher.ERROR_MESSAGE, message);
         request.getRequestDispatcher(url).forward(request, response);
-//        throw new BusinessException(message);
     }
 
 }

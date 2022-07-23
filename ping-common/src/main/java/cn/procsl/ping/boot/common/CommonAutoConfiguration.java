@@ -15,12 +15,14 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration;
+import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.repository.config.BootstrapMode;
+import org.springframework.web.servlet.View;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
@@ -32,7 +34,7 @@ import javax.persistence.PersistenceException;
  * @date 2020/03/21
  */
 @Slf4j
-@AutoConfiguration(before = JpaBaseConfiguration.class)
+@AutoConfiguration(before = {JpaBaseConfiguration.class, ErrorMvcAutoConfiguration.class})
 @ConditionalOnMissingBean(CommonAutoConfiguration.class)
 @EnableJpaRepositories(bootstrapMode = BootstrapMode.LAZY, basePackages = "cn.procsl.ping.boot.common.jpa")
 @EntityScan(basePackages = "cn.procsl.ping.boot.common.jpa")
@@ -48,6 +50,14 @@ public class CommonAutoConfiguration implements ApplicationContextAware {
     @ConditionalOnMissingBean
     public UniqueValidator uniqueValidation(EntityManager entityManager) {
         return new UniqueValidatorImpl(entityManager);
+    }
+
+    @Bean("error")
+    public View errorView() {
+        return (model, request, response) -> {
+            response.setStatus(500);
+            response.getWriter().write("test");
+        };
     }
 
     @Bean

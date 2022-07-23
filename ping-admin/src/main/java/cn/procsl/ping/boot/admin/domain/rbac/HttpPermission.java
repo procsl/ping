@@ -36,7 +36,14 @@ public class HttpPermission extends Permission {
         return this.getResource();
     }
 
+    @Transient
     public boolean isDynamicURI() {
         return dynamic.matcher(resource).matches();
+    }
+
+    @Override
+    @Transient
+    public String getType() {
+        return "http";
     }
 }

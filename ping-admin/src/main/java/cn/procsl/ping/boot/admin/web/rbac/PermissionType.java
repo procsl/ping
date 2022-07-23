@@ -1,6 +1,8 @@
 package cn.procsl.ping.boot.admin.web.rbac;
 
-import cn.procsl.ping.boot.admin.domain.rbac.*;
+import cn.procsl.ping.boot.admin.domain.rbac.HttpPermission;
+import cn.procsl.ping.boot.admin.domain.rbac.PagePermission;
+import cn.procsl.ping.boot.admin.domain.rbac.Permission;
 import com.querydsl.core.types.dsl.EntityPathBase;
 
 import java.util.function.BiFunction;
@@ -8,7 +10,8 @@ import java.util.function.BiFunction;
 public enum PermissionType {
 
 
-    http(HttpPermission::create, QHttpPermission.httpPermission), page(PagePermission::new, QPagePermission.pagePermission);
+    http(HttpPermission::create, QHttpPermission.httpPermission), page(PagePermission::new,
+            QPagePermission.pagePermission);
 
     final BiFunction<String, String, Permission> factory;
     final EntityPathBase<? extends Permission> query;
@@ -18,4 +21,7 @@ public enum PermissionType {
         query = type;
     }
 
+    public Class<? extends Permission> getType() {
+        return query.getType();
+    }
 }

@@ -16,7 +16,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "错误信息描述")
-public class ErrorCode implements Serializable {
+public class ErrorCode implements Serializable, ErrorEntity {
 
     @Schema(description = "错误信息编码", example = "E001")
     private String code;

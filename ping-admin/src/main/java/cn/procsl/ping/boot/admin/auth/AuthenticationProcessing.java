@@ -4,6 +4,8 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,9 +38,12 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class AuthenticationProcessing implements ApplicationEventPublisherAware {
 
-    final AuthenticationSuccessHandler successHandler;
-    final AuthenticationFailureHandler failureHandler;
+
+    @Value("${server.error.path:/error}")
+    String error;
     final AuthenticationManager authenticationManager;
+    AuthenticationSuccessHandler successHandler;
+    AuthenticationFailureHandler failureHandler;
     @Setter
     SessionAuthenticationStrategy sessionStrategy = new NullAuthenticatedSessionStrategy();
     @Setter
@@ -60,10 +65,11 @@ public class AuthenticationProcessing implements ApplicationEventPublisherAware 
         } catch (InternalAuthenticationServiceException failed) {
             log.error("尝试对用户进行身份验证时发生内部错误:", failed);
             unsuccessfulAuthentication(request, response, failed);
+            throw failed;
         } catch (AuthenticationException ex) {
             unsuccessfulAuthentication(request, response, ex);
+            throw ex;
         }
-        return null;
     }
 
     @Override
@@ -74,11 +80,11 @@ public class AuthenticationProcessing implements ApplicationEventPublisherAware 
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                               AuthenticationException failed) throws IOException, ServletException {
         SecurityContextHolder.clearContext();
-        log.trace("认证请求失败:", failed);
-        log.trace("清除 SecurityContextHolder");
-        log.trace("认证失败");
+        log.trace("认证失败,清除 SecurityContextHolder");
         this.rememberMeServices.loginFail(request, response);
-        this.failureHandler.onAuthenticationFailure(request, response, failed);
+        if (this.failureHandler != null) {
+            this.failureHandler.onAuthenticationFailure(request, response, failed);
+        }
     }
 
 
@@ -93,7 +99,18 @@ public class AuthenticationProcessing implements ApplicationEventPublisherAware 
         if (this.eventPublisher != null) {
             this.eventPublisher.publishEvent(new InteractiveAuthenticationSuccessEvent(authResult, this.getClass()));
         }
-        this.successHandler.onAuthenticationSuccess(request, response, authResult);
+        if (this.successHandler != null) {
+            this.successHandler.onAuthenticationSuccess(request, response, authResult);
+        }
     }
 
+    @Autowired(required = false)
+    public void setSuccessHandler(AuthenticationSuccessHandler successHandler) {
+        this.successHandler = successHandler;
+    }
+
+    @Autowired(required = false)
+    public void setFailureHandler(AuthenticationFailureHandler failureHandler) {
+        this.failureHandler = failureHandler;
+    }
 }

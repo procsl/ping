@@ -10,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 分页从第一页开始
@@ -30,6 +32,11 @@ public class FormatPage<T> extends PageImpl<T> {
     public static <T> FormatPage<T> page(QueryBuilder<T> query, Pageable pageable) {
         QueryResults<T> result = query.build(pageable).fetchResults();
         return new FormatPage<>(result.getResults(), pageable, result.getTotal());
+    }
+
+    public <E> FormatPage<E> convert(Function<T, E> convert) {
+        List<E> content = this.getContent().stream().map(convert).collect(Collectors.toList());
+        return page(content, this.getPageable(), this.getTotal());
     }
 
 
