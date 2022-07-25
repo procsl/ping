@@ -7,7 +7,7 @@
     <property name="CATALINA_BASE" value="logs"/>
 
     <property name="CONSOLE_LOG_PATTERN"
-              value="%highlight(%date{yyyy-MM-dd HH:mm:ss}) %highlight(%-5level) %red([%thread]) %boldMagenta(%logger{50}) %highlight(%msg%n)"/>
+              value="%highlight(%date{yyyy-MM-dd HH:mm:ss}) %highlight(%-5level) [%X{RequestId}] %red([%thread]) %boldMagenta(%logger{50}) %highlight(%msg%n)"/>
 
     <contextName>ping-admin</contextName>
 
@@ -31,5 +31,7 @@
         <appender-ref ref="CONSOLE"/>
     </logger>
     <logger name="org.hibernate.hql.internal.ast" level="DEBUG"/>
+    <logger name="org.hibernate.hql.internal.ast.QueryTranslatorImpl" level="INFO"/>
+    <logger name="org.hibernate.hql.internal.ast.util.JoinProcessor" level="INFO"/>
     <logger name="cn.procsl.ping" level="TRACE"/>
 </configuration>

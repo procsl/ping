@@ -38,14 +38,15 @@ public class UserController {
 
     @Transactional
     @PostMapping("/v1/users")
-    @Operation(summary = "创建用户", description = "创建用户时, 用户账户默认为用户昵称, 用户昵称可通过后期修改完成, 用户账户不可修改")
+    @Operation(summary = "创建用户", operationId = "createUser", description = "创建用户时, 用户账户默认为用户昵称, " +
+            "用户昵称可通过后期修改完成, 用户账户不可修改")
     public Long register(@Validated @RequestBody RegisterDTO registerDTO) {
         return this.userUserRegisterService.register(registerDTO.getAccount(), registerDTO.getPassword());
     }
 
     @Transactional
     @PatchMapping("/v1/users/{id}")
-    @Operation(summary = "更新用户信息")
+    @Operation(summary = "更新用户信息", operationId = "updateUser")
     public void update(@PathVariable Long id, @Validated @RequestBody UserPropDTO userPropDTO) {
         User user = this.jpaRepository.getReferenceById(id);
         user.updateSelf(userPropDTO.getName(), userPropDTO.getGender(), userPropDTO.getRemark());

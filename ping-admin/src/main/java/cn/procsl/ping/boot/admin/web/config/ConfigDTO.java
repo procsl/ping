@@ -8,12 +8,12 @@ import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
-public class ConfigDTO extends ConfigKeyValueDTO implements Serializable {
+public class ConfigDTO extends ConfigNameValueDTO implements Serializable {
 
     String description;
 
-    public ConfigDTO(@NonNull String key, String content, String description) {
-        super(key, content);
+    public ConfigDTO(@NonNull String name, String content, String description) {
+        super(name, content);
         this.description = description;
     }
 }

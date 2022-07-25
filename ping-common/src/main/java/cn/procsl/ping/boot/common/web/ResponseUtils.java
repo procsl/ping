@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.common.web;
 
+import cn.procsl.ping.boot.common.CommonAutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 
@@ -19,8 +20,8 @@ public final class ResponseUtils {
         request.setAttribute(RequestDispatcher.ERROR_STATUS_CODE, HttpStatus.FORBIDDEN.value());
         response.setStatus(HttpStatus.FORBIDDEN.value());
         request.setAttribute(RequestDispatcher.ERROR_MESSAGE, message);
+        request.setAttribute(CommonAutoConfiguration.SYSTEM_ERROR_CODE_KEY, code);
         request.getRequestDispatcher(url).forward(request, response);
-//        throw new BusinessException(message);
     }
 
     public static void unauthorizedError(HttpServletRequest request, HttpServletResponse response,
@@ -30,6 +31,7 @@ public final class ResponseUtils {
         request.setAttribute(RequestDispatcher.ERROR_STATUS_CODE, HttpStatus.UNAUTHORIZED.value());
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         request.setAttribute(RequestDispatcher.ERROR_MESSAGE, message);
+        request.setAttribute(CommonAutoConfiguration.SYSTEM_ERROR_CODE_KEY, code);
         request.getRequestDispatcher(url).forward(request, response);
     }
 

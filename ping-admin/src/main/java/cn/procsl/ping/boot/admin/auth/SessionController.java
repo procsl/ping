@@ -48,12 +48,12 @@ public class SessionController {
         if (authentication.isAuthenticated() && authentication.getPrincipal() instanceof SessionUserDetails) {
             return (SessionUserDetails) authentication.getPrincipal();
         }
-        throw new BusinessException("E002", HttpStatus.UNAUTHORIZED.value(), "尚未登录,请登录");
+        throw new BusinessException("401002", HttpStatus.UNAUTHORIZED.value(), "尚未登录,请登录");
     }
 
     @ResponseBody
     @PostMapping("/v1/session")
-    @Operation(summary = "用户登录")
+    @Operation(summary = "用户登录", operationId = "authenticate")
     public SessionUserDetails createSession(HttpServletRequest request, HttpServletResponse response,
                                             @Validated @RequestBody LoginDetailsDTO details)
             throws ServletException, IOException {
@@ -77,7 +77,7 @@ public class SessionController {
         if (ObjectUtils.nullSafeEquals(tmp.getUsername(), details.getAccount())) {
             return tmp;
         }
-        throw new BusinessException("E003", HttpStatus.CONFLICT.value(), "当前系统已登录其他用户, 请注销当前用户后登录");
+        throw new BusinessException("401003", HttpStatus.CONFLICT.value(), "当前系统已登录其他用户, 请注销当前用户后登录");
     }
 
 
@@ -85,7 +85,7 @@ public class SessionController {
     @ExceptionHandler(value = AuthenticationException.class)
     @ResponseStatus(code = HttpStatus.UNAUTHORIZED)
     public ErrorCode AuthenticationExceptionHandler(AuthenticationException e) {
-        return ErrorCode.builder("E001", "账户或密码错误");
+        return ErrorCode.builder("401001", "账户名或密码错误");
     }
 
 }

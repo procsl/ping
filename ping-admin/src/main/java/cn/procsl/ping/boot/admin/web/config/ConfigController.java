@@ -42,14 +42,15 @@ public class ConfigController {
     @Operation(summary = "编辑配置项")
     @PatchMapping("/v1/configs/{id}")
     public void edit(@PathVariable Long id, @RequestBody @Validated ConfigDTO config) throws BusinessException {
-        this.jpaRepository.getReferenceById(id).edit(config.getKey(), config.getContent(), config.getDescription());
+        this.jpaRepository.getReferenceById(id)
+                          .edit(config.getName(), config.getContent(), config.getDescription());
     }
 
     @Transactional
     @PutMapping("/v1/configs")
     @Operation(summary = "创建或更新配置项")
     public Long put(@RequestBody @Validated ConfigDTO config) throws BusinessException {
-        return configOptionService.put(config.getKey(), config.getContent(), config.getDescription());
+        return configOptionService.put(config.getName(), config.getContent(), config.getDescription());
     }
 
 
@@ -61,11 +62,11 @@ public class ConfigController {
     }
 
     @Nullable
-    @GetMapping("/v1/configs/{key}")
+    @GetMapping("/v1/configs/{name}")
     @Transactional(readOnly = true)
     @Operation(summary = "获取配置内容")
-    public ConfigKeyValueDTO getConfig(@PathVariable String key) {
-        return new ConfigKeyValueDTO(key, this.configOptionService.get(key));
+    public ConfigNameValueDTO getConfig(@PathVariable String name) {
+        return new ConfigNameValueDTO(name, this.configOptionService.get(name));
     }
 
     @Nullable
@@ -74,11 +75,13 @@ public class ConfigController {
     @Transactional(readOnly = true)
     @Operation(summary = "获取配置内容")
     public FormatPage<ConfigVO> findConfig(Pageable pageable, @RequestParam(required = false) String name) {
-        QBean<ConfigVO> select = Projections.bean(ConfigVO.class, qconfig.id, qconfig.name, qconfig.content, qconfig.description);
+        QBean<ConfigVO> select = Projections.fields(ConfigVO.class, qconfig.id, qconfig.name, qconfig.content,
+                qconfig.description);
 
         JPQLQuery<ConfigVO> query = this.queryFactory.select(select).from(qconfig);
 
-        QueryBuilder<ConfigVO> builder = QueryBuilder.builder(query).and(name, () -> qconfig.name.like(String.format("%%%s%%", name)));
+        QueryBuilder<ConfigVO> builder = QueryBuilder.builder(query)
+                                                     .and(name, () -> qconfig.name.like(String.format("%%%s%%", name)));
 
         return FormatPage.page(builder, pageable);
     }

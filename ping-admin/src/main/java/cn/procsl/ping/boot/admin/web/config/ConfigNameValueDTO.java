@@ -8,14 +8,14 @@ import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
-public class ConfigKeyValueDTO implements Serializable {
+public class ConfigNameValueDTO implements Serializable {
 
-    @NonNull String key;
+    @NonNull String name;
 
     String content;
 
-    public ConfigKeyValueDTO(@NonNull String key, String content) {
-        this.key = key;
+    public ConfigNameValueDTO(@NonNull String name, String content) {
+        this.name = name;
         this.content = content;
     }
 }

@@ -77,10 +77,10 @@ public class AdminAutoConfiguration implements ApplicationContextAware {
             .authenticationEntryPoint(
                     (request, response, authException) ->
                             ResponseUtils.unauthorizedError(request, response,
-                                    error, "E002", "你尚未登录,请登录"))
+                                    error, "401001", "你尚未登录,请登录"))
             .accessDeniedHandler(
                     (request, response, accessDeniedException) -> ResponseUtils.forbiddenError(request, response, error,
-                            "001", "无权限,拒绝访问")
+                            "403001", "无权限,拒绝访问")
             );
 
         http.formLogin().disable();

@@ -36,7 +36,7 @@ public class PermissionController {
 
     @Transactional
     @PostMapping("/v1/permissions")
-    @Operation(summary = "创建权限")
+    @Operation(summary = "创建权限", operationId = "createPermission")
     public PermissionVO create(@Validated @RequestBody PermissionCreateDTO permission) throws BusinessException {
         Permission entity = permission.convert();
         permissionJpaRepository.save(entity);
@@ -44,7 +44,7 @@ public class PermissionController {
     }
 
     @Transactional
-    @Operation(summary = "删除权限")
+    @Operation(summary = "删除权限", operationId = "deletePermission")
     @DeleteMapping("/v1/permissions/{id}")
     public void delete(@PathVariable Long id) throws BusinessException {
         this.permissionJpaRepository.deleteById(id);
@@ -52,7 +52,7 @@ public class PermissionController {
 
     @Transactional
     @PatchMapping("/v1/permissions/{id}")
-    @Operation(summary = "更新权限")
+    @Operation(summary = "更新权限", operationId = "updatePermission")
     public void update(@PathVariable Long id, @Validated @RequestBody PermissionUpdateDTO permission)
             throws BusinessException {
         permissionJpaRepository.getReferenceById(id)

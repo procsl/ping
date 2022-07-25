@@ -34,8 +34,9 @@ public class AccessController {
 
     @Transactional
     @PostMapping("/v1/users/{id}/roles")
-    @Operation(summary = "授予角色")
-    public void grant(@PathVariable("id") Long id, @RequestBody @NotNull @Validated @Schema(description = "角色名称") Collection<String> roles) {
+    @Operation(summary = "授予角色", operationId = "grantRoles")
+    public void grant(@PathVariable("id") Long id,
+                      @RequestBody @NotNull @Validated @Schema(description = "角色名称") Collection<String> roles) {
         this.accessControlService.grant(id, roles);
     }
 

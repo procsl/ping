@@ -30,6 +30,7 @@
         <module>ping-common</module>
         <module>ping-admin</module>
         <module>ping-apt</module>
+        <module>ping-distribute</module>
     </modules>
 
     <name>Ping 父模块</name>

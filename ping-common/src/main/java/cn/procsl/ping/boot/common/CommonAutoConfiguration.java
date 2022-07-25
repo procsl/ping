@@ -41,6 +41,8 @@ import javax.persistence.PersistenceException;
 @ComponentScan(basePackages = "cn.procsl.ping.boot.common")
 public class CommonAutoConfiguration implements ApplicationContextAware {
 
+    public final static String SYSTEM_ERROR_CODE_KEY = "SYSTEM_ERROR_CODE_KEY";
+
     @Override
     public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
         ContextHolder.setApplicationContext(applicationContext);

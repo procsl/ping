@@ -2,6 +2,7 @@ package cn.procsl.ping.boot.common.error;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -47,7 +48,14 @@ public class GlobalExceptionHandler {
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     public ParameterErrorCode MethodArgumentNotValidExceptionHandler(MethodArgumentNotValidException e) {
-        return new ParameterErrorCode("P001", "参数校验失败", Collections.emptyList());
+        return new ParameterErrorCode("400001", "参数校验失败", Collections.emptyList());
+    }
+
+    @ResponseBody
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(value = HttpMessageNotReadableException.class)
+    public ErrorCode httpMessageNotReadableException() {
+        return ErrorCode.builder("400001", "请求体不可为空");
     }
 
     ErrorCode getDefaultErrorCode(Exception e) {
