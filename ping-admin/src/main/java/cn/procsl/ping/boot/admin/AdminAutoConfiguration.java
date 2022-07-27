@@ -1,17 +1,15 @@
 package cn.procsl.ping.boot.admin;
 
-import cn.procsl.ping.boot.admin.auth.DynamicAuthorizationManager;
+import cn.procsl.ping.boot.admin.auth.access.FailureAuthenticationHandler;
+import cn.procsl.ping.boot.admin.auth.access.HttpAuthorizationManager;
 import cn.procsl.ping.boot.admin.domain.conf.ConfigOptionService;
 import cn.procsl.ping.boot.admin.domain.rbac.AccessControlService;
 import cn.procsl.ping.boot.admin.domain.user.RoleSettingService;
 import cn.procsl.ping.boot.admin.domain.user.UserRegisterService;
-import cn.procsl.ping.boot.common.web.ResponseUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -28,7 +26,13 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.CompositeLogoutHandler;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import java.util.List;
+
+import static org.springframework.http.HttpMethod.*;
 
 @Slf4j
 @AutoConfiguration
@@ -37,52 +41,43 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @ConditionalOnMissingBean({AdminAutoConfiguration.class})
 @EntityScan(basePackages = "cn.procsl.ping.boot.admin.domain")
 @EnableJpaRepositories(basePackages = "cn.procsl.ping.boot.admin.domain", bootstrapMode = BootstrapMode.LAZY)
-@ComponentScan(basePackages = {
-        "cn.procsl.ping.boot.admin.web",
-        "cn.procsl.ping.boot.admin.service",
-        "cn.procsl.ping.boot.admin.listener",
-        "cn.procsl.ping.boot.admin.adapter"},
-        basePackageClasses = {
-                ConfigOptionService.class,
-                AccessControlService.class,
-                RoleSettingService.class,
-                UserRegisterService.class
-        }
-)
+@ComponentScan(basePackages = {"cn.procsl.ping.boot.admin.web", "cn.procsl.ping.boot.admin.service", "cn.procsl.ping" +
+        ".boot.admin.listener", "cn.procsl.ping.boot.admin.adapter"}, basePackageClasses = {ConfigOptionService.class
+        , AccessControlService.class, RoleSettingService.class, UserRegisterService.class})
 public class AdminAutoConfiguration implements ApplicationContextAware {
 
     protected ApplicationContext context;
 
-    @Value("${server.error.path:/error}")
-    String error;
 
     @Bean
     @ConditionalOnMissingBean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        val dynamicAuthorizationManager = this.context
-                .getBean(DynamicAuthorizationManager.class);
-
-        http.csrf().disable();
-
-        // 动态权限相关
+        // 以下链接放行
         http.authorizeHttpRequests()
-            .antMatchers("/v1/session")
-            .permitAll()
-            .antMatchers("/v1/*")
-            .access(dynamicAuthorizationManager);
+            .antMatchers(POST, "/v1/session")
+            .permitAll();
+
+        http.authorizeHttpRequests()
+            .antMatchers(GET, "/v1/session")
+            .authenticated()
+            .antMatchers(DELETE, "/v1/session")
+            .authenticated();
+
+        // 以下链接校验URL权限
+        http.authorizeHttpRequests()
+            .antMatchers("/v1/**")
+            .access(new HttpAuthorizationManager());
 
         // 无权限处理
-        http.exceptionHandling()
-            .authenticationEntryPoint(
-                    (request, response, authException) ->
-                            ResponseUtils.unauthorizedError(request, response,
-                                    error, "401001", "你尚未登录,请登录"))
-            .accessDeniedHandler(
-                    (request, response, accessDeniedException) -> ResponseUtils.forbiddenError(request, response, error,
-                            "403001", "无权限,拒绝访问")
-            );
+        FailureAuthenticationHandler handler = this.context.getBean(FailureAuthenticationHandler.class);
+        http.exceptionHandling().authenticationEntryPoint(handler).accessDeniedHandler(handler);
 
+        http.rememberMe().useSecureCookie(true)
+            .authenticationSuccessHandler((request, response, authentication) -> log.info("RememberMe 登录"));
+
+        http.logout().disable();
+        http.csrf().disable();
         http.formLogin().disable();
         http.httpBasic().disable();
         return http.build();
@@ -109,6 +104,12 @@ public class AdminAutoConfiguration implements ApplicationContextAware {
         dao.setUserDetailsService(userDetailsService);
         dao.setHideUserNotFoundExceptions(true);
         return dao;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public CompositeLogoutHandler compositeLogoutHandler() {
+        return new CompositeLogoutHandler(List.of(new SecurityContextLogoutHandler()));
     }
 
 }

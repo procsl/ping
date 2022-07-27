@@ -1,21 +1,24 @@
-package cn.procsl.ping.boot.admin.auth;
+package cn.procsl.ping.boot.admin.auth.login;
 
+import cn.procsl.ping.boot.admin.auth.access.GrantedAuthorityFactory;
+import cn.procsl.ping.boot.admin.domain.rbac.Permission;
 import cn.procsl.ping.boot.admin.domain.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.Hidden;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @ToString(exclude = {"password"})
-@EqualsAndHashCode(exclude = {"password"})
-public class SessionUserDetails implements UserDetails {
+@EqualsAndHashCode(exclude = {"password", "authorities"})
+public class SessionUserDetail implements UserDetails {
 
     @Getter
     @Hidden
@@ -32,30 +35,20 @@ public class SessionUserDetails implements UserDetails {
 
     boolean enable;
 
-    public SessionUserDetails(User user) {
+    @Getter
+    Collection<GrantedAuthority> authorities;
+
+    public SessionUserDetail(@NonNull User user, @NonNull Collection<Permission> permissions) {
         this.id = user.getId();
         this.nickname = user.getName();
         this.username = user.getAccount().getName();
         this.password = user.getAccount().getPassword();
         this.enable = user.getAccount().isEnable();
-    }
+        this.authorities = permissions.stream()
+                                      .map(GrantedAuthorityFactory::create)
+                                      .filter(Objects::nonNull)
+                                      .collect(Collectors.toList());
 
-    @Builder
-    SessionUserDetails(Long id, String nickname, String username, String password, boolean enable) {
-        this.id = id;
-        this.nickname = nickname;
-        this.username = username;
-        this.password = password;
-        this.enable = enable;
-    }
-
-    public static SessionUserDetails anno(String name) {
-        return SessionUserDetails.builder().username(name).nickname(name).build();
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptySet();
     }
 
     @Override

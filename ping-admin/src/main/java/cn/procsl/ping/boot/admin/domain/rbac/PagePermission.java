@@ -7,7 +7,6 @@ import lombok.Setter;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.Transient;
 import javax.validation.constraints.NotBlank;
 
 @Getter
@@ -24,9 +23,4 @@ public class PagePermission extends Permission {
     @NotBlank
     protected String resource;
 
-    @Override
-    @Transient
-    public String getType() {
-        return "page";
-    }
 }

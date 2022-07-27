@@ -30,7 +30,7 @@
             additivity="false">
         <appender-ref ref="CONSOLE"/>
     </logger>
-    <logger name="org.hibernate.hql.internal.ast" level="DEBUG"/>
+    <logger name="org.hibernate.hql.internal.ast" level="INFO"/>
     <logger name="org.hibernate.hql.internal.ast.QueryTranslatorImpl" level="INFO"/>
     <logger name="org.hibernate.hql.internal.ast.util.JoinProcessor" level="INFO"/>
     <logger name="cn.procsl.ping" level="TRACE"/>

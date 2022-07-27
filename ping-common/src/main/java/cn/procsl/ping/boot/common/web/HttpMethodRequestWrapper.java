@@ -1,9 +1,9 @@
-package cn.procsl.ping.boot.admin.auth;
+package cn.procsl.ping.boot.common.web;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
-final class HttpMethodRequestWrapper extends HttpServletRequestWrapper {
+public final class HttpMethodRequestWrapper extends HttpServletRequestWrapper {
 
     final String method;
 

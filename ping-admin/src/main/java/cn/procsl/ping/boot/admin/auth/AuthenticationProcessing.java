@@ -20,6 +20,7 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.NullRememberMeServices;
 import org.springframework.security.web.authentication.RememberMeServices;
+import org.springframework.security.web.authentication.logout.CompositeLogoutHandler;
 import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.context.NullSecurityContextRepository;
@@ -42,6 +43,8 @@ public class AuthenticationProcessing implements ApplicationEventPublisherAware 
     @Value("${server.error.path:/error}")
     String error;
     final AuthenticationManager authenticationManager;
+
+    final CompositeLogoutHandler compositeLogoutHandler;
     AuthenticationSuccessHandler successHandler;
     AuthenticationFailureHandler failureHandler;
     @Setter
@@ -51,6 +54,7 @@ public class AuthenticationProcessing implements ApplicationEventPublisherAware 
     @Setter
     RememberMeServices rememberMeServices = new NullRememberMeServices();
     ApplicationEventPublisher eventPublisher;
+
 
     public Authentication login(HttpServletRequest request, HttpServletResponse response, Authentication token)
             throws ServletException, IOException {
@@ -112,5 +116,9 @@ public class AuthenticationProcessing implements ApplicationEventPublisherAware 
     @Autowired(required = false)
     public void setFailureHandler(AuthenticationFailureHandler failureHandler) {
         this.failureHandler = failureHandler;
+    }
+
+    public void logout(HttpServletRequest request, HttpServletResponse response, Authentication auth) {
+        this.compositeLogoutHandler.logout(request, response, auth);
     }
 }

@@ -1,8 +1,10 @@
-package cn.procsl.ping.boot.admin.auth;
+package cn.procsl.ping.boot.admin.auth.login;
 
+import cn.procsl.ping.boot.admin.auth.AuthenticationProcessing;
 import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.common.error.ErrorCode;
 import cn.procsl.ping.boot.common.utils.ObjectUtils;
+import cn.procsl.ping.boot.common.web.PromptDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -43,10 +45,10 @@ public class SessionController {
     @ResponseBody
     @GetMapping("/v1/session")
     @Operation(summary = "获取用户当前登录信息")
-    public SessionUserDetails currentSession() {
+    public SessionUserDetail currentSession() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication.isAuthenticated() && authentication.getPrincipal() instanceof SessionUserDetails) {
-            return (SessionUserDetails) authentication.getPrincipal();
+        if (authentication.isAuthenticated() && authentication.getPrincipal() instanceof SessionUserDetail) {
+            return (SessionUserDetail) authentication.getPrincipal();
         }
         throw new BusinessException("401002", HttpStatus.UNAUTHORIZED.value(), "尚未登录,请登录");
     }
@@ -54,8 +56,8 @@ public class SessionController {
     @ResponseBody
     @PostMapping("/v1/session")
     @Operation(summary = "用户登录", operationId = "authenticate")
-    public SessionUserDetails createSession(HttpServletRequest request, HttpServletResponse response,
-                                            @Validated @RequestBody LoginDetailsDTO details)
+    public SessionUserDetail createSession(HttpServletRequest request, HttpServletResponse response,
+                                           @Validated @RequestBody LoginDetailDTO details)
             throws ServletException, IOException {
         Authentication authenticate = SecurityContextHolder.getContext().getAuthentication();
 
@@ -70,16 +72,24 @@ public class SessionController {
             }
         }
 
-        if (!(authenticate.getPrincipal() instanceof SessionUserDetails)) {
+        if (!(authenticate.getPrincipal() instanceof SessionUserDetail)) {
             throw new BusinessException("系统内部错误");
         }
-        SessionUserDetails tmp = (SessionUserDetails) authenticate.getPrincipal();
+        SessionUserDetail tmp = (SessionUserDetail) authenticate.getPrincipal();
         if (ObjectUtils.nullSafeEquals(tmp.getUsername(), details.getAccount())) {
             return tmp;
         }
         throw new BusinessException("401003", HttpStatus.CONFLICT.value(), "当前系统已登录其他用户, 请注销当前用户后登录");
     }
 
+    @ResponseBody
+    @DeleteMapping("/v1/session")
+    @Operation(summary = "用户注销", operationId = "logout")
+    public PromptDTO deleteSession(HttpServletRequest request, HttpServletResponse response) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        this.authenticationProcessing.logout(request, response, authentication);
+        return new PromptDTO(String.format("用户[%s]已退出登录", authentication.getName()));
+    }
 
     @ResponseBody
     @ExceptionHandler(value = AuthenticationException.class)

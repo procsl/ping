@@ -16,7 +16,6 @@ import javax.validation.constraints.Pattern;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class HttpPermission extends Permission {
 
-    final static java.util.regex.Pattern dynamic = java.util.regex.Pattern.compile("[*{}?]+");
 
     @Pattern(regexp = "(GET|POST|DELETE|PATCH|PUT)", message = "仅支持[{regexp}]方法") @NotBlank String operate;
 
@@ -36,14 +35,5 @@ public class HttpPermission extends Permission {
         return this.getResource();
     }
 
-    @Transient
-    public boolean isDynamicURI() {
-        return dynamic.matcher(resource).matches();
-    }
 
-    @Override
-    @Transient
-    public String getType() {
-        return "http";
-    }
 }

@@ -50,7 +50,13 @@ public abstract class Permission extends AbstractPersistable<Long> implements Se
     }
 
     @Transient
-    public abstract String getType();
+    public String getType() {
+        val discriminatorValues = this.getClass().getAnnotationsByType(DiscriminatorValue.class);
+        if (discriminatorValues.length == 0) {
+            return null;
+        }
+        return discriminatorValues[0].value();
+    }
 
 }
 
