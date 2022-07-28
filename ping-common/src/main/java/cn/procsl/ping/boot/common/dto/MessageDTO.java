@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.common.web;
+package cn.procsl.ping.boot.common.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -9,9 +9,9 @@ import java.io.Serializable;
 @Getter
 @RequiredArgsConstructor
 @Schema(description = "提示信息")
-public class PromptDTO implements Serializable {
+public class MessageDTO implements Serializable {
 
-    @Schema(description = "提示信息")
+    @Schema(description = "错误信息或提示信息")
     final String message;
 
 }

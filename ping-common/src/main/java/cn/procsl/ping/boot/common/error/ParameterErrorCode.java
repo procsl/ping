@@ -19,8 +19,7 @@ public class ParameterErrorCode extends ErrorCode {
 
     @Builder
     public ParameterErrorCode(String code, String message, List<Map<String, String>> errors) {
-        this.setCode(code);
-        this.setMessage(message);
+        super(code, message);
         this.errors = errors;
     }
 

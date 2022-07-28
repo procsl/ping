@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.common.error;
+package cn.procsl.ping.boot.common.web;
 
 import cn.procsl.ping.boot.common.CommonAutoConfiguration;
 import lombok.extern.slf4j.Slf4j;

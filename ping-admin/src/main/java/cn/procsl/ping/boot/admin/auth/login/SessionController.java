@@ -1,10 +1,11 @@
 package cn.procsl.ping.boot.admin.auth.login;
 
 import cn.procsl.ping.boot.admin.auth.AuthenticationProcessing;
+import cn.procsl.ping.boot.captcha.web.VerifyCaptcha;
+import cn.procsl.ping.boot.common.dto.MessageDTO;
 import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.common.error.ErrorCode;
 import cn.procsl.ping.boot.common.utils.ObjectUtils;
-import cn.procsl.ping.boot.common.web.PromptDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Indexed;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.PermitAll;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -50,11 +52,13 @@ public class SessionController {
         if (authentication.isAuthenticated() && authentication.getPrincipal() instanceof SessionUserDetail) {
             return (SessionUserDetail) authentication.getPrincipal();
         }
-        throw new BusinessException("401002", HttpStatus.UNAUTHORIZED.value(), "尚未登录,请登录");
+        throw new BusinessException(HttpStatus.UNAUTHORIZED, "401002", "尚未登录,请登录");
     }
 
+    @PermitAll
     @ResponseBody
-    @PostMapping("/v1/session")
+    @PostMapping(value = "/v1/session")
+    @VerifyCaptcha(type = VerifyCaptcha.CaptchaType.image)
     @Operation(summary = "用户登录", operationId = "authenticate")
     public SessionUserDetail createSession(HttpServletRequest request, HttpServletResponse response,
                                            @Validated @RequestBody LoginDetailDTO details)
@@ -79,16 +83,16 @@ public class SessionController {
         if (ObjectUtils.nullSafeEquals(tmp.getUsername(), details.getAccount())) {
             return tmp;
         }
-        throw new BusinessException("401003", HttpStatus.CONFLICT.value(), "当前系统已登录其他用户, 请注销当前用户后登录");
+        throw new BusinessException(HttpStatus.CONFLICT, "401003", "当前系统已登录其他用户, 请注销当前用户后登录");
     }
 
     @ResponseBody
     @DeleteMapping("/v1/session")
     @Operation(summary = "用户注销", operationId = "logout")
-    public PromptDTO deleteSession(HttpServletRequest request, HttpServletResponse response) {
+    public MessageDTO deleteSession(HttpServletRequest request, HttpServletResponse response) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         this.authenticationProcessing.logout(request, response, authentication);
-        return new PromptDTO(String.format("用户[%s]已退出登录", authentication.getName()));
+        return new MessageDTO(String.format("用户[%s]已退出登录", authentication.getName()));
     }
 
     @ResponseBody

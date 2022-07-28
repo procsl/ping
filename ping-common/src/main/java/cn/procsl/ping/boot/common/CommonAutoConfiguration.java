@@ -3,6 +3,7 @@ package cn.procsl.ping.boot.common;
 import cn.procsl.ping.boot.common.utils.ContextHolder;
 import cn.procsl.ping.boot.common.validator.UniqueValidator;
 import cn.procsl.ping.boot.common.validator.UniqueValidatorImpl;
+import cn.procsl.ping.boot.common.web.AccessLoggerFilter;
 import com.querydsl.jpa.Hibernate5Templates;
 import com.querydsl.jpa.JPQLQueryFactory;
 import com.querydsl.jpa.hibernate.HibernateQueryFactory;
@@ -40,7 +41,7 @@ import javax.persistence.PersistenceException;
 @EnableJpaRepositories(bootstrapMode = BootstrapMode.LAZY, basePackages = "cn.procsl.ping.boot.common.jpa")
 @EntityScan(basePackages = "cn.procsl.ping.boot.common.jpa")
 @ComponentScan(basePackages = "cn.procsl.ping.boot.common")
-@ServletComponentScan(basePackages = "cn.procsl.ping.boot.common.web")
+@ServletComponentScan(basePackageClasses = AccessLoggerFilter.class)
 public class CommonAutoConfiguration implements ApplicationContextAware {
 
     public final static String SYSTEM_ERROR_CODE_KEY = "SYSTEM_ERROR_CODE_KEY";

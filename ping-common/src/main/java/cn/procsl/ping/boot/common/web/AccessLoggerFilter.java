@@ -1,10 +1,8 @@
 package cn.procsl.ping.boot.common.web;
 
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.core.annotation.Order;
 import org.springframework.web.filter.AbstractRequestLoggingFilter;
 
 import javax.servlet.FilterChain;
@@ -15,9 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.UUID;
 
-@RequiredArgsConstructor
-@Order(Integer.MIN_VALUE)
-@WebFilter(filterName = "mvcLogFilter", urlPatterns = "/v1/**")
+@WebFilter(filterName = "accessLoggerFilter", urlPatterns = "/*")
 public class AccessLoggerFilter extends AbstractRequestLoggingFilter implements InitializingBean {
 
     @Override

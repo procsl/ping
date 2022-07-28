@@ -7,7 +7,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ExceptionResolver {
 
-    String code() default "E001";
+    String code() default "001";
 
     String message() default "server error!";
 

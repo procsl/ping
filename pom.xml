@@ -31,6 +31,7 @@
         <module>ping-admin</module>
         <module>ping-apt</module>
         <module>ping-distribute</module>
+        <module>ping-captcha</module>
     </modules>
 
     <name>Ping 父模块</name>
@@ -178,6 +179,12 @@
             <dependency>
                 <groupId>cn.procsl</groupId>
                 <artifactId>ping-admin</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.procsl</groupId>
+                <artifactId>ping-captcha</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

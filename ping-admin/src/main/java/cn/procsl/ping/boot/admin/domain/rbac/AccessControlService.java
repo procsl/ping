@@ -59,7 +59,7 @@ public class AccessControlService {
             Set<String> dbRoles = roles.stream().map(Role::getName).collect(Collectors.toSet());
             Set<String> params = roleNames.stream().filter(item -> !dbRoles.contains(item)).collect(Collectors.toSet());
             if (!params.isEmpty()) {
-                throw new BusinessException(String.format("角色不存在: [%s]", String.join(",", params)));
+                throw new BusinessException("角色不存在: [%s]", String.join(",", params));
             }
         }
 
@@ -67,7 +67,8 @@ public class AccessControlService {
     }
 
     private void save(Long subject, List<Role> roles) {
-        Optional<Subject> option = this.subjectJpaSpecificationExecutor.findOne((root, query, cb) -> cb.equal(root.get("subject"), subject));
+        Optional<Subject> option = this.subjectJpaSpecificationExecutor.findOne(
+                (root, query, cb) -> cb.equal(root.get("subject"), subject));
         Subject entity = option.orElseGet(Subject::new);
         entity.setSubject(subject);
         entity.putRoles(roles);
@@ -126,7 +127,8 @@ public class AccessControlService {
      */
     @Transactional(readOnly = true)
     public Collection<Role> loadRoles(Long subject) {
-        Optional<Subject> entity = this.subjectJpaSpecificationExecutor.findOne((root, query, cb) -> cb.equal(root.get("subject"), subject));
+        Optional<Subject> entity = this.subjectJpaSpecificationExecutor.findOne(
+                (root, query, cb) -> cb.equal(root.get("subject"), subject));
         if (entity.isEmpty()) {
             return Collections.emptyList();
         }
