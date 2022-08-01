@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.admin.domain.rbac;
 
+import cn.procsl.ping.boot.common.jpa.DiscriminatorValueFinder;
 import cn.procsl.ping.boot.common.jpa.RepositoryCreator;
 import lombok.*;
 import org.springframework.data.jpa.domain.AbstractPersistable;
@@ -20,7 +21,7 @@ import java.util.function.Function;
 @DiscriminatorColumn(name = "type")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public abstract class Permission extends AbstractPersistable<Long> implements Serializable {
+public abstract class Permission extends AbstractPersistable<Long> implements Serializable, DiscriminatorValueFinder {
 
     @Override
     public @NonNull String toString() {
@@ -51,11 +52,7 @@ public abstract class Permission extends AbstractPersistable<Long> implements Se
 
     @Transient
     public String getType() {
-        val discriminatorValues = this.getClass().getAnnotationsByType(DiscriminatorValue.class);
-        if (discriminatorValues.length == 0) {
-            return null;
-        }
-        return discriminatorValues[0].value();
+        return this.find();
     }
 
 }

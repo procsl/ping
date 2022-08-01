@@ -1,16 +1,19 @@
 package cn.procsl.ping.boot.captcha.interceptor;
 
-import cn.procsl.ping.boot.captcha.web.VerifyCaptcha;
-import cn.procsl.ping.boot.common.error.BusinessException;
+import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
+import cn.procsl.ping.boot.captcha.service.VerifyCaptchaService;
 import lombok.NonNull;
-import org.springframework.http.HttpStatus;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+@RequiredArgsConstructor
 public class VerifyCaptchaHandler implements HandlerInterceptor {
+
+    final VerifyCaptchaService verifyCaptchaService;
 
     @Override
     public boolean preHandle(@NonNull HttpServletRequest request,
@@ -26,10 +29,8 @@ public class VerifyCaptchaHandler implements HandlerInterceptor {
             return true;
         }
         String token = request.getHeader(VerifyCaptcha.header);
-        if (token == null || token.isBlank()) {
-            throw new BusinessException(HttpStatus.FORBIDDEN, "003", "请校验%s验证码", markup.type().getMessage());
-        }
-        // TODO 校验验证码
+        String sessionId = request.getRequestedSessionId();
+        this.verifyCaptchaService.verify(sessionId, token, markup);
         return true;
     }
 }

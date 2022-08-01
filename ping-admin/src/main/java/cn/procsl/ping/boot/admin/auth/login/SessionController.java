@@ -1,7 +1,8 @@
 package cn.procsl.ping.boot.admin.auth.login;
 
 import cn.procsl.ping.boot.admin.auth.AuthenticationProcessing;
-import cn.procsl.ping.boot.captcha.web.VerifyCaptcha;
+import cn.procsl.ping.boot.captcha.domain.CaptchaType;
+import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
 import cn.procsl.ping.boot.common.dto.MessageDTO;
 import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.common.error.ErrorCode;
@@ -58,7 +59,7 @@ public class SessionController {
     @PermitAll
     @ResponseBody
     @PostMapping(value = "/v1/session")
-    @VerifyCaptcha(type = VerifyCaptcha.CaptchaType.image)
+    @VerifyCaptcha(type = CaptchaType.image)
     @Operation(summary = "用户登录", operationId = "authenticate")
     public SessionUserDetail createSession(HttpServletRequest request, HttpServletResponse response,
                                            @Validated @RequestBody LoginDetailDTO details)

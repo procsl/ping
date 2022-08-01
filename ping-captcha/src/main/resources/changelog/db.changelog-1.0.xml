@@ -1,0 +1,22 @@
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+
+    <changeSet id="create_captcha_table" author="captcha_module">
+
+        <createTable tableName="c_captcha" remarks="验证码">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="target" type="varchar(32)" remarks="目标用户"/>
+            <column name="ticket" type="varchar(100)" remarks="验证码"/>
+            <column name="expired" type="bigint" remarks="过期时间"/>
+
+        </createTable>
+    </changeSet>
+
+
+</databaseChangeLog>

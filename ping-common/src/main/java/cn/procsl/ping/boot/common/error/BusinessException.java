@@ -26,4 +26,14 @@ public class BusinessException extends RuntimeException implements ErrorEntity {
         this.code = code;
         this.httpStatus = httpStatus.value();
     }
+
+    public BusinessException(Exception e, String format, Object... arguments) {
+        super(String.format(format, arguments), e, true, true);
+    }
+
+    public BusinessException(Exception e, HttpStatus httpStatus, String code, String format, Object... arguments) {
+        super(String.format(format, arguments), e, true, true);
+        this.code = code;
+        this.httpStatus = httpStatus.value();
+    }
 }
