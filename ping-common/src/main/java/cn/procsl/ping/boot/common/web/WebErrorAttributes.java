@@ -4,10 +4,7 @@ import cn.procsl.ping.boot.common.CommonAutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Indexed;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.ModelAndView;
@@ -17,10 +14,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
-@Order
+//@Order
 @Slf4j
-@Indexed
-@Component
+//@Indexed
+//@Component
 public class WebErrorAttributes extends DefaultErrorAttributes {
 
     @Override

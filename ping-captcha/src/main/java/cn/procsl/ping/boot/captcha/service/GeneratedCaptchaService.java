@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Indexed;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Optional;
 
@@ -24,7 +23,7 @@ public class GeneratedCaptchaService implements CaptchaGenerator {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void generated(String id, CaptchaType type, OutputStream os) throws IOException {
+    public void generated(String id, CaptchaType type, OutputStream os) {
         Optional<Captcha> optional = this.specificationExecutor.findOne(new TicketSpecification(id, type));
         optional.ifPresent(this.jpaRepository::delete);
 

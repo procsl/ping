@@ -14,6 +14,10 @@
 
     <name>Ping 验证码模块</name>
 
+    <properties>
+        <server.port>10001</server.port>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>cn.procsl</groupId>
@@ -23,6 +27,11 @@
         <dependency>
             <groupId>cn.procsl</groupId>
             <artifactId>ping-apt</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
 
         <dependency>

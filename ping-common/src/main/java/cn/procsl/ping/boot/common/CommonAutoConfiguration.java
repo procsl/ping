@@ -17,6 +17,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration;
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -24,10 +25,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.repository.config.BootstrapMode;
-import org.springframework.web.servlet.View;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
+import java.util.List;
 
 /**
  * 自动配置 用于注册加载时依赖注入和包扫描
@@ -57,13 +58,13 @@ public class CommonAutoConfiguration implements ApplicationContextAware {
         return new UniqueValidatorImpl(entityManager);
     }
 
-    @Bean("error")
-    public View errorView() {
-        return (model, request, response) -> {
-            response.setStatus(500);
-            response.getWriter().write("test");
-        };
-    }
+//    @Bean("error")
+//    public View errorView() {
+//        return (model, request, response) -> {
+//            response.setStatus(500);
+//            response.getWriter().write("test");
+//        };
+//    }
 
     @Bean
     @ConditionalOnMissingBean
@@ -74,6 +75,16 @@ public class CommonAutoConfiguration implements ApplicationContextAware {
             return new JPAQueryFactory(entityManager);
         }
 
+    }
+
+    @Bean
+    public FilterRegistrationBean<AccessLoggerFilter> accessLoggerFilterFilterRegistrationBean() {
+        FilterRegistrationBean<AccessLoggerFilter> filter = new FilterRegistrationBean<>();
+        filter.setFilter(new AccessLoggerFilter());
+        filter.setName("accessLoggerFilter");
+        filter.setOrder(Integer.MIN_VALUE);
+        filter.setUrlPatterns(List.of("/v1/**"));
+        return filter;
     }
 
 }

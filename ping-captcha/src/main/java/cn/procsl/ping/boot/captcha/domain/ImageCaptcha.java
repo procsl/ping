@@ -5,6 +5,7 @@ import lombok.*;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import java.util.Base64;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -18,6 +19,7 @@ public class ImageCaptcha extends Captcha {
         this.target = target;
         this.ticket = ticket;
         this.expired = this.expired(expired);
+        this.createDate = new Date();
     }
 
     @Override

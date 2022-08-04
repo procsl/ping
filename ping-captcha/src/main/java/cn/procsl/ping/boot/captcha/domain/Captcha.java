@@ -27,6 +27,8 @@ public abstract class Captcha extends AbstractPersistable<Long> implements Seria
 
     Date expired;
 
+    Date createDate;
+
     public void verify(@NonNull String ticket) throws VerifyFailureException {
         // 如果当前时间是过期时间之后, 则属于验证码超时
         if (new Date().after(expired)) {
@@ -36,7 +38,7 @@ public abstract class Captcha extends AbstractPersistable<Long> implements Seria
         this.check(ticket);
     }
 
-    protected abstract void check(String token) throws VerifyFailureException;
+    protected abstract void check(String ticket) throws VerifyFailureException;
 
     public String message() {
         return CaptchaType.valueOf(this.find()).message;
