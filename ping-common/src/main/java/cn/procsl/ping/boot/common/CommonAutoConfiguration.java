@@ -18,7 +18,6 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration;
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
@@ -42,7 +41,6 @@ import java.util.List;
 @EnableJpaRepositories(bootstrapMode = BootstrapMode.LAZY, basePackages = "cn.procsl.ping.boot.common.jpa")
 @EntityScan(basePackages = "cn.procsl.ping.boot.common.jpa")
 @ComponentScan(basePackages = "cn.procsl.ping.boot.common")
-@ServletComponentScan(basePackageClasses = AccessLoggerFilter.class)
 public class CommonAutoConfiguration implements ApplicationContextAware {
 
     public final static String SYSTEM_ERROR_CODE_KEY = "SYSTEM_ERROR_CODE_KEY";

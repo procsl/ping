@@ -32,18 +32,11 @@
             <artifactId>ping-captcha</artifactId>
         </dependency>
 
-    </dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
 
-    <profiles>
-        <profile>
-            <id>springboot</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-security</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
+    </dependencies>
 
 </project>

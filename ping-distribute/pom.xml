@@ -40,6 +40,12 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>cn.procsl.li</groupId>
+            <artifactId>li-admin-ui</artifactId>
+            <version>0.0.5-SNAPSHOT</version>
+        </dependency>
+
     </dependencies>
 
 
