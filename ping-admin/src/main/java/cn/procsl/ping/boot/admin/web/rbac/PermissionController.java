@@ -3,6 +3,7 @@ package cn.procsl.ping.boot.admin.web.rbac;
 import cn.procsl.ping.boot.admin.domain.rbac.Permission;
 import cn.procsl.ping.boot.admin.domain.rbac.QPermission;
 import cn.procsl.ping.boot.common.error.BusinessException;
+import cn.procsl.ping.boot.common.error.ExceptionResolver;
 import cn.procsl.ping.boot.common.utils.QueryBuilder;
 import cn.procsl.ping.boot.common.web.FormatPage;
 import cn.procsl.ping.boot.common.web.MarkPageable;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.mapstruct.factory.Mappers;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Indexed;
@@ -46,6 +48,7 @@ public class PermissionController {
     @Transactional
     @Operation(summary = "删除权限", operationId = "deletePermission")
     @DeleteMapping("/v1/permissions/{id}")
+    @ExceptionResolver(message = "该角色已被关联, 角色删除失败", code = "409001", matcher = DataIntegrityViolationException.class)
     public void delete(@PathVariable Long id) throws BusinessException {
         this.permissionJpaRepository.deleteById(id);
     }

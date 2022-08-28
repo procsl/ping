@@ -33,7 +33,7 @@ public class ErrorCode extends MessageDTO implements Serializable, ErrorEntity {
         this.code = "001";
     }
 
-    public ErrorCode(String message, String code) {
+    public ErrorCode(String code, String message) {
         super(message);
         this.code = code;
     }

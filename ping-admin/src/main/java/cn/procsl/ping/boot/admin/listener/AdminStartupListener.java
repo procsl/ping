@@ -68,8 +68,9 @@ public class AdminStartupListener implements ApplicationListener<ApplicationRead
 
         log.info("注册默认账户:{}", account);
         Long id = this.userRegisterService.register(account, password);
-        this.accessControlService.grant(id, List.of(roleName));
-        this.configOptionService.put("初始化系统数据", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date()));
+        this.accessControlService.grantByName(id, List.of(roleName));
+        this.configOptionService.put("初始化系统数据",
+                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date()));
     }
 
 }

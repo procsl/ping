@@ -77,10 +77,8 @@ public class FormatPage<T> extends PageImpl<T> {
         return super.getTotalPages();
     }
 
-    @Override
-    @JsonIgnore
-    @Schema(hidden = true)
-    public boolean hasNext() {
+
+    public boolean isNext() {
         return super.hasNext();
     }
 

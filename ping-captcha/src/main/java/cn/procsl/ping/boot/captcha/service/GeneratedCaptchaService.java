@@ -10,7 +10,7 @@ import org.springframework.stereotype.Indexed;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.OutputStream;
-import java.util.Optional;
+import java.util.List;
 
 @Indexed
 @Component
@@ -24,9 +24,8 @@ public class GeneratedCaptchaService implements CaptchaGenerator {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void generated(String id, CaptchaType type, OutputStream os) {
-        Optional<Captcha> optional = this.specificationExecutor.findOne(new TicketSpecification(id, type));
-        optional.ifPresent(this.jpaRepository::delete);
-
+        List<Captcha> all = this.specificationExecutor.findAll(new TicketSpecification(id, type));
+        this.jpaRepository.deleteAll(all);
         SpecCaptcha specCaptcha = new SpecCaptcha(130, 48, 6);
         ImageCaptcha imageCaptcha = new ImageCaptcha(id, specCaptcha.text(), 2);
         this.jpaRepository.save(imageCaptcha);

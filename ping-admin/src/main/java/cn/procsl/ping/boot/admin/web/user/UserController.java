@@ -56,8 +56,10 @@ public class UserController {
     @GetMapping("/v1/users")
     @Transactional(readOnly = true)
     @Operation(summary = "获取用户列表")
-    public FormatPage<UserDetailsVO> findUsers(Pageable pageable, @RequestParam(required = false) String name,
-                                               @RequestParam(required = false) String account,
+    public FormatPage<UserDetailsVO> findUsers(Pageable pageable,
+                                               @RequestParam(required = false) String name,
+                                               @RequestParam(required = false, name = "account.name") String account,
+                                               @RequestParam(required = false, name = "account.state") AccountState state,
                                                @RequestParam(required = false) Gender gender) {
 
         Expression<AccountVO> accountProjection = Projections.bean(AccountVO.class, qaccount.name, qaccount.state)
@@ -71,6 +73,7 @@ public class UserController {
         val builder = QueryBuilder.builder(query)
                                   .and(name, () -> quser.name.like(String.format("%%%s%%", name)))
                                   .and(account, () -> qaccount.name.like(String.format("%%%s%%", account)))
+                                  .and(state != null, () -> qaccount.state.eq(state))
                                   .and(gender != null, () -> quser.gender.eq(gender));
 
         return FormatPage.page(builder, pageable);

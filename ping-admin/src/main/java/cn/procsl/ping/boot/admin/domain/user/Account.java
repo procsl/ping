@@ -78,4 +78,7 @@ public class Account extends AbstractPersistable<Long> implements Stateful<Accou
         }
     }
 
+    public void resetPassword(String password) {
+        this.password = password;
+    }
 }

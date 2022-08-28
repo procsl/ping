@@ -5,6 +5,7 @@ import cn.procsl.ping.boot.admin.domain.rbac.Permission;
 import cn.procsl.ping.boot.admin.domain.rbac.QRole;
 import cn.procsl.ping.boot.admin.domain.rbac.Role;
 import cn.procsl.ping.boot.common.error.BusinessException;
+import cn.procsl.ping.boot.common.error.ExceptionResolver;
 import cn.procsl.ping.boot.common.utils.QueryBuilder;
 import cn.procsl.ping.boot.common.validator.UniqueValidator;
 import cn.procsl.ping.boot.common.web.FormatPage;
@@ -26,6 +27,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.groups.Default;
 import java.util.List;
 
 @Indexed
@@ -50,10 +52,10 @@ public class RoleController {
     @Transactional
     @PostMapping("/v1/roles")
     @Operation(summary = "创建角色")
-    public RoleVO create(@Validated @RequestBody RoleDetailsDTO roleDetails) throws BusinessException {
-        uniqueValidator.valid(Role.class, null, "name", roleDetails.getName(), "角色已存在");
-        List<Permission> permissions = this.permissionJpaRepository.findAllById(roleDetails.getPermissions());
-        Role entity = new Role(roleDetails.getName(), permissions);
+    public RoleVO createRole(@Validated @RequestBody RoleGrantDTO details) throws BusinessException {
+        uniqueValidator.valid(Role.class, null, "name", details.getName(), "角色已存在");
+        List<Permission> permissions = this.permissionJpaRepository.findAllById(details.getPermissions());
+        Role entity = new Role(details.getName(), permissions);
         roleRepository.save(entity);
         return mapStructMapper.mapper(entity);
     }
@@ -61,14 +63,16 @@ public class RoleController {
     @Transactional
     @Operation(summary = "删除角色")
     @DeleteMapping("/v1/roles/{id}")
-    public void delete(@PathVariable Long id) throws BusinessException {
+    @ExceptionResolver(message = "该角色正在使用中,无法删除")
+    public void deleteRole(@PathVariable Long id) throws BusinessException {
         this.roleRepository.deleteById(id);
     }
 
     @Transactional
     @PatchMapping("/v1/roles/{id}")
     @Operation(summary = "修改指定角色信息")
-    public void change(@PathVariable("id") Long id, @Validated @RequestBody @NotNull RoleDetailsDTO details)
+    public void changeRole(@PathVariable("id") Long id,
+                           @Validated({Default.class}) @RequestBody @NotNull RoleGrantDTO details)
             throws BusinessException {
         uniqueValidator.valid(Role.class, id, "name", details.getName(), "角色已存在");
         Role role = this.roleRepository.getReferenceById(id);
@@ -79,9 +83,9 @@ public class RoleController {
     @Transactional
     @GetMapping("/v1/roles/{id}")
     @Operation(summary = "获取指定角色信息")
-    public RoleDetailsDTO getById(@PathVariable("id") Long id) throws BusinessException {
+    public RolePermissionVO getRoleById(@PathVariable("id") Long id) throws BusinessException {
         Role role = this.roleRepository.getReferenceById(id);
-        return new RoleDetailsDTO(role);
+        return this.mapStructMapper.mapperDetails(role);
     }
 
     @MarkPageable

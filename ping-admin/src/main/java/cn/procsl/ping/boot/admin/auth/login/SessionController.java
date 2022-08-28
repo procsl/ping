@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -96,10 +97,18 @@ public class SessionController {
         return new MessageDTO(String.format("用户[%s]已退出登录", authentication.getName()));
     }
 
+
+    @ResponseBody
+    @ExceptionHandler(value = DisabledException.class)
+    @ResponseStatus(code = HttpStatus.UNAUTHORIZED)
+    public ErrorCode disabledException() {
+        return ErrorCode.builder("401002", "用户已被禁用");
+    }
+
     @ResponseBody
     @ExceptionHandler(value = AuthenticationException.class)
     @ResponseStatus(code = HttpStatus.UNAUTHORIZED)
-    public ErrorCode AuthenticationExceptionHandler(AuthenticationException e) {
+    public ErrorCode authenticationExceptionHandler() {
         return ErrorCode.builder("401001", "账户名或密码错误");
     }
 

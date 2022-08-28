@@ -14,7 +14,7 @@ import java.io.Serializable;
 public class RoleNameDTO implements Serializable {
 
     @Schema(description = "角色名称, 必须唯一")
-    @NotEmpty
+    @NotEmpty(groups = NotEmpty.class)
     String name;
 
 }

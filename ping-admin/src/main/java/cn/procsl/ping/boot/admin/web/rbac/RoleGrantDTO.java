@@ -13,17 +13,17 @@ import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
-public class RoleDetailsDTO extends RoleNameDTO {
+public class RoleGrantDTO extends RoleNameDTO {
 
     @Schema(description = "权限列表IDs")
     @NotNull @Size(max = 100) Collection<Long> permissions;
 
-    public RoleDetailsDTO(Role role) {
+    public RoleGrantDTO(Role role) {
         this.name = role.getName();
         this.permissions = role.getPermissions().stream().map(Permission::getId).collect(Collectors.toSet());
     }
 
-    public RoleDetailsDTO(String name, Collection<Long> permissions) {
+    public RoleGrantDTO(String name, Collection<Long> permissions) {
         super(name);
         this.permissions = permissions;
     }

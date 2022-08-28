@@ -26,13 +26,14 @@ public class FailureAuthenticationHandler implements AuthenticationEntryPoint, A
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException e) throws IOException, ServletException {
-
+        log.debug("未登陆的访问:{}", request.getRequestURI());
         ResponseUtils.unauthorizedError(request, response, error, "401001", "你尚未登录,请登录");
     }
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response,
                        AccessDeniedException e) throws IOException, ServletException {
+        log.debug("未授权的访问:{}", request.getRequestURI());
         ResponseUtils.forbiddenError(request, response, error, "403001", "无权限,拒绝访问");
     }
 }

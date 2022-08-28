@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.admin.web.rbac;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RoleVO extends RoleNameDTO {
 
+    @Schema(required = true)
     Long id;
 
 }

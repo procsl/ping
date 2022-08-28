@@ -62,7 +62,7 @@ public class RoleControllerTest {
                });
 
 
-        RoleDetailsDTO role = new RoleDetailsDTO(Faker.instance().name().fullName(), List.of(pid.get()));
+        RoleGrantDTO role = new RoleGrantDTO(Faker.instance().name().fullName(), List.of(pid.get()));
         mockMvc.perform(post("/v1/roles")
                        .contentType(APPLICATION_JSON)
                        .content(jsonMapper.writeValueAsString(role))
@@ -82,7 +82,7 @@ public class RoleControllerTest {
     @Test
     public void create() throws Exception {
         Collection<Long> permission = List.of(pid.get());
-        RoleDetailsDTO role = new RoleDetailsDTO(Faker.instance().name().fullName(), permission);
+        RoleGrantDTO role = new RoleGrantDTO(Faker.instance().name().fullName(), permission);
         mockMvc.perform(post("/v1/roles")
                        .contentType(APPLICATION_JSON)
                        .content(jsonMapper.writeValueAsString(role))
@@ -106,7 +106,7 @@ public class RoleControllerTest {
 
     @Test
     public void change() throws Exception {
-        RoleDetailsDTO role = new RoleDetailsDTO(Faker.instance().name().fullName(), List.of(pid.get()));
+        RoleGrantDTO role = new RoleGrantDTO(Faker.instance().name().fullName(), List.of(pid.get()));
         mockMvc.perform(patch("/v1/roles/{id}", gid.get())
                        .contentType(APPLICATION_JSON)
                        .content(jsonMapper.writeValueAsString(role))

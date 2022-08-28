@@ -27,6 +27,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -64,12 +65,13 @@ public class AdminAutoConfiguration implements ApplicationContextAware {
                                                    WebApplicationContext webApplicationContext)
             throws Exception {
 
-        this.permitAllConfig(webApplicationContext, http);
+        val requests = http.authorizeHttpRequests();
+        this.permitAllConfig(webApplicationContext, requests);
+        requests.antMatchers("/h2/**", "**.js", "**.css", "**.html", "**.ico").permitAll();
 
         // 以下链接校验URL权限
-        http.authorizeHttpRequests()
-            .antMatchers("/v1/**")
-            .access(new HttpAuthorizationManager());
+        requests.antMatchers("/v1/**")
+                .access(new HttpAuthorizationManager());
 
         // 无权限处理
         FailureAuthenticationHandler handler = this.context.getBean(FailureAuthenticationHandler.class);
@@ -82,10 +84,12 @@ public class AdminAutoConfiguration implements ApplicationContextAware {
         http.csrf().disable();
         http.formLogin().disable();
         http.httpBasic().disable();
+        http.headers().frameOptions().disable();
         return http.build();
     }
 
-    void permitAllConfig(WebApplicationContext webApplicationContext, HttpSecurity http) {
+    void permitAllConfig(WebApplicationContext webApplicationContext,
+                         AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry http) {
         Map<String, RequestMappingHandlerMapping> mappings = webApplicationContext.getBeansOfType(
                 RequestMappingHandlerMapping.class);
         mappings.forEach((name, mapping) -> mapping.getHandlerMethods().forEach((k, v) -> {
@@ -98,13 +102,13 @@ public class AdminAutoConfiguration implements ApplicationContextAware {
     }
 
     @SneakyThrows
-    void permitAllProcess(RequestMappingInfo k, HandlerMethod v, HttpSecurity http) {
+    void permitAllProcess(RequestMappingInfo k, HandlerMethod v,
+                          AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry http) {
         log.debug("Permit URL:{} :{}", k.getMethodsCondition().getMethods(), k.getDirectPaths());
-        val request = http.authorizeHttpRequests();
         for (RequestMethod method : k.getMethodsCondition().getMethods()) {
             for (String path : k.getDirectPaths()) {
                 // 这里需要判断动态链接
-                request.antMatchers(HttpMethod.resolve(method.name()), path).permitAll();
+                http.antMatchers(HttpMethod.resolve(method.name()), path).permitAll();
             }
         }
     }

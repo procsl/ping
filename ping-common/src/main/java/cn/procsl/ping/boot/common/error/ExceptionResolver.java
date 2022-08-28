@@ -3,7 +3,7 @@ package cn.procsl.ping.boot.common.error;
 import java.lang.annotation.*;
 
 @Documented
-@Target({ElementType.TYPE})
+@Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ExceptionResolver {
 

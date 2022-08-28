@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 
-import java.util.List;
 import java.util.Map;
 
 @Data
@@ -14,17 +13,17 @@ public class ParameterErrorCode extends ErrorCode {
 
     @Getter
     @Schema(description = "参数校验信息", example = "{\"field:\":\"不可为空\"}")
-    final List<Map<String, String>> errors;
+    final Map<String, String> errors;
 
 
     @Builder
-    public ParameterErrorCode(String code, String message, List<Map<String, String>> errors) {
+    public ParameterErrorCode(String code, String message, Map<String, String> errors) {
         super(code, message);
         this.errors = errors;
     }
 
     @Override
-    @Schema(example = "E002")
+    @Schema(example = "E001")
     public String getCode() {
         return super.getCode();
     }

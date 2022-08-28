@@ -56,14 +56,6 @@ public class CommonAutoConfiguration implements ApplicationContextAware {
         return new UniqueValidatorImpl(entityManager);
     }
 
-//    @Bean("error")
-//    public View errorView() {
-//        return (model, request, response) -> {
-//            response.setStatus(500);
-//            response.getWriter().write("test");
-//        };
-//    }
-
     @Bean
     @ConditionalOnMissingBean
     public JPQLQueryFactory jpaQueryFactory(EntityManager entityManager) {
@@ -81,7 +73,7 @@ public class CommonAutoConfiguration implements ApplicationContextAware {
         filter.setFilter(new AccessLoggerFilter());
         filter.setName("accessLoggerFilter");
         filter.setOrder(Integer.MIN_VALUE);
-        filter.setUrlPatterns(List.of("/v1/**"));
+        filter.setUrlPatterns(List.of("/v1/*"));
         return filter;
     }
 

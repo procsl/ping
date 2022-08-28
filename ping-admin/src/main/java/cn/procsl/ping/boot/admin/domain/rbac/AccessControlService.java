@@ -40,7 +40,7 @@ public class AccessControlService {
      * @throws BusinessException 如果角色不存在
      */
     @Transactional
-    public void grant(@NotNull Long subject, @NotNull Collection<String> roleNames) throws BusinessException {
+    public void grantByName(@NotNull Long subject, @NotNull Collection<String> roleNames) throws BusinessException {
 
         log.debug("subject is {}, role name is {}.", subject, roleNames);
         if (roleNames.isEmpty()) {
@@ -74,6 +74,21 @@ public class AccessControlService {
         entity.putRoles(roles);
         this.subjectRepository.save(entity);
     }
+
+    @Transactional
+    public void grant(@NotNull Long subject, @NotNull Collection<Long> roleIds) throws BusinessException {
+
+        log.debug("subject is {}, role id is {}.", subject, roleIds);
+        if (roleIds.isEmpty()) {
+            save(subject, Collections.emptyList());
+            return;
+        }
+
+        List<Role> roles = this.roleJpaSpecificationExecutor.findAll(
+                (root, query, cb) -> root.get("id").in(roleIds));
+        save(subject, roles);
+    }
+
 
     /**
      * 判断是否存在角色

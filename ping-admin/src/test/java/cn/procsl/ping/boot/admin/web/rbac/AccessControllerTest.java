@@ -91,7 +91,7 @@ public class AccessControllerTest {
                        });
             }
 
-            RoleDetailsDTO role = new RoleDetailsDTO(mock(String.class, config), pid);
+            RoleGrantDTO role = new RoleGrantDTO(mock(String.class, config), pid);
             mockMvc.perform(
                            post("/v1/roles")
                                    .contentType(APPLICATION_JSON)

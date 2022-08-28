@@ -25,7 +25,7 @@ class RoleSettingServiceAdapter implements RoleSettingService {
 
     @Override
     public void grant(Long userId, Collection<String> roleNames) {
-        this.accessControlService.grant(userId, roleNames);
+        this.accessControlService.grantByName(userId, roleNames);
     }
 
 

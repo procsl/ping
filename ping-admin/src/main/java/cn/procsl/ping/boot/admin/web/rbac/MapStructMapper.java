@@ -10,6 +10,8 @@ public interface MapStructMapper {
 
     RoleVO mapper(Role role);
 
+    RolePermissionVO mapperDetails(Role role);
+
     PermissionVO mapper(Permission permission);
 
 

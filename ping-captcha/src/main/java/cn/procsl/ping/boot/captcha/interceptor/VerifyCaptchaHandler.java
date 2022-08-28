@@ -18,8 +18,7 @@ public class VerifyCaptchaHandler implements HandlerInterceptor {
     @Override
     public boolean preHandle(@NonNull HttpServletRequest request,
                              @NonNull HttpServletResponse response,
-                             @NonNull Object handler)
-            throws Exception {
+                             @NonNull Object handler) {
         boolean isHandler = handler instanceof HandlerMethod;
         if (!isHandler) {
             return true;

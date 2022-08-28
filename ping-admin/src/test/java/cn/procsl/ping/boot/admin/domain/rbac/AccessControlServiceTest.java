@@ -77,7 +77,7 @@ public class AccessControlServiceTest {
 
     @Test
     @DisplayName("测试授权")
-    public void grant() {
+    public void grantByName() {
 
         log.info("开始测试角色授予");
 
@@ -90,7 +90,7 @@ public class AccessControlServiceTest {
 
         List<String> allRoleNames = allRoles.stream().map(Role::getName).collect(Collectors.toList());
         log.info("为[{}]授予角色:[{}]", subject, allRoleNames);
-        this.accessControlService.grant(subject, allRoleNames);
+        this.accessControlService.grantByName(subject, allRoleNames);
         log.info("授予完成");
 
         {
@@ -105,7 +105,8 @@ public class AccessControlServiceTest {
         }
         String role = faker.name().username();
         log.info("测试授予不存在的角色:[{}]", role);
-        Assertions.assertThrows(BusinessException.class, () -> this.accessControlService.grant(subject, Collections.singleton(role)));
+        Assertions.assertThrows(BusinessException.class,
+                () -> this.accessControlService.grantByName(subject, Collections.singleton(role)));
 
         log.info("测试成功");
     }
@@ -132,7 +133,7 @@ public class AccessControlServiceTest {
             grantRoles.add(role.getName());
         }
         log.info("为指定的subject[{}]授予角色:[{}]", id, grantRoles);
-        this.accessControlService.grant(id, grantRoles);
+        this.accessControlService.grantByName(id, grantRoles);
 
         log.info("断言subject[{}]存在授予角色:[{}]", id, grantRoles);
         for (String role : grantRoles) {
