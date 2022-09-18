@@ -4,9 +4,11 @@ package cn.procsl.ping.boot.connect.resolver;
 import cn.procsl.ping.boot.connect.server.SocketIOConnectContext;
 import cn.procsl.ping.boot.connect.server.SocketIOHandlerArgumentResolver;
 import com.google.auto.service.AutoService;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Parameter;
 
+@Slf4j
 @AutoService(SocketIOHandlerArgumentResolver.class)
 public class DefaultSocketIOHandlerArgumentResolver implements SocketIOHandlerArgumentResolver {
 

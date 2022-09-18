@@ -8,7 +8,6 @@ import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.UUID;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 @Slf4j
@@ -19,10 +18,10 @@ public class WebServerSSLConfigure implements WebServerFactoryCustomizer<TomcatS
     @Override
     public void customize(TomcatServletWebServerFactory factory) {
 
-        ThreadFactory threadFactory = Thread.ofVirtual().name("virtual-", 0).factory();
-        factory.addProtocolHandlerCustomizers(protocolHandler -> protocolHandler.setExecutor(
-                Executors.newThreadPerTaskExecutor(new ThreadFactoryWrapper(threadFactory))
-        ));
+//        ThreadFactory threadFactory = Thread.ofVirtual().name("virtual-", 0).factory();
+//        factory.addProtocolHandlerCustomizers(protocolHandler -> protocolHandler.setExecutor(
+//                Executors.newThreadPerTaskExecutor(new ThreadFactoryWrapper(threadFactory))
+//        ));
     }
 
 //    @Bean

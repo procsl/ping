@@ -1,6 +1,8 @@
 package cn.procsl.ping.boot.connect.server;
 
-import io.socket.engineio.server.Emitter;
+import cn.procsl.ping.boot.common.invoker.AnnotationHandlerInvokerContext;
+import cn.procsl.ping.boot.common.invoker.MultiScannerAnnotationHandlerResolver;
+import cn.procsl.ping.boot.common.invoker.SimpleHandlerInvoker;
 import io.socket.engineio.server.EngineIoServer;
 import io.socket.engineio.server.EngineIoServerOptions;
 import io.socket.socketio.server.SocketIoNamespace;
@@ -10,22 +12,21 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.AnnotationUtils;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 @Slf4j
 public final class SocketIOServerBuilder {
 
-    final ProxyNamespaceEventHandlerResolverLoader resolverProxy = new ProxyNamespaceEventHandlerResolverLoader();
+    final ProxyNamespaceEventHandlerResolverLoader handlerResolverLoader =
+            new ProxyNamespaceEventHandlerResolverLoader();
     EngineIoServerOptions config = EngineIoServerOptions.newFromDefault();
     EngineIoServer server;
     SocketIoServer socketIoServer;
     Collection<Object> handlers = new ArrayList<>();
-    HandlerInvoker handlerInvoker;
+    ProxyArgumentResolverLoader argumentResolver = new ProxyArgumentResolverLoader();
+
+    MultiScannerAnnotationHandlerResolver scannerAnnotationHandlerResolver;
 
     private SocketIOServerBuilder() {
     }
@@ -45,15 +46,18 @@ public final class SocketIOServerBuilder {
     }
 
     void namespaceConnectRegister(SocketIoNamespace instance, Object handler) {
-
-        List<List<Map<String, Object>>> events = this.handlerInvoker.findEventHandler(handler);
+        Collection<AnnotationHandlerInvokerContext> events =
+                this.scannerAnnotationHandlerResolver.resolve(handler);
 
         instance.on("connection", args -> {
             SocketIoSocket socket = (SocketIoSocket) args[0];
-            log.info("新连接:namespace:{}, id:{}", socket.getNamespace().getName(), socket.getId());
+            log.debug("connect to namespace:{}, id:{}", socket.getNamespace().getName(), socket.getId());
             try {
-                for (List<Map<String, Object>> namespace : events) {
-                    connectionRegister(namespace, args);
+                for (AnnotationHandlerInvokerContext namespace : events) {
+                    SocketIOConnectContext context = new SocketIOConnectContext(namespace, args);
+                    SimpleHandlerInvoker<SocketIOConnectContext> invoker = new SimpleHandlerInvoker<>(context,
+                            this.argumentResolver);
+                    this.handlerResolverLoader.processor(context, invoker);
                 }
             } catch (Exception e) {
                 log.error("出现错误:", e);
@@ -61,15 +65,6 @@ public final class SocketIOServerBuilder {
             }
             socket.emit(Namespace.Connect.connect);
         });
-    }
-
-    void connectionRegister(List<Map<String, Object>> events, Object[] args) {
-        for (Map<String, Object> event : events) {
-            SocketIOConnectContext invokeContext = new SocketIOConnectContext(event.get("handler"),
-                    (Method) event.get("method"), args);
-            Emitter.Listener func = item -> this.handlerInvoker.invoke(invokeContext, item);
-            resolverProxy.processor((Annotation) event.get("annotation"), invokeContext, func);
-        }
     }
 
     void socketIoNamespaceAwareRegister(Object v, SocketIoNamespace instance) {
@@ -81,8 +76,10 @@ public final class SocketIOServerBuilder {
     public EngineIoServer build() {
         this.server = new EngineIoServer(config);
         this.socketIoServer = new SocketIoServer(this.server);
-        this.resolverProxy.load();
-        this.handlerInvoker = new HandlerInvoker(resolverProxy.getNamespaceAnnotations());
+        this.handlerResolverLoader.load();
+        this.argumentResolver.load();
+        this.scannerAnnotationHandlerResolver = new MultiScannerAnnotationHandlerResolver(
+                handlerResolverLoader.getNamespaceAnnotations());
         for (Object handler : this.handlers) {
             SocketIoNamespace instance = this.namespaceRegister(handler);
             socketIoNamespaceAwareRegister(handler, instance);

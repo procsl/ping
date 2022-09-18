@@ -37,7 +37,7 @@
 
         <dependency>
             <groupId>cn.procsl</groupId>
-            <artifactId>ping-connect</artifactId>
+            <artifactId>ping-im</artifactId>
         </dependency>
 
         <dependency>

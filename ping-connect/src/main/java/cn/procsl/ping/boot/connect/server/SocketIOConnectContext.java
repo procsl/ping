@@ -1,29 +1,38 @@
 package cn.procsl.ping.boot.connect.server;
 
+import cn.procsl.ping.boot.common.invoker.AnnotationHandlerInvokerContext;
 import io.socket.socketio.server.SocketIoSocket;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.lang.reflect.InvocationTargetException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 @Getter
 @RequiredArgsConstructor
-public class SocketIOConnectContext {
+public class SocketIOConnectContext implements AnnotationHandlerInvokerContext {
 
-    final private Object target;
+    final AnnotationHandlerInvokerContext context;
 
-    final private Method method;
+    final Object[] connectionArgs;
 
-    final private Object[] connectionArgs;
-
-
-    void invoke(Object... args) throws InvocationTargetException, IllegalAccessException {
-        method.invoke(target, args);
-    }
 
     public SocketIoSocket getSocketIoSocket() {
         return (SocketIoSocket) connectionArgs[0];
     }
 
+    @Override
+    public Annotation getAnnotation() {
+        return context.getAnnotation();
+    }
+
+    @Override
+    public Object getHandler() {
+        return context.getHandler();
+    }
+
+    @Override
+    public Method getMethod() {
+        return context.getMethod();
+    }
 }

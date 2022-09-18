@@ -1,23 +1,19 @@
 package cn.procsl.ping.boot.connect.server;
 
+import cn.procsl.ping.boot.common.invoker.HandlerInvoker;
 import cn.procsl.ping.boot.common.load.ServiceProxyLoader;
-import io.socket.engineio.server.Emitter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+@Slf4j
 final class ProxyNamespaceEventHandlerResolverLoader extends
-        ServiceProxyLoader<NamespaceEventHandlerResolver> implements
-        NamespaceEventHandlerResolver {
+        ServiceProxyLoader<NamespaceEventHandlerResolver> {
 
     public ProxyNamespaceEventHandlerResolverLoader() {
         super(NamespaceEventHandlerResolver.class);
-    }
-
-    @Override
-    public Class<? extends Annotation> getNamespaceAnnotation() {
-        throw new UnsupportedOperationException("不允许的操作");
     }
 
     public Collection<Class<? extends Annotation>> getNamespaceAnnotations() {
@@ -25,14 +21,13 @@ final class ProxyNamespaceEventHandlerResolverLoader extends
                            .collect(Collectors.toSet());
     }
 
-    @Override
-    public void processor(Annotation annotation, SocketIOConnectContext invokeContext, Emitter.Listener func) {
+    public void processor(SocketIOConnectContext invokeContext, HandlerInvoker<SocketIOConnectContext> func) {
         for (NamespaceEventHandlerResolver resolver : this.service) {
-            boolean isSupport = resolver.support(annotation);
+            boolean isSupport = resolver.support(invokeContext.getAnnotation());
             if (!isSupport) {
                 continue;
             }
-            resolver.processor(annotation, invokeContext, func);
+            resolver.processor(invokeContext.getAnnotation(), invokeContext, func::invoke);
         }
     }
 }

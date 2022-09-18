@@ -199,6 +199,12 @@
 
             <dependency>
                 <groupId>cn.procsl</groupId>
+                <artifactId>ping-im</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.procsl</groupId>
                 <artifactId>ping-product</artifactId>
                 <version>${project.version}</version>
             </dependency>
