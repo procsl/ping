@@ -5,11 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
 
 @Slf4j
 @Rollback
@@ -18,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest(classes = TestAdminApplication.class, webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 public class PermissionTest {
 
-    @Autowired
+    @Inject
     JpaRepository<Permission, Long> permissionLongJpaRepository;
 
     @BeforeEach

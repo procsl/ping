@@ -10,13 +10,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Example;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,16 +28,16 @@ import java.util.stream.Collectors;
 @SpringBootTest(classes = TestAdminApplication.class, webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 public class AccessControlServiceTest {
 
-    @Autowired
+    @Inject
     AccessControlService accessControlService;
 
-    @Autowired
+    @Inject
     JpaRepository<Role, Long> repository;
 
-    @Autowired
+    @Inject
     JpaRepository<Subject, Long> subjectLongJpaRepository;
 
-    @Autowired
+    @Inject
     JpaRepository<Permission, Long> permissionLongJpaRepository;
 
     Faker faker = new Faker(Locale.CHINA);

@@ -9,12 +9,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
@@ -30,19 +30,19 @@ import java.util.Set;
 @SpringBootTest(classes = TestCommonApplication.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class UniqueFieldValidatorTest {
 
-    @Autowired
+    @Inject
     JpaRepository<Unique, Long> jpaRepository;
 
-    @Autowired
+    @Inject
     EntityManagerFactory factory;
 
-    @Autowired
+    @Inject
     EntityManager springEntityManager;
 
-    @Autowired
+    @Inject
     Validator validator;
 
-    @Autowired
+    @Inject
     UniqueService service;
 
     Long gid;

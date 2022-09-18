@@ -16,11 +16,11 @@
         <maven.compiler.compilerVersion>${java.version}</maven.compiler.compilerVersion>
         <compiler.version>${java.version}</compiler.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <springboot.version>2.7.1</springboot.version>
+        <springboot.version>2.7.3</springboot.version>
         <querydsl.version>5.0.0</querydsl.version>
         <springdoc.version>1.6.9</springdoc.version>
         <jpa-streamer-version>1.0.2</jpa-streamer-version>
-        <mapstruct.version>1.5.1.Final</mapstruct.version>
+        <mapstruct.version>1.5.2.Final</mapstruct.version>
         <native.version>0.12.0</native.version>
         <server.port>10000</server.port>
     </properties>
@@ -32,6 +32,8 @@
         <module>ping-apt</module>
         <module>ping-distribute</module>
         <module>ping-captcha</module>
+        <module>ping-connect</module>
+        <module>ping-im</module>
     </modules>
 
     <name>Ping 父模块</name>
@@ -96,6 +98,7 @@
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-launcher</artifactId>
+            <version>1.9.0</version>
             <scope>test</scope>
         </dependency>
 
@@ -190,6 +193,12 @@
 
             <dependency>
                 <groupId>cn.procsl</groupId>
+                <artifactId>ping-connect</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.procsl</groupId>
                 <artifactId>ping-product</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -243,7 +252,7 @@
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-annotations</artifactId>
-                <version>2.2.0</version>
+                <version>2.2.2</version>
                 <scope>provided</scope>
             </dependency>
 
@@ -284,7 +293,7 @@
             <dependency>
                 <groupId>org.javassist</groupId>
                 <artifactId>javassist</artifactId>
-                <version>3.29.0-GA</version>
+                <version>3.29.1-GA</version>
             </dependency>
 
             <dependency>
@@ -293,6 +302,12 @@
                 <version>1.0.1</version>
                 <scope>compile</scope>
                 <optional>true</optional>
+            </dependency>
+
+            <dependency>
+                <groupId>io.socket</groupId>
+                <artifactId>socket.io-server</artifactId>
+                <version>4.0.1</version>
             </dependency>
 
         </dependencies>
@@ -471,6 +486,7 @@
     </build>
 
     <profiles>
+
         <profile>
             <id>springboot</id>
             <activation>
@@ -531,6 +547,35 @@
 
             </dependencies>
         </profile>
+
+        <profile>
+            <id>undertow</id>
+            <dependencies>
+
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-undertow</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-web</artifactId>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-starter-tomcat</artifactId>
+                        </exclusion>
+
+                        <exclusion>
+                            <groupId>org.apache.tomcat.embed</groupId>
+                            <artifactId>tomcat-embed-websocket</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+
+            </dependencies>
+        </profile>
+
 
         <profile>
             <id>h2</id>

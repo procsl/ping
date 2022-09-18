@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -14,10 +13,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 @SpringBootTest(classes = TestCommonApplication.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class UniqueValidatorImplTest {
 
-    @Autowired
+    @Inject
     UniqueValidator uniqueValidator;
 
-    @Autowired
+    @Inject
     JpaRepository<Unique, Long> jpaRepository;
     Unique unique;
 

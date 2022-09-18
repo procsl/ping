@@ -8,11 +8,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
 
 @Slf4j
 @DisplayName("用户账户服务单元测试")
@@ -20,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest(classes = TestAdminApplication.class, webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 public class AccountServiceImplTest {
 
-    @Autowired
+    @Inject
     JpaRepository<Account, Long> jpaRepository;
 
     Long gid;

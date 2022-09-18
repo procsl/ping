@@ -73,7 +73,7 @@ public class CommonAutoConfiguration implements ApplicationContextAware {
         filter.setFilter(new AccessLoggerFilter());
         filter.setName("accessLoggerFilter");
         filter.setOrder(Integer.MIN_VALUE);
-        filter.setUrlPatterns(List.of("/v1/*"));
+        filter.setUrlPatterns(List.of("/*"));
         return filter;
     }
 

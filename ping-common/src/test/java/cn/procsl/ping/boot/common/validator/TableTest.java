@@ -5,12 +5,12 @@ import com.github.javafaker.Faker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.inject.Inject;
 import java.util.Locale;
 
 @Slf4j
@@ -19,7 +19,7 @@ import java.util.Locale;
 public class TableTest {
 
     Faker faker = new Faker(Locale.CHINA);
-    @Autowired
+    @Inject
     JpaRepository<Table, Long> jpaRepository;
 
     @Test

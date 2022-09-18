@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+          name="viewport">
+    <meta content="ie=edge" http-equiv="X-UA-Compatible">
+    <title>测试</title>
+</head>
+
+<body>
+<script crossorigin="anonymous"
+        integrity="sha512-VJ6+sp2E5rFQk05caiXXzQd1wBABpjEj1r5kMiLmGAAgwPItw1YpqsCCBtq8Yr1x6C49/mTpRdXtq8O2RcZhlQ=="
+        src="https://lib.baomitu.com/socket.io/4.5.2/socket.io.js"></script>
+
+<div id="msg"></div>
+
+<script>
+    var socket = io("/single");
+    socket.on('chat', function (data) {
+        console.log(data);
+        socket.emit('echo', {my: 'data'})
+    });
+    socket.on('echo', function (data) {
+        console.log(data);
+    });
+</script>
+
+</body>
+</html>
