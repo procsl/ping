@@ -104,7 +104,7 @@ public class AdminAutoConfiguration implements ApplicationContextAware {
     @SneakyThrows
     void permitAllProcess(RequestMappingInfo k, HandlerMethod v,
                           AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry http) {
-        log.debug("Permit URL:{} :{}", k.getMethodsCondition().getMethods(), k.getDirectPaths());
+        log.debug("免登录 URL:{} :{}", k.getMethodsCondition().getMethods(), k.getDirectPaths());
         for (RequestMethod method : k.getMethodsCondition().getMethods()) {
             for (String path : k.getDirectPaths()) {
                 // 这里需要判断动态链接
