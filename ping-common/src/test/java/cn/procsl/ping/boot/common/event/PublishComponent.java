@@ -14,4 +14,15 @@ public class PublishComponent {
         log.info("被调用了");
     }
 
+    @Publisher(name = "love", parameter = "#p0")
+    public void forLiPing(String love) {
+        log.info("ok:{}", love);
+    }
+
+    @Publisher(name = "love", parameter = "#p0 + ' ' + #root[return] ")
+    public String forLiPing2(String love) {
+        log.info("ok:{}", love);
+        return "me too";
+    }
+
 }

@@ -23,9 +23,9 @@ public class SubscribeMethod {
         log.info("方法被调用2:{}", eventObject);
     }
 
-    @Subscriber(name = "test", order = 3)
+    @Subscriber(name = "love", order = 3)
     public void onEvent3(String parameters) {
-        log.info("方法被调用3:{}", parameters);
+        log.info("接受:{}", parameters);
     }
 
     @Subscriber(name = "test", order = 4)
