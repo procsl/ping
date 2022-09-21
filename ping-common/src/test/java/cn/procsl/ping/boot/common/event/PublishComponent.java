@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PublishComponent {
 
     @Transactional
-    @Publish(name = "test", parameter = "静态参数")
+    @Publisher(name = "test", parameter = "静态参数")
     public void callable() {
         log.info("被调用了");
     }

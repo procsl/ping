@@ -269,20 +269,6 @@
             </dependency>
 
             <dependency>
-                <groupId>com.speedment.jpastreamer</groupId>
-                <artifactId>jpastreamer-core</artifactId>
-                <version>${jpa-streamer-version}</version>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>com.speedment.jpastreamer.integration.spring</groupId>
-                <artifactId>spring-boot-jpastreamer-autoconfigure</artifactId>
-                <version>${jpa-streamer-version}</version>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
                 <groupId>com.github.wenhao</groupId>
                 <artifactId>jpa-spec</artifactId>
                 <version>3.2.5</version>

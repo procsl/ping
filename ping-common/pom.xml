@@ -23,16 +23,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.speedment.jpastreamer</groupId>
-            <artifactId>jpastreamer-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.speedment.jpastreamer.integration.spring</groupId>
-            <artifactId>spring-boot-jpastreamer-autoconfigure</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>com.github.wenhao</groupId>
             <artifactId>jpa-spec</artifactId>
         </dependency>

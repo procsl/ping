@@ -10,11 +10,13 @@ public class SingleChatRoom {
 
     @Namespace.Event("message")
     public void chat(SocketIoSocket socket, Object... args) {
-        log.info("收到消息:{}, {}", socket, args);
+        log.info("收到消息:{}, {}, {}, {}, {}", socket, args, socket.getConnectData(), socket.getInitialHeaders(),
+                socket.getInitialQuery());
+        socket.disconnect(false);
     }
 
     @Namespace.Connect
-    public void connect() {
+    public void connect(SocketIoSocket socket) {
         log.info("客户端已连接");
     }
 

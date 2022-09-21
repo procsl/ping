@@ -48,7 +48,8 @@ public class AccessLoggerFilter extends AbstractRequestLoggingFilter implements 
 //            logger.warn("初始化日志信息异常:", e);
 //        }
 
-        log.info("HTTP request remote host: [{}] address: [{}]", request.getRemoteHost(), request.getRemoteAddr());
+        log.debug("HTTP request [{}] remote host: [{}] address: [{}]", request.getRequestURI(), request.getRemoteHost(),
+                request.getRemoteAddr());
         response.setHeader(traceName, MDC.get("RequestId"));
         super.doFilterInternal(request, response, filterChain);
     }

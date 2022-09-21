@@ -2,8 +2,7 @@ package cn.procsl.ping.boot.common.invoker;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-
-import java.lang.reflect.InvocationTargetException;
+import org.springframework.util.ReflectionUtils;
 
 @Slf4j
 public final class SimpleHandlerInvoker<T extends HandlerInvokerContext> implements
@@ -20,19 +19,8 @@ public final class SimpleHandlerInvoker<T extends HandlerInvokerContext> impleme
 
     @Override
     public Object invoke(Object... args) {
-
-        Object result;
-        try {
-            Object[] newArgs = this.resolver.resolveArgument(context, args);
-            result = context.getMethod().invoke(context.getHandler(), newArgs);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            log.error("方法调用失败:", e);
-            throw new RuntimeException(e);
-        } catch (IllegalArgumentException e) {
-            log.error("参数解析错误:", e);
-            throw e;
-        }
-        return result;
+        Object[] newArgs = this.resolver.resolveArgument(context, args);
+        return ReflectionUtils.invokeMethod(this.context.getMethod(), this.getContext().getHandler(), newArgs);
     }
 
 

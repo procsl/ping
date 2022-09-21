@@ -18,13 +18,13 @@ import java.util.Collection;
 @Slf4j
 public final class SocketIOServerBuilder {
 
-    final ProxyNamespaceEventHandlerResolverLoader handlerResolverLoader =
-            new ProxyNamespaceEventHandlerResolverLoader();
+    final NamespaceEventHandlerResolverLoader handlerResolverLoader =
+            new NamespaceEventHandlerResolverLoader();
     EngineIoServerOptions config = EngineIoServerOptions.newFromDefault();
     EngineIoServer server;
     SocketIoServer socketIoServer;
     Collection<Object> handlers = new ArrayList<>();
-    ProxyArgumentResolverLoader argumentResolver = new ProxyArgumentResolverLoader();
+    ArgumentResolverLoader argumentResolver = new ArgumentResolverLoader();
 
     MultiScannerAnnotationHandlerResolver scannerAnnotationHandlerResolver;
 
@@ -40,7 +40,7 @@ public final class SocketIOServerBuilder {
         if (namespace == null) {
             throw new IllegalStateException("@Namespace annotation not found!");
         } else {
-            log.info("init namespace: {}", handler.getClass());
+            log.info("Init namespace: {}", handler.getClass());
         }
         return socketIoServer.namespace(namespace.name());
     }

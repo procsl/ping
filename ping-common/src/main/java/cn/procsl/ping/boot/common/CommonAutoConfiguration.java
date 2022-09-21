@@ -1,5 +1,7 @@
 package cn.procsl.ping.boot.common;
 
+import cn.procsl.ping.boot.common.advice.AnnotationPointcutAdvisor;
+import cn.procsl.ping.boot.common.event.*;
 import cn.procsl.ping.boot.common.utils.ContextHolder;
 import cn.procsl.ping.boot.common.validator.UniqueValidator;
 import cn.procsl.ping.boot.common.validator.UniqueValidatorImpl;
@@ -67,7 +69,8 @@ public class CommonAutoConfiguration implements ApplicationContextAware {
 
     }
 
-    @Bean
+    @Bean("accessLoggerFilterBean")
+    @ConditionalOnMissingBean(name = "accessLoggerFilterBean")
     public FilterRegistrationBean<AccessLoggerFilter> accessLoggerFilterFilterRegistrationBean() {
         FilterRegistrationBean<AccessLoggerFilter> filter = new FilterRegistrationBean<>();
         filter.setFilter(new AccessLoggerFilter());
@@ -75,6 +78,25 @@ public class CommonAutoConfiguration implements ApplicationContextAware {
         filter.setOrder(Integer.MIN_VALUE);
         filter.setUrlPatterns(List.of("/*"));
         return filter;
+    }
+
+
+    @Bean(name = "publishAnnotationPointcutAdvisor")
+    public AnnotationPointcutAdvisor publishAnnotationPointcutAdvisor(EventBusBridge eventBusBridge) {
+        PublisherMethodInterceptor interceptor = new PublisherMethodInterceptor(eventBusBridge);
+        return AnnotationPointcutAdvisor.forAnnotation(Publisher.class, interceptor);
+    }
+
+    @Bean
+    public SubscriberMethodRegister subscribeMethodRegister(EventBusBridge eventBusBridge,
+                                                            ApplicationContext context) {
+        return new SubscriberMethodRegister(eventBusBridge, context);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public EventBusBridge eventBusBridge(ApplicationContext applicationContext) {
+        return new SpringEventBusBridge(applicationContext);
     }
 
 }
