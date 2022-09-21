@@ -36,7 +36,7 @@ public class SpringEventBusBridge implements EventBusBridge,
     }
 
     @Override
-    public void subscribe(String name, Consumer<EventObject> consumer) {
+    public void subscriber(String name, Consumer<EventObject> consumer) {
         this.tasks.computeIfAbsent(name, s -> new ConcurrentLinkedQueue<>());
         final ConcurrentLinkedQueue<Consumer<EventObject>> callbacks = this.tasks.get(name);
         callbacks.add(consumer);

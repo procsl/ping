@@ -56,7 +56,7 @@ public final class SubscriberMethodRegister implements SmartInitializingSingleto
                     Subscriber annotation = item.getContext().getAnnotation(Subscriber.class);
                     log.debug("注册:[{}]订阅 -> [{}#{}]", annotation.name(), item.getContext().getHandler().getClass(),
                             item.getContext().getMethod().getName());
-                    this.eventBusBridge.subscribe(annotation.name(), item::invoke);
+                    this.eventBusBridge.subscriber(annotation.name(), item::invoke);
                 });
     }
 

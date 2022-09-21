@@ -8,6 +8,6 @@ public interface EventBusBridge {
 
     String publisher(String name, Serializable parameters) throws EventPublishException;
 
-    void subscribe(String name, Consumer<EventObject> consumer);
+    void subscriber(String name, Consumer<EventObject> consumer);
 
 }

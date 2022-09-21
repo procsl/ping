@@ -24,14 +24,16 @@ public class SpringEventBusBridgeTest {
     @Test
     @Order(1)
     public void publisher() {
-        eventBusBridge.publisher("测试", "参数1, 参数2");
-        eventBusBridge.publisher("test", "来自注解的参数");
+        String id = eventBusBridge.publisher("测试", "参数1, 参数2");
+        log.info("事件ID:{}", id);
+        id = eventBusBridge.publisher("test", "来自注解的参数");
+        log.info("事件ID:{}", id);
     }
 
     @Test
     @Order(0)
     public void subscribe() {
-        this.eventBusBridge.subscribe("测试", serializable -> {
+        this.eventBusBridge.subscriber("测试", serializable -> {
             log.info("成功执行了:{}", serializable);
         });
     }
