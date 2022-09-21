@@ -40,7 +40,7 @@ final class ArgumentResolverLoader extends AbstractServiceProxyLoader<SocketIOHa
     }
 
     Object resolveParameter(SocketIOConnectContext context, int i, Parameter parameters, Object[] args) {
-        for (SocketIOHandlerArgumentResolver resolver : this.service) {
+        for (SocketIOHandlerArgumentResolver resolver : this.getService()) {
             if (!resolver.supportsParameter(context, i, parameters, args)) {
                 continue;
             }

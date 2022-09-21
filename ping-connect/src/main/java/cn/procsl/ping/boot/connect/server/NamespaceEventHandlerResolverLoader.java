@@ -17,12 +17,12 @@ final class NamespaceEventHandlerResolverLoader extends
     }
 
     public Collection<Class<? extends Annotation>> getNamespaceAnnotations() {
-        return this.service.stream().map(NamespaceEventHandlerResolver::getNamespaceAnnotation)
-                           .collect(Collectors.toSet());
+        return this.getService().stream().map(NamespaceEventHandlerResolver::getNamespaceAnnotation)
+                   .collect(Collectors.toSet());
     }
 
     public void processor(SocketIOConnectContext invokeContext, HandlerInvoker<SocketIOConnectContext> func) {
-        for (NamespaceEventHandlerResolver resolver : this.service) {
+        for (NamespaceEventHandlerResolver resolver : this.getService()) {
             boolean isSupport = resolver.support(invokeContext.getAnnotation());
             if (!isSupport) {
                 continue;

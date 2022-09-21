@@ -6,6 +6,7 @@ import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
 import cn.procsl.ping.boot.common.dto.MessageDTO;
 import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.common.error.ErrorCode;
+import cn.procsl.ping.boot.common.event.Publisher;
 import cn.procsl.ping.boot.common.utils.ObjectUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -62,6 +63,7 @@ public class SessionController {
     @PostMapping(value = "/v1/session")
     @VerifyCaptcha(type = CaptchaType.image)
     @Operation(summary = "用户登录", operationId = "authenticate")
+    @Publisher(name = "cn.procsl.ping.admin.user-login", parameter = "#{details.account}")
     public SessionUserDetail createSession(HttpServletRequest request, HttpServletResponse response,
                                            @Validated @RequestBody LoginDetailDTO details)
             throws ServletException, IOException {
@@ -91,6 +93,7 @@ public class SessionController {
     @ResponseBody
     @DeleteMapping("/v1/session")
     @Operation(summary = "用户注销", operationId = "logout")
+    @Publisher(name = "cn.procsl.ping.admin.user-logout", parameter = "#{session.account}")
     public MessageDTO deleteSession(HttpServletRequest request, HttpServletResponse response) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         this.authenticationProcessing.logout(request, response, authentication);
