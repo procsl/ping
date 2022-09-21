@@ -35,23 +35,23 @@ public final class PublisherMethodInterceptor extends AbstractMethodInterceptor<
                 try {
                     returnedValue = invocation.proceed();
                 } finally {
-                    publish(publisher, invocation, returnedValue);
+                    publisher(publisher, invocation, returnedValue);
                 }
             case complete:
                 returnedValue = invocation.proceed();
-                publish(publisher, invocation, returnedValue);
+                publisher(publisher, invocation, returnedValue);
             case error:
                 try {
                     returnedValue = invocation.proceed();
                 } catch (Exception e) {
-                    publish(publisher, invocation, returnedValue);
+                    publisher(publisher, invocation, returnedValue);
                     throw e;
                 }
         }
         return returnedValue;
     }
 
-    void publish(Publisher publisher, MethodInvocation invocation, Object returnedValue) {
+    void publisher(Publisher publisher, MethodInvocation invocation, Object returnedValue) {
         try {
 
             Serializable parameter = publisher.parameter();
@@ -81,7 +81,6 @@ public final class PublisherMethodInterceptor extends AbstractMethodInterceptor<
 
     Object evaluation(Publisher publisher, MethodInvocation invocation, Object returnValue) {
         String param = publisher.parameter();
-//        param = param.replaceAll("return", "#root[return]");
         Object root = getRoot(returnValue);
         StandardReflectionParameterNameDiscoverer discoverer = new StandardReflectionParameterNameDiscoverer();
         EvaluationContext context = new MethodBasedEvaluationContext(root, invocation.getMethod(),
