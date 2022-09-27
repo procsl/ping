@@ -7,10 +7,7 @@ import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactor
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.task.AsyncTaskExecutor;
-import org.springframework.core.task.support.TaskExecutorAdapter;
 
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
@@ -25,13 +22,6 @@ public class WebServerSSLConfigure implements WebServerFactoryCustomizer<TomcatS
         ThreadFactory threadFactory = Thread.ofVirtual().name("virtual-", 0).factory();
         factory.addProtocolHandlerCustomizers(protocolHandler -> protocolHandler.setExecutor(
                 Executors.newThreadPerTaskExecutor(new ThreadFactoryWrapper(threadFactory))));
-    }
-
-    @Bean
-    public AsyncTaskExecutor applicationTaskExecutor() {
-        ThreadFactory threadFactory = Thread.ofVirtual().name("async-task-", 0).factory();
-        ExecutorService execute = Executors.newThreadPerTaskExecutor(new ThreadFactoryWrapper(threadFactory));
-        return new TaskExecutorAdapter(execute);
     }
 
     @Bean

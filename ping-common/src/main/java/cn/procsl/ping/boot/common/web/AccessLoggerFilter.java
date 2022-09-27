@@ -25,7 +25,6 @@ public class AccessLoggerFilter extends AbstractRequestLoggingFilter implements 
 
     @Override
     protected void beforeRequest(@NonNull HttpServletRequest request, @NonNull String message) {
-        getServletContext().log(message);
     }
 
     @Override
@@ -58,6 +57,5 @@ public class AccessLoggerFilter extends AbstractRequestLoggingFilter implements 
 
     @Override
     protected void afterRequest(@NonNull HttpServletRequest request, @NonNull String message) {
-        getServletContext().log(message);
     }
 }

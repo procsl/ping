@@ -3,6 +3,7 @@ package cn.procsl.ping.boot.admin.domain.rbac;
 import cn.procsl.ping.boot.common.error.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Indexed;
@@ -130,6 +131,7 @@ public class AccessControlService {
      * @param <T>     转换类型
      * @return 返回被转换后的类型
      */
+    @Cacheable(cacheNames = "cn.procsl.ping.subject.http.permissions", key = "#subject")
     @Transactional(readOnly = true)
     public <T> Collection<T> loadPermissions(Long subject, Function<Permission, T> convert) {
         Collection<Permission> tmp = this.loadPermissions(subject);

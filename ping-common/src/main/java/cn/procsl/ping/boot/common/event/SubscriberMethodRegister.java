@@ -9,7 +9,6 @@ import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.context.ApplicationContext;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Map;
 
 @Slf4j
@@ -38,7 +37,7 @@ public final class SubscriberMethodRegister implements SmartInitializingSingleto
         }
 
         Collection<Object> beans = annotations.values();
-        ScannerAnnotationHandlerResolver scanner = new ScannerAnnotationHandlerResolver(Subscriber.class);
+        ScannerAnnotationHandlerResolver scanner = new ScannerAnnotationHandlerResolver(Subscribers.class);
         for (Object bean : beans) {
             resolver(scanner, bean);
         }
@@ -51,12 +50,17 @@ public final class SubscriberMethodRegister implements SmartInitializingSingleto
         Collection<AnnotationHandlerInvokerContext> contexts = scanner.resolve(bean);
         contexts.stream()
                 .map(item -> new SimpleHandlerInvoker<>(item, this.resolver))
-                .sorted(Comparator.comparingInt(pre -> pre.getContext().getAnnotation(Subscriber.class).order()))
                 .forEach(item -> {
-                    Subscriber annotation = item.getContext().getAnnotation(Subscriber.class);
-                    log.debug("注册:[{}]订阅 -> [{}#{}]", annotation.name(), item.getContext().getHandler().getClass(),
-                            item.getContext().getMethod().getName());
-                    this.eventBusBridge.subscriber(annotation.name(), item::invoke);
+                    Subscribers annotation = item.getContext().getAnnotation(Subscribers.class);
+                    if (annotation.value() == null || annotation.value().length == 0) {
+                        return;
+                    }
+                    for (Subscriber subscriber : annotation.value()) {
+                        log.debug("注册:[{}]订阅 -> [{}#{}]", subscriber.name(),
+                                item.getContext().getHandler().getClass(),
+                                item.getContext().getMethod().getName());
+                        this.eventBusBridge.subscriber(subscriber.name(), item::invoke);
+                    }
                 });
     }
 

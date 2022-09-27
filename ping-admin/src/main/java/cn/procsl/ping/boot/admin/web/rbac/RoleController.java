@@ -6,6 +6,7 @@ import cn.procsl.ping.boot.admin.domain.rbac.QRole;
 import cn.procsl.ping.boot.admin.domain.rbac.Role;
 import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.common.error.ExceptionResolver;
+import cn.procsl.ping.boot.common.event.Publisher;
 import cn.procsl.ping.boot.common.utils.QueryBuilder;
 import cn.procsl.ping.boot.common.validator.UniqueValidator;
 import cn.procsl.ping.boot.common.web.FormatPage;
@@ -26,15 +27,19 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;
 import java.util.List;
+
+import static cn.procsl.ping.boot.admin.constant.EventPublisherConstant.*;
 
 @Indexed
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "roles", description = "角色管理模块")
 public class RoleController {
+
 
     final JpaRepository<Role, Long> roleRepository;
 
@@ -52,8 +57,9 @@ public class RoleController {
     @Transactional
     @PostMapping("/v1/roles")
     @Operation(summary = "创建角色")
+    @Publisher(name = ROLE_CREATE_EVENT, parameter = "#details.name")
+    @ExceptionResolver(matcher = ConstraintViolationException.class, message = "角色已存在")
     public RoleVO createRole(@Validated @RequestBody RoleGrantDTO details) throws BusinessException {
-        uniqueValidator.valid(Role.class, null, "name", details.getName(), "角色已存在");
         List<Permission> permissions = this.permissionJpaRepository.findAllById(details.getPermissions());
         Role entity = new Role(details.getName(), permissions);
         roleRepository.save(entity);
@@ -63,7 +69,8 @@ public class RoleController {
     @Transactional
     @Operation(summary = "删除角色")
     @DeleteMapping("/v1/roles/{id}")
-    @ExceptionResolver(message = "该角色正在使用中,无法删除")
+    @ExceptionResolver(message = "该角色正在使用中,无法删除", code = "409001")
+    @Publisher(name = ROLE_DELETE_EVENT, parameter = "#id")
     public void deleteRole(@PathVariable Long id) throws BusinessException {
         this.roleRepository.deleteById(id);
     }
@@ -71,6 +78,7 @@ public class RoleController {
     @Transactional
     @PatchMapping("/v1/roles/{id}")
     @Operation(summary = "修改指定角色信息")
+    @Publisher(name = ROLE_CHANGED_EVENT, parameter = "#id")
     public void changeRole(@PathVariable("id") Long id,
                            @Validated({Default.class}) @RequestBody @NotNull RoleGrantDTO details)
             throws BusinessException {

@@ -1,6 +1,7 @@
 package cn.procsl.ping.boot.admin;
 
 import cn.procsl.ping.boot.admin.auth.access.FailureAuthenticationHandler;
+import cn.procsl.ping.boot.admin.auth.access.GrantedAuthorityLoader;
 import cn.procsl.ping.boot.admin.auth.access.HttpAuthorizationManager;
 import cn.procsl.ping.boot.admin.domain.conf.ConfigOptionService;
 import cn.procsl.ping.boot.admin.domain.rbac.AccessControlService;
@@ -51,9 +52,18 @@ import java.util.Map;
 @ConditionalOnMissingBean({AdminAutoConfiguration.class})
 @EntityScan(basePackages = "cn.procsl.ping.boot.admin.domain")
 @EnableJpaRepositories(basePackages = "cn.procsl.ping.boot.admin.domain", bootstrapMode = BootstrapMode.LAZY)
-@ComponentScan(basePackages = {"cn.procsl.ping.boot.admin.web", "cn.procsl.ping.boot.admin.service", "cn.procsl.ping" +
-        ".boot.admin.listener", "cn.procsl.ping.boot.admin.adapter"}, basePackageClasses = {ConfigOptionService.class
-        , AccessControlService.class, RoleSettingService.class, UserRegisterService.class})
+@ComponentScan(basePackages = {
+        "cn.procsl.ping.boot.admin.web",
+        "cn.procsl.ping.boot.admin.service",
+        "cn.procsl.ping.boot.admin.listener",
+        "cn.procsl.ping.boot.admin.adapter"
+},
+        basePackageClasses = {
+                ConfigOptionService.class,
+                AccessControlService.class,
+                RoleSettingService.class,
+                UserRegisterService.class
+        })
 public class AdminAutoConfiguration implements ApplicationContextAware {
 
     protected ApplicationContext context;
@@ -61,8 +71,9 @@ public class AdminAutoConfiguration implements ApplicationContextAware {
 
     @Bean
     @ConditionalOnMissingBean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   WebApplicationContext webApplicationContext)
+    public SecurityFilterChain securityFilterChain(@NonNull HttpSecurity http,
+                                                   WebApplicationContext webApplicationContext,
+                                                   GrantedAuthorityLoader loader)
             throws Exception {
 
         val requests = http.authorizeHttpRequests();
@@ -71,7 +82,7 @@ public class AdminAutoConfiguration implements ApplicationContextAware {
 
         // 以下链接校验URL权限
         requests.antMatchers("/v1/**")
-                .access(new HttpAuthorizationManager());
+                .access(new HttpAuthorizationManager(loader));
 
         // 无权限处理
         FailureAuthenticationHandler handler = this.context.getBean(FailureAuthenticationHandler.class);
@@ -88,7 +99,7 @@ public class AdminAutoConfiguration implements ApplicationContextAware {
         return http.build();
     }
 
-    void permitAllConfig(WebApplicationContext webApplicationContext,
+    void permitAllConfig(@NonNull WebApplicationContext webApplicationContext,
                          AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry http) {
         Map<String, RequestMappingHandlerMapping> mappings = webApplicationContext.getBeansOfType(
                 RequestMappingHandlerMapping.class);
@@ -102,7 +113,7 @@ public class AdminAutoConfiguration implements ApplicationContextAware {
     }
 
     @SneakyThrows
-    void permitAllProcess(RequestMappingInfo k, HandlerMethod v,
+    void permitAllProcess(@NonNull RequestMappingInfo k, HandlerMethod v,
                           AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry http) {
         log.debug("免登录 URL:{} :{}", k.getMethodsCondition().getMethods(), k.getDirectPaths());
         for (RequestMethod method : k.getMethodsCondition().getMethods()) {

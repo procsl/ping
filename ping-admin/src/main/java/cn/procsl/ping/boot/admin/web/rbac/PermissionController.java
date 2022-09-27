@@ -4,6 +4,7 @@ import cn.procsl.ping.boot.admin.domain.rbac.Permission;
 import cn.procsl.ping.boot.admin.domain.rbac.QPermission;
 import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.common.error.ExceptionResolver;
+import cn.procsl.ping.boot.common.event.Publisher;
 import cn.procsl.ping.boot.common.utils.QueryBuilder;
 import cn.procsl.ping.boot.common.web.FormatPage;
 import cn.procsl.ping.boot.common.web.MarkPageable;
@@ -20,6 +21,8 @@ import org.springframework.stereotype.Indexed;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import static cn.procsl.ping.boot.admin.constant.EventPublisherConstant.*;
 
 
 @Indexed
@@ -39,6 +42,7 @@ public class PermissionController {
     @Transactional
     @PostMapping("/v1/permissions")
     @Operation(summary = "创建权限", operationId = "createPermission")
+    @Publisher(name = PERMISSION_CREATE_EVENT, parameter = "#id")
     public PermissionVO create(@Validated @RequestBody PermissionCreateDTO permission) throws BusinessException {
         Permission entity = permission.convert();
         permissionJpaRepository.save(entity);
@@ -49,6 +53,7 @@ public class PermissionController {
     @Operation(summary = "删除权限", operationId = "deletePermission")
     @DeleteMapping("/v1/permissions/{id}")
     @ExceptionResolver(message = "该角色已被关联, 角色删除失败", code = "409001", matcher = DataIntegrityViolationException.class)
+    @Publisher(name = PERMISSION_DELETE_EVENT, parameter = "#id")
     public void delete(@PathVariable Long id) throws BusinessException {
         this.permissionJpaRepository.deleteById(id);
     }
@@ -56,6 +61,7 @@ public class PermissionController {
     @Transactional
     @PatchMapping("/v1/permissions/{id}")
     @Operation(summary = "更新权限", operationId = "updatePermission")
+    @Publisher(name = PERMISSION_UPDATE_EVENT, parameter = "#id")
     public void update(@PathVariable Long id, @Validated @RequestBody PermissionUpdateDTO permission)
             throws BusinessException {
         permissionJpaRepository.getReferenceById(id)

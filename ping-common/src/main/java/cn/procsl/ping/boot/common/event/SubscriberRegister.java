@@ -7,7 +7,9 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
+@Inherited
 @Component
 public @interface SubscriberRegister {
+
 
 }

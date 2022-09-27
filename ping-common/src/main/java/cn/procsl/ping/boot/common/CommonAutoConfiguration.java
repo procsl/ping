@@ -14,6 +14,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -29,6 +30,7 @@ import org.springframework.data.repository.config.BootstrapMode;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -82,8 +84,9 @@ public class CommonAutoConfiguration implements ApplicationContextAware {
 
 
     @Bean(name = "publishAnnotationPointcutAdvisor")
-    public AnnotationPointcutAdvisor publishAnnotationPointcutAdvisor(EventBusBridge eventBusBridge) {
-        PublisherMethodInterceptor interceptor = new PublisherMethodInterceptor(eventBusBridge);
+    public AnnotationPointcutAdvisor publishAnnotationPointcutAdvisor(EventBusBridge eventBusBridge,
+                                                                      @Autowired(required = false) Collection<PublisherRootAttributeConfigurer> configurers) {
+        PublisherMethodInterceptor interceptor = new PublisherMethodInterceptor(eventBusBridge, configurers);
         return AnnotationPointcutAdvisor.forAnnotation(Publisher.class, interceptor);
     }
 

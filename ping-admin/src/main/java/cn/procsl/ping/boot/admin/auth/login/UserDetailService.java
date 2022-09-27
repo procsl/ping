@@ -1,7 +1,6 @@
 package cn.procsl.ping.boot.admin.auth.login;
 
 import cn.procsl.ping.boot.admin.domain.rbac.AccessControlService;
-import cn.procsl.ping.boot.admin.domain.rbac.Permission;
 import cn.procsl.ping.boot.admin.domain.user.User;
 import cn.procsl.ping.boot.admin.domain.user.UserSpecification;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Indexed;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
 import java.util.Optional;
 
 @Slf4j
@@ -33,8 +31,7 @@ public class UserDetailService implements UserDetailsService {
         Optional<User> optional = userJpaSpecificationExecutor.findOne(new UserSpecification(username));
         User user = optional.orElseThrow(() -> new UsernameNotFoundException("账户不存在!", null));
         // 加载所有权限
-        Collection<Permission> permissions = accessControlService.loadPermissions(user.getId());
-        return new SessionUserDetail(user, permissions);
+        return new SessionUserDetail(user);
     }
 
 

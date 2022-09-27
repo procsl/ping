@@ -12,6 +12,7 @@ import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,9 +23,18 @@ public final class PublisherMethodInterceptor extends AbstractMethodInterceptor<
 
     final ExpressionParser parser = new SpelExpressionParser();
 
-    public PublisherMethodInterceptor(EventBusBridge eventBusBridge) {
+    final Map<String, Object> rootAttributes = new HashMap<>();
+
+    public PublisherMethodInterceptor(EventBusBridge eventBusBridge,
+                                      Collection<PublisherRootAttributeConfigurer> configurers) {
         super(Publisher.class);
         this.eventBusBridge = eventBusBridge;
+        if (configurers == null || configurers.isEmpty()) {
+            return;
+        }
+        for (PublisherRootAttributeConfigurer configurer : configurers) {
+            rootAttributes.putAll(configurer.getAttributes());
+        }
     }
 
     @Override
@@ -37,16 +47,19 @@ public final class PublisherMethodInterceptor extends AbstractMethodInterceptor<
                 } finally {
                     publisher(publisher, invocation, returnedValue);
                 }
+                break;
             case complete:
                 returnedValue = invocation.proceed();
                 publisher(publisher, invocation, returnedValue);
+                break;
             case error:
                 try {
                     returnedValue = invocation.proceed();
                 } catch (Exception e) {
-                    publisher(publisher, invocation, returnedValue);
+                    publisher(publisher, invocation, null);
                     throw e;
                 }
+                break;
         }
         return returnedValue;
     }
@@ -60,8 +73,8 @@ public final class PublisherMethodInterceptor extends AbstractMethodInterceptor<
                 return;
             }
 
-            boolean isSpel = publisher.parameter().startsWith("#") || publisher.parameter().startsWith("$");
-            if (!isSpel) {
+            boolean isSpringEL = publisher.parameter().startsWith("#") || publisher.parameter().startsWith("$");
+            if (!isSpringEL) {
                 eventBusBridge.publisher(publisher.name(), parameter);
                 return;
             }
@@ -81,26 +94,13 @@ public final class PublisherMethodInterceptor extends AbstractMethodInterceptor<
 
     Object evaluation(Publisher publisher, MethodInvocation invocation, Object returnValue) {
         String param = publisher.parameter();
-        Object root = getRoot(returnValue);
         StandardReflectionParameterNameDiscoverer discoverer = new StandardReflectionParameterNameDiscoverer();
-        EvaluationContext context = new MethodBasedEvaluationContext(root, invocation.getMethod(),
+        EvaluationContext context = new MethodBasedEvaluationContext(this.rootAttributes, invocation.getMethod(),
                 invocation.getArguments(), discoverer);
+        context.setVariable("return", returnValue);
         Expression exp = this.parser.parseExpression(param);
         Object value = exp.getValue(context);
         log.debug("表达式:[{}], 值:[{}]", param, value);
         return value;
     }
-
-    Object getRoot(Object returnValue) {
-        Object root;
-        if (returnValue != null) {
-            root = Map.of("return", returnValue);
-        } else {
-            HashMap<String, Object> map = new HashMap<>();
-            map.put("return", null);
-            root = map;
-        }
-        return root;
-    }
-
 }

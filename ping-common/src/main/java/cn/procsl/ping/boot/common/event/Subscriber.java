@@ -5,11 +5,11 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
+@Inherited
+@Repeatable(value = Subscribers.class)
 public @interface Subscriber {
 
     String name();
-
-    int order() default 0;
 
     @Documented
     @Retention(RetentionPolicy.RUNTIME)

@@ -30,8 +30,8 @@ public class SpringEventBusBridge implements EventBusBridge,
     @Override
     public String publisher(String name, Serializable parameters) {
         String eventId = UUID.randomUUID().toString().replaceAll("-", "");
+        log.debug("开始发布事件:[{}] 名称:[{}], 参数:[{}]", eventId, name, parameters);
         context.publishEvent(new InnerListenerEvent(eventId, name, parameters));
-        log.debug("发布事件ID:[{}] 名称:[{}], 参数:[{}]", eventId, name, parameters);
         return eventId;
     }
 
@@ -40,7 +40,7 @@ public class SpringEventBusBridge implements EventBusBridge,
         this.tasks.computeIfAbsent(name, s -> new ConcurrentLinkedQueue<>());
         final ConcurrentLinkedQueue<Consumer<EventObject>> callbacks = this.tasks.get(name);
         callbacks.add(consumer);
-        log.info("添加事件订阅成功:{}", name);
+        log.info("注册事件订阅:{}", name);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class SpringEventBusBridge implements EventBusBridge,
             log.trace("未找到事件:{}", event.getName());
             return;
         }
-        log.debug("开始执行事件ID[{}], 名称:[{}], 任务数量:[{}]", event.getId(), event.getName(), callbacks.size());
+        log.debug("开始执行事件[{}], 名称:[{}], 任务数量:[{}]", event.getId(), event.getName(), callbacks.size());
         for (Consumer<EventObject> consumer : callbacks) {
             try {
                 consumer.accept(event);

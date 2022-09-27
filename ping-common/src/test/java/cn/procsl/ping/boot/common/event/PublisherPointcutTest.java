@@ -17,6 +17,15 @@ public class PublisherPointcutTest {
     @Test
     public void matches() {
         publishComponent.callable();
+    }
+
+    @Test
+    public void matches3() {
+        publishComponent.callable1();
+    }
+
+    @Test
+    public void matches2() {
         publishComponent.forLiPing("forever");
         publishComponent.forLiPing2("forever");
     }

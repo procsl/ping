@@ -1,5 +1,9 @@
 package cn.procsl.ping.boot.admin.auth.access;
 
+import cn.procsl.ping.boot.admin.auth.login.SessionUserDetail;
+import cn.procsl.ping.boot.admin.domain.rbac.HttpPermission;
+import cn.procsl.ping.boot.admin.domain.rbac.HttpServletPermissionMatcherService;
+import cn.procsl.ping.boot.admin.domain.rbac.PermissionMatcherService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
@@ -7,7 +11,6 @@ import org.springframework.security.authentication.AuthenticationTrustResolverIm
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 
 import java.util.Collection;
@@ -23,6 +26,10 @@ public class HttpAuthorizationManager implements AuthorizationManager<RequestAut
 
     final AuthenticationTrustResolver authenticationTrustResolver = new AuthenticationTrustResolverImpl();
 
+    final PermissionMatcherService<HttpPermission> permissionMatcherService = new HttpServletPermissionMatcherService();
+
+    final GrantedAuthorityLoader grantedAuthorityLoader;
+
     @Override
     public AuthorizationDecision check(Supplier<Authentication> authentication, RequestAuthorizationContext context) {
 
@@ -36,17 +43,15 @@ public class HttpAuthorizationManager implements AuthorizationManager<RequestAut
             return accessDenied;
         }
 
-        Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
-
-        for (GrantedAuthority authority : authorities) {
-            boolean bool = authority instanceof HttpGrantedAuthority;
+        if (auth.isAuthenticated() && auth.getPrincipal() instanceof SessionUserDetail) {
+            SessionUserDetail pric = (SessionUserDetail) auth.getPrincipal();
+            Long subject = pric.getId();
+            Collection<HttpPermission> permissions = this.grantedAuthorityLoader.getPermissions(subject);
+            boolean bool = permissionMatcherService.matcher(context.getRequest(), permissions).isEmpty();
             if (!bool) {
-                continue;
+                return this.accessAllow;
             }
-
-            if (((HttpGrantedAuthority) authority).matcher(context.getRequest())) {
-                return accessAllow;
-            }
+            return this.accessDenied;
         }
 
         return accessDenied;

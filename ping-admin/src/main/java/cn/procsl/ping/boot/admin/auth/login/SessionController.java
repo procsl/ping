@@ -7,12 +7,12 @@ import cn.procsl.ping.boot.common.dto.MessageDTO;
 import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.common.error.ErrorCode;
 import cn.procsl.ping.boot.common.event.Publisher;
+import cn.procsl.ping.boot.common.event.PublisherRootAttributeConfigurer;
 import cn.procsl.ping.boot.common.utils.ObjectUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
@@ -21,6 +21,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Indexed;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +31,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import static cn.procsl.ping.boot.admin.constant.EventPublisherConstant.USER_LOGIN;
+import static cn.procsl.ping.boot.admin.constant.EventPublisherConstant.USER_LOGOUT;
 
 
 @Slf4j
@@ -43,9 +49,6 @@ public class SessionController {
     final AuthenticationTrustResolver authenticationTrustResolver = new AuthenticationTrustResolverImpl();
 
     final AuthenticationProcessing authenticationProcessing;
-
-    @Value("${server.error.path:/error}")
-    String url;
 
     @ResponseBody
     @GetMapping("/v1/session")
@@ -63,7 +66,7 @@ public class SessionController {
     @PostMapping(value = "/v1/session")
     @VerifyCaptcha(type = CaptchaType.image)
     @Operation(summary = "用户登录", operationId = "authenticate")
-    @Publisher(name = "cn.procsl.ping.admin.user-login", parameter = "#{details.account}")
+    @Publisher(name = USER_LOGIN, parameter = "#details.account")
     public SessionUserDetail createSession(HttpServletRequest request, HttpServletResponse response,
                                            @Validated @RequestBody LoginDetailDTO details)
             throws ServletException, IOException {
@@ -93,7 +96,7 @@ public class SessionController {
     @ResponseBody
     @DeleteMapping("/v1/session")
     @Operation(summary = "用户注销", operationId = "logout")
-    @Publisher(name = "cn.procsl.ping.admin.user-logout", parameter = "#{session.account}")
+    @Publisher(name = USER_LOGOUT, parameter = "#root[currentAccount].get()")
     public MessageDTO deleteSession(HttpServletRequest request, HttpServletResponse response) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         this.authenticationProcessing.logout(request, response, authentication);
@@ -114,5 +117,22 @@ public class SessionController {
     public ErrorCode authenticationExceptionHandler() {
         return ErrorCode.builder("401001", "账户名或密码错误");
     }
+
+    @Indexed
+    @Component
+    public static class SessionContext implements PublisherRootAttributeConfigurer {
+        @Override
+        public Map<String, Object> getAttributes() {
+            Supplier<String> getCurrentAccount = () -> {
+                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                if (authentication.isAuthenticated() && authentication.getPrincipal() instanceof SessionUserDetail) {
+                    return ((SessionUserDetail) authentication.getPrincipal()).getUsername();
+                }
+                return null;
+            };
+            return Map.of("currentAccount", getCurrentAccount);
+        }
+    }
+
 
 }
