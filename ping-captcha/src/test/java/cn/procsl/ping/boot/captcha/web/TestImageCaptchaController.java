@@ -16,8 +16,8 @@ import java.util.Base64;
 
 @Controller
 @RequestMapping
-@Tag(name = "captcha", description = "图形验证码")
-public class ImageCaptchaControllerTest {
+@Tag(name = "captcha-test", description = "图形验证码")
+public class TestImageCaptchaController {
 
     @ResponseBody
     @GetMapping("/v1/test")

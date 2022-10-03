@@ -7,10 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -28,6 +25,7 @@ public class Account extends AbstractPersistable<Long> implements Stateful<Accou
 
     @Schema(description = "账户名称")
     @NotBlank
+    @Column(updatable = false)
     String name;
 
     @Schema(description = "账户密码")

@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.admin.auth.login;
 
+import cn.procsl.ping.boot.admin.advice.DataPermissionRootAttributeRegistry;
 import cn.procsl.ping.boot.admin.auth.AuthenticationProcessing;
 import cn.procsl.ping.boot.captcha.domain.CaptchaType;
 import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
@@ -7,7 +8,7 @@ import cn.procsl.ping.boot.common.dto.MessageDTO;
 import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.common.error.ErrorCode;
 import cn.procsl.ping.boot.common.event.Publisher;
-import cn.procsl.ping.boot.common.event.PublisherRootAttributeConfigurer;
+import cn.procsl.ping.boot.common.event.PublisherRootAttributeRegistry;
 import cn.procsl.ping.boot.common.utils.ObjectUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -96,7 +97,8 @@ public class SessionController {
     @ResponseBody
     @DeleteMapping("/v1/session")
     @Operation(summary = "用户注销", operationId = "logout")
-    @Publisher(name = USER_LOGOUT, parameter = "#root[currentAccount].get()")
+    @Publisher(name = USER_LOGOUT, parameter = "#root[currentAccount].get()?.id",
+            trigger = Publisher.Trigger.start)
     public MessageDTO deleteSession(HttpServletRequest request, HttpServletResponse response) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         this.authenticationProcessing.logout(request, response, authentication);
@@ -120,13 +122,17 @@ public class SessionController {
 
     @Indexed
     @Component
-    public static class SessionContext implements PublisherRootAttributeConfigurer {
+    public static class SessionContextRegistry implements PublisherRootAttributeRegistry,
+            DataPermissionRootAttributeRegistry {
         @Override
         public Map<String, Object> getAttributes() {
-            Supplier<String> getCurrentAccount = () -> {
+            Supplier<SessionUserDetail> getCurrentAccount = () -> {
                 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                if (authentication == null) {
+                    return null;
+                }
                 if (authentication.isAuthenticated() && authentication.getPrincipal() instanceof SessionUserDetail) {
-                    return ((SessionUserDetail) authentication.getPrincipal()).getUsername();
+                    return ((SessionUserDetail) authentication.getPrincipal());
                 }
                 return null;
             };

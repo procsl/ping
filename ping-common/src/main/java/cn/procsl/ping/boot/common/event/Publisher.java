@@ -17,7 +17,7 @@ public @interface Publisher {
     Trigger trigger() default Trigger.complete;
 
     enum Trigger {
-        always, complete, error
+        start, always, complete, error
     }
 
 }

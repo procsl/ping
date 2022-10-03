@@ -23,12 +23,18 @@ import java.util.function.Function;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class Permission extends AbstractPersistable<Long> implements Serializable, DiscriminatorValueFinder {
 
+    protected Boolean readOnly = true;
+
     @Override
     public @NonNull String toString() {
         return String.format("[%s: %s]", getOperate(), getResource());
     }
 
     public abstract String getOperate();
+
+    public boolean readOnly() {
+        return readOnly;
+    }
 
     public abstract void setOperate(String option);
 

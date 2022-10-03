@@ -10,7 +10,6 @@ import com.querydsl.jpa.Hibernate5Templates;
 import com.querydsl.jpa.JPQLQueryFactory;
 import com.querydsl.jpa.hibernate.HibernateQueryFactory;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.springframework.beans.BeansException;
@@ -27,6 +26,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.repository.config.BootstrapMode;
+import org.springframework.lang.NonNull;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
@@ -85,7 +85,7 @@ public class CommonAutoConfiguration implements ApplicationContextAware {
 
     @Bean(name = "publishAnnotationPointcutAdvisor")
     public AnnotationPointcutAdvisor publishAnnotationPointcutAdvisor(EventBusBridge eventBusBridge,
-                                                                      @Autowired(required = false) Collection<PublisherRootAttributeConfigurer> configurers) {
+                                                                      @Autowired(required = false) Collection<PublisherRootAttributeRegistry> configurers) {
         PublisherMethodInterceptor interceptor = new PublisherMethodInterceptor(eventBusBridge, configurers);
         return AnnotationPointcutAdvisor.forAnnotation(Publisher.class, interceptor);
     }

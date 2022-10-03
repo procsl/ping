@@ -34,6 +34,7 @@
         <module>ping-captcha</module>
         <module>ping-connect</module>
         <module>ping-im</module>
+        <module>ping-oa</module>
     </modules>
 
     <name>Ping 父模块</name>
@@ -206,6 +207,12 @@
             <dependency>
                 <groupId>cn.procsl</groupId>
                 <artifactId>ping-product</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.procsl</groupId>
+                <artifactId>ping-oa</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

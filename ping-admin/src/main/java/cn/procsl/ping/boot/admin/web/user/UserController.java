@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.admin.web.user;
 
+import cn.procsl.ping.boot.admin.domain.rbac.DataPermissionFilter;
 import cn.procsl.ping.boot.admin.domain.user.*;
 import cn.procsl.ping.boot.common.utils.QueryBuilder;
 import cn.procsl.ping.boot.common.web.FormatPage;
@@ -10,6 +11,7 @@ import com.querydsl.core.types.QBean;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.JPQLQueryFactory;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -49,14 +51,25 @@ public class UserController {
     @Operation(summary = "更新用户信息", operationId = "updateUser")
     public void update(@PathVariable Long id, @Validated @RequestBody UserPropDTO userPropDTO) {
         User user = this.jpaRepository.getReferenceById(id);
-        user.updateSelf(userPropDTO.getName(), userPropDTO.getGender(), userPropDTO.getRemark());
+        user.updateSelf(userPropDTO.getName(),
+                userPropDTO.getGender(),
+                userPropDTO.getCardNumber(),
+                userPropDTO.getNation(),
+                userPropDTO.getBirthday(),
+                userPropDTO.getGraduateSchool(),
+                userPropDTO.getTelephone(),
+                userPropDTO.getEmail(),
+                userPropDTO.getRemark()
+        );
     }
 
     @MarkPageable
     @GetMapping("/v1/users")
     @Transactional(readOnly = true)
     @Operation(summary = "获取用户列表")
+    @DataPermissionFilter(filter = "#p1", key = "查询全部用户数据权限")
     public FormatPage<UserDetailsVO> findUsers(Pageable pageable,
+                                               @Parameter(hidden = true) @RequestParam(required = false) Long id,
                                                @RequestParam(required = false) String name,
                                                @RequestParam(required = false, name = "account.name") String account,
                                                @RequestParam(required = false, name = "account.state") AccountState state,
@@ -64,13 +77,24 @@ public class UserController {
 
         Expression<AccountVO> accountProjection = Projections.bean(AccountVO.class, qaccount.name, qaccount.state)
                                                              .as("account");
-        QBean<UserDetailsVO> projections = Projections.bean(UserDetailsVO.class, quser.id, quser.name, quser.gender,
-                quser.remark, accountProjection);
+        QBean<UserDetailsVO> projections = Projections.bean(UserDetailsVO.class,
+                quser.id,
+                quser.name,
+                quser.gender,
+                quser.birthday,
+                quser.cardNumber,
+                quser.email,
+                quser.graduateSchool,
+                quser.nation,
+                quser.telephone,
+                quser.remark,
+                accountProjection);
 
         JPQLQuery<UserDetailsVO> query = queryFactory.select(projections).from(quser).innerJoin(qaccount)
                                                      .on(quser.account.id.eq(qaccount.id));
 
         val builder = QueryBuilder.builder(query)
+                                  .and(id != null, () -> quser.id.eq(id))
                                   .and(name, () -> quser.name.like(String.format("%%%s%%", name)))
                                   .and(account, () -> qaccount.name.like(String.format("%%%s%%", account)))
                                   .and(state != null, () -> qaccount.state.eq(state))

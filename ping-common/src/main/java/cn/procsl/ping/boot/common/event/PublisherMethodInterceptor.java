@@ -25,14 +25,16 @@ public final class PublisherMethodInterceptor extends AbstractMethodInterceptor<
 
     final Map<String, Object> rootAttributes = new HashMap<>();
 
+    final StandardReflectionParameterNameDiscoverer discoverer = new StandardReflectionParameterNameDiscoverer();
+
     public PublisherMethodInterceptor(EventBusBridge eventBusBridge,
-                                      Collection<PublisherRootAttributeConfigurer> configurers) {
+                                      Collection<PublisherRootAttributeRegistry> configurers) {
         super(Publisher.class);
         this.eventBusBridge = eventBusBridge;
         if (configurers == null || configurers.isEmpty()) {
             return;
         }
-        for (PublisherRootAttributeConfigurer configurer : configurers) {
+        for (PublisherRootAttributeRegistry configurer : configurers) {
             rootAttributes.putAll(configurer.getAttributes());
         }
     }
@@ -41,6 +43,10 @@ public final class PublisherMethodInterceptor extends AbstractMethodInterceptor<
     protected Object doInvoke(Publisher publisher, MethodInvocation invocation) throws Throwable {
         Object returnedValue = null;
         switch (publisher.trigger()) {
+            case start:
+                publisher(publisher, invocation, null);
+                returnedValue = invocation.proceed();
+                break;
             case always:
                 try {
                     returnedValue = invocation.proceed();
@@ -94,7 +100,6 @@ public final class PublisherMethodInterceptor extends AbstractMethodInterceptor<
 
     Object evaluation(Publisher publisher, MethodInvocation invocation, Object returnValue) {
         String param = publisher.parameter();
-        StandardReflectionParameterNameDiscoverer discoverer = new StandardReflectionParameterNameDiscoverer();
         EvaluationContext context = new MethodBasedEvaluationContext(this.rootAttributes, invocation.getMethod(),
                 invocation.getArguments(), discoverer);
         context.setVariable("return", returnValue);

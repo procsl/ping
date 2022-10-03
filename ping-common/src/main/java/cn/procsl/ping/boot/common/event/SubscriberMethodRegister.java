@@ -32,20 +32,23 @@ public final class SubscriberMethodRegister implements SmartInitializingSingleto
         try {
             annotations = applicationContext.getBeansWithAnnotation(SubscriberRegister.class);
         } catch (BeansException e) {
-            log.info("找不到:[{}]", SubscriberRegister.class.getName());
+            log.warn("找不到:[{}]", SubscriberRegister.class.getName());
             return;
         }
 
         Collection<Object> beans = annotations.values();
         ScannerAnnotationHandlerResolver scanner = new ScannerAnnotationHandlerResolver(Subscribers.class);
+        ScannerAnnotationHandlerResolver scanner1 = new ScannerAnnotationHandlerResolver(Subscriber.class);
         for (Object bean : beans) {
-            resolver(scanner, bean);
+            resolver(scanner, scanner1, bean);
         }
+
         this.resolver.load();
 
     }
 
     void resolver(ScannerAnnotationHandlerResolver scanner,
+                  ScannerAnnotationHandlerResolver scanner1,
                   Object bean) {
         Collection<AnnotationHandlerInvokerContext> contexts = scanner.resolve(bean);
         contexts.stream()
@@ -56,12 +59,25 @@ public final class SubscriberMethodRegister implements SmartInitializingSingleto
                         return;
                     }
                     for (Subscriber subscriber : annotation.value()) {
-                        log.debug("注册:[{}]订阅 -> [{}#{}]", subscriber.name(),
-                                item.getContext().getHandler().getClass(),
-                                item.getContext().getMethod().getName());
-                        this.eventBusBridge.subscriber(subscriber.name(), item::invoke);
+                        register(item, subscriber);
                     }
                 });
+
+        Collection<AnnotationHandlerInvokerContext> context2 = scanner1.resolve(bean);
+        context2.stream()
+                .map(item -> new SimpleHandlerInvoker<>(item, this.resolver))
+                .forEach(item -> {
+                    Subscriber annotation = item.getContext().getAnnotation(Subscriber.class);
+                    register(item, annotation);
+                });
+
+    }
+
+    private void register(SimpleHandlerInvoker<AnnotationHandlerInvokerContext> item, Subscriber subscriber) {
+        log.debug("注册:[{}]订阅 -> [{}#{}]", subscriber.name(),
+                item.getContext().getHandler().getClass(),
+                item.getContext().getMethod().getName());
+        this.eventBusBridge.subscriber(subscriber.name(), item::invoke);
     }
 
 }

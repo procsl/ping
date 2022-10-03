@@ -35,6 +35,7 @@ public class SessionControllerTest {
     @Test
     @Order(2)
     public void deleteSession() throws Exception {
+        session = LoginUtils.toLogin(mockMvc);
         MockHttpServletRequestBuilder processor = delete("/v1/session").session(this.session);
         mockMvc.perform(processor).andExpect(status().is2xxSuccessful());
         log.info("注销成功");

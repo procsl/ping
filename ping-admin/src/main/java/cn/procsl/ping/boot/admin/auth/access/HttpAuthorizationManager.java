@@ -3,6 +3,7 @@ package cn.procsl.ping.boot.admin.auth.access;
 import cn.procsl.ping.boot.admin.auth.login.SessionUserDetail;
 import cn.procsl.ping.boot.admin.domain.rbac.HttpPermission;
 import cn.procsl.ping.boot.admin.domain.rbac.HttpServletPermissionMatcherService;
+import cn.procsl.ping.boot.admin.domain.rbac.PermissionCacheService;
 import cn.procsl.ping.boot.admin.domain.rbac.PermissionMatcherService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +29,7 @@ public class HttpAuthorizationManager implements AuthorizationManager<RequestAut
 
     final PermissionMatcherService<HttpPermission> permissionMatcherService = new HttpServletPermissionMatcherService();
 
-    final GrantedAuthorityLoader grantedAuthorityLoader;
+    final PermissionCacheService<HttpPermission, Long> grantedAuthorityLoader;
 
     @Override
     public AuthorizationDecision check(Supplier<Authentication> authentication, RequestAuthorizationContext context) {
@@ -44,14 +45,11 @@ public class HttpAuthorizationManager implements AuthorizationManager<RequestAut
         }
 
         if (auth.isAuthenticated() && auth.getPrincipal() instanceof SessionUserDetail) {
-            SessionUserDetail pric = (SessionUserDetail) auth.getPrincipal();
-            Long subject = pric.getId();
+            SessionUserDetail details = (SessionUserDetail) auth.getPrincipal();
+            Long subject = details.getId();
             Collection<HttpPermission> permissions = this.grantedAuthorityLoader.getPermissions(subject);
             boolean bool = permissionMatcherService.matcher(context.getRequest(), permissions).isEmpty();
-            if (!bool) {
-                return this.accessAllow;
-            }
-            return this.accessDenied;
+            return bool ? this.accessDenied : this.accessAllow;
         }
 
         return accessDenied;

@@ -1,5 +1,7 @@
 package cn.procsl.ping.boot.common.event;
 
+import org.springframework.lang.NonNull;
+
 import java.lang.annotation.*;
 
 @Documented
@@ -9,6 +11,7 @@ import java.lang.annotation.*;
 @Repeatable(value = Subscribers.class)
 public @interface Subscriber {
 
+    @NonNull
     String name();
 
     @Documented

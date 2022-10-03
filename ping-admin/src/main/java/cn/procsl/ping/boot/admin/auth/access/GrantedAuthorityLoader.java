@@ -3,6 +3,7 @@ package cn.procsl.ping.boot.admin.auth.access;
 import cn.procsl.ping.boot.admin.domain.rbac.AccessControlService;
 import cn.procsl.ping.boot.admin.domain.rbac.HttpPermission;
 import cn.procsl.ping.boot.admin.domain.rbac.Permission;
+import cn.procsl.ping.boot.admin.domain.rbac.PermissionCacheService;
 import cn.procsl.ping.boot.common.event.Subscriber;
 import cn.procsl.ping.boot.common.event.SubscriberRegister;
 import lombok.RequiredArgsConstructor;
@@ -16,12 +17,14 @@ import static cn.procsl.ping.boot.admin.constant.EventPublisherConstant.*;
 @Slf4j
 @SubscriberRegister
 @RequiredArgsConstructor
-public class GrantedAuthorityLoader {
+public class GrantedAuthorityLoader implements
+        PermissionCacheService<HttpPermission, Long> {
 
     final AccessControlService accessControlService;
 
     final ConcurrentHashMap<Long, Collection<HttpPermission>> concurrentHashMap = new ConcurrentHashMap<>();
 
+    @Override
     public Collection<HttpPermission> getPermissions(Long id) {
         Collection<HttpPermission> permissions = this.concurrentHashMap.get(id);
         if (permissions == null) {
@@ -39,6 +42,12 @@ public class GrantedAuthorityLoader {
     public void reload() {
         log.info("重新加载用户权限信息");
         concurrentHashMap.clear();
+    }
+
+    @Subscriber(name = USER_LOGOUT)
+    public void onLogout(Long id) {
+        log.info("卸载用户权限信息:{}", id);
+        concurrentHashMap.remove(id);
     }
 
     HttpPermission loadPermission(Permission permission) {

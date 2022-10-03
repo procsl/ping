@@ -91,7 +91,10 @@ public class UserControllerTest {
 
     @Test
     public void update() throws Exception {
-        UserPropDTO prop = new UserPropDTO(Faker.instance().name().username(), Gender.man, "这是备注");
+        UserPropDTO prop = UserPropDTO.builder().name(Faker.instance().name().username())
+                                      .gender(Gender.man)
+                                      .remark("备注")
+                                      .build();
         val builder =
                 patch("/v1/users/{id}", gid.get())
                         .content(jsonMapper.writeValueAsString(prop))

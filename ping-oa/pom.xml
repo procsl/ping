@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>ping</artifactId>
+        <groupId>cn.procsl</groupId>
+        <version>0.0.5-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>ping-oa</artifactId>
+    <name>Ping 办公管理模块</name>
+
+    <properties>
+        <server.port>10002</server.port>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>cn.procsl</groupId>
+            <artifactId>ping-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.procsl</groupId>
+            <artifactId>ping-captcha</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.procsl</groupId>
+            <artifactId>ping-apt</artifactId>
+        </dependency>
+
+    </dependencies>
+
+</project>

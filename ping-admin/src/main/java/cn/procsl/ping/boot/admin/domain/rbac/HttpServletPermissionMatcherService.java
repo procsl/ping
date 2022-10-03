@@ -22,7 +22,7 @@ public class HttpServletPermissionMatcherService implements
         String url = request.getRequestURI();
         return permissions.stream()
                           .filter(item -> item.matcher(method, url))
-                          .peek(item -> log.debug("[{}:{}]匹配到权限:[{}]", method, url, item))
+                          .peek(item -> log.debug("[{}:{}]匹配到权限:{}", method, url, item))
                           .collect(Collectors.toList());
     }
 

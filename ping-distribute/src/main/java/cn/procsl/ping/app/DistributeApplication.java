@@ -10,7 +10,7 @@ import org.springframework.hateoas.config.EnableHypermediaSupport;
 
 import static cn.procsl.ping.app.DistributeApplication.*;
 
-@SpringBootApplication(scanBasePackages = "cn.procsl.ping")
+@SpringBootApplication(scanBasePackages = "cn.procsl.ping.app")
 @OpenAPIDefinition(info = @Info(title = "接口文档", version = "1.0", license = @License(url =
         apache, name = name), description = desc))
 @EnableHypermediaSupport(type = {EnableHypermediaSupport.HypermediaType.HAL})

@@ -1,18 +1,23 @@
 package cn.procsl.ping.boot.admin;
 
+import cn.procsl.ping.boot.admin.advice.DataPermissionRootAttributeRegistry;
+import cn.procsl.ping.boot.admin.advice.DatePermissionMethodInterceptor;
 import cn.procsl.ping.boot.admin.auth.access.FailureAuthenticationHandler;
 import cn.procsl.ping.boot.admin.auth.access.GrantedAuthorityLoader;
 import cn.procsl.ping.boot.admin.auth.access.HttpAuthorizationManager;
 import cn.procsl.ping.boot.admin.domain.conf.ConfigOptionService;
 import cn.procsl.ping.boot.admin.domain.rbac.AccessControlService;
+import cn.procsl.ping.boot.admin.domain.rbac.DataPermissionFilter;
 import cn.procsl.ping.boot.admin.domain.user.RoleSettingService;
 import cn.procsl.ping.boot.admin.domain.user.UserRegisterService;
+import cn.procsl.ping.boot.common.advice.AnnotationPointcutAdvisor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -42,6 +47,7 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import javax.annotation.security.PermitAll;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -54,6 +60,7 @@ import java.util.Map;
 @EnableJpaRepositories(basePackages = "cn.procsl.ping.boot.admin.domain", bootstrapMode = BootstrapMode.LAZY)
 @ComponentScan(basePackages = {
         "cn.procsl.ping.boot.admin.web",
+        "cn.procsl.ping.boot.admin.auth",
         "cn.procsl.ping.boot.admin.service",
         "cn.procsl.ping.boot.admin.listener",
         "cn.procsl.ping.boot.admin.adapter"
@@ -152,5 +159,13 @@ public class AdminAutoConfiguration implements ApplicationContextAware {
     public CompositeLogoutHandler compositeLogoutHandler() {
         return new CompositeLogoutHandler(List.of(new SecurityContextLogoutHandler()));
     }
+
+    @Bean(name = "dataPermissionAnnotationPointcutAdvisor")
+    public AnnotationPointcutAdvisor dataPermissionAnnotationPointcutAdvisor(
+            @Autowired(required = false) Collection<DataPermissionRootAttributeRegistry> configurers) {
+        DatePermissionMethodInterceptor interceptor = new DatePermissionMethodInterceptor(configurers);
+        return AnnotationPointcutAdvisor.forAnnotation(DataPermissionFilter.class, interceptor);
+    }
+
 
 }
