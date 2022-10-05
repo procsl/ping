@@ -1,6 +1,5 @@
 package cn.procsl.ping.boot.admin.auth.login;
 
-import cn.procsl.ping.boot.admin.domain.rbac.AccessControlService;
 import cn.procsl.ping.boot.admin.domain.user.User;
 import cn.procsl.ping.boot.admin.domain.user.UserSpecification;
 import lombok.RequiredArgsConstructor;
@@ -23,14 +22,11 @@ public class UserDetailService implements UserDetailsService {
 
     final JpaSpecificationExecutor<User> userJpaSpecificationExecutor;
 
-    final AccessControlService accessControlService;
-
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> optional = userJpaSpecificationExecutor.findOne(new UserSpecification(username));
         User user = optional.orElseThrow(() -> new UsernameNotFoundException("账户不存在!", null));
-        // 加载所有权限
         return new SessionUserDetail(user);
     }
 

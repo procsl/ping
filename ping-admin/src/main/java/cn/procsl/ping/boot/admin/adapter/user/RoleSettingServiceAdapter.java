@@ -1,7 +1,6 @@
 package cn.procsl.ping.boot.admin.adapter.user;
 
 import cn.procsl.ping.boot.admin.domain.conf.ConfigOptionService;
-import cn.procsl.ping.boot.admin.domain.rbac.AccessControlService;
 import cn.procsl.ping.boot.admin.domain.user.RoleSettingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,13 +19,7 @@ import java.util.Collections;
 class RoleSettingServiceAdapter implements RoleSettingService {
 
     public static final String DEFAULT_ROLES_CONFIG_KEY = "默认角色";
-    final AccessControlService accessControlService;
     final ConfigOptionService configService;
-
-    @Override
-    public void grant(Long userId, Collection<String> roleNames) {
-        this.accessControlService.grantByName(userId, roleNames);
-    }
 
 
     @Override

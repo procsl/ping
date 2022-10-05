@@ -9,11 +9,9 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
@@ -30,24 +28,43 @@ public class Subject extends AbstractPersistable<Long> implements Serializable {
 
     public Subject(Long subject) {
         this.subject = subject;
+        this.roles = new HashSet<>();
     }
 
-    public Subject(Long subject, Collection<Role> roles) {
-        this.subject = subject;
-        this.putRoles(roles);
+
+    public void grant(Collection<Role> roles) {
+        this.roles.clear();
+        this.roles.addAll(roles);
     }
 
-    void putRoles(Collection<Role> roles) {
-        if (this.roles == null) {
-            this.roles = new HashSet<>(roles);
-        } else {
+    public void grant(Role... roles) {
+        if (roles == null || roles.length == 0) {
             this.roles.clear();
-            this.roles.addAll(roles);
+            return;
         }
+        this.roles.addAll(List.of(roles));
     }
 
     public Set<Role> getRoles() {
         return Collections.unmodifiableSet(roles);
+    }
+
+    @Transient
+    public Collection<Permission> getPermissions() {
+        HashSet<Permission> hashset = new HashSet<>();
+        for (Role role : roles) {
+            hashset.addAll(role.getPermissions());
+        }
+        return Collections.unmodifiableCollection(hashset);
+    }
+
+    @Transient
+    public <T extends Permission> Collection<T> getPermissions(Class<T> clazz) {
+        HashSet<T> hashset = new HashSet<>();
+        for (Role role : roles) {
+            hashset.addAll(role.getPermissions(clazz));
+        }
+        return Collections.unmodifiableCollection(hashset);
     }
 
 }

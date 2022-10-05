@@ -1,14 +1,17 @@
 package cn.procsl.ping.boot.admin.auth.access;
 
-import cn.procsl.ping.boot.admin.domain.rbac.AccessControlService;
 import cn.procsl.ping.boot.admin.domain.rbac.HttpPermission;
-import cn.procsl.ping.boot.admin.domain.rbac.Permission;
+import cn.procsl.ping.boot.admin.domain.rbac.Subject;
+import cn.procsl.ping.boot.admin.domain.rbac.SubjectRoleSpecification;
 import cn.procsl.ping.boot.common.event.Subscriber;
 import cn.procsl.ping.boot.common.event.SubscriberRegister;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static cn.procsl.ping.boot.admin.constant.EventPublisherConstant.*;
@@ -18,14 +21,21 @@ import static cn.procsl.ping.boot.admin.constant.EventPublisherConstant.*;
 @RequiredArgsConstructor
 public class GrantedAuthorityLoader {
 
-    final AccessControlService accessControlService;
+    final JpaSpecificationExecutor<Subject> subjectJpaSpecificationExecutor;
 
     final ConcurrentHashMap<Long, Collection<HttpPermission>> concurrentHashMap = new ConcurrentHashMap<>();
 
     public Collection<HttpPermission> getPermissions(Long id) {
         Collection<HttpPermission> permissions = this.concurrentHashMap.get(id);
         if (permissions == null) {
-            Collection<HttpPermission> permission = this.accessControlService.loadPermissions(id, this::loadPermission);
+            Optional<Subject> optional = subjectJpaSpecificationExecutor.findOne(
+                    new SubjectRoleSpecification(id, null));
+
+            if (optional.isEmpty()) {
+                return Collections.emptyList();
+            }
+
+            Collection<HttpPermission> permission = optional.get().getPermissions(HttpPermission.class);
             concurrentHashMap.put(id, permission);
             return permission;
         }
@@ -41,11 +51,10 @@ public class GrantedAuthorityLoader {
         concurrentHashMap.clear();
     }
 
-    HttpPermission loadPermission(Permission permission) {
-        if (permission instanceof HttpPermission) {
-            return (HttpPermission) permission;
-        }
-        return null;
+    @Subscriber(name = USER_LOGIN)
+    public void logout(Long id) {
+        log.info("用户注销,卸载用户权限信息:{}", id);
+        concurrentHashMap.remove(id);
     }
 
 }

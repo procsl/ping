@@ -1,11 +1,12 @@
 package cn.procsl.ping.boot.admin.listener;
 
 import cn.procsl.ping.boot.admin.domain.conf.ConfigOptionService;
-import cn.procsl.ping.boot.admin.domain.rbac.AccessControlService;
 import cn.procsl.ping.boot.admin.domain.rbac.HttpPermission;
 import cn.procsl.ping.boot.admin.domain.rbac.Permission;
 import cn.procsl.ping.boot.admin.domain.rbac.Role;
-import cn.procsl.ping.boot.admin.domain.user.UserRegisterService;
+import cn.procsl.ping.boot.admin.domain.rbac.Subject;
+import cn.procsl.ping.boot.admin.domain.user.User;
+import cn.procsl.ping.boot.common.service.PasswordEncoderService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,15 +32,17 @@ public class AdminStartupListener implements ApplicationListener<ApplicationRead
     final String password = "123456";
 
     final String roleName = "系统管理员角色";
-    final UserRegisterService userRegisterService;
-
-    final ConfigOptionService configOptionService;
 
     final JpaRepository<Role, Long> roleJpaRepository;
 
-    final AccessControlService accessControlService;
-
     final JpaRepository<Permission, Long> permissionJpaRepository;
+
+    final JpaRepository<User, Long> userLongJpaRepository;
+
+    final JpaRepository<Subject, Long> subjectLongJpaRepository;
+
+    final PasswordEncoderService passwordEncoderService;
+    final ConfigOptionService configOptionService;
 
     @Override
     @Transactional
@@ -52,6 +55,7 @@ public class AdminStartupListener implements ApplicationListener<ApplicationRead
         }
         log.info("创建默认角色:{}", roleName);
 
+        // 创建权限
         List<Permission> permissions = List.of(
                 HttpPermission.create("GET", "/**"),
                 HttpPermission.create("POST", "/**"),
@@ -59,16 +63,25 @@ public class AdminStartupListener implements ApplicationListener<ApplicationRead
                 HttpPermission.create("PATCH", "/**"),
                 HttpPermission.create("PUT", "/**")
         );
-        Role role = new Role(roleName);
-        role.addPermissions(permissions);
         this.permissionJpaRepository.saveAll(permissions);
-        this.roleJpaRepository.flush();
-        this.roleJpaRepository.save(role);
-        this.roleJpaRepository.flush();
 
+        // 创建角色
+        Role role = new Role(roleName);
+        // 添加权限
+        role.addPermissions(permissions);
+        this.roleJpaRepository.save(role);
+
+        // 创建账户
+        String password = passwordEncoderService.encode(this.password);
+        User user = User.creator(account, account, password);
+        this.userLongJpaRepository.save(user);
         log.info("注册默认账户:{}", account);
-        Long id = this.userRegisterService.register(account, password);
-        this.accessControlService.grantByName(id, List.of(roleName));
+
+        // 创建subject, 为用户授权
+        Subject subject = new Subject(user.getId());
+        subject.grant(role);
+        this.subjectLongJpaRepository.save(subject);
+
         this.configOptionService.put("初始化系统数据",
                 new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date()));
     }

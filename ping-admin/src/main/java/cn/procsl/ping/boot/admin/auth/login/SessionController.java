@@ -72,7 +72,6 @@ public class SessionController {
             throws ServletException, IOException {
         Authentication authenticate = SecurityContextHolder.getContext().getAuthentication();
 
-
         if (this.authenticationTrustResolver.isAnonymous(authenticate) || !authenticate.isAuthenticated()) {
             UsernamePasswordAuthenticationToken info = new UsernamePasswordAuthenticationToken(details.getAccount(),
                     details.getPassword());
@@ -96,7 +95,7 @@ public class SessionController {
     @ResponseBody
     @DeleteMapping("/v1/session")
     @Operation(summary = "用户注销", operationId = "logout")
-    @Publisher(name = USER_LOGOUT, parameter = "#root[currentAccount].get()")
+    @Publisher(name = USER_LOGOUT, parameter = "#root[currentAccount].get()?.id")
     public MessageDTO deleteSession(HttpServletRequest request, HttpServletResponse response) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         this.authenticationProcessing.logout(request, response, authentication);
@@ -123,10 +122,13 @@ public class SessionController {
     public static class SessionContext implements PublisherRootAttributeConfigurer {
         @Override
         public Map<String, Object> getAttributes() {
-            Supplier<String> getCurrentAccount = () -> {
+            Supplier<SessionUserDetail> getCurrentAccount = () -> {
                 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                if (authentication == null) {
+                    return null;
+                }
                 if (authentication.isAuthenticated() && authentication.getPrincipal() instanceof SessionUserDetail) {
-                    return ((SessionUserDetail) authentication.getPrincipal()).getUsername();
+                    return ((SessionUserDetail) authentication.getPrincipal());
                 }
                 return null;
             };

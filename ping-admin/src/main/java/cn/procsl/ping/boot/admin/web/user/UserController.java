@@ -1,6 +1,9 @@
 package cn.procsl.ping.boot.admin.web.user;
 
+import cn.procsl.ping.boot.admin.domain.rbac.Role;
+import cn.procsl.ping.boot.admin.domain.rbac.Subject;
 import cn.procsl.ping.boot.admin.domain.user.*;
+import cn.procsl.ping.boot.common.service.PasswordEncoderService;
 import cn.procsl.ping.boot.common.utils.QueryBuilder;
 import cn.procsl.ping.boot.common.web.FormatPage;
 import cn.procsl.ping.boot.common.web.MarkPageable;
@@ -15,10 +18,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Indexed;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collection;
+import java.util.List;
 
 @Indexed
 @RestController
@@ -32,16 +39,39 @@ public class UserController {
 
     final JpaRepository<User, Long> jpaRepository;
 
+    final JpaSpecificationExecutor<Role> jpaSpecificationExecutor;
+
+    final JpaRepository<Subject, Long> subjectLongJpaRepository;
+
     final JPQLQueryFactory queryFactory;
 
-    final UserRegisterService userUserRegisterService;
+    final PasswordEncoderService passwordEncoderService;
+
+    final RoleSettingService roleSettingService;
 
     @Transactional
     @PostMapping("/v1/users")
     @Operation(summary = "创建用户", operationId = "createUser", description = "创建用户时, 用户账户默认为用户昵称, " +
             "用户昵称可通过后期修改完成, 用户账户不可修改")
     public Long register(@Validated @RequestBody RegisterDTO registerDTO) {
-        return this.userUserRegisterService.register(registerDTO.getAccount(), registerDTO.getPassword());
+
+        String password = registerDTO.getPassword();
+        User user = User.creator(registerDTO.getAccount(), registerDTO.getAccount(),
+                passwordEncoderService.encode(password));
+        this.jpaRepository.save(user);
+
+        Collection<String> roleNames = this.roleSettingService.getDefaultRoles();
+        if (roleNames == null || roleNames.isEmpty()) {
+            return user.getId();
+        }
+
+        Subject subject = new Subject(user.getId());
+        List<Role> roles = this.jpaSpecificationExecutor.findAll(
+                (root, query, criteriaBuilder) -> root.get("name").in(roleNames));
+        subject.grant(roles);
+
+        subjectLongJpaRepository.save(subject);
+        return user.getId();
     }
 
     @Transactional

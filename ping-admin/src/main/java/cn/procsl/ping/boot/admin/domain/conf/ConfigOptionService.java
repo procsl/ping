@@ -35,7 +35,8 @@ public class ConfigOptionService {
     }
 
     public Long put(@NotNull String name, String content, String desc) {
-        Optional<Config> option = this.jpaSpecificationExecutor.findOne((Specification<Config>) (root, query, cb) -> cb.equal(root.get("name"), name));
+        Optional<Config> option = this.jpaSpecificationExecutor
+                .findOne((Specification<Config>) (root, query, cb) -> cb.equal(root.get("name"), name));
         option.ifPresent(item -> item.edit(name, content, desc));
         Config config = option.orElseGet(() -> Config.creator(name, content, desc));
         return this.jpaRepository.save(config).getId();
@@ -49,7 +50,8 @@ public class ConfigOptionService {
      */
     @Nullable
     public String get(@NotEmpty String name) {
-        Optional<Config> config = this.jpaSpecificationExecutor.findOne((root, query, cb) -> cb.equal(root.get("name"), name));
+        Optional<Config> config = this.jpaSpecificationExecutor.findOne(
+                (root, query, cb) -> cb.equal(root.get("name"), name));
         return config.map(Config::getContent).orElse(null);
     }
 }

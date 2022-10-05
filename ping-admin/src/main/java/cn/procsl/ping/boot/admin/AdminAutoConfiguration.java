@@ -4,9 +4,7 @@ import cn.procsl.ping.boot.admin.auth.access.FailureAuthenticationHandler;
 import cn.procsl.ping.boot.admin.auth.access.GrantedAuthorityLoader;
 import cn.procsl.ping.boot.admin.auth.access.HttpAuthorizationManager;
 import cn.procsl.ping.boot.admin.domain.conf.ConfigOptionService;
-import cn.procsl.ping.boot.admin.domain.rbac.AccessControlService;
 import cn.procsl.ping.boot.admin.domain.user.RoleSettingService;
-import cn.procsl.ping.boot.admin.domain.user.UserRegisterService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -60,9 +58,7 @@ import java.util.Map;
 },
         basePackageClasses = {
                 ConfigOptionService.class,
-                AccessControlService.class,
                 RoleSettingService.class,
-                UserRegisterService.class
         })
 public class AdminAutoConfiguration implements ApplicationContextAware {
 

@@ -15,6 +15,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -77,6 +78,15 @@ public class Role extends AbstractPersistable<Long> implements Serializable {
             this.permissions = new ArrayList<>();
         }
         this.permissions.addAll(permissions);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends Permission> Collection<T> getPermissions(Class<T> clazz) {
+        return this.getPermissions()
+                   .stream()
+                   .filter(item -> item.getClass() == clazz)
+                   .map(item -> (T) item)
+                   .collect(Collectors.toUnmodifiableList());
     }
 
 }

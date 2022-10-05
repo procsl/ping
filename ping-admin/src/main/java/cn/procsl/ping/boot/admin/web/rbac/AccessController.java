@@ -1,8 +1,7 @@
 package cn.procsl.ping.boot.admin.web.rbac;
 
-import cn.procsl.ping.boot.admin.domain.rbac.AccessControlService;
-import cn.procsl.ping.boot.admin.domain.rbac.QRole;
-import cn.procsl.ping.boot.admin.domain.rbac.QSubject;
+import cn.procsl.ping.boot.admin.domain.rbac.*;
+import cn.procsl.ping.boot.common.error.BusinessException;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPQLQueryFactory;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,6 +9,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Indexed;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 @Indexed
 @RestController
@@ -24,9 +27,11 @@ import java.util.Collection;
 @Tag(name = "users")
 public class AccessController {
 
-    final AccessControlService accessControlService;
-
     final JPQLQueryFactory queryFactory;
+
+    final JpaSpecificationExecutor<Subject> subjectJpaSpecificationExecutor;
+
+    final JpaRepository<Role, Long> roleLongJpaRepository;
 
     final QSubject sub = QSubject.subject1;
 
@@ -36,8 +41,12 @@ public class AccessController {
     @PostMapping("/v1/users/{id}/roles")
     @Operation(summary = "授予角色", operationId = "grantRoles")
     public void grant(@PathVariable("id") Long id,
-                      @RequestBody @NotNull @Validated @Schema(description = "角色ID") Collection<Long> roles) {
-        this.accessControlService.grant(id, roles);
+                      @RequestBody @NotNull @Validated @Schema(description = "角色ID") Collection<Long> roleIds) {
+        Optional<Subject> optional = this.subjectJpaSpecificationExecutor.findOne(
+                new SubjectRoleSpecification(id, null));
+        Subject subject = optional.orElseThrow(() -> new BusinessException("目标用户不存在"));
+        List<Role> roles = this.roleLongJpaRepository.findAllById(roleIds);
+        subject.grant(roles);
     }
 
     @Transactional(readOnly = true)
