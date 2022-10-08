@@ -14,6 +14,7 @@ public class MessageVO implements Serializable {
 
     @NonNull
     @Schema(description = "错误信息或提示信息")
+    @NonNull
     final String message;
 
 }
