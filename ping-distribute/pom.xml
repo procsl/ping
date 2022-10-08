@@ -17,11 +17,6 @@
 
     <properties>
         <liquibase.version>4.15.0</liquibase.version>
-        <java.version>19</java.version>
-        <maven.compiler.target>19</maven.compiler.target>
-        <maven.compiler.source>19</maven.compiler.source>
-        <maven.compiler.compilerVersion>19</maven.compiler.compilerVersion>
-        <compiler.version>19</compiler.version>
     </properties>
 
     <dependencies>
@@ -70,18 +65,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <compilerArgs>
-                        <arg>--enable-preview</arg>
-                        <arg>-Xlint:preview</arg>
-                    </compilerArgs>
-                </configuration>
-            </plugin>
-
         </plugins>
     </build>
 

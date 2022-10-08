@@ -86,7 +86,7 @@ public class PermissionController {
                     return qpermission.instanceOf(type.getType());
                 });
 
-        return FormatPage.page(builder, pageable).convert(this.mapStructMapper::mapper);
+        return FormatPage.page(builder, pageable).transform(this.mapStructMapper::mapper);
     }
 
 }

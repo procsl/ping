@@ -30,7 +30,7 @@ public class User extends AbstractPersistable<Long> implements Serializable {
     String remark;
 
     @Schema(defaultValue = "用户账户ID")
-    @OneToOne
+    @OneToOne(cascade = CascadeType.PERSIST)
     Account account;
 
 

@@ -1,11 +1,12 @@
 package cn.procsl.ping.boot.common.error;
 
-import cn.procsl.ping.boot.common.dto.MessageDTO;
+import cn.procsl.ping.boot.common.dto.MessageVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.lang.NonNull;
 
 import java.io.Serializable;
 
@@ -18,11 +19,11 @@ import java.io.Serializable;
 @ToString
 @EqualsAndHashCode
 @Schema(description = "错误信息描述")
-public class ErrorCode extends MessageDTO implements Serializable, ErrorEntity {
+public class ErrorCode extends MessageVO implements Serializable, ErrorEntity {
 
     @Schema(description = "错误信息编码", example = "001")
+    @NonNull
     private String code;
-
 
     public ErrorCode(String message) {
         super(message);

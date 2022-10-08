@@ -3,7 +3,7 @@ package cn.procsl.ping.boot.admin.auth.login;
 import cn.procsl.ping.boot.admin.auth.AuthenticationProcessing;
 import cn.procsl.ping.boot.captcha.domain.CaptchaType;
 import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
-import cn.procsl.ping.boot.common.dto.MessageDTO;
+import cn.procsl.ping.boot.common.dto.MessageVO;
 import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.common.error.ErrorCode;
 import cn.procsl.ping.boot.common.event.Publisher;
@@ -96,10 +96,10 @@ public class SessionController {
     @DeleteMapping("/v1/session")
     @Operation(summary = "用户注销", operationId = "logout")
     @Publisher(name = USER_LOGOUT, parameter = "#root[currentAccount].get()?.id")
-    public MessageDTO deleteSession(HttpServletRequest request, HttpServletResponse response) {
+    public MessageVO deleteSession(HttpServletRequest request, HttpServletResponse response) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         this.authenticationProcessing.logout(request, response, authentication);
-        return new MessageDTO(String.format("用户[%s]已退出登录", authentication.getName()));
+        return new MessageVO(String.format("用户[%s]已退出登录", authentication.getName()));
     }
 
 

@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.common.error;
 
+import cn.procsl.ping.boot.common.dto.MessageVO;
 import cn.procsl.ping.boot.common.utils.CollectionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -13,9 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.method.HandlerMethod;
 
-import javax.annotation.Nullable;
 import javax.persistence.RollbackException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,23 +30,9 @@ public class GlobalExceptionHandler {
     @ResponseBody
     @ExceptionHandler(value = Exception.class)
     @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorCode exceptionHandler(Exception e, @Nullable HandlerMethod handlerMethod) {
+    public MessageVO exceptionHandler(Exception e) {
         log.warn("未解析的异常:", e);
-        if (handlerMethod == null) {
-            return getDefaultErrorCode(500, e);
-        }
-
-        ExceptionResolver resolver = ((handlerMethod).getMethod()).getAnnotation(
-                ExceptionResolver.class);
-        if (resolver == null) {
-            return getDefaultErrorCode(500, e);
-        }
-
-        if (resolver.matcher().isAssignableFrom(e.getClass())) {
-            return ErrorCode.builder(resolver.code(), resolver.message());
-        }
-
-        return getDefaultErrorCode(500, e);
+        return new MessageVO("服务器内部错误");
     }
 
     @ResponseBody

@@ -2,7 +2,7 @@ package cn.procsl.ping.boot.captcha.web;
 
 import cn.procsl.ping.boot.captcha.domain.CaptchaType;
 import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
-import cn.procsl.ping.boot.common.dto.MessageDTO;
+import cn.procsl.ping.boot.common.dto.MessageVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.stereotype.Controller;
@@ -30,9 +30,9 @@ public class ImageCaptchaControllerTest {
     @ResponseBody
     @GetMapping("/v1/encoder")
     @Operation(summary = "编码接口")
-    public MessageDTO decoder(@RequestParam("code") String code) {
+    public MessageVO decoder(@RequestParam("code") String code) {
         String msg = Base64.getEncoder().encodeToString(code.getBytes(StandardCharsets.UTF_8));
-        return new MessageDTO(msg);
+        return new MessageVO(msg);
     }
 
 }
