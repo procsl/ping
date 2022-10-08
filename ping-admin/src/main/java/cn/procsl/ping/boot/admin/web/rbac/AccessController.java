@@ -3,6 +3,7 @@ package cn.procsl.ping.boot.admin.web.rbac;
 import cn.procsl.ping.boot.admin.domain.rbac.AccessControlService;
 import cn.procsl.ping.boot.admin.domain.rbac.QRole;
 import cn.procsl.ping.boot.admin.domain.rbac.QSubject;
+import cn.procsl.ping.boot.common.event.Publisher;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPQLQueryFactory;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
 import java.util.Collection;
+
+import static cn.procsl.ping.boot.admin.constant.EventPublisherConstant.GRANT_CHANGED;
 
 @Indexed
 @RestController
@@ -35,6 +38,7 @@ public class AccessController {
     @Transactional
     @PostMapping("/v1/users/{id}/roles")
     @Operation(summary = "授予角色", operationId = "grantRoles")
+    @Publisher(name = GRANT_CHANGED, parameter = "#id")
     public void grant(@PathVariable("id") Long id,
                       @RequestBody @NotNull @Validated @Schema(description = "角色ID") Collection<Long> roles) {
         this.accessControlService.grant(id, roles);

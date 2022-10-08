@@ -3,13 +3,13 @@ package cn.procsl.ping.boot.admin;
 import cn.procsl.ping.boot.admin.advice.DataPermissionRootAttributeRegistry;
 import cn.procsl.ping.boot.admin.advice.DatePermissionMethodInterceptor;
 import cn.procsl.ping.boot.admin.auth.access.FailureAuthenticationHandler;
-import cn.procsl.ping.boot.admin.auth.access.GrantedAuthorityLoader;
 import cn.procsl.ping.boot.admin.auth.access.HttpAuthorizationManager;
 import cn.procsl.ping.boot.admin.domain.conf.ConfigOptionService;
 import cn.procsl.ping.boot.admin.domain.rbac.AccessControlService;
 import cn.procsl.ping.boot.admin.domain.rbac.DataPermissionFilter;
 import cn.procsl.ping.boot.admin.domain.user.RoleSettingService;
 import cn.procsl.ping.boot.admin.domain.user.UserRegisterService;
+import cn.procsl.ping.boot.admin.service.HttpPermissionCacheService;
 import cn.procsl.ping.boot.common.advice.AnnotationPointcutAdvisor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -80,7 +80,7 @@ public class AdminAutoConfiguration implements ApplicationContextAware {
     @ConditionalOnMissingBean
     public SecurityFilterChain securityFilterChain(@NonNull HttpSecurity http,
                                                    WebApplicationContext webApplicationContext,
-                                                   GrantedAuthorityLoader loader)
+                                                   HttpPermissionCacheService loader)
             throws Exception {
 
         val requests = http.authorizeHttpRequests();

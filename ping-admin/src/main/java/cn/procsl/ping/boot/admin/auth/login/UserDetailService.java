@@ -31,7 +31,7 @@ public class UserDetailService implements UserDetailsService {
         Optional<User> optional = userJpaSpecificationExecutor.findOne(new UserSpecification(username));
         User user = optional.orElseThrow(() -> new UsernameNotFoundException("账户不存在!", null));
         // 加载所有权限
-        return new SessionUserDetail(user);
+        return new SessionUserDetail(user, accessControlService.loadPermissions(user.getId()));
     }
 
 

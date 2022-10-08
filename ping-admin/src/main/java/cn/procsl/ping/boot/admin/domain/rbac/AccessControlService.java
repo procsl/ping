@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 @Indexed
 @Service
 @RequiredArgsConstructor
+@Transactional(rollbackFor = Exception.class, readOnly = true)
 public class AccessControlService {
 
     final JpaRepository<Subject, Long> subjectRepository;
@@ -114,6 +115,7 @@ public class AccessControlService {
      */
     @Transactional(readOnly = true)
     public Collection<Permission> loadPermissions(Long subject) {
+        log.debug("加载所有权限:{}", subject);
         Collection<Role> roles = this.loadRoles(subject);
         HashSet<Permission> hashset = new HashSet<>();
         for (Role role : roles) {
@@ -132,6 +134,7 @@ public class AccessControlService {
      */
     @Transactional(readOnly = true)
     public <T> Collection<T> loadPermissions(Long subject, Function<Permission, T> convert) {
+        log.debug("加载所有权限,并转换:{}", subject);
         Collection<Permission> tmp = this.loadPermissions(subject);
         return tmp.stream().map(convert).filter(Objects::nonNull).collect(Collectors.toUnmodifiableList());
     }
@@ -142,6 +145,7 @@ public class AccessControlService {
      */
     @Transactional(readOnly = true)
     public Collection<Role> loadRoles(Long subject) {
+        log.debug("加载所有角色:{}", subject);
         Optional<Subject> entity = this.subjectJpaSpecificationExecutor.findOne(
                 (root, query, cb) -> cb.equal(root.get("subject"), subject));
         if (entity.isEmpty()) {

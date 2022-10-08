@@ -8,8 +8,9 @@ import java.util.function.BiFunction;
 public enum PermissionType {
 
 
-    http(HttpPermission::create, QHttpPermission.httpPermission), page(PagePermission::new,
-            QPagePermission.pagePermission);
+    http(HttpPermission::create, QHttpPermission.httpPermission),
+    page(PagePermission::new, QPagePermission.pagePermission),
+    data(DataPermission::new, QDataPermission.dataPermission);
 
     final BiFunction<String, String, Permission> factory;
     final EntityPathBase<? extends Permission> query;

@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -22,7 +21,6 @@ import java.time.Duration;
 @ComponentScan(basePackages = {
         "cn.procsl.ping.boot.oa.web",
 })
-@EnableCaching
 public class OaAutoConfiguration {
 
 

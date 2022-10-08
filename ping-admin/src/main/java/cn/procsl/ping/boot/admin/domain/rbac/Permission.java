@@ -25,6 +25,13 @@ public abstract class Permission extends AbstractPersistable<Long> implements Se
 
     protected Boolean readOnly = true;
 
+    @Column(length = 50)
+    String summary;
+
+    @Basic(fetch = FetchType.LAZY)
+    @Column(length = 200)
+    String description;
+
     @Override
     public @NonNull String toString() {
         return String.format("[%s: %s]", getOperate(), getResource());

@@ -97,7 +97,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value = HttpMessageNotReadableException.class)
     public ErrorCode httpMessageNotReadableException() {
-        return ErrorCode.builder("400001", "请求体不可为空");
+        return ErrorCode.builder("400001", "请求参数错误");
     }
 
     ErrorCode getDefaultErrorCode(int code, Exception e) {

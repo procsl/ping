@@ -22,6 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
+import java.util.Map;
+
 @Indexed
 @RestController
 @RequiredArgsConstructor
@@ -37,6 +40,8 @@ public class UserController {
     final JPQLQueryFactory queryFactory;
 
     final UserRegisterService userUserRegisterService;
+
+    final DepartService departService;
 
     @Transactional
     @PostMapping("/v1/users")
@@ -67,7 +72,8 @@ public class UserController {
     @GetMapping("/v1/users")
     @Transactional(readOnly = true)
     @Operation(summary = "获取用户列表")
-    @DataPermissionFilter(filter = "#p1", key = "查询全部用户数据权限")
+    @DataPermissionFilter(filter = "#root[currentUserDataPermission]?.apply('读取-所有用户列表权限')",
+            executor = "#root[overrideArgument]?.apply(#arguments, #root[currentAccount].get()?.id, 1)")
     public FormatPage<UserDetailsVO> findUsers(Pageable pageable,
                                                @Parameter(hidden = true) @RequestParam(required = false) Long id,
                                                @RequestParam(required = false) String name,
@@ -100,7 +106,15 @@ public class UserController {
                                   .and(state != null, () -> qaccount.state.eq(state))
                                   .and(gender != null, () -> quser.gender.eq(gender));
 
-        return FormatPage.page(builder, pageable);
+
+        FormatPage<UserDetailsVO> tmp = FormatPage.page(builder, pageable);
+        Collection<Long> ids = tmp.convert(UserVO::getId);
+        Map<Long, DepartmentDTO> departNames = this.departService.getDepartNames(ids);
+        for (UserDetailsVO vo : tmp.getContent()) {
+            vo.setDepartment(departNames.get(vo.getId()));
+        }
+
+        return tmp;
     }
 
 

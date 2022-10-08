@@ -11,4 +11,7 @@ public class UserDetailsVO extends UserVO {
     @Schema(description = "用户账户信息")
     AccountVO account;
 
+    @Schema(description = "用户部门信息")
+    DepartmentDTO department;
+
 }

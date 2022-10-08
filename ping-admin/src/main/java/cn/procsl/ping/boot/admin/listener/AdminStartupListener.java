@@ -1,11 +1,9 @@
 package cn.procsl.ping.boot.admin.listener;
 
 import cn.procsl.ping.boot.admin.domain.conf.ConfigOptionService;
-import cn.procsl.ping.boot.admin.domain.rbac.AccessControlService;
-import cn.procsl.ping.boot.admin.domain.rbac.HttpPermission;
-import cn.procsl.ping.boot.admin.domain.rbac.Permission;
-import cn.procsl.ping.boot.admin.domain.rbac.Role;
+import cn.procsl.ping.boot.admin.domain.rbac.*;
 import cn.procsl.ping.boot.admin.domain.user.UserRegisterService;
+import cn.procsl.ping.boot.admin.service.HttpPermissionRegistry;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -41,6 +40,8 @@ public class AdminStartupListener implements ApplicationListener<ApplicationRead
 
     final JpaRepository<Permission, Long> permissionJpaRepository;
 
+    final HttpPermissionRegistry registry;
+
     @Override
     @Transactional
     public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
@@ -52,15 +53,21 @@ public class AdminStartupListener implements ApplicationListener<ApplicationRead
         }
         log.info("创建默认角色:{}", roleName);
 
+        ArrayList<Permission> scanner = registry.httpPermissionScanner();
+        this.permissionJpaRepository.saveAll(scanner);
         List<Permission> permissions = List.of(
                 HttpPermission.create("GET", "/**"),
                 HttpPermission.create("POST", "/**"),
                 HttpPermission.create("DELETE", "/**"),
                 HttpPermission.create("PATCH", "/**"),
-                HttpPermission.create("PUT", "/**")
+                HttpPermission.create("PUT", "/**"),
+                new DataPermission("读取", "所有用户列表权限"),
+                new DataPermission("重置", "所有用户密码权限"),
+                new DataPermission("读取", "所有用户工资信息权限"),
+                new DataPermission("读取", "所有用户销售信息权限")
         );
         Role role = new Role(roleName);
-        role.addPermissions(permissions);
+        role.addPermissions(scanner);
         this.permissionJpaRepository.saveAll(permissions);
         this.roleJpaRepository.flush();
         this.roleJpaRepository.save(role);

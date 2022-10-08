@@ -2,9 +2,9 @@ package cn.procsl.ping.boot.admin.auth.access;
 
 import cn.procsl.ping.boot.admin.auth.login.SessionUserDetail;
 import cn.procsl.ping.boot.admin.domain.rbac.HttpPermission;
-import cn.procsl.ping.boot.admin.domain.rbac.HttpServletPermissionMatcherService;
 import cn.procsl.ping.boot.admin.domain.rbac.PermissionCacheService;
 import cn.procsl.ping.boot.admin.domain.rbac.PermissionMatcherService;
+import cn.procsl.ping.boot.admin.service.HttpServletPermissionMatcherService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationTrustResolver;

@@ -21,12 +21,16 @@ import java.util.Date;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class Captcha extends AbstractPersistable<Long> implements Serializable, DiscriminatorValueFinder {
 
+    @Column(length = 36, updatable = false)
     String target;
 
+    @Column(length = 10, updatable = false)
     String ticket;
 
+    @Column(updatable = false)
     Date expired;
 
+    @Column(updatable = false)
     Date createDate;
 
     public void verify(@NonNull String ticket) throws VerifyFailureException {

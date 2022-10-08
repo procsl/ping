@@ -11,6 +11,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.UUID;
 
 @Slf4j
 public class AccessLoggerFilter extends AbstractRequestLoggingFilter implements InitializingBean {
@@ -31,21 +32,21 @@ public class AccessLoggerFilter extends AbstractRequestLoggingFilter implements 
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
         String traceName = "X-request-ID";
-//        String requestId = response.getHeader(traceName);
-//
-//        if (requestId == null || requestId.isEmpty()) {
-//            requestId = request.getHeader(traceName);
-//        }
-//
-//        if (requestId == null || requestId.isEmpty()) {
-//            requestId = UUID.randomUUID().toString().replaceAll("-", "");
-//        }
-//
-//        try {
-//            MDC.put("RequestId", requestId);
-//        } catch (Exception e) {
-//            logger.warn("初始化日志信息异常:", e);
-//        }
+        String requestId = response.getHeader(traceName);
+
+        if (requestId == null || requestId.isEmpty()) {
+            requestId = request.getHeader(traceName);
+        }
+
+        if (requestId == null || requestId.isEmpty()) {
+            requestId = UUID.randomUUID().toString().replaceAll("-", "");
+        }
+
+        try {
+            MDC.put("RequestId", requestId);
+        } catch (Exception e) {
+            logger.warn("初始化日志信息异常:", e);
+        }
 
         log.debug("HTTP request [{}:{}] remote host: [{}] address: [{}]", request.getMethod(), request.getRequestURI(),
                 request.getRemoteHost(),

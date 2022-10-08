@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.admin.web.user;
 
+import cn.procsl.ping.boot.admin.domain.rbac.DataPermissionFilter;
 import cn.procsl.ping.boot.admin.domain.user.User;
 import cn.procsl.ping.boot.common.service.PasswordEncoderService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,6 +39,8 @@ public class AccountController {
     @Transactional
     @PatchMapping("/v1/users/{id}/password")
     @Operation(summary = "重置指定用户密码")
+    @DataPermissionFilter(filter = "#root[currentUserDataPermission]?.apply('重置-所有用户密码权限')",
+            executor = "#root[overrideArgument]?.apply(#arguments, #root[currentAccount].get()?.id, 0)")
     public void resetPassword(@PathVariable Long id, @Validated @RequestBody ResetPasswordDTO passwordDTO) {
         userRepository
                 .getReferenceById(id)

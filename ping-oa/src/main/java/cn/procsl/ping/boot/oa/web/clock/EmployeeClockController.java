@@ -2,6 +2,7 @@ package cn.procsl.ping.boot.oa.web.clock;
 
 import cn.procsl.ping.boot.oa.adapter.EmployeeServiceAdapter;
 import cn.procsl.ping.boot.oa.domain.clock.*;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -40,8 +41,9 @@ public class EmployeeClockController {
     @Transactional(rollbackFor = Exception.class)
     @PostMapping("/v1/oa/clock")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @Operation(summary = "员工打卡")
     public void addClock() {
-        val employeeId = this.adapter.getEmployeeId();
+        val employeeId = this.adapter.currentLoginEmployeeId();
         EmployeeClock employeeClock = new EmployeeClock(employeeId);
         Optional<EmployeeClock> optional = this.repository.findOne(Example.of(employeeClock));
         employeeClock = optional.orElse(employeeClock);
@@ -50,21 +52,23 @@ public class EmployeeClockController {
     }
 
     @GetMapping("/v1/oa/clock")
+    @Operation(summary = "员工打卡详情")
     public EmployeeClockDTO getClock() {
-        val employeeId = this.adapter.getEmployeeId();
+        val employeeId = this.adapter.currentLoginEmployeeId();
         EmployeeClock employeeClock = new EmployeeClock(employeeId);
         Optional<EmployeeClock> optional = this.repository.findOne(Example.of(employeeClock));
         return mapStructMapper.mapper(optional.orElse(employeeClock));
     }
 
     @GetMapping("/v1/oa/clock/calendars")
+    @Operation(summary = "员工工时日历")
     public Collection<EmployeeClockCalendar> getClockCalendars(@RequestParam(required = false) String month) {
         if (ObjectUtils.isEmpty(month)) {
             SimpleDateFormat fmt = new SimpleDateFormat("yyyyMM");
             month = fmt.format(new Date());
         }
 
-        String id = this.adapter.getEmployeeId();
+        String id = this.adapter.currentLoginEmployeeId();
         List<EmployeeClock> clocks = this.jpaSpecificationExecutor.findAll(
                 new MonthClockSpecification(id, month));
 

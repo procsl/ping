@@ -4,11 +4,12 @@ import cn.procsl.ping.boot.common.utils.QueryBuilder;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.querydsl.core.QueryResults;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.NonNull;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.lang.NonNull;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -34,11 +35,32 @@ public class FormatPage<T> extends PageImpl<T> {
         return new FormatPage<>(result.getResults(), pageable, result.getTotal());
     }
 
-    public <E> FormatPage<E> convert(Function<T, E> convert) {
+    public <E> FormatPage<E> transform(Function<T, E> convert) {
         List<E> content = this.getContent().stream().map(convert).collect(Collectors.toList());
         return page(content, this.getPageable(), this.getTotal());
     }
 
+    public <E> Collection<E> convert(Function<T, E> converter) {
+        return this.getContent().stream().map(converter).collect(Collectors.toList());
+    }
+
+    @Override
+    @NonNull
+    public List<T> getContent() {
+        return super.getContent();
+    }
+
+    @Override
+    @NonNull
+    public boolean isFirst() {
+        return super.isFirst();
+    }
+
+    @Override
+    @NonNull
+    public boolean isEmpty() {
+        return super.isEmpty();
+    }
 
     @Override
     @JsonIgnore
@@ -48,6 +70,7 @@ public class FormatPage<T> extends PageImpl<T> {
     }
 
     @Schema(example = "100", description = "总页数")
+    @NonNull
     public Long getTotal() {
         return super.getTotalElements();
     }
@@ -60,11 +83,13 @@ public class FormatPage<T> extends PageImpl<T> {
     }
 
     @Schema(example = "10", description = "每页大小")
+    @NonNull
     public int getLimit() {
         return super.getSize();
     }
 
     @Schema(example = "1", description = "页码偏移量")
+    @NonNull
     public long getOffset() {
         return this.getPageable().getOffset() + 1;
     }
@@ -78,6 +103,7 @@ public class FormatPage<T> extends PageImpl<T> {
     }
 
 
+    @NonNull
     public boolean isNext() {
         return super.hasNext();
     }

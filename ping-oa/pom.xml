@@ -32,6 +32,11 @@
             <artifactId>ping-apt</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>cn.procsl</groupId>
+            <artifactId>ping-admin</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

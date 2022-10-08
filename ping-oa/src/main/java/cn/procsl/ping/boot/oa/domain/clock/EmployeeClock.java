@@ -21,10 +21,10 @@ import java.util.Date;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class EmployeeClock extends AbstractPersistable<Long> implements Serializable {
 
-    @Column(updatable = false)
+    @Column(updatable = false, length = 10)
     String employeeId;
 
-    @Column(updatable = false)
+    @Column(updatable = false, length = 8)
     String clockDay;
 
     Date startAt;

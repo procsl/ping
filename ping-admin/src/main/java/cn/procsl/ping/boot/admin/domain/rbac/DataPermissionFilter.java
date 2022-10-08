@@ -11,8 +11,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 public @interface DataPermissionFilter {
 
+    String ARGUMENTS_NAME = "arguments";
+
     String filter();
 
-    String key();
+    String executor();
 
 }
