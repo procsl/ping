@@ -7,7 +7,7 @@
     <groupId>cn.procsl</groupId>
     <artifactId>ping</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.5-SNAPSHOT</version>
+    <version>0.0.6-SNAPSHOT</version>
 
     <properties>
         <java.version>11</java.version>
@@ -16,7 +16,7 @@
         <maven.compiler.compilerVersion>${java.version}</maven.compiler.compilerVersion>
         <compiler.version>${java.version}</compiler.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <springboot.version>2.7.3</springboot.version>
+        <springboot.version>2.7.4</springboot.version>
         <querydsl.version>5.0.0</querydsl.version>
         <springdoc.version>1.6.9</springdoc.version>
         <jpa-streamer-version>1.0.2</jpa-streamer-version>
@@ -258,7 +258,7 @@
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-annotations</artifactId>
-                <version>2.2.2</version>
+                <version>2.2.3</version>
                 <scope>provided</scope>
             </dependency>
 
@@ -285,7 +285,7 @@
             <dependency>
                 <groupId>org.javassist</groupId>
                 <artifactId>javassist</artifactId>
-                <version>3.29.1-GA</version>
+                <version>3.29.2-GA</version>
             </dependency>
 
             <dependency>
@@ -343,8 +343,8 @@
 
         <pluginManagement>
 
-
             <plugins>
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
@@ -627,21 +627,16 @@
             <id>native</id>
 
             <dependencies>
+
                 <dependency>
                     <groupId>org.springframework.experimental</groupId>
                     <artifactId>spring-native</artifactId>
                 </dependency>
+
                 <dependency>
                     <groupId>org.springframework.experimental</groupId>
                     <artifactId>spring-aot</artifactId>
                 </dependency>
-
-                <!--                <dependency>-->
-                <!--                    <groupId>org.graalvm.buildtools</groupId>-->
-                <!--                    <artifactId>junit-platform-native</artifactId>-->
-                <!--                    <version>${junit.platform.native.version}</version>-->
-                <!--                    <scope>test</scope>-->
-                <!--                </dependency>-->
 
             </dependencies>
 
@@ -702,6 +697,12 @@
             </pluginRepositories>
 
             <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.experimental</groupId>
+                        <artifactId>spring-aot-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
 
                 <pluginManagement>
                     <plugins>
@@ -830,7 +831,6 @@
                                     <phase>test</phase>
                                 </execution>
                             </executions>
-
                         </plugin>
                     </plugins>
                 </pluginManagement>

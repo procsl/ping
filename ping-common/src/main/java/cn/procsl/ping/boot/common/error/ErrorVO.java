@@ -19,22 +19,22 @@ import java.io.Serializable;
 @ToString
 @EqualsAndHashCode
 @Schema(description = "错误信息描述")
-public class ErrorCode extends MessageVO implements Serializable, ErrorEntity {
+public class ErrorVO extends MessageVO implements Serializable, ErrorEntity {
 
     @Schema(description = "错误信息编码", example = "001")
     @NonNull
     private String code;
 
-    public ErrorCode(String message) {
+    public ErrorVO(String message) {
         super(message);
     }
 
-    public ErrorCode() {
+    public ErrorVO() {
         super("系统内部错误");
         this.code = "001";
     }
 
-    public ErrorCode(String code, String message) {
+    public ErrorVO(String code, String message) {
         super(message);
         this.code = code;
     }
@@ -45,8 +45,8 @@ public class ErrorCode extends MessageVO implements Serializable, ErrorEntity {
         return super.getMessage();
     }
 
-    public static ErrorCode builder(String code, String message) {
-        return new ErrorCode(code, message);
+    public static ErrorVO builder(String code, String message) {
+        return new ErrorVO(code, message);
     }
 
 }

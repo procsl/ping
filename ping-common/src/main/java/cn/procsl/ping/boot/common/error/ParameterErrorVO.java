@@ -9,7 +9,7 @@ import java.util.Map;
 
 @Data
 @Schema(description = "格式化输出参数校验错误信息")
-public class ParameterErrorCode extends ErrorCode {
+public class ParameterErrorVO extends ErrorVO {
 
     @Getter
     @Schema(description = "参数校验信息", example = "{\"field:\":\"不可为空\"}")
@@ -17,7 +17,7 @@ public class ParameterErrorCode extends ErrorCode {
 
 
     @Builder
-    public ParameterErrorCode(String code, String message, Map<String, String> errors) {
+    public ParameterErrorVO(String code, String message, Map<String, String> errors) {
         super(code, message);
         this.errors = errors;
     }

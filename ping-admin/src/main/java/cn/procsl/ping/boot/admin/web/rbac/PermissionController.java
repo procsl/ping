@@ -6,10 +6,8 @@ import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.common.error.ExceptionResolver;
 import cn.procsl.ping.boot.common.event.Publisher;
 import cn.procsl.ping.boot.common.utils.QueryBuilder;
-import cn.procsl.ping.boot.common.web.FormatPage;
-import cn.procsl.ping.boot.common.web.MarkPageable;
+import cn.procsl.ping.boot.common.web.*;
 import com.querydsl.jpa.JPQLQueryFactory;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -18,9 +16,11 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Indexed;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import static cn.procsl.ping.boot.admin.constant.EventPublisherConstant.*;
 
@@ -39,9 +39,7 @@ public class PermissionController {
 
     final MapStructMapper mapStructMapper = Mappers.getMapper(MapStructMapper.class);
 
-    @Transactional
-    @PostMapping("/v1/permissions")
-    @Operation(summary = "创建权限", operationId = "createPermission")
+    @Created(path = "/v1/permissions", summary = "创建权限")
     @Publisher(name = PERMISSION_CREATE_EVENT, parameter = "#id")
     public PermissionVO create(@Validated @RequestBody PermissionCreateDTO permission) throws BusinessException {
         Permission entity = permission.convert();
@@ -49,18 +47,14 @@ public class PermissionController {
         return this.mapStructMapper.mapper(entity);
     }
 
-    @Transactional
-    @Operation(summary = "删除权限", operationId = "deletePermission")
-    @DeleteMapping("/v1/permissions/{id}")
+    @Deleted(path = "/v1/permissions/{id}", summary = "删除权限")
     @ExceptionResolver(message = "该角色已被关联, 角色删除失败", code = "409001", matcher = DataIntegrityViolationException.class)
     @Publisher(name = PERMISSION_DELETE_EVENT, parameter = "#id")
     public void delete(@PathVariable Long id) throws BusinessException {
         this.permissionJpaRepository.deleteById(id);
     }
 
-    @Transactional
-    @PatchMapping("/v1/permissions/{id}")
-    @Operation(summary = "更新权限", operationId = "updatePermission")
+    @Changed(path = "/v1/permissions/{id}", summary = "更新权限")
     @Publisher(name = PERMISSION_UPDATE_EVENT, parameter = "#id")
     public void update(@PathVariable Long id, @Validated @RequestBody PermissionUpdateDTO permission)
             throws BusinessException {
@@ -70,9 +64,7 @@ public class PermissionController {
     }
 
     @MarkPageable
-    @Transactional(readOnly = true)
-    @Operation(summary = "查询角色权限")
-    @GetMapping("/v1/permissions")
+    @QueryDetails(path = "/v1/permissions", summary = "查询角色权限")
     public FormatPage<PermissionVO> findPermissions(Pageable pageable,
                                                     @RequestParam(required = false) String resource,
                                                     @RequestParam(required = false) PermissionType type) {

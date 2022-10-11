@@ -5,8 +5,7 @@ import cn.procsl.ping.boot.admin.domain.conf.ConfigOptionService;
 import cn.procsl.ping.boot.admin.domain.conf.QConfig;
 import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.common.utils.QueryBuilder;
-import cn.procsl.ping.boot.common.web.FormatPage;
-import cn.procsl.ping.boot.common.web.MarkPageable;
+import cn.procsl.ping.boot.common.web.*;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.QBean;
 import com.querydsl.jpa.JPQLQuery;
@@ -38,9 +37,7 @@ public class ConfigController {
 
     final QConfig qconfig = QConfig.config;
 
-    @Transactional
-    @Operation(summary = "编辑配置项")
-    @PatchMapping("/v1/configs/{id}")
+    @Changed(path = "/v1/configs/{id}", summary = "编辑配置项")
     public void edit(@PathVariable Long id, @RequestBody @Validated ConfigDTO config) throws BusinessException {
         this.jpaRepository.getReferenceById(id)
                           .edit(config.getName(), config.getContent(), config.getDescription());
@@ -54,26 +51,19 @@ public class ConfigController {
     }
 
 
-    @Transactional
-    @Operation(summary = "删除配置项")
-    @DeleteMapping("/v1/configs/{id}")
+    @Deleted(path = "/v1/configs/{id}", summary = "删除配置项")
     public void delete(@PathVariable Long id) throws BusinessException {
         this.jpaRepository.deleteById(id);
     }
 
     @Nullable
-    @GetMapping("/v1/configs/{name}")
-    @Transactional(readOnly = true)
-    @Operation(summary = "获取配置内容")
+    @QueryDetails(path = "/v1/configs/{name}", summary = "获取配置内容")
     public ConfigNameValueDTO getConfig(@PathVariable String name) {
         return new ConfigNameValueDTO(name, this.configOptionService.get(name));
     }
 
-    @Nullable
     @MarkPageable
-    @GetMapping("/v1/configs")
-    @Transactional(readOnly = true)
-    @Operation(summary = "获取配置内容")
+    @QueryDetails(path = "/v1/configs", summary = "获取配置内容")
     public FormatPage<ConfigVO> findConfig(Pageable pageable, @RequestParam(required = false) String name) {
         QBean<ConfigVO> select = Projections.fields(ConfigVO.class, qconfig.id, qconfig.name, qconfig.content,
                 qconfig.description);

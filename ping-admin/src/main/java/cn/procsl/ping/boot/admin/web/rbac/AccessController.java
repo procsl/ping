@@ -2,9 +2,10 @@ package cn.procsl.ping.boot.admin.web.rbac;
 
 import cn.procsl.ping.boot.admin.domain.rbac.*;
 import cn.procsl.ping.boot.common.error.BusinessException;
+import cn.procsl.ping.boot.common.web.Changed;
+import cn.procsl.ping.boot.common.web.QueryDetails;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPQLQueryFactory;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -12,9 +13,10 @@ import lombok.val;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Indexed;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.NotNull;
 import java.util.Collection;
@@ -37,9 +39,7 @@ public class AccessController {
 
     final QRole qrole = QRole.role;
 
-    @Transactional
-    @PostMapping("/v1/users/{id}/roles")
-    @Operation(summary = "授予角色", operationId = "grantRoles")
+    @Changed(path = "/v1/users/{id}/roles", summary = "授予角色权限")
     public void grant(@PathVariable("id") Long id,
                       @RequestBody @NotNull @Validated @Schema(description = "角色ID") Collection<Long> roleIds) {
         Optional<Subject> optional = this.subjectJpaSpecificationExecutor.findOne(
@@ -49,9 +49,7 @@ public class AccessController {
         subject.grant(roles);
     }
 
-    @Transactional(readOnly = true)
-    @GetMapping("/v1/users/{id}/roles")
-    @Operation(summary = "获取已授权列表")
+    @QueryDetails(path = "/v1/users/{id}/roles", summary = "获取已授权列表")
     public Collection<RoleVO> findSubjects(@PathVariable("id") Long id) {
         val select = Projections.bean(RoleVO.class, qrole.name, qrole.id);
         return this.queryFactory.select(select).from(sub).innerJoin(sub.roles, qrole).where(sub.subject.eq(id)).fetch();

@@ -5,7 +5,7 @@ import cn.procsl.ping.boot.captcha.domain.CaptchaType;
 import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
 import cn.procsl.ping.boot.common.dto.MessageVO;
 import cn.procsl.ping.boot.common.error.BusinessException;
-import cn.procsl.ping.boot.common.error.ErrorCode;
+import cn.procsl.ping.boot.common.error.ErrorVO;
 import cn.procsl.ping.boot.common.event.Publisher;
 import cn.procsl.ping.boot.common.event.PublisherRootAttributeConfigurer;
 import cn.procsl.ping.boot.common.utils.ObjectUtils;
@@ -106,15 +106,15 @@ public class SessionController {
     @ResponseBody
     @ExceptionHandler(value = DisabledException.class)
     @ResponseStatus(code = HttpStatus.UNAUTHORIZED)
-    public ErrorCode disabledException() {
-        return ErrorCode.builder("401002", "用户已被禁用");
+    public ErrorVO disabledException() {
+        return ErrorVO.builder("401002", "用户已被禁用");
     }
 
     @ResponseBody
     @ExceptionHandler(value = AuthenticationException.class)
     @ResponseStatus(code = HttpStatus.UNAUTHORIZED)
-    public ErrorCode authenticationExceptionHandler() {
-        return ErrorCode.builder("401001", "账户名或密码错误");
+    public ErrorVO authenticationExceptionHandler() {
+        return ErrorVO.builder("401001", "账户名或密码错误");
     }
 
     @Indexed

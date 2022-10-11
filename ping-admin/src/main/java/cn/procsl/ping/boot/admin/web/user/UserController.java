@@ -5,14 +5,12 @@ import cn.procsl.ping.boot.admin.domain.rbac.Subject;
 import cn.procsl.ping.boot.admin.domain.user.*;
 import cn.procsl.ping.boot.common.service.PasswordEncoderService;
 import cn.procsl.ping.boot.common.utils.QueryBuilder;
-import cn.procsl.ping.boot.common.web.FormatPage;
-import cn.procsl.ping.boot.common.web.MarkPageable;
+import cn.procsl.ping.boot.common.web.*;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.QBean;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.JPQLQueryFactory;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -20,9 +18,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Indexed;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
 import java.util.List;
@@ -49,10 +49,7 @@ public class UserController {
 
     final RoleSettingService roleSettingService;
 
-    @Transactional
-    @PostMapping("/v1/users")
-    @Operation(summary = "创建用户", operationId = "createUser", description = "创建用户时, 用户账户默认为用户昵称, " +
-            "用户昵称可通过后期修改完成, 用户账户不可修改")
+    @Created(path = "/v1/users", summary = "创建用户", description = "用户昵称可通过后期修改完成, 用户账户不可修改")
     public Long register(@Validated @RequestBody RegisterDTO registerDTO) {
 
         String password = registerDTO.getPassword();
@@ -74,18 +71,14 @@ public class UserController {
         return user.getId();
     }
 
-    @Transactional
-    @PatchMapping("/v1/users/{id}")
-    @Operation(summary = "更新用户信息", operationId = "updateUser")
+    @Changed(path = "/v1/users/{id}", summary = "更新用户信息")
     public void update(@PathVariable Long id, @Validated @RequestBody UserPropDTO userPropDTO) {
         User user = this.jpaRepository.getReferenceById(id);
         user.updateSelf(userPropDTO.getName(), userPropDTO.getGender(), userPropDTO.getRemark());
     }
 
     @MarkPageable
-    @GetMapping("/v1/users")
-    @Transactional(readOnly = true)
-    @Operation(summary = "获取用户列表")
+    @QueryDetails(path = "/v1/users", summary = "获取用户列表")
     public FormatPage<UserDetailsVO> findUsers(Pageable pageable,
                                                @RequestParam(required = false) String name,
                                                @RequestParam(required = false, name = "account.name") String account,

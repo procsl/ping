@@ -37,17 +37,17 @@ public class GlobalExceptionHandler {
 
     @ResponseBody
     @ExceptionHandler(value = BusinessException.class)
-    public ErrorCode BusinessExceptionHandler(HttpServletRequest request, HttpServletResponse response,
-                                              BusinessException businessException) {
+    public ErrorVO BusinessExceptionHandler(HttpServletRequest request, HttpServletResponse response,
+                                            BusinessException businessException) {
         response.setStatus(businessException.getHttpStatus());
-        return ErrorCode.builder(businessException.getHttpStatus() + businessException.getCode(),
+        return ErrorVO.builder(businessException.getHttpStatus() + businessException.getCode(),
                 businessException.getMessage());
     }
 
     @ResponseBody
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    public ParameterErrorCode MethodArgumentNotValidExceptionHandler(MethodArgumentNotValidException e) {
+    public ParameterErrorVO MethodArgumentNotValidExceptionHandler(MethodArgumentNotValidException e) {
         BindingResult result = e.getBindingResult();
         HashMap<String, String> tmp = new HashMap<>();
         List<ObjectError> errors = result.getAllErrors();
@@ -62,56 +62,56 @@ public class GlobalExceptionHandler {
                 tmp.put(error.getObjectName(), error.getDefaultMessage());
             }
         });
-        return new ParameterErrorCode("400001", "参数校验失败", tmp);
+        return new ParameterErrorVO("400001", "参数校验失败", tmp);
     }
 
 
     @ResponseBody
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value = ConstraintViolationException.class)
-    public ParameterErrorCode constraintViolationException(ConstraintViolationException constraintViolationException) {
+    public ParameterErrorVO constraintViolationException(ConstraintViolationException constraintViolationException) {
         HashMap<String, String> tmp = new HashMap<>();
         for (ConstraintViolation<?> violation : constraintViolationException.getConstraintViolations()) {
             String key = violation.getPropertyPath().toString();
             tmp.put(key, violation.getMessage());
         }
-        return new ParameterErrorCode("400001", "参数校验失败", tmp);
+        return new ParameterErrorVO("400001", "参数校验失败", tmp);
     }
 
     @ResponseBody
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value = HttpMessageNotReadableException.class)
-    public ErrorCode httpMessageNotReadableException() {
-        return ErrorCode.builder("400001", "请求体不可为空");
+    public ErrorVO httpMessageNotReadableException() {
+        return ErrorVO.builder("400001", "请求体不可为空");
     }
 
-    ErrorCode getDefaultErrorCode(int code, Exception e) {
+    ErrorVO getDefaultErrorCode(int code, Exception e) {
         String s = String.format("%s001", code);
         if (e == null) {
-            return ErrorCode.builder(s, "server error!");
+            return ErrorVO.builder(s, "server error!");
         }
 
         if (log.isDebugEnabled()) {
-            return ErrorCode.builder(s, e.getMessage());
+            return ErrorVO.builder(s, e.getMessage());
         }
-        return ErrorCode.builder(s, "server error!");
+        return ErrorVO.builder(s, "server error!");
     }
 
     @ResponseBody
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value = RollbackException.class)
-    public ErrorCode rollbackException(RollbackException rollbackException) {
+    public ErrorVO rollbackException(RollbackException rollbackException) {
         Throwable cause = rollbackException.getCause();
         if (cause instanceof ConstraintViolationException) {
             return this.constraintViolationException((ConstraintViolationException) cause);
         }
-        return ErrorCode.builder("400001", "参数校验失败");
+        return ErrorVO.builder("400001", "参数校验失败");
     }
 
     @ResponseBody
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value = TransactionSystemException.class)
-    public ErrorCode transactionSystemException(TransactionSystemException transactionSystemException) {
+    public ErrorVO transactionSystemException(TransactionSystemException transactionSystemException) {
         if (!(transactionSystemException.getCause() instanceof RollbackException)) {
             return getDefaultErrorCode(500, transactionSystemException);
         }
