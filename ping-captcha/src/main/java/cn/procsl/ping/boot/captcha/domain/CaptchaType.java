@@ -1,6 +1,8 @@
 package cn.procsl.ping.boot.captcha.domain;
 
 
+import cn.procsl.ping.boot.captcha.domain.image.ImageCaptcha;
+
 public enum CaptchaType {
     image("图形", ImageCaptcha.class),
     sms("短信", Captcha.class),

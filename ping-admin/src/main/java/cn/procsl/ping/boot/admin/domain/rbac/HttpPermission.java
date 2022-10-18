@@ -1,8 +1,8 @@
 package cn.procsl.ping.boot.admin.domain.rbac;
 
-import cn.procsl.ping.boot.common.utils.ObjectUtils;
 import lombok.*;
 import org.springframework.http.server.PathContainer;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 

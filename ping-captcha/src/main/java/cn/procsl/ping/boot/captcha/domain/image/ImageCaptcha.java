@@ -1,5 +1,8 @@
-package cn.procsl.ping.boot.captcha.domain;
+package cn.procsl.ping.boot.captcha.domain.image;
 
+import cn.procsl.ping.boot.captcha.domain.Captcha;
+import cn.procsl.ping.boot.captcha.domain.VerifyFailureException;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import javax.persistence.DiscriminatorValue;
@@ -12,6 +15,7 @@ import java.util.Date;
 @Entity
 @DiscriminatorValue("image")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@JsonIgnoreProperties("new")
 public class ImageCaptcha extends Captcha {
 
     @Builder

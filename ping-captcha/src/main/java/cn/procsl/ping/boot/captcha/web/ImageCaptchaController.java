@@ -1,12 +1,10 @@
 package cn.procsl.ping.boot.captcha.web;
 
-import cn.procsl.ping.boot.captcha.domain.CaptchaType;
-import cn.procsl.ping.boot.captcha.service.GeneratedCaptchaService;
-import io.swagger.v3.oas.annotations.Operation;
+import cn.procsl.ping.boot.captcha.domain.image.ImageCaptchaService;
+import cn.procsl.ping.boot.common.web.Created;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.security.PermitAll;
@@ -19,11 +17,10 @@ import java.io.IOException;
 @Tag(name = "captcha", description = "图形验证码")
 public class ImageCaptchaController {
 
-    final GeneratedCaptchaService generatedCaptchaService;
+    final ImageCaptchaService generatedCaptchaService;
 
     @PermitAll
-    @Operation(summary = "创建图形验证码")
-    @PostMapping(value = "/v1/captcha/image", produces = MediaType.IMAGE_GIF_VALUE)
+    @Created(path = "/v1/captcha/image", produces = MediaType.IMAGE_GIF_VALUE, summary = "创建图形验证码")
     public void imageCaptcha(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String sessionId = request.getRequestedSessionId();
         if (sessionId == null) {
@@ -33,7 +30,7 @@ public class ImageCaptchaController {
         response.setHeader("Pragma", "No-cache");
         response.setHeader("Cache-Control", "no-cache");
         response.setDateHeader("Expires", 0);
-        this.generatedCaptchaService.generated(sessionId, CaptchaType.image, response.getOutputStream());
+//        this.generatedCaptchaService.generated(sessionId, CaptchaType.image, response.getOutputStream());
     }
 
 }

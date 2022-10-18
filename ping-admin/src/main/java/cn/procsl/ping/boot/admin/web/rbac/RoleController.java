@@ -8,7 +8,6 @@ import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.common.error.ExceptionResolver;
 import cn.procsl.ping.boot.common.event.Publisher;
 import cn.procsl.ping.boot.common.utils.QueryBuilder;
-import cn.procsl.ping.boot.common.validator.UniqueValidator;
 import cn.procsl.ping.boot.common.web.*;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.QBean;
@@ -45,8 +44,6 @@ public class RoleController {
 
     final JpaRepository<Permission, Long> permissionJpaRepository;
 
-    final UniqueValidator uniqueValidator;
-
     final JPQLQueryFactory queryFactory;
 
     final QRole qrole = QRole.role;
@@ -76,7 +73,6 @@ public class RoleController {
     public void changeRole(@PathVariable("id") Long id,
                            @Validated({Default.class}) @RequestBody @NotNull RoleGrantDTO details)
             throws BusinessException {
-        uniqueValidator.valid(Role.class, id, "name", details.getName(), "角色已存在");
         Role role = this.roleRepository.getReferenceById(id);
         List<Permission> permissions = this.permissionJpaRepository.findAllById(details.getPermissions());
         role.change(details.getName(), permissions);

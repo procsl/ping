@@ -1,11 +1,11 @@
 package cn.procsl.ping.boot.common.error;
 
 import cn.procsl.ping.boot.common.dto.MessageVO;
-import cn.procsl.ping.boot.common.utils.CollectionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.transaction.TransactionSystemException;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;

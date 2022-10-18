@@ -3,8 +3,6 @@ package cn.procsl.ping.boot.common;
 import cn.procsl.ping.boot.common.advice.AnnotationPointcutAdvisor;
 import cn.procsl.ping.boot.common.event.*;
 import cn.procsl.ping.boot.common.utils.ContextHolder;
-import cn.procsl.ping.boot.common.validator.UniqueValidator;
-import cn.procsl.ping.boot.common.validator.UniqueValidatorImpl;
 import cn.procsl.ping.boot.common.web.AccessLoggerFilter;
 import com.querydsl.jpa.Hibernate5Templates;
 import com.querydsl.jpa.JPQLQueryFactory;
@@ -52,12 +50,6 @@ public class CommonAutoConfiguration implements ApplicationContextAware {
     @Override
     public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
         ContextHolder.setApplicationContext(applicationContext);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public UniqueValidator uniqueValidation(EntityManager entityManager) {
-        return new UniqueValidatorImpl(entityManager);
     }
 
     @Bean

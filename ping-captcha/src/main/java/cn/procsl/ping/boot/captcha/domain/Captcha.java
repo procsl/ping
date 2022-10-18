@@ -21,13 +21,13 @@ import java.util.Date;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class Captcha extends AbstractPersistable<Long> implements Serializable, DiscriminatorValueFinder {
 
-    String target;
+    protected String target;
 
-    String ticket;
+    protected String ticket;
 
-    Date expired;
+    protected Date expired;
 
-    Date createDate;
+    protected Date createDate;
 
     public void verify(@NonNull String ticket) throws VerifyFailureException {
         // 如果当前时间是过期时间之后, 则属于验证码超时
@@ -52,4 +52,14 @@ public abstract class Captcha extends AbstractPersistable<Long> implements Seria
         return calendar.getTime();
     }
 
+    @Override
+    public @NonNull String toString() {
+        return "{" +
+                "target='" + target + '\'' +
+                ", ticket='" + ticket + '\'' +
+                ", expired=" + expired +
+                ", createDate=" + createDate +
+                ", id=" + getId() +
+                '}';
+    }
 }
