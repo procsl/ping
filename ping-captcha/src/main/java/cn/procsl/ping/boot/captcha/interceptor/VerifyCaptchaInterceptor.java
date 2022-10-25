@@ -1,7 +1,7 @@
 package cn.procsl.ping.boot.captcha.interceptor;
 
 import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
-import cn.procsl.ping.boot.captcha.service.VerifyCaptchaService;
+import cn.procsl.ping.boot.captcha.handler.VerifyCaptchaHandlerStrategy;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.method.HandlerMethod;
@@ -11,25 +11,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @RequiredArgsConstructor
-public class VerifyCaptchaHandler implements HandlerInterceptor {
+public class VerifyCaptchaInterceptor implements HandlerInterceptor {
 
-    final VerifyCaptchaService verifyCaptchaService;
+    final VerifyCaptchaHandlerStrategy verifyCaptchaService;
 
     @Override
-    public boolean preHandle(@NonNull HttpServletRequest request,
-                             @NonNull HttpServletResponse response,
+    public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
                              @NonNull Object handler) {
         boolean isHandler = handler instanceof HandlerMethod;
         if (!isHandler) {
             return true;
         }
-        VerifyCaptcha markup = ((HandlerMethod) handler).getMethodAnnotation(VerifyCaptcha.class);
-        if (markup == null) {
+        VerifyCaptcha verifyAnnotation = ((HandlerMethod) handler).getMethodAnnotation(VerifyCaptcha.class);
+        if (verifyAnnotation == null) {
             return true;
         }
-        String token = request.getHeader(VerifyCaptcha.header);
-        String sessionId = request.getRequestedSessionId();
-        this.verifyCaptchaService.verify(sessionId, token, markup);
+        verifyCaptchaService.verifyForStrategy(request, response, (HandlerMethod) handler, verifyAnnotation);
         return true;
     }
 }

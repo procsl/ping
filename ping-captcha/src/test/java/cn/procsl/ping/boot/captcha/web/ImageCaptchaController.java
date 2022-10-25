@@ -20,14 +20,14 @@ import java.util.Base64;
 @Controller
 @RequestMapping
 @Tag(name = "captcha", description = "图形验证码")
-public class ImageCaptchaControllerTest {
+public class ImageCaptchaController {
 
     @ResponseBody
     @GetMapping("/v1/test")
     @VerifyCaptcha(type = CaptchaType.image)
     @Operation(summary = "测试接口")
     public String test() {
-        return "hello world";
+        return "{}";
     }
 
     @ResponseBody

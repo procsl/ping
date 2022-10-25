@@ -1,37 +1,47 @@
 package cn.procsl.ping.boot.captcha.domain.image;
 
 import cn.procsl.ping.boot.captcha.domain.Captcha;
+import cn.procsl.ping.boot.captcha.domain.CaptchaType;
 import cn.procsl.ping.boot.captcha.domain.VerifyFailureException;
+import cn.procsl.ping.boot.common.jpa.RepositoryCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.util.Base64;
-import java.util.Date;
 
 @Getter
 @Setter
 @Entity
-@DiscriminatorValue("image")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "c_captcha_image")
 @JsonIgnoreProperties("new")
+@RepositoryCreator(builders = "org.springframework.data.jpa.repository.JpaSpecificationExecutor",
+        repositoryName = "ImageCaptchaSpecificationExecutor")
 public class ImageCaptcha extends Captcha {
 
+    public final static String token_key = "image-captcha-token";
+
+    @Id
+    Long id;
+
     @Builder
-    public ImageCaptcha(@NonNull String target, @NonNull String ticket, int expired) {
-        this.target = target;
-        this.ticket = ticket;
-        this.expired = this.expired(expired);
-        this.createDate = new Date();
+    public ImageCaptcha(Long id, @NonNull String target, @NonNull String ticket, int expired) {
+        super(target, ticket, expired);
+        this.id = id;
     }
 
     @Override
-    protected void check(String ticket) throws VerifyFailureException {
+    protected boolean check(String ticket) throws VerifyFailureException {
         String str = this.parse(ticket);
-        if (!this.ticket.equalsIgnoreCase(str)) {
-            throw new VerifyFailureException("%s验证码错误", this.message());
-        }
+        return this.ticket.equalsIgnoreCase(str);
+    }
+
+    @Override
+    public String message() {
+        return CaptchaType.image.message;
     }
 
     protected String parse(String ticket) throws VerifyFailureException {
@@ -39,9 +49,22 @@ public class ImageCaptcha extends Captcha {
             byte[] str = Base64.getDecoder().decode(ticket);
             return new String(str);
         } catch (IllegalArgumentException e) {
-            throw new VerifyFailureException(e, "%s验证码错误", this.message());
+            throw new VerifyFailureException(e, false, "%s验证码错误", this.message());
         }
 
     }
 
+
+    /**
+     * 有效秒数
+     *
+     * @return second time
+     */
+    public int validSecond() {
+        long second = (this.expiredDate.getTime() - this.createDate.getTime()) / 1000;
+        if (second <= Integer.MAX_VALUE) {
+            return (int) second;
+        }
+        throw new IllegalStateException("错误的超时时间");
+    }
 }
