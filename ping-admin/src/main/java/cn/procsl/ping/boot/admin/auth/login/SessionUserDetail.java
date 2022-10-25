@@ -7,15 +7,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.Collection;
-import java.util.Collections;
 
 @ToString(exclude = {"password"})
 @EqualsAndHashCode(exclude = {"password"})
-public class SessionUserDetail implements UserDetails {
+public class SessionUserDetail {
 
     @Getter
     @Hidden
@@ -41,45 +36,32 @@ public class SessionUserDetail implements UserDetails {
         this.enable = user.getAccount().isEnable();
     }
 
-    @Hidden
-    @JsonIgnore
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptySet();
-    }
-
-    @Override
     public String getPassword() {
         return this.password;
     }
 
-    @Override
     public String getUsername() {
         return this.username;
     }
 
-    @Override
     @Hidden
     @JsonIgnore
     public boolean isAccountNonExpired() {
         return true;
     }
 
-    @Override
     @Hidden
     @JsonIgnore
     public boolean isAccountNonLocked() {
         return true;
     }
 
-    @Override
     @Hidden
     @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
-    @Override
     @Hidden
     @JsonIgnore
     public boolean isEnabled() {
