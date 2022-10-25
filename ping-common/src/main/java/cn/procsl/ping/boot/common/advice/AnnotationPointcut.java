@@ -48,6 +48,12 @@ final class AnnotationPointcut extends StaticMethodMatcherPointcut {
         if (name.startsWith("com.fasterxml")) {
             return false;
         }
+        if (name.startsWith("com.sun")) {
+            return false;
+        }
+        if (name.startsWith("io.micrometer")) {
+            return false;
+        }
 
         log.trace("matcher target class:{}", name);
         Method specMethod = AopUtils.getMostSpecificMethod(method, targetClass);

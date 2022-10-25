@@ -4,7 +4,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.web.filter.AbstractRequestLoggingFilter;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -14,19 +14,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 @Slf4j
-public class AccessLoggerFilter extends AbstractRequestLoggingFilter implements InitializingBean {
-
-    @Override
-    public void afterPropertiesSet() throws ServletException {
-        super.afterPropertiesSet();
-        this.setAfterMessagePrefix("请求结束:[");
-        this.setBeforeMessagePrefix("请求开始:[");
-    }
-
-
-    @Override
-    protected void beforeRequest(@NonNull HttpServletRequest request, @NonNull String message) {
-    }
+public class AccessLoggerFilter extends OncePerRequestFilter implements InitializingBean {
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
@@ -41,19 +29,10 @@ public class AccessLoggerFilter extends AbstractRequestLoggingFilter implements 
         if (requestId == null || requestId.isEmpty()) {
             requestId = UUID.randomUUID().toString().replaceAll("-", "");
         }
-
-        try {
-            MDC.put("RequestId", requestId);
-        } catch (Exception e) {
-            logger.warn("初始化日志信息异常:", e);
-        }
-
+        MDC.put("RequestId", requestId);
         response.setHeader(traceName, MDC.get("RequestId"));
-        super.doFilterInternal(request, response, filterChain);
+        filterChain.doFilter(request, response);
     }
 
 
-    @Override
-    protected void afterRequest(@NonNull HttpServletRequest request, @NonNull String message) {
-    }
 }

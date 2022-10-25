@@ -26,11 +26,8 @@ public @interface RepositoryCreator {
      */
     String[] builders() default {};
 
-    /**
-     * 指定的命名策略
-     *
-     * @return 返回指定的命名策略
-     */
     String strategy() default "cn.procsl.ping.processor.repository.DefaultNamingStrategy";
+
+    String repositoryName() default "";
 
 }
