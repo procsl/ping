@@ -1,5 +1,6 @@
 package cn.procsl.ping.apt.repository;
 
+import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
@@ -38,7 +39,8 @@ public abstract class AbstractRepositoryBuilder implements RepositoryBuilder {
         this.processingEnvironment = processingEnv;
         this.configFinder = configFinder;
         innerInit();
-        this.processingEnvironment.getMessager().printMessage(Diagnostic.Kind.NOTE, "Init builder: " + this.getClass().getName());
+        this.processingEnvironment.getMessager()
+                                  .printMessage(Diagnostic.Kind.NOTE, "Init builder: " + this.getClass().getName());
     }
 
     /**
@@ -75,22 +77,48 @@ public abstract class AbstractRepositoryBuilder implements RepositoryBuilder {
         }
 
         TypeMirror superClass = entity.getSuperclass();
-        if (superClass.toString().startsWith("org.springframework.data.jpa.domain.AbstractPersistable") && superClass instanceof DeclaredType) {
-            List<? extends TypeMirror> arguments = ((DeclaredType) superClass).getTypeArguments();
+        String start = superClass.toString();
+        Element element = processingEnvironment.getTypeUtils().asElement(superClass);
+        Messager messager = this.processingEnvironment.getMessager();
+        if (!(superClass instanceof DeclaredType)) {
+            messager.printMessage(Diagnostic.Kind.NOTE, "Is not DeclaredType", element);
+            return null;
+        }
+
+        if (!(element instanceof TypeElement)) {
+            messager.printMessage(Diagnostic.Kind.NOTE, "Is not TypeElement", element);
+            return null;
+        }
+
+        if (start.startsWith("java") || start.startsWith("javax")) {
+            messager.printMessage(Diagnostic.Kind.NOTE, "Is java type", element);
+            return null;
+        }
+
+        DeclaredType type = (DeclaredType) superClass;
+        if (start.startsWith("org.springframework.data.jpa.domain.AbstractPersistable")) {
+            List<? extends TypeMirror> arguments = type.getTypeArguments();
             if (!arguments.isEmpty()) {
                 return arguments.get(0);
             }
         }
 
-        if (superClass.toString().startsWith("cn.procsl.ping.boot.user.config.AbstractAuditable") && superClass instanceof DeclaredType) {
-            List<? extends TypeMirror> arguments = ((DeclaredType) superClass).getTypeArguments();
+        if (start.startsWith("org.springframework.data.domain.Persistable")) {
+            List<? extends TypeMirror> arguments = type.getTypeArguments();
+            if (!arguments.isEmpty()) {
+                return arguments.get(0);
+            }
+        }
+
+        if (start.startsWith(
+                "cn.procsl.ping.boot.user.config.AbstractAuditable")) {
+            List<? extends TypeMirror> arguments = type.getTypeArguments();
             if (!arguments.isEmpty()) {
                 return arguments.get(1);
             }
         }
+        return this.findIdType((TypeElement) element);
 
-        this.processingEnvironment.getMessager().printMessage(Diagnostic.Kind.WARNING, "Not fount @Id annotation", entity);
-        return null;
     }
 
 
