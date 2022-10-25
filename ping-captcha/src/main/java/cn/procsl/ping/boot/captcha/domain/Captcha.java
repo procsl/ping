@@ -19,10 +19,8 @@ import java.util.Random;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class Captcha implements Serializable, Persistable<Long> {
 
-    final protected static char[] number_chars = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-
     final public static int max_times = 3;
-
+    final protected static char[] number_chars = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
     @Column(updatable = false, length = 50)
     protected String target;
 
@@ -48,6 +46,16 @@ public abstract class Captcha implements Serializable, Persistable<Long> {
         this.verified = false;
     }
 
+    @SuppressWarnings("all")
+    protected static String random(int count, char[] chars) {
+        Random random = new Random();
+        StringBuilder buffer = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            int index = random.nextInt(chars.length);
+            buffer.append(chars[index]);
+        }
+        return buffer.toString();
+    }
 
     public void verify(@NonNull String ticket) throws VerifyFailureException {
         // 如果当前时间是过期时间之后, 则属于验证码超时
@@ -96,16 +104,5 @@ public abstract class Captcha implements Serializable, Persistable<Long> {
         SimpleDateFormat format = new SimpleDateFormat("[yyyy-MM-dd HH:mm:ss.SSS]");
         return "{" + "target='" + target + '\'' + ", ticket='" + ticket + '\'' + ", expired=" + format.format(
                 expiredDate) + ", " + "createDate=" + format.format(createDate) + ", id=" + getId() + '}';
-    }
-
-    @SuppressWarnings("all")
-    protected static String random(int count, char[] chars) {
-        Random random = new Random();
-        StringBuilder buffer = new StringBuilder();
-        for (int i = 0; i < count; i++) {
-            int index = random.nextInt(chars.length);
-            buffer.append(chars[index]);
-        }
-        return buffer.toString();
     }
 }

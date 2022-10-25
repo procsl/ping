@@ -1,8 +1,8 @@
 package cn.procsl.ping.boot.captcha.handler;
 
 import cn.procsl.ping.boot.captcha.domain.CaptchaType;
-import cn.procsl.ping.boot.captcha.domain.image.ImageCaptchaRepository;
 import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
+import cn.procsl.ping.boot.captcha.domain.image.ImageCaptchaRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.InitializingBean;

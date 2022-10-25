@@ -45,11 +45,10 @@ public class ImageVerifyCaptchaInterceptorTest {
     }
 
     static class MockVerifyCommand extends ImageVerifyCommand {
+        final ImageCaptchaBuilderService service = new ImageCaptchaBuilderService();
         private final ImageCaptcha captcha;
         private final String token;
-
         private final String ticket;
-        final ImageCaptchaBuilderService service = new ImageCaptchaBuilderService();
 
         public MockVerifyCommand(ImageCaptcha captcha, String ticket) {
             super(null);

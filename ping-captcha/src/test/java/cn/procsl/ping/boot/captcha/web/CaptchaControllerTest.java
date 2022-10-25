@@ -1,7 +1,7 @@
 package cn.procsl.ping.boot.captcha.web;
 
 import cn.procsl.ping.boot.captcha.TestCaptchaApplication;
-import cn.procsl.ping.boot.captcha.domain.*;
+import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
 import cn.procsl.ping.boot.captcha.domain.email.EmailCaptcha;
 import cn.procsl.ping.boot.captcha.domain.image.ImageCaptcha;
 import cn.procsl.ping.boot.captcha.domain.image.ImageCaptchaBuilderService;

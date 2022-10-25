@@ -1,9 +1,9 @@
 package cn.procsl.ping.boot.captcha.web;
 
 import cn.procsl.ping.boot.captcha.domain.CaptchaType;
+import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
 import cn.procsl.ping.boot.captcha.domain.image.ImageCaptcha;
 import cn.procsl.ping.boot.captcha.domain.image.ImageCaptchaBuilderService;
-import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
 import cn.procsl.ping.boot.captcha.handler.EmailCaptchaHandler;
 import cn.procsl.ping.boot.common.web.Accepted;
 import cn.procsl.ping.boot.common.web.Created;
@@ -37,8 +37,14 @@ public class CaptchaController {
 
     final AtomicLong auto = new AtomicLong(0);
 
+    public static String getTarget(HttpServletRequest request) {
+        String sessionId = request.getRequestedSessionId();
+        if (sessionId == null) {
+            sessionId = request.getSession().getId();
+        }
+        return sessionId;
+    }
 
-    // TODO  应该修改为只要成功过一次, 就必须更换验证码, 如果校验失败, 则最多3次
     @PermitAll
     @Created(path = "/v1/captcha/image", produces = MediaType.IMAGE_GIF_VALUE, summary = "创建图形验证码")
     public void createImageCaptcha(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -61,15 +67,6 @@ public class CaptchaController {
         response.setDateHeader("Expires", 0);
 
         captcha.out(response.getOutputStream());
-    }
-
-
-    public static String getTarget(HttpServletRequest request) {
-        String sessionId = request.getRequestedSessionId();
-        if (sessionId == null) {
-            sessionId = request.getSession().getId();
-        }
-        return sessionId;
     }
 
     @PermitAll

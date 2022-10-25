@@ -2,8 +2,8 @@ package cn.procsl.ping.boot.captcha;
 
 import cn.procsl.ping.boot.captcha.adapter.DefaultEmailSenderAdapter;
 import cn.procsl.ping.boot.captcha.adapter.EmailSenderAdapter;
-import cn.procsl.ping.boot.captcha.interceptor.VerifyCaptchaInterceptor;
 import cn.procsl.ping.boot.captcha.handler.VerifyCaptchaHandlerStrategy;
+import cn.procsl.ping.boot.captcha.interceptor.VerifyCaptchaInterceptor;
 import lombok.NonNull;
 import org.springframework.beans.BeansException;
 import org.springframework.boot.autoconfigure.AutoConfiguration;

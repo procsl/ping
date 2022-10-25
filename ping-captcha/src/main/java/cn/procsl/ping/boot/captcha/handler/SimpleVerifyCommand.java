@@ -13,17 +13,17 @@ class SimpleVerifyCommand implements VerifyCaptchaCommand {
 
     final protected HttpServletRequest request;
 
-    @Override
-    public String target() {
-        return getTarget(request);
-    }
-
     public static String getTarget(HttpServletRequest request) {
         String sessionId = request.getRequestedSessionId();
         if (sessionId == null) {
             sessionId = request.getSession().getId();
         }
         return sessionId;
+    }
+
+    @Override
+    public String target() {
+        return getTarget(request);
     }
 
     @Override
