@@ -1,1 +1,1 @@
-mvnDebug clean package -Dmaven.test.skip=true -e
+mvnDebug clean package -Dfile.encoding=GBK -Dmaven.test.skip=true -e
