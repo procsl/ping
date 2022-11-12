@@ -1,0 +1,20 @@
+module ping.captcha {
+
+    requires static ping.apt;
+    requires static lombok;
+    requires static java.compiler;
+
+    requires ping.common;
+    requires java.persistence;
+    requires spring.web;
+    requires com.fasterxml.jackson.annotation;
+    requires com.fasterxml.jackson.databind;
+    requires easy.captcha;
+    requires io.swagger.v3.oas.annotations;
+    requires spring.context;
+    requires java.annotation;
+    requires java.servlet;
+
+    uses javax.annotation.processing.Processor;
+    uses cn.procsl.ping.apt.repository.RepositoryBuilder;
+}

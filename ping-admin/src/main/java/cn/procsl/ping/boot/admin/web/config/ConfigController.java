@@ -10,17 +10,16 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.QBean;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.JPQLQueryFactory;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Indexed;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
-import javax.annotation.Nullable;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 
 @Indexed
@@ -37,33 +36,30 @@ public class ConfigController {
 
     final QConfig qconfig = QConfig.config;
 
-    @Changed(path = "/v1/configs/{id}", summary = "编辑配置项")
+    @Changed(path = "/v1/admin/configs/{id}", summary = "编辑配置项")
     public void edit(@PathVariable Long id, @RequestBody @Validated ConfigDTO config) throws BusinessException {
         this.jpaRepository.getReferenceById(id)
                           .edit(config.getName(), config.getContent(), config.getDescription());
     }
 
-    @Transactional
-    @PutMapping("/v1/configs")
-    @Operation(summary = "创建或更新配置项")
-    public Long put(@RequestBody @Validated ConfigDTO config) throws BusinessException {
-        return configOptionService.put(config.getName(), config.getContent(), config.getDescription());
+    @Patch(path = "/v1/admin/configs", summary = "创建或更新配置项")
+    public void put(@RequestBody @Validated ConfigDTO config) throws BusinessException {
+        configOptionService.put(config.getName(), config.getContent(), config.getDescription());
     }
 
 
-    @Deleted(path = "/v1/configs/{id}", summary = "删除配置项")
+    @Deleted(path = "/v1/admin/configs/{id}", summary = "删除配置项")
     public void delete(@PathVariable Long id) throws BusinessException {
         this.jpaRepository.deleteById(id);
     }
 
-    @Nullable
-    @QueryDetails(path = "/v1/configs/{name}", summary = "获取配置内容")
+    @Query(path = "/v1/admin/configs/{name}", summary = "获取配置内容")
     public ConfigNameValueDTO getConfig(@PathVariable String name) {
         return new ConfigNameValueDTO(name, this.configOptionService.get(name));
     }
 
     @MarkPageable
-    @QueryDetails(path = "/v1/configs", summary = "获取配置内容")
+    @Query(path = "/v1/admin/configs", summary = "获取配置内容")
     public FormatPage<ConfigVO> findConfig(Pageable pageable, @RequestParam(required = false) String name) {
         QBean<ConfigVO> select = Projections.fields(ConfigVO.class, qconfig.id, qconfig.name, qconfig.content,
                 qconfig.description);

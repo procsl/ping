@@ -22,7 +22,7 @@ public class AccountController {
 
     final PasswordEncoderService passwordEncoderService;
 
-    @Changed(path = "/v1/users/{id}/account", summary = "修改用户账户状态")
+    @Changed(path = "/v1/admin/users/{id}/account", summary = "修改用户账户状态")
     public void accountStatusSetting(@PathVariable Long id, @Validated @RequestBody AccountStateDTO state) {
         userRepository
                 .getReferenceById(id)
@@ -30,7 +30,7 @@ public class AccountController {
                 .stateSetting(state.getState());
     }
 
-    @Changed(path = "/v1/users/{id}/password", summary = "重置用户密码")
+    @Changed(path = "/v1/admin/users/{id}/password", summary = "重置用户密码")
     public void resetPassword(@PathVariable Long id, @Validated @RequestBody ResetPasswordDTO passwordDTO) {
         userRepository
                 .getReferenceById(id)

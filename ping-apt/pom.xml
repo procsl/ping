@@ -10,9 +10,16 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>ping-apt</artifactId>
-    <name>Ping 注解处理器模块</name>
+    <name>Ping 注解处理器</name>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
 
         <dependency>
             <groupId>com.squareup</groupId>
@@ -27,6 +34,19 @@
         <dependency>
             <groupId>cn.procsl</groupId>
             <artifactId>ping-common</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service</artifactId>
+            <optional>true</optional>
         </dependency>
 
     </dependencies>

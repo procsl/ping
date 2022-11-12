@@ -11,15 +11,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.lang.annotation.*;
 
-@Operation
 @Documented
+@Operation
 @VersionControl
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@RequestMapping(method = RequestMethod.PUT)
-@ResponseStatus(HttpStatus.NO_CONTENT)
-@Transactional(rollbackFor = Exception.class)
-public @interface Changed {
+@RequestMapping(method = RequestMethod.GET)
+@ResponseStatus(HttpStatus.OK)
+@Transactional(rollbackFor = Exception.class, readOnly = true)
+public @interface Query {
 
     @AliasFor(annotation = RequestMapping.class, attribute = "path") String[] path();
 
@@ -35,9 +35,6 @@ public @interface Changed {
 
     @AliasFor(annotation = Operation.class, attribute = "description") String description() default "";
 
-    @AliasFor(annotation = ResponseStatus.class, attribute = "code")
-    HttpStatus httpStatus() default HttpStatus.ACCEPTED;
-
     @AliasFor(annotation = Transactional.class, attribute = "propagation")
-    Propagation propagation() default Propagation.REQUIRED;
+    Propagation propagation() default Propagation.SUPPORTS;
 }

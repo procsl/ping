@@ -9,6 +9,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -36,8 +37,16 @@ public class GlobalExceptionHandler {
     }
 
     @ResponseBody
+    @ExceptionHandler(value = RuntimeException.class)
+    @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
+    public MessageVO runtimeExceptionHandler(RuntimeException e) {
+        log.warn("未解析的异常:", e);
+        return new MessageVO("服务器内部错误");
+    }
+
+    @ResponseBody
     @ExceptionHandler(value = BusinessException.class)
-    public ErrorVO BusinessExceptionHandler(HttpServletRequest request, HttpServletResponse response,
+    public ErrorVO businessExceptionHandler(HttpServletRequest request, HttpServletResponse response,
                                             BusinessException businessException) {
         response.setStatus(businessException.getHttpStatus());
         return ErrorVO.builder(businessException.getHttpStatus() + businessException.getCode(),
@@ -47,7 +56,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    public ParameterErrorVO MethodArgumentNotValidExceptionHandler(MethodArgumentNotValidException e) {
+    public ParameterErrorVO methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException e) {
         BindingResult result = e.getBindingResult();
         HashMap<String, String> tmp = new HashMap<>();
         List<ObjectError> errors = result.getAllErrors();
@@ -116,6 +125,14 @@ public class GlobalExceptionHandler {
             return getDefaultErrorCode(500, transactionSystemException);
         }
         return this.rollbackException((RollbackException) transactionSystemException.getCause());
+    }
+
+
+    @ResponseBody
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
+    public ErrorVO httpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException exception) {
+        return new ErrorVO("400003", exception.getMessage());
     }
 
 }

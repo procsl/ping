@@ -1,9 +1,11 @@
 package cn.procsl.ping.boot.admin.web.rbac;
 
-import cn.procsl.ping.boot.admin.domain.rbac.*;
+import cn.procsl.ping.boot.admin.domain.rbac.Role;
+import cn.procsl.ping.boot.admin.domain.rbac.Subject;
+import cn.procsl.ping.boot.admin.domain.rbac.SubjectRoleSpecification;
 import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.common.web.Changed;
-import cn.procsl.ping.boot.common.web.QueryDetails;
+import cn.procsl.ping.boot.common.web.Query;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPQLQueryFactory;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -39,7 +41,7 @@ public class AccessController {
 
     final QRole qrole = QRole.role;
 
-    @Changed(path = "/v1/users/{id}/roles", summary = "授予角色权限")
+    @Changed(path = "/v1/admin/users/{id}/roles", summary = "授予角色权限")
     public void grant(@PathVariable("id") Long id,
                       @RequestBody @NotNull @Validated @Schema(description = "角色ID") Collection<Long> roleIds) {
         Optional<Subject> optional = this.subjectJpaSpecificationExecutor.findOne(
@@ -49,7 +51,7 @@ public class AccessController {
         subject.grant(roles);
     }
 
-    @QueryDetails(path = "/v1/users/{id}/roles", summary = "获取已授权列表")
+    @Query(path = "/v1/admin/users/{id}/roles", summary = "获取已授权列表")
     public Collection<RoleVO> findSubjects(@PathVariable("id") Long id) {
         val select = Projections.bean(RoleVO.class, qrole.name, qrole.id);
         return this.queryFactory.select(select).from(sub).innerJoin(sub.roles, qrole).where(sub.subject.eq(id)).fetch();

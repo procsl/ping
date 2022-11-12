@@ -16,7 +16,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Indexed;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,8 +39,7 @@ public class PermissionController {
 
     final MapStructMapper mapStructMapper = Mappers.getMapper(MapStructMapper.class);
 
-    @Created(path = "/v1/permissions", summary = "创建权限")
-    @Transactional(rollbackFor = Exception.class)
+    @Created(path = "/v1/admin/permissions", summary = "创建权限")
     @Publisher(name = PERMISSION_CREATE_EVENT, parameter = "#id")
     public PermissionVO create(@Validated @RequestBody PermissionCreateDTO permission) throws BusinessException {
         Permission entity = permission.convert();
@@ -49,16 +47,14 @@ public class PermissionController {
         return this.mapStructMapper.mapper(entity);
     }
 
-    @Deleted(path = "/v1/permissions/{id}", summary = "删除权限")
-    @Transactional(rollbackFor = Exception.class)
+    @Deleted(path = "/v1/admin/permissions/{id}", summary = "删除权限")
     @ExceptionResolver(message = "该角色已被关联, 角色删除失败", code = "409001", matcher = DataIntegrityViolationException.class)
     @Publisher(name = PERMISSION_DELETE_EVENT, parameter = "#id")
     public void delete(@PathVariable Long id) throws BusinessException {
         this.permissionJpaRepository.deleteById(id);
     }
 
-    @Changed(path = "/v1/permissions/{id}", summary = "更新权限")
-    @Transactional(rollbackFor = Exception.class)
+    @Changed(path = "/v1/admin/permissions/{id}", summary = "更新权限")
     @Publisher(name = PERMISSION_UPDATE_EVENT, parameter = "#id")
     public void update(@PathVariable Long id, @Validated @RequestBody PermissionUpdateDTO permission)
             throws BusinessException {
@@ -68,8 +64,7 @@ public class PermissionController {
     }
 
     @MarkPageable
-    @QueryDetails(path = "/v1/permissions", summary = "查询角色权限")
-    @Transactional(rollbackFor = Exception.class, readOnly = true)
+    @Query(path = "/v1/admin/permissions", summary = "查询角色权限")
     public FormatPage<PermissionVO> findPermissions(Pageable pageable,
                                                     @RequestParam(required = false) String resource,
                                                     @RequestParam(required = false) PermissionType type) {

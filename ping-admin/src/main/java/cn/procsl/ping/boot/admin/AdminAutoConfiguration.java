@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.core.annotation.Order;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.repository.config.BootstrapMode;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -24,12 +25,14 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
         "cn.procsl.ping.boot.admin.web",
         "cn.procsl.ping.boot.admin.service",
         "cn.procsl.ping.boot.admin.listener",
-        "cn.procsl.ping.boot.admin.adapter"
+        "cn.procsl.ping.boot.admin.adapter",
+        "cn.procsl.ping.boot.admin.auth"
 },
         basePackageClasses = {
                 ConfigOptionService.class,
                 RoleSettingService.class,
         })
+@Order
 public class AdminAutoConfiguration {
 
 }

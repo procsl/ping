@@ -16,7 +16,6 @@ import javax.tools.StandardLocation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyMap;
@@ -49,8 +48,6 @@ public class RepositoryProcessor extends AbstractProcessor {
     private Map<Object, Object> config;
 
     private Map<String, RepositoryNamingStrategy> namingStrategy;
-
-    private ConcurrentHashMap<String, Object> concurrentHashMap = new ConcurrentHashMap<String, Object>();
 
     private boolean init = true;
 

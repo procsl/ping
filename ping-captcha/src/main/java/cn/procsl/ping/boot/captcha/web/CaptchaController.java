@@ -7,14 +7,15 @@ import cn.procsl.ping.boot.captcha.domain.image.ImageCaptchaBuilderService;
 import cn.procsl.ping.boot.captcha.handler.EmailCaptchaHandler;
 import cn.procsl.ping.boot.common.web.Accepted;
 import cn.procsl.ping.boot.common.web.Created;
-import com.wf.captcha.ChineseCaptcha;
+import com.wf.captcha.SpecCaptcha;
+import com.wf.captcha.base.Captcha;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.security.PermitAll;
@@ -47,11 +48,16 @@ public class CaptchaController {
 
     @PermitAll
     @Created(path = "/v1/captcha/image", produces = MediaType.IMAGE_GIF_VALUE, summary = "创建图形验证码")
-    public void createImageCaptcha(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String sessionId = getTarget(request);
+    public void createImageCaptcha(HttpServletRequest request, HttpServletResponse response,
+                                   @RequestParam(defaultValue = "130", required = false) Integer width,
+                                   @RequestParam(defaultValue = "48", required = false) Integer height)
+            throws IOException {
 
-        ChineseCaptcha captcha = new ChineseCaptcha();
+        Captcha captcha = new SpecCaptcha();
+
         long id = System.currentTimeMillis() + auto.getAndIncrement();
+
+        String sessionId = getTarget(request);
         ImageCaptcha imageCaptcha = new ImageCaptcha(id, sessionId, captcha.text(), 2);
         String token = this.imageCaptchaBuilderService.buildToken("123456", imageCaptcha);
 
@@ -61,18 +67,19 @@ public class CaptchaController {
         cookie.setPath("/");
 
         response.addCookie(cookie);
-        response.setContentType("image/gif");
         response.setHeader("Pragma", "no-cache");
         response.setHeader("Cache-Control", "no-cache");
-        response.setDateHeader("Expires", 0);
+        response.setContentType(MediaType.IMAGE_GIF_VALUE);
+
+        // 由于直接输出响应, 会影响 HttpStatus 的设置, 因此应该提前设置 HttpStatus
+        response.setStatus(HttpStatus.CREATED.value());
 
         captcha.out(response.getOutputStream());
     }
 
     @PermitAll
     @VerifyCaptcha(type = CaptchaType.image)
-    @Accepted(path = "/v1/captcha/email", summary = "发送邮件验证码")
-    @ResponseStatus(code = HttpStatus.NO_CONTENT)
+    @Accepted(path = "/v1/captcha/email", summary = "发送邮件验证码", httpStatus = HttpStatus.NO_CONTENT)
     public void sendEmailCaptcha(HttpServletRequest request, @RequestBody @Validated EmailSenderDTO sender) {
         this.emailCaptchaHandler.createEmailCaptcha(getTarget(request), sender.getEmail());
     }

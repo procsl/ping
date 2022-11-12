@@ -3,27 +3,18 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>ping</artifactId>
+        <artifactId>ping-parent</artifactId>
         <groupId>cn.procsl</groupId>
         <version>0.0.6-SNAPSHOT</version>
+        <relativePath>../ping-parent</relativePath>
     </parent>
+
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>ping-connect</artifactId>
-    <name>Ping 聊天模块</name>
-
-    <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    <name>Ping 连接模块</name>
 
     <dependencies>
-
-        <dependency>
-            <groupId>cn.procsl</groupId>
-            <artifactId>ping-common</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>io.socket</groupId>

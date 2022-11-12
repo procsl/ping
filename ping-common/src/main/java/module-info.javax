@@ -1,0 +1,45 @@
+module ping.common {
+
+    requires static transitive lombok;
+    requires static java.compiler;
+    requires org.hibernate.orm.core;
+
+    requires java.persistence;
+    requires java.validation;
+    requires java.servlet;
+    requires java.annotation;
+
+    requires io.swagger.v3.oas.annotations;
+    requires com.fasterxml.jackson.annotation;
+    requires com.google.auto.service;
+
+    requires com.querydsl.core;
+    requires com.querydsl.jpa;
+
+    requires spring.core;
+    requires spring.aop;
+    requires spring.boot.autoconfigure;
+    requires spring.boot;
+    requires spring.context;
+    requires spring.data.jpa;
+    requires spring.data.commons;
+    requires spring.tx;
+    requires spring.expression;
+    requires spring.beans;
+    requires spring.web;
+    requires spring.webmvc;
+    requires org.slf4j;
+
+    exports cn.procsl.ping.boot.common;
+    exports cn.procsl.ping.boot.common.jpa;
+    exports cn.procsl.ping.boot.common.error;
+    exports cn.procsl.ping.boot.common.event;
+    exports cn.procsl.ping.boot.common.advice;
+    exports cn.procsl.ping.boot.common.invoker;
+    exports cn.procsl.ping.boot.common.load;
+    exports cn.procsl.ping.boot.common.service;
+    exports cn.procsl.ping.boot.common.utils;
+    exports cn.procsl.ping.boot.common.web;
+
+    uses javax.annotation.processing.Processor;
+}

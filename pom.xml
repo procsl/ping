@@ -20,96 +20,28 @@
         <querydsl.version>5.0.0</querydsl.version>
         <springdoc.version>1.6.9</springdoc.version>
         <jpa-streamer-version>1.0.2</jpa-streamer-version>
-        <mapstruct.version>1.5.2.Final</mapstruct.version>
+        <mapstruct.version>1.5.3.Final</mapstruct.version>
         <native.version>0.12.0</native.version>
-        <server.port>10000</server.port>
+        <web.server.port>10000</web.server.port>
+        <spring-dev>false</spring-dev>
     </properties>
 
     <modules>
-        <module>ping-product</module>
         <module>ping-common</module>
-        <module>ping-admin</module>
         <module>ping-apt</module>
+        <module>ping-parent</module>
         <module>ping-distribute</module>
-        <module>ping-captcha</module>
-        <module>ping-connect</module>
-        <module>ping-im</module>
     </modules>
 
     <name>Ping 父模块</name>
 
     <dependencies>
 
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.persistence</groupId>
-            <artifactId>javax.persistence-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>io.swagger.core.v3</groupId>
-            <artifactId>swagger-annotations</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.javafaker</groupId>
-            <artifactId>javafaker</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.jsonzou</groupId>
-            <artifactId>jmockdata</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.auto.service</groupId>
-            <artifactId>auto-service</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.querydsl</groupId>
-            <artifactId>querydsl-apt</artifactId>
-            <classifier>jpa</classifier>
-        </dependency>
-
-        <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-launcher</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct-processor</artifactId>
-        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>org.springframework.security</groupId>-->
+        <!--            <artifactId>spring-security-test</artifactId>-->
+        <!--            <scope>test</scope>-->
+        <!--        </dependency>-->
 
     </dependencies>
 
@@ -166,14 +98,6 @@
 
             <dependency>
                 <groupId>cn.procsl</groupId>
-                <artifactId>ping-apt</artifactId>
-                <version>${project.version}</version>
-                <scope>provided</scope>
-                <optional>true</optional>
-            </dependency>
-
-            <dependency>
-                <groupId>cn.procsl</groupId>
                 <artifactId>ping-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -214,6 +138,12 @@
                 <version>1.0.2</version>
                 <scope>test</scope>
                 <optional>true</optional>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.yaml</groupId>
+                        <artifactId>snakeyaml</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -229,7 +159,6 @@
                 <artifactId>querydsl-apt</artifactId>
                 <version>${querydsl.version}</version>
                 <classifier>jpa</classifier>
-                <scope>provided</scope>
                 <optional>true</optional>
             </dependency>
 
@@ -244,6 +173,7 @@
                 <artifactId>javax.inject</artifactId>
                 <version>1</version>
                 <scope>provided</scope>
+                <optional>true</optional>
             </dependency>
 
             <dependency>
@@ -252,12 +182,13 @@
                 <version>2.1.1</version>
                 <type>jar</type>
                 <scope>provided</scope>
+                <optional>true</optional>
             </dependency>
 
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-annotations</artifactId>
-                <version>2.2.3</version>
+                <version>2.2.4</version>
                 <scope>provided</scope>
             </dependency>
 
@@ -285,13 +216,13 @@
                 <groupId>org.javassist</groupId>
                 <artifactId>javassist</artifactId>
                 <version>3.29.2-GA</version>
+                <optional>true</optional>
             </dependency>
 
             <dependency>
                 <groupId>com.google.auto.service</groupId>
                 <artifactId>auto-service</artifactId>
                 <version>1.0.1</version>
-                <scope>compile</scope>
                 <optional>true</optional>
             </dependency>
 
@@ -485,67 +416,6 @@
     <profiles>
 
         <profile>
-            <id>springboot</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <dependencies>
-
-                <dependency>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-validation</artifactId>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-data-jpa</artifactId>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-autoconfigure</artifactId>
-                    <scope>compile</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-web</artifactId>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-test</artifactId>
-                    <scope>test</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-context-indexer</artifactId>
-                    <optional>true</optional>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.springframework.hateoas</groupId>
-                    <artifactId>spring-hateoas</artifactId>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.springframework.security</groupId>
-                    <artifactId>spring-security-test</artifactId>
-                    <scope>test</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-configuration-processor</artifactId>
-                    <optional>true</optional>
-                    <scope>provided</scope>
-                </dependency>
-
-            </dependencies>
-        </profile>
-
-        <profile>
             <id>undertow</id>
             <dependencies>
 
@@ -612,6 +482,94 @@
                     <artifactId>postgresql</artifactId>
                 </dependency>
             </dependencies>
+        </profile>
+
+
+        <profile>
+            <id>openapi</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.springdoc</groupId>
+                    <artifactId>springdoc-openapi-webmvc-core</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.springdoc</groupId>
+                    <artifactId>springdoc-openapi-ui</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.springdoc</groupId>
+                    <artifactId>springdoc-openapi-javadoc</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.springdoc</groupId>
+                    <artifactId>springdoc-openapi-common</artifactId>
+                </dependency>
+            </dependencies>
+
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.springdoc</groupId>
+                            <artifactId>springdoc-openapi-maven-plugin</artifactId>
+                            <version>1.3</version>
+                            <executions>
+                                <execution>
+                                    <id>integration-test</id>
+                                    <goals>
+                                        <goal>generate</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+
+                            <configuration>
+                                <apiDocsUrl>http://localhost:${web.server.port}/v3/api-docs</apiDocsUrl>
+                                <outputFileName>openapi.json</outputFileName>
+                                <outputDir>${project.build.directory}/spring-doc</outputDir>
+                                <skip>false</skip>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+
+        </profile>
+
+        <profile>
+            <id>monitor</id>
+
+            <dependencies>
+                <dependency>
+                    <groupId>de.codecentric</groupId>
+                    <artifactId>spring-boot-admin-starter-client</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-actuator</artifactId>
+                </dependency>
+
+            </dependencies>
+
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>de.codecentric</groupId>
+                        <artifactId>spring-boot-admin-starter-client</artifactId>
+                        <version>${springboot.version}</version>
+                    </dependency>
+
+                    <dependency>
+                        <groupId>de.codecentric</groupId>
+                        <artifactId>spring-boot-admin-starter-server</artifactId>
+                        <version>${springboot.version}</version>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
+
         </profile>
 
         <profile>
@@ -840,107 +798,16 @@
         </profile>
 
         <profile>
-            <id>openapi</id>
+            <id>debug</id>
+            <properties>
+                <spring-dev>true</spring-dev>
+            </properties>
             <dependencies>
-                <dependency>
-                    <groupId>org.springdoc</groupId>
-                    <artifactId>springdoc-openapi-webmvc-core</artifactId>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.springdoc</groupId>
-                    <artifactId>springdoc-openapi-ui</artifactId>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.springdoc</groupId>
-                    <artifactId>springdoc-openapi-javadoc</artifactId>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.springdoc</groupId>
-                    <artifactId>springdoc-openapi-common</artifactId>
-                </dependency>
-
-                <dependency>
-                    <groupId>com.querydsl</groupId>
-                    <artifactId>querydsl-apt</artifactId>
-                    <classifier>jpa</classifier>
-                    <optional>true</optional>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>io.github.classgraph</groupId>
-                            <artifactId>classgraph</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-            </dependencies>
-
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.springdoc</groupId>
-                            <artifactId>springdoc-openapi-maven-plugin</artifactId>
-                            <version>1.3</version>
-                            <executions>
-                                <execution>
-                                    <id>integration-test</id>
-                                    <goals>
-                                        <goal>generate</goal>
-                                    </goals>
-                                </execution>
-                            </executions>
-
-                            <configuration>
-                                <apiDocsUrl>http://localhost:${server.port}/v3/api-docs</apiDocsUrl>
-                                <outputFileName>openapi.json</outputFileName>
-                                <outputDir>${project.build.directory}/spring-doc</outputDir>
-                                <skip>false</skip>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-
-        </profile>
-
-        <profile>
-            <id>monitor</id>
-
-            <dependencies>
-
-                <dependency>
-                    <groupId>de.codecentric</groupId>
-                    <artifactId>spring-boot-admin-starter-client</artifactId>
-                    <version>${springboot.version}</version>
-                </dependency>
-
                 <dependency>
                     <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-actuator</artifactId>
+                    <artifactId>spring-boot-devtools</artifactId>
                 </dependency>
-
             </dependencies>
-
-            <dependencyManagement>
-                <dependencies>
-
-                    <dependency>
-                        <groupId>de.codecentric</groupId>
-                        <artifactId>spring-boot-admin-starter-client</artifactId>
-                        <version>${springboot.version}</version>
-                    </dependency>
-
-                    <dependency>
-                        <groupId>de.codecentric</groupId>
-                        <artifactId>spring-boot-admin-starter-server</artifactId>
-                        <version>${springboot.version}</version>
-                    </dependency>
-
-                </dependencies>
-            </dependencyManagement>
-
         </profile>
 
     </profiles>

@@ -3,9 +3,10 @@ package cn.procsl.ping.boot.common.web;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.lang.annotation.*;
@@ -13,11 +14,11 @@ import java.lang.annotation.*;
 @Operation
 @Documented
 @VersionControl
-@ResponseBody
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @RequestMapping(method = RequestMethod.POST)
 @ResponseStatus(HttpStatus.CREATED)
+@Transactional(rollbackFor = Exception.class)
 public @interface Created {
 
     @AliasFor(annotation = RequestMapping.class, attribute = "path") String[] path();
@@ -34,5 +35,10 @@ public @interface Created {
 
     @AliasFor(annotation = Operation.class, attribute = "description") String description() default "";
 
-    @AliasFor(annotation = VersionControl.class, attribute = "version") String version() default "v1";
+    @AliasFor(annotation = ResponseStatus.class, attribute = "code")
+    HttpStatus httpStatus() default HttpStatus.CREATED;
+
+    @AliasFor(annotation = Transactional.class, attribute = "propagation")
+    Propagation propagation() default Propagation.REQUIRED;
+
 }

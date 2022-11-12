@@ -1,17 +1,21 @@
 package cn.procsl.ping.boot.admin.auth.login;
 
 import cn.procsl.ping.boot.admin.TestAdminApplication;
+import cn.procsl.ping.boot.admin.domain.session.Session;
+import cn.procsl.ping.boot.admin.domain.session.SessionSpecification;
 import cn.procsl.ping.boot.admin.web.LoginUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import javax.inject.Inject;
+import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -40,5 +44,11 @@ public class SessionControllerTest {
         log.info("注销成功");
     }
 
+    @Inject
+    JpaSpecificationExecutor<Session> jpaSpecificationExecutor;
 
+    @Test
+    public void currentSession() {
+        Optional optional = this.jpaSpecificationExecutor.findOne(new SessionSpecification("1234"));
+    }
 }

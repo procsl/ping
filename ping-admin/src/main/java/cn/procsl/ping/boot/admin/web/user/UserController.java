@@ -2,7 +2,10 @@ package cn.procsl.ping.boot.admin.web.user;
 
 import cn.procsl.ping.boot.admin.domain.rbac.Role;
 import cn.procsl.ping.boot.admin.domain.rbac.Subject;
-import cn.procsl.ping.boot.admin.domain.user.*;
+import cn.procsl.ping.boot.admin.domain.user.AccountState;
+import cn.procsl.ping.boot.admin.domain.user.Gender;
+import cn.procsl.ping.boot.admin.domain.user.RoleSettingService;
+import cn.procsl.ping.boot.admin.domain.user.User;
 import cn.procsl.ping.boot.common.service.PasswordEncoderService;
 import cn.procsl.ping.boot.common.utils.QueryBuilder;
 import cn.procsl.ping.boot.common.web.*;
@@ -18,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Indexed;
+import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -49,8 +53,8 @@ public class UserController {
 
     final RoleSettingService roleSettingService;
 
-    @Created(path = "/v1/users", summary = "创建用户", description = "用户昵称可通过后期修改完成, 用户账户不可修改")
-    public Long register(@Validated @RequestBody RegisterDTO registerDTO) {
+    @Created(path = "/v1/admin/users", summary = "创建用户", description = "用户昵称可通过后期修改完成, 用户账户不可修改")
+    public void register(@Validated @RequestBody RegisterDTO registerDTO) {
 
         String password = registerDTO.getPassword();
         User user = User.creator(registerDTO.getAccount(), registerDTO.getAccount(),
@@ -58,27 +62,28 @@ public class UserController {
         this.jpaRepository.save(user);
 
         Collection<String> roleNames = this.roleSettingService.getDefaultRoles();
-        if (roleNames == null || roleNames.isEmpty()) {
-            return user.getId();
+
+        if (ObjectUtils.isEmpty(roleNames)) {
+            return;
         }
 
         Subject subject = new Subject(user.getId());
+
         List<Role> roles = this.jpaSpecificationExecutor.findAll(
                 (root, query, criteriaBuilder) -> root.get("name").in(roleNames));
         subject.grant(roles);
-
         subjectLongJpaRepository.save(subject);
-        return user.getId();
+
     }
 
-    @Changed(path = "/v1/users/{id}", summary = "更新用户信息")
+    @Changed(path = "/v1/admin/users/{id}", summary = "更新用户信息")
     public void update(@PathVariable Long id, @Validated @RequestBody UserPropDTO userPropDTO) {
         User user = this.jpaRepository.getReferenceById(id);
         user.updateSelf(userPropDTO.getName(), userPropDTO.getGender(), userPropDTO.getRemark());
     }
 
     @MarkPageable
-    @QueryDetails(path = "/v1/users", summary = "获取用户列表")
+    @Query(path = "/v1/admin/users", summary = "获取用户列表")
     public FormatPage<UserDetailsVO> findUsers(Pageable pageable,
                                                @RequestParam(required = false) String name,
                                                @RequestParam(required = false, name = "account.name") String account,

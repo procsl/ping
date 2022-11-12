@@ -4,9 +4,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
-        <artifactId>ping</artifactId>
+        <artifactId>ping-parent</artifactId>
         <groupId>cn.procsl</groupId>
         <version>0.0.6-SNAPSHOT</version>
+        <relativePath>../ping-parent</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -19,23 +20,9 @@
 
         <dependency>
             <groupId>cn.procsl</groupId>
-            <artifactId>ping-common</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.procsl</groupId>
-            <artifactId>ping-apt</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.procsl</groupId>
             <artifactId>ping-captcha</artifactId>
         </dependency>
 
-        <!--        <dependency>-->
-        <!--            <groupId>org.springframework.boot</groupId>-->
-        <!--            <artifactId>spring-boot-starter-security</artifactId>-->
-        <!--        </dependency>-->
 
     </dependencies>
 

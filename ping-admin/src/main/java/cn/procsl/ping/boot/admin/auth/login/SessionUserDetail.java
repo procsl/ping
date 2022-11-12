@@ -8,8 +8,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 
-@ToString(exclude = {"password"})
-@EqualsAndHashCode(exclude = {"password"})
+@ToString
+@EqualsAndHashCode
 public class SessionUserDetail {
 
     @Getter
@@ -21,23 +21,10 @@ public class SessionUserDetail {
     String nickname;
     String username;
 
-    @Hidden
-    @JsonIgnore
-    String password;
-
-    boolean enable;
-
-
     public SessionUserDetail(@NonNull User user) {
         this.id = user.getId();
         this.nickname = user.getName();
         this.username = user.getAccount().getName();
-        this.password = user.getAccount().getPassword();
-        this.enable = user.getAccount().isEnable();
-    }
-
-    public String getPassword() {
-        return this.password;
     }
 
     public String getUsername() {
@@ -60,12 +47,6 @@ public class SessionUserDetail {
     @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return true;
-    }
-
-    @Hidden
-    @JsonIgnore
-    public boolean isEnabled() {
-        return enable;
     }
 
 }

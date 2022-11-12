@@ -3,9 +3,10 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>ping</artifactId>
+        <artifactId>ping-parent</artifactId>
         <groupId>cn.procsl</groupId>
         <version>0.0.6-SNAPSHOT</version>
+        <relativePath>../ping-parent</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,19 +16,10 @@
     <name>Ping 验证码模块</name>
 
     <properties>
-        <server.port>10001</server.port>
+        <web.server.port>10001</web.server.port>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>cn.procsl</groupId>
-            <artifactId>ping-common</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.procsl</groupId>
-            <artifactId>ping-apt</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

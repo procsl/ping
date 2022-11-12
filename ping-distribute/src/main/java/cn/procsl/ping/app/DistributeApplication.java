@@ -1,19 +1,21 @@
 package cn.procsl.ping.app;
 
 
+//import de.codecentric.boot.admin.server.config.EnableAdminServer;
+
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.info.License;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.hateoas.config.EnableHypermediaSupport;
 
 import static cn.procsl.ping.app.DistributeApplication.*;
 
-@SpringBootApplication(scanBasePackages = "cn.procsl.ping")
+@SpringBootApplication
 @OpenAPIDefinition(info = @Info(title = "接口文档", version = "1.0", license = @License(url = apache, name = name),
         description = desc))
-@EnableHypermediaSupport(type = {EnableHypermediaSupport.HypermediaType.HAL})
+//@EnableHypermediaSupport(type = {EnableHypermediaSupport.HypermediaType.HAL})
+//@EnableAdminServer
 public class DistributeApplication {
 
     final static String name = "Apache License 2.0";

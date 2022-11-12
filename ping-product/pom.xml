@@ -6,9 +6,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>ping</artifactId>
+        <artifactId>ping-parent</artifactId>
         <groupId>cn.procsl</groupId>
         <version>0.0.6-SNAPSHOT</version>
+        <relativePath>../ping-parent</relativePath>
     </parent>
 
     <artifactId>ping-product</artifactId>
@@ -16,15 +17,6 @@
     <name>Ping 商品模块</name>
 
     <dependencies>
-        <dependency>
-            <groupId>cn.procsl</groupId>
-            <artifactId>ping-apt</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.procsl</groupId>
-            <artifactId>ping-common</artifactId>
-        </dependency>
 
     </dependencies>
 

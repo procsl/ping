@@ -31,13 +31,13 @@ public class MarkWebController {
     public void delete() {
     }
 
-    @QueryDetails(path = "restful/details", summary = "查询详情接口")
+    @Query(path = "restful/details", summary = "查询详情接口")
     public Map<String, String> queryDetails() {
         return null;
     }
 
     @MarkPageable
-    @QueryDetails(path = "restful/page", summary = "查询详情接口")
+    @Query(path = "restful/page", summary = "查询详情接口")
     public FormatPage<String> pageable(Pageable pageable) {
         return null;
     }
