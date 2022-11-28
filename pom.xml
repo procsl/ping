@@ -104,7 +104,7 @@
 
             <dependency>
                 <groupId>cn.procsl</groupId>
-                <artifactId>ping-admin</artifactId>
+                <artifactId>ping-system</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -816,7 +816,7 @@
 
     <distributionManagement>
         <site>
-            <id>ping-admin</id>
+            <id>ping</id>
             <url>https://github.com/procsl/ping</url>
         </site>
     </distributionManagement>

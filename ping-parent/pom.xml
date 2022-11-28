@@ -14,7 +14,7 @@
     <modules>
         <module>../ping-im</module>
         <module>../ping-product</module>
-        <module>../ping-admin</module>
+        <module>../ping-system</module>
         <module>../ping-captcha</module>
         <module>../ping-connect</module>
     </modules>

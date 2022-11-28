@@ -48,7 +48,7 @@
 
         <dependency>
             <groupId>cn.procsl</groupId>
-            <artifactId>ping-admin</artifactId>
+            <artifactId>ping-system</artifactId>
         </dependency>
 
         <!--        <dependency>-->
