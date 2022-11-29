@@ -1,5 +1,9 @@
 package cn.procsl.ping.boot.common.jpa;
 
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import lombok.NonNull;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedBy;
@@ -10,10 +14,6 @@ import org.springframework.data.domain.Auditable;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.EntityListeners;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;

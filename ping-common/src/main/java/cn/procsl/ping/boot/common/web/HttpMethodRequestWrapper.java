@@ -1,7 +1,8 @@
 package cn.procsl.ping.boot.common.web;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 
 public final class HttpMethodRequestWrapper extends HttpServletRequestWrapper {
 

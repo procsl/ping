@@ -1,23 +1,18 @@
 package cn.procsl.ping.boot.connect.server;
 
 import io.socket.engineio.server.EngineIoServer;
-import io.swagger.v3.oas.annotations.Hidden;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.Map;
 
 @Slf4j
@@ -31,14 +26,14 @@ public class SocketIOServer implements HandshakeInterceptor, WebSocketHandler {
     protected static final String ATTRIBUTE_ENGINE_HEADERS = "engineIo.headers";
     final EngineIoServer engineIoServer;
 
-    @Hidden
-    @RequestMapping(
-            value = endpoint,
-            method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.OPTIONS},
-            headers = "Connection!=Upgrade")
-    public void httpHandler(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        engineIoServer.handleRequest(request, response);
-    }
+//    @Hidden
+//    @RequestMapping(
+//            value = endpoint,
+//            method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.OPTIONS},
+//            headers = "Connection!=Upgrade")
+//    public void httpHandler(HttpServletRequest request, HttpServletResponse response) throws IOException {
+//        engineIoServer.handleRequest(request, response);
+//    }
 
 
     @Override

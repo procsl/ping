@@ -1,6 +1,7 @@
 package cn.procsl.ping.boot.common.jpa.tree;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
 import java.io.Serializable;
 
 /**

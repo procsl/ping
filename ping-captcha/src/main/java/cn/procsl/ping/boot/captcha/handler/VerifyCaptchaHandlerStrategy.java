@@ -3,6 +3,8 @@ package cn.procsl.ping.boot.captcha.handler;
 import cn.procsl.ping.boot.captcha.domain.CaptchaType;
 import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
 import cn.procsl.ping.boot.captcha.domain.image.ImageCaptchaRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.InitializingBean;
@@ -10,8 +12,6 @@ import org.springframework.stereotype.Indexed;
 import org.springframework.stereotype.Service;
 import org.springframework.web.method.HandlerMethod;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.EnumMap;
 import java.util.function.Function;
 

@@ -2,11 +2,10 @@ package cn.procsl.ping.boot.system.auth.login;
 
 import cn.procsl.ping.boot.common.web.AbstractMethodAnnotationInterceptor;
 import cn.procsl.ping.boot.system.domain.user.AuthenticateException;
+import jakarta.annotation.security.PermitAll;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.method.HandlerMethod;
-
-import javax.annotation.security.PermitAll;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import static cn.procsl.ping.boot.system.auth.login.SessionController.session_key;
 

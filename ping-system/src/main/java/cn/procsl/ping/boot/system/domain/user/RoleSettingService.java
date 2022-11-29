@@ -1,6 +1,7 @@
 package cn.procsl.ping.boot.system.domain.user;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
+
 import java.util.Collection;
 
 public interface RoleSettingService {

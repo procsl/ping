@@ -7,6 +7,8 @@ import cn.procsl.ping.boot.captcha.domain.image.ImageCaptcha;
 import cn.procsl.ping.boot.captcha.domain.image.ImageCaptchaBuilderService;
 import cn.procsl.ping.boot.captcha.domain.image.ImageCaptchaRepository;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import jakarta.inject.Inject;
+import jakarta.servlet.http.Cookie;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -18,8 +20,6 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
-import javax.inject.Inject;
-import javax.servlet.http.Cookie;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;

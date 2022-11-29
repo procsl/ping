@@ -1,14 +1,14 @@
 package cn.procsl.ping.boot.system.domain.conf;
 
 import cn.procsl.ping.boot.common.jpa.RepositoryCreator;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Version;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @Getter

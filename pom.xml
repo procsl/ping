@@ -10,15 +10,15 @@
     <version>0.0.6-SNAPSHOT</version>
 
     <properties>
-        <java.version>11</java.version>
+        <java.version>17</java.version>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.compilerVersion>${java.version}</maven.compiler.compilerVersion>
         <compiler.version>${java.version}</compiler.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <springboot.version>2.7.4</springboot.version>
+        <springboot.version>3.0.0</springboot.version>
         <querydsl.version>5.0.0</querydsl.version>
-        <springdoc.version>1.6.9</springdoc.version>
+        <springdoc.version>1.6.12</springdoc.version>
         <jpa-streamer-version>1.0.2</jpa-streamer-version>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
         <native.version>0.12.0</native.version>
@@ -73,27 +73,14 @@
 
             <dependency>
                 <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-webmvc-core</artifactId>
-                <version>${springdoc.version}</version>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>2.0.0</version>
             </dependency>
 
             <dependency>
                 <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-ui</artifactId>
-                <version>${springdoc.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-javadoc</artifactId>
-                <version>${springdoc.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-common</artifactId>
-                <version>${springdoc.version}</version>
-                <scope>provided</scope>
+                <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+                <version>2.0.0</version>
             </dependency>
 
             <dependency>
@@ -158,38 +145,15 @@
                 <groupId>com.querydsl</groupId>
                 <artifactId>querydsl-apt</artifactId>
                 <version>${querydsl.version}</version>
-                <classifier>jpa</classifier>
+                <classifier>jakarta</classifier>
                 <optional>true</optional>
             </dependency>
 
             <dependency>
                 <groupId>com.querydsl</groupId>
                 <artifactId>querydsl-jpa</artifactId>
+                <classifier>jakarta</classifier>
                 <version>${querydsl.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>javax.inject</groupId>
-                <artifactId>javax.inject</artifactId>
-                <version>1</version>
-                <scope>provided</scope>
-                <optional>true</optional>
-            </dependency>
-
-            <dependency>
-                <groupId>javax.ws.rs</groupId>
-                <artifactId>javax.ws.rs-api</artifactId>
-                <version>2.1.1</version>
-                <type>jar</type>
-                <scope>provided</scope>
-                <optional>true</optional>
-            </dependency>
-
-            <dependency>
-                <groupId>io.swagger.core.v3</groupId>
-                <artifactId>swagger-annotations</artifactId>
-                <version>2.2.4</version>
-                <scope>provided</scope>
             </dependency>
 
             <dependency>
@@ -244,6 +208,32 @@
 
 
     <build>
+
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.hibernate.orm.tooling</groupId>
+                <artifactId>hibernate-enhance-maven-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+            </plugin>
+
+        </plugins>
+
         <finalName>${project.artifactId}-${project.version}</finalName>
 
         <testResources>
@@ -304,21 +294,6 @@
                     </configuration>
                 </plugin>
 
-                <plugin>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-maven-plugin</artifactId>
-                    <version>${springboot.version}</version>
-                    <executions>
-                        <execution>
-                            <id>repackage</id>
-                            <goals>
-                                <goal>repackage</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-
-                <!-- 必须显式的声明测试插件，否则无法执行测试 -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
@@ -384,32 +359,6 @@
             </plugins>
 
         </pluginManagement>
-
-
-        <plugins>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-
-            <plugin>
-                <groupId>org.hibernate.orm.tooling</groupId>
-                <artifactId>hibernate-enhance-maven-plugin</artifactId>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-            </plugin>
-
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-            </plugin>
-
-        </plugins>
 
     </build>
 
@@ -488,25 +437,23 @@
         <profile>
             <id>openapi</id>
             <dependencies>
+
                 <dependency>
                     <groupId>org.springdoc</groupId>
-                    <artifactId>springdoc-openapi-webmvc-core</artifactId>
+                    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
                 </dependency>
 
                 <dependency>
                     <groupId>org.springdoc</groupId>
-                    <artifactId>springdoc-openapi-ui</artifactId>
+                    <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
                 </dependency>
 
                 <dependency>
                     <groupId>org.springdoc</groupId>
-                    <artifactId>springdoc-openapi-javadoc</artifactId>
+                    <artifactId>springdoc-openapi-starter-common</artifactId>
+                    <version>2.0.0</version>
                 </dependency>
 
-                <dependency>
-                    <groupId>org.springdoc</groupId>
-                    <artifactId>springdoc-openapi-common</artifactId>
-                </dependency>
             </dependencies>
 
             <build>
@@ -559,13 +506,15 @@
                     <dependency>
                         <groupId>de.codecentric</groupId>
                         <artifactId>spring-boot-admin-starter-client</artifactId>
-                        <version>${springboot.version}</version>
+                        <version>2.7.4</version>
+                        <!--                        <version>${springboot.version}</version>-->
                     </dependency>
 
                     <dependency>
                         <groupId>de.codecentric</groupId>
                         <artifactId>spring-boot-admin-starter-server</artifactId>
-                        <version>${springboot.version}</version>
+                        <version>2.7.4</version>
+                        <!--                        <version>${springboot.version}</version>-->
                     </dependency>
                 </dependencies>
             </dependencyManagement>
@@ -584,218 +533,25 @@
             </build>
         </profile>
 
-        <profile>
-            <id>native</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.springframework.experimental</groupId>
-                    <artifactId>spring-native</artifactId>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.springframework.experimental</groupId>
-                    <artifactId>spring-aot</artifactId>
-                </dependency>
-
-            </dependencies>
-
-
-            <dependencyManagement>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.springframework.experimental</groupId>
-                        <artifactId>spring-native</artifactId>
-                        <version>${native.version}</version>
-                    </dependency>
-
-                    <dependency>
-                        <groupId>org.springframework.experimental</groupId>
-                        <artifactId>spring-aot</artifactId>
-                        <version>${native.version}</version>
-                        <scope>provided</scope>
-                    </dependency>
-
-                    <dependency>
-                        <groupId>org.jboss.logging</groupId>
-                        <artifactId>jboss-logging-annotations</artifactId>
-                        <version>2.2.1.Final</version>
-                    </dependency>
-
-                </dependencies>
-
-            </dependencyManagement>
-
-            <repositories>
-                <repository>
-                    <id>spring-release</id>
-                    <name>Spring release</name>
-                    <url>https://repo.spring.io/release</url>
-                </repository>
-
-            </repositories>
-
-            <pluginRepositories>
-                <pluginRepository>
-                    <id>spring-release</id>
-                    <name>Spring release</name>
-                    <url>https://repo.spring.io/release</url>
-                </pluginRepository>
-
-                <pluginRepository>
-                    <id>graalvm-native-build-tools-snapshots</id>
-                    <name>GraalVM native-build-tools Snapshots</name>
-                    <url>https://raw.githubusercontent.com/graalvm/native-build-tools/snapshots</url>
-                    <releases>
-                        <enabled>false</enabled>
-                    </releases>
-                    <snapshots>
-                        <enabled>true</enabled>
-                    </snapshots>
-                </pluginRepository>
-
-            </pluginRepositories>
-
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.springframework.experimental</groupId>
-                        <artifactId>spring-aot-maven-plugin</artifactId>
-                    </plugin>
-                </plugins>
-
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.springframework.experimental</groupId>
-                            <artifactId>spring-aot-maven-plugin</artifactId>
-                            <version>${native.version}</version>
-                            <executions>
-                                <execution>
-                                    <id>generate</id>
-                                    <goals>
-                                        <goal>generate</goal>
-                                    </goals>
-                                </execution>
-                                <execution>
-                                    <id>test-generate</id>
-                                    <goals>
-                                        <goal>test-generate</goal>
-                                    </goals>
-                                </execution>
-                            </executions>
-                        </plugin>
-
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-dependency-plugin</artifactId>
-                            <version>3.3.0</version>
-                            <executions>
-                                <execution>
-                                    <id>unpack-dependencies</id>
-                                    <phase>package</phase>
-                                    <goals>
-                                        <goal>unpack-dependencies</goal>
-                                    </goals>
-                                    <configuration>
-                                        <excludeScope>system</excludeScope>
-                                        <excludes>META-INF/*.SF</excludes>
-                                        <excludes>META-INF/*.DSA</excludes>
-                                        <excludes>META-INF/*.RSA</excludes>
-                                        <excludeGroupIds>junit,org.mockito,org.hamcrest</excludeGroupIds>
-                                        <outputDirectory>${project.build.directory}/classes</outputDirectory>
-                                    </configuration>
-                                </execution>
-                            </executions>
-                        </plugin>
-
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-shade-plugin</artifactId>
-                            <version>3.2.4</version>
-
-                            <executions>
-                                <execution>
-                                    <phase>package</phase>
-                                    <goals>
-                                        <goal>shade</goal>
-                                    </goals>
-                                    <configuration>
-                                        <shadedArtifactAttached>true</shadedArtifactAttached>
-                                        <minimizeJar>true</minimizeJar>
-                                        <filters>
-                                            <filter>
-                                                <artifact>*:*</artifact>
-                                                <excludes>
-                                                    <exclude>META-INF/*.SF</exclude>
-                                                    <exclude>META-INF/*.DSA</exclude>
-                                                    <exclude>META-INF/*.RSA</exclude>
-                                                </excludes>
-                                            </filter>
-                                        </filters>
-                                    </configuration>
-                                </execution>
-                            </executions>
-                        </plugin>
-
-                        <plugin>
-                            <groupId>org.graalvm.buildtools</groupId>
-                            <artifactId>native-maven-plugin</artifactId>
-                            <version>0.9.11</version>
-                            <extensions>true</extensions>
-
-                            <configuration>
-                                <skip>false</skip>
-                                <useArgFile>false</useArgFile>
-                                <buildArgs>
-                                    <buildArg>--no-fallback</buildArg>
-                                    <buildArg>-H:+ReportExceptionStackTraces</buildArg>
-                                    <buildArg>--verbose</buildArg>
-                                    <buildArg>
-                                        --initialize-at-run-time=org.hibernate.validator.internal.util.Contracts
-                                    </buildArg>
-                                    <buildArg>
-                                        -H:+PrintAnalysisCallTree
-                                    </buildArg>
-                                    <buildArg>
-                                        -H:Log=registerResource:3
-                                    </buildArg>
-                                    <buildArg>--report-unsupported-elements-at-runtime</buildArg>
-                                    <buildArg>--link-at-build-time</buildArg>
-                                    <buildArg>
-                                        -H:ReportAnalysisForbiddenType=org.hibernate.validator.internal.util.Contracts
-                                    </buildArg>
-                                </buildArgs>
-
-                                <classpath>
-                                    <param>
-                                        ${project.build.directory}/${project.artifactId}-${project.version}-shaded.jar
-                                    </param>
-                                </classpath>
-
-                            </configuration>
-
-                            <executions>
-                                <execution>
-                                    <id>build-native</id>
-                                    <goals>
-                                        <goal>build</goal>
-                                    </goals>
-                                    <phase>package</phase>
-                                </execution>
-                                <execution>
-                                    <id>test-native</id>
-                                    <goals>
-                                        <goal>test</goal>
-                                    </goals>
-                                    <phase>test</phase>
-                                </execution>
-                            </executions>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-
-        </profile>
+        <!--                                <buildArgs>-->
+        <!--                                    <buildArg>&#45;&#45;no-fallback</buildArg>-->
+        <!--                                    <buildArg>-H:+ReportExceptionStackTraces</buildArg>-->
+        <!--                                    <buildArg>&#45;&#45;verbose</buildArg>-->
+        <!--                                    <buildArg>-->
+        <!--                                        &#45;&#45;initialize-at-run-time=org.hibernate.validator.internal.util.Contracts-->
+        <!--                                    </buildArg>-->
+        <!--                                    <buildArg>-->
+        <!--                                        -H:+PrintAnalysisCallTree-->
+        <!--                                    </buildArg>-->
+        <!--                                    <buildArg>-->
+        <!--                                        -H:Log=registerResource:3-->
+        <!--                                    </buildArg>-->
+        <!--                                    <buildArg>&#45;&#45;report-unsupported-elements-at-runtime</buildArg>-->
+        <!--                                    <buildArg>&#45;&#45;link-at-build-time</buildArg>-->
+        <!--                                    <buildArg>-->
+        <!--                                        -H:ReportAnalysisForbiddenType=org.hibernate.validator.internal.util.Contracts-->
+        <!--                                    </buildArg>-->
+        <!--                                </buildArgs>-->
 
         <profile>
             <id>debug</id>
@@ -808,6 +564,100 @@
                     <artifactId>spring-boot-devtools</artifactId>
                 </dependency>
             </dependencies>
+        </profile>
+
+        <profile>
+            <id>native</id>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-maven-plugin</artifactId>
+                            <configuration>
+                                <image>
+                                    <builder>paketobuildpacks/builder:tiny</builder>
+                                    <env>
+                                        <BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
+                                    </env>
+                                </image>
+                            </configuration>
+                            <executions>
+                                <execution>
+                                    <id>process-aot</id>
+                                    <goals>
+                                        <goal>process-aot</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.graalvm.buildtools</groupId>
+                            <artifactId>native-maven-plugin</artifactId>
+                            <configuration>
+                                <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+                                <metadataRepository>
+                                    <enabled>true</enabled>
+                                </metadataRepository>
+                                <requiredVersion>22.3</requiredVersion>
+                            </configuration>
+                            <executions>
+                                <execution>
+                                    <id>add-reachability-metadata</id>
+                                    <goals>
+                                        <goal>add-reachability-metadata</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+        <profile>
+            <id>nativeTest</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.junit.platform</groupId>
+                    <artifactId>junit-platform-launcher</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>process-test-aot</id>
+                                <goals>
+                                    <goal>process-test-aot</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <configuration>
+                            <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+                            <metadataRepository>
+                                <enabled>true</enabled>
+                            </metadataRepository>
+                            <requiredVersion>22.3</requiredVersion>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>native-test</id>
+                                <goals>
+                                    <goal>test</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
 
     </profiles>
@@ -826,5 +676,41 @@
         Ping项目, 基于DDD思想设计
     </description>
 
+    <repositories>
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>spring-snapshots</id>
+            <name>Spring Snapshots</name>
+            <url>https://repo.spring.io/snapshot</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>spring-snapshots</id>
+            <name>Spring Snapshots</name>
+            <url>https://repo.spring.io/snapshot</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
 
 </project>

@@ -1,8 +1,7 @@
 package cn.procsl.ping.boot.common.jpa;
 
+import jakarta.persistence.DiscriminatorValue;
 import lombok.val;
-
-import javax.persistence.DiscriminatorValue;
 
 public interface DiscriminatorValueFinder {
 

@@ -4,6 +4,7 @@ import cn.procsl.ping.boot.system.TestSystemApplication;
 import cn.procsl.ping.boot.system.web.LoginUtils;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.github.jsonzou.jmockdata.JMockData;
+import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,8 +16,6 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.inject.Inject;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;

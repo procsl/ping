@@ -5,11 +5,11 @@ import cn.procsl.ping.boot.captcha.domain.CaptchaType;
 import cn.procsl.ping.boot.captcha.domain.VerifyFailureException;
 import cn.procsl.ping.boot.common.jpa.RepositoryCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 import java.util.Base64;
 
 @Getter

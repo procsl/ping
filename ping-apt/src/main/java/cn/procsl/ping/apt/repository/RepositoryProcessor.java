@@ -3,6 +3,7 @@ package cn.procsl.ping.apt.repository;
 import cn.procsl.ping.boot.common.jpa.RepositoryCreator;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
+import jakarta.persistence.Entity;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -10,7 +11,6 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
-import javax.persistence.Entity;
 import javax.tools.Diagnostic;
 import javax.tools.StandardLocation;
 import java.io.IOException;

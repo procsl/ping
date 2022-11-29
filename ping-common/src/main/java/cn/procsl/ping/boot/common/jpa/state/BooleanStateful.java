@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.common.jpa.state;
 
-import javax.persistence.Transient;
+import java.beans.Transient;
 
 /**
  * bool类型状态化接口

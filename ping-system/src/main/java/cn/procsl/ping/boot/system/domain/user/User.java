@@ -3,12 +3,12 @@ package cn.procsl.ping.boot.system.domain.user;
 
 import cn.procsl.ping.boot.common.jpa.RepositoryCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
-import javax.persistence.*;
 import java.io.Serializable;
 
 @Getter

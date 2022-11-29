@@ -1,12 +1,12 @@
 package cn.procsl.ping.boot.system.domain.session;
 
 import cn.procsl.ping.boot.common.jpa.RepositoryCreator;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.*;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Date;
 

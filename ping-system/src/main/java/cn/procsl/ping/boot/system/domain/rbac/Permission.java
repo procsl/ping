@@ -2,11 +2,11 @@ package cn.procsl.ping.boot.system.domain.rbac;
 
 import cn.procsl.ping.boot.common.jpa.DiscriminatorValueFinder;
 import cn.procsl.ping.boot.common.jpa.RepositoryCreator;
+import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.util.ObjectUtils;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.function.Function;
 

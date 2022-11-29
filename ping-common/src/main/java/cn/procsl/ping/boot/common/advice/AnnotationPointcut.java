@@ -36,6 +36,9 @@ final class AnnotationPointcut extends StaticMethodMatcherPointcut {
         if (name.startsWith("javax.")) {
             return false;
         }
+        if (name.startsWith("jakarta.")) {
+           return false;
+        }
         if (name.startsWith("jdk.")) {
             return false;
         }

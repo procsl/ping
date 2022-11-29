@@ -3,6 +3,7 @@ package cn.procsl.ping.boot.system.domain.conf;
 import cn.procsl.ping.boot.system.TestSystemApplication;
 import com.github.javafaker.Faker;
 import com.github.jsonzou.jmockdata.JMockData;
+import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +16,6 @@ import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
 import java.util.List;
 import java.util.Locale;
 

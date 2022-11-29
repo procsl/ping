@@ -8,6 +8,8 @@ import com.querydsl.jpa.Hibernate5Templates;
 import com.querydsl.jpa.JPQLQueryFactory;
 import com.querydsl.jpa.hibernate.HibernateQueryFactory;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceException;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
@@ -26,8 +28,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.repository.config.BootstrapMode;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceException;
 import java.util.Collection;
 import java.util.List;
 
