@@ -17,11 +17,11 @@
         <compiler.version>${java.version}</compiler.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <springboot.version>3.0.0</springboot.version>
+        <native-plugin.version>0.9.18</native-plugin.version>
         <querydsl.version>5.0.0</querydsl.version>
         <springdoc.version>1.6.12</springdoc.version>
         <jpa-streamer-version>1.0.2</jpa-streamer-version>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
-        <native.version>0.12.0</native.version>
         <web.server.port>10000</web.server.port>
         <spring-dev>false</spring-dev>
     </properties>
@@ -206,7 +206,6 @@
 
     </dependencyManagement>
 
-
     <build>
 
         <plugins>
@@ -214,22 +213,69 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.10.1</version>
+                <configuration>
+                    <generatedSourcesDirectory>
+                        ${project.build.directory}/generated-sources/java
+                    </generatedSourcesDirectory>
+                    <compilerVersion>${compiler.version}</compilerVersion>
+                    <verbose>true</verbose>
+                    <showWarnings>true</showWarnings>
+                    <fork>true</fork>
+                    <!--保留参数名称-->
+                    <maxmem>2048m</maxmem>
+                    <compilerArgs>
+                        <arg>-g</arg>
+                        <arg>-Xlint:unchecked</arg>
+                        <arg>-Xlint:deprecation</arg>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
+                </configuration>
             </plugin>
 
             <plugin>
                 <groupId>org.hibernate.orm.tooling</groupId>
                 <artifactId>hibernate-enhance-maven-plugin</artifactId>
+                <version>6.1.0.Final</version>
+                <executions>
+                    <execution>
+                        <configuration>
+                            <failOnError>true</failOnError>
+                            <enableLazyInitialization>true</enableLazyInitialization>
+                            <enableDirtyTracking>true</enableDirtyTracking>
+                            <enableAssociationManagement>true</enableAssociationManagement>
+                            <enableExtendedEnhancement>false</enableExtendedEnhancement>
+                        </configuration>
+                        <goals>
+                            <goal>enhance</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M7</version>
             </plugin>
-
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <encoding>utf-8</encoding>
+                    <!-- 解决Spring boot引起的profile失效问题 -->
+                    <useDefaultDelimiters>true</useDefaultDelimiters>
+                    <!-- 过滤后缀为p12、pem、pfx的证书文件 -->
+                    <nonFilteredFileExtensions>
+                        <nonFilteredFileExtension>p12</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>cer</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>pem</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>pfx</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jkx</nonFilteredFileExtension>
+                    </nonFilteredFileExtensions>
+                </configuration>
             </plugin>
 
         </plugins>
@@ -272,57 +318,9 @@
             <plugins>
 
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.10.1</version>
-                    <configuration>
-                        <generatedSourcesDirectory>
-                            ${project.build.directory}/generated-sources/java
-                        </generatedSourcesDirectory>
-                        <compilerVersion>${compiler.version}</compilerVersion>
-                        <verbose>true</verbose>
-                        <showWarnings>true</showWarnings>
-                        <fork>true</fork>
-                        <!--保留参数名称-->
-                        <maxmem>2048m</maxmem>
-                        <compilerArgs>
-                            <arg>-g</arg>
-                            <arg>-Xlint:unchecked</arg>
-                            <arg>-Xlint:deprecation</arg>
-                            <arg>-parameters</arg>
-                        </compilerArgs>
-                    </configuration>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.0.0-M7</version>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.2.0</version>
-                    <configuration>
-                        <encoding>utf-8</encoding>
-                        <!-- 解决Spring boot引起的profile失效问题 -->
-                        <useDefaultDelimiters>true</useDefaultDelimiters>
-                        <!-- 过滤后缀为p12、pem、pfx的证书文件 -->
-                        <nonFilteredFileExtensions>
-                            <nonFilteredFileExtension>p12</nonFilteredFileExtension>
-                            <nonFilteredFileExtension>cer</nonFilteredFileExtension>
-                            <nonFilteredFileExtension>pem</nonFilteredFileExtension>
-                            <nonFilteredFileExtension>pfx</nonFilteredFileExtension>
-                            <nonFilteredFileExtension>jkx</nonFilteredFileExtension>
-                        </nonFilteredFileExtensions>
-                    </configuration>
-                </plugin>
-
-                <plugin>
                     <groupId>org.owasp</groupId>
                     <artifactId>dependency-check-maven</artifactId>
-                    <version>6.5.2</version>
+                    <version>7.3.2</version>
                     <configuration>
                         <skipProvidedScope>true</skipProvidedScope>
                     </configuration>
@@ -331,26 +329,6 @@
                         <execution>
                             <goals>
                                 <goal>check</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.hibernate.orm.tooling</groupId>
-                    <artifactId>hibernate-enhance-maven-plugin</artifactId>
-                    <version>6.1.0.Final</version>
-                    <executions>
-                        <execution>
-                            <configuration>
-                                <failOnError>true</failOnError>
-                                <enableLazyInitialization>true</enableLazyInitialization>
-                                <enableDirtyTracking>true</enableDirtyTracking>
-                                <enableAssociationManagement>true</enableAssociationManagement>
-                                <enableExtendedEnhancement>false</enableExtendedEnhancement>
-                            </configuration>
-                            <goals>
-                                <goal>enhance</goal>
                             </goals>
                         </execution>
                     </executions>
@@ -506,14 +484,14 @@
                     <dependency>
                         <groupId>de.codecentric</groupId>
                         <artifactId>spring-boot-admin-starter-client</artifactId>
-                        <version>2.7.4</version>
+                        <version>3.0.0-M5</version>
                         <!--                        <version>${springboot.version}</version>-->
                     </dependency>
 
                     <dependency>
                         <groupId>de.codecentric</groupId>
                         <artifactId>spring-boot-admin-starter-server</artifactId>
-                        <version>2.7.4</version>
+                        <version>3.0.0-M5</version>
                         <!--                        <version>${springboot.version}</version>-->
                     </dependency>
                 </dependencies>
@@ -532,26 +510,6 @@
                 </plugins>
             </build>
         </profile>
-
-        <!--                                <buildArgs>-->
-        <!--                                    <buildArg>&#45;&#45;no-fallback</buildArg>-->
-        <!--                                    <buildArg>-H:+ReportExceptionStackTraces</buildArg>-->
-        <!--                                    <buildArg>&#45;&#45;verbose</buildArg>-->
-        <!--                                    <buildArg>-->
-        <!--                                        &#45;&#45;initialize-at-run-time=org.hibernate.validator.internal.util.Contracts-->
-        <!--                                    </buildArg>-->
-        <!--                                    <buildArg>-->
-        <!--                                        -H:+PrintAnalysisCallTree-->
-        <!--                                    </buildArg>-->
-        <!--                                    <buildArg>-->
-        <!--                                        -H:Log=registerResource:3-->
-        <!--                                    </buildArg>-->
-        <!--                                    <buildArg>&#45;&#45;report-unsupported-elements-at-runtime</buildArg>-->
-        <!--                                    <buildArg>&#45;&#45;link-at-build-time</buildArg>-->
-        <!--                                    <buildArg>-->
-        <!--                                        -H:ReportAnalysisForbiddenType=org.hibernate.validator.internal.util.Contracts-->
-        <!--                                    </buildArg>-->
-        <!--                                </buildArgs>-->
 
         <profile>
             <id>debug</id>
@@ -590,6 +548,7 @@
                                     </goals>
                                 </execution>
                             </executions>
+                            <version>${springboot.version}</version>
                         </plugin>
                         <plugin>
                             <groupId>org.graalvm.buildtools</groupId>
@@ -601,6 +560,7 @@
                                 </metadataRepository>
                                 <requiredVersion>22.3</requiredVersion>
                             </configuration>
+                            <version>${native-plugin.version}</version>
                             <executions>
                                 <execution>
                                     <id>add-reachability-metadata</id>
@@ -628,6 +588,7 @@
                     <plugin>
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-maven-plugin</artifactId>
+                        <version>${springboot.version}</version>
                         <executions>
                             <execution>
                                 <id>process-test-aot</id>
@@ -655,6 +616,7 @@
                                 </goals>
                             </execution>
                         </executions>
+                        <version>${native-plugin.version}</version>
                     </plugin>
                 </plugins>
             </build>
