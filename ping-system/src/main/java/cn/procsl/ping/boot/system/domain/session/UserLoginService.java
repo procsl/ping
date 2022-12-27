@@ -4,9 +4,9 @@ import cn.procsl.ping.boot.system.domain.user.AuthenticateException;
 import cn.procsl.ping.boot.system.domain.user.User;
 import lombok.NonNull;
 
-public class UserLoginHandler {
+public class UserLoginService {
 
-    public Session doLogin(@NonNull String sessionId, @NonNull String ip, @NonNull String password, User user) {
+    public Session doLogin(@NonNull String sessionId, @NonNull String password, User user) {
         if (user == null) {
             throw new AuthenticateException("用户名或密码错误");
         }
@@ -15,7 +15,6 @@ public class UserLoginHandler {
                       .userId(user.getId())
                       .account(user.getAccount().getName())
                       .username(user.getName())
-                      .ip(ip)
                       .sessionId(sessionId)
                       .build();
     }

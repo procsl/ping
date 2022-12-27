@@ -21,31 +21,29 @@ import java.util.Date;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Session extends AbstractPersistable<Long> implements Serializable {
 
+    @Column(updatable = false)
     Long userId;
 
-    @Column(length = 50)
+    @Column(length = 50, updatable = false)
     String account;
 
     @Column(length = 50)
     String nickName;
 
-    @Column(length = 32)
+    @Column(length = 32, updatable = false)
     String sessionId;
 
+    @Column(updatable = false)
     Date loginDate;
 
     Date logoutDate;
 
-    @Column(length = 30)
-    String ip;
-
     SessionState state;
 
     @Builder
-    public static Session createSession(String sessionId, String ip, String account, String username, Long userId) {
+    public static Session createSession(String sessionId, String account, String username, Long userId) {
         Session session = new Session();
         session.setSessionId(sessionId);
-        session.setIp(ip);
         session.setNickName(username);
         session.setAccount(account);
         session.setUserId(userId);

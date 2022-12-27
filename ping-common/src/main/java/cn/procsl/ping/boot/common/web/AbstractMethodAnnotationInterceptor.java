@@ -21,9 +21,6 @@ public abstract class AbstractMethodAnnotationInterceptor<A extends Annotation> 
             return true;
         }
         A annotation = ((HandlerMethod) handler).getMethodAnnotation(annotationClass);
-        if (annotation == null) {
-            return true;
-        }
         return this.doPreHandle(request, response, (HandlerMethod) handler, annotation);
     }
 

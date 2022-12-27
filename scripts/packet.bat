@@ -1,0 +1,1 @@
+mvn clean native:compile -Dmaven.test.skip=true -P h2,native,openapi

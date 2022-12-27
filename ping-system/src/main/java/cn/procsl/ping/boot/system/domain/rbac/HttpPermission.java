@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.system.domain.rbac;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Transient;
@@ -12,6 +13,7 @@ import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
 import static java.util.regex.Pattern.compile;
+import static org.springframework.http.server.PathContainer.parsePath;
 
 @Getter
 @Setter
@@ -20,10 +22,13 @@ import static java.util.regex.Pattern.compile;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class HttpPermission extends Permission {
 
+    @NotBlank
+    @Column(updatable = false)
+    @Pattern(regexp = "(GET|POST|DELETE|PATCH|PUT)", message = "仅支持[{regexp}]方法") String operate;
 
-    @Pattern(regexp = "(GET|POST|DELETE|PATCH|PUT)", message = "仅支持[{regexp}]方法") @NotBlank String operate;
-
-    @NotBlank String resource;
+    @NotBlank
+    @Column(updatable = false)
+    String resource;
     final static PathPatternParser parser = PathPatternParser.defaultInstance;
     private final static java.util.regex.Pattern DYNAMIC_PATTERN = compile("[*{}?]+");
     @Transient
@@ -31,7 +36,7 @@ public class HttpPermission extends Permission {
     @Transient
     private PathPattern matcher;
 
-    public static Permission create(@NonNull String httpMethod, @NonNull String url) {
+    public static HttpPermission create(@NonNull String httpMethod, @NonNull String url) {
         return new HttpPermission(httpMethod.toUpperCase(), url);
     }
 
@@ -71,7 +76,7 @@ public class HttpPermission extends Permission {
             this.matcher = parser.parse(this.getUrl());
         }
 
-        PathContainer container = PathContainer.parsePath(url, PathContainer.Options.HTTP_PATH);
+        PathContainer container = parsePath(url, PathContainer.Options.HTTP_PATH);
         return this.matcher.matches(container);
     }
 

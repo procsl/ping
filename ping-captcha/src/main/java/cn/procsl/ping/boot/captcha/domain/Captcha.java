@@ -21,6 +21,7 @@ public abstract class Captcha implements Serializable, Persistable<Long> {
 
     final public static int max_times = 3;
     final protected static char[] number_chars = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+
     @Column(updatable = false, length = 50)
     protected String target;
 

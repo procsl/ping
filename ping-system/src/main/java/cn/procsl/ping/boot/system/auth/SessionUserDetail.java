@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.system.auth.login;
+package cn.procsl.ping.boot.system.auth;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.EqualsAndHashCode;

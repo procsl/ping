@@ -3,9 +3,9 @@ package cn.procsl.ping.boot.system.web.config;
 import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.common.utils.QueryBuilder;
 import cn.procsl.ping.boot.common.web.*;
-import cn.procsl.ping.boot.system.domain.conf.Config;
-import cn.procsl.ping.boot.system.domain.conf.ConfigOptionService;
-import cn.procsl.ping.boot.system.domain.conf.QConfig;
+import cn.procsl.ping.boot.system.domain.config.Config;
+import cn.procsl.ping.boot.system.domain.config.QConfig;
+import cn.procsl.ping.boot.system.service.ConfigFacade;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.QBean;
 import com.querydsl.jpa.JPQLQuery;
@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "config", description = "系统配置接口")
 public class ConfigController {
 
-    final ConfigOptionService configOptionService;
+    final ConfigFacade configFacade;
 
     final JpaRepository<Config, Long> jpaRepository;
 
@@ -44,7 +44,7 @@ public class ConfigController {
 
     @Patch(path = "/v1/system/configs", summary = "创建或更新配置项")
     public void put(@RequestBody @Validated ConfigDTO config) throws BusinessException {
-        configOptionService.put(config.getName(), config.getContent(), config.getDescription());
+        configFacade.put(config.getName(), config.getContent(), config.getDescription());
     }
 
 
@@ -55,7 +55,7 @@ public class ConfigController {
 
     @Query(path = "/v1/system/configs/{name}", summary = "获取配置内容")
     public ConfigNameValueDTO getConfig(@PathVariable String name) {
-        return new ConfigNameValueDTO(name, this.configOptionService.get(name));
+        return new ConfigNameValueDTO(name, this.configFacade.get(name));
     }
 
     @MarkPageable

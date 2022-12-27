@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.system.domain.conf;
+package cn.procsl.ping.boot.system.domain.config;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

@@ -1,12 +1,12 @@
 package cn.procsl.ping.boot.system.listener;
 
 import cn.procsl.ping.boot.common.service.PasswordEncoderService;
-import cn.procsl.ping.boot.system.domain.conf.ConfigOptionService;
 import cn.procsl.ping.boot.system.domain.rbac.HttpPermission;
 import cn.procsl.ping.boot.system.domain.rbac.Permission;
 import cn.procsl.ping.boot.system.domain.rbac.Role;
 import cn.procsl.ping.boot.system.domain.rbac.Subject;
 import cn.procsl.ping.boot.system.domain.user.User;
+import cn.procsl.ping.boot.system.service.ConfigFacade;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,20 +42,66 @@ public class SystemStartupListener implements ApplicationListener<ApplicationRea
     final JpaRepository<Subject, Long> subjectLongJpaRepository;
 
     final PasswordEncoderService passwordEncoderService;
-    final ConfigOptionService configOptionService;
+    final ConfigFacade configFacade;
 
     @Override
     @Transactional
     public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
         log.info("应用启动完成!!!");
-        String init = configOptionService.get("初始化系统数据");
-        if (!ObjectUtils.isEmpty(init)) {
-            log.info("系统默认数据已于[{}]初始化完成", init);
+        if (lock()) {
             return;
         }
-        log.info("创建默认角色:{}", roleName);
 
-        // 创建权限
+        // 创建初始超级账户
+        User user = createSuperUser();
+
+        // 导入HTTP权限
+        List<Permission> permissions = importHttpPermissions();
+        // 创建subject, 为用户授权
+        Role role = createSuperManagerRole(permissions);
+        grantUserSuperRole(role, user);
+
+        unlock();
+    }
+
+    void unlock() {
+        this.configFacade.put("初始化系统数据",
+                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date()));
+    }
+
+    boolean lock() {
+        String init = configFacade.get("初始化系统数据");
+        if (!ObjectUtils.isEmpty(init)) {
+            log.info("系统默认数据已于[{}]初始化完成", init);
+            return true;
+        }
+        log.info("创建默认角色:{}", roleName);
+        return false;
+    }
+
+    void grantUserSuperRole(Role role, User user) {
+        Subject subject = new Subject(user.getId());
+        subject.grant(role);
+        this.subjectLongJpaRepository.save(subject);
+    }
+
+    User createSuperUser() {
+        String password = passwordEncoderService.encode(this.password);
+        User user = User.creator(account, account, password);
+        this.userLongJpaRepository.save(user);
+        log.info("注册默认账户:{}", account);
+        return user;
+    }
+
+    Role createSuperManagerRole(List<Permission> permissions) {
+        Role role = new Role(roleName);
+        // 添加权限
+        role.addPermissions(permissions);
+        this.roleJpaRepository.save(role);
+        return role;
+    }
+
+    List<Permission> importHttpPermissions() {
         List<Permission> permissions = List.of(
                 HttpPermission.create("GET", "/**"),
                 HttpPermission.create("POST", "/**"),
@@ -64,26 +110,7 @@ public class SystemStartupListener implements ApplicationListener<ApplicationRea
                 HttpPermission.create("PUT", "/**")
         );
         this.permissionJpaRepository.saveAll(permissions);
-
-        // 创建角色
-        Role role = new Role(roleName);
-        // 添加权限
-        role.addPermissions(permissions);
-        this.roleJpaRepository.save(role);
-
-        // 创建账户
-        String password = passwordEncoderService.encode(this.password);
-        User user = User.creator(account, account, password);
-        this.userLongJpaRepository.save(user);
-        log.info("注册默认账户:{}", account);
-
-        // 创建subject, 为用户授权
-        Subject subject = new Subject(user.getId());
-        subject.grant(role);
-        this.subjectLongJpaRepository.save(subject);
-
-        this.configOptionService.put("初始化系统数据",
-                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date()));
+        return permissions;
     }
 
 }

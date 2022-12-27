@@ -1,8 +1,8 @@
 package cn.procsl.ping.boot.system;
 
-import cn.procsl.ping.boot.system.auth.login.AuthenticateInterceptor;
-import cn.procsl.ping.boot.system.domain.conf.ConfigOptionService;
+import cn.procsl.ping.boot.system.auth.AuthenticateInterceptor;
 import cn.procsl.ping.boot.system.domain.user.RoleSettingService;
+import cn.procsl.ping.boot.system.service.ConfigFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -32,7 +32,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
         "cn.procsl.ping.boot.system.auth"
 },
         basePackageClasses = {
-                ConfigOptionService.class,
+                ConfigFacade.class,
                 RoleSettingService.class,
         })
 @Order
@@ -40,7 +40,7 @@ public class AdminAutoConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new AuthenticateInterceptor());
+        registry.addInterceptor(new AuthenticateInterceptor()).addPathPatterns("/**");
     }
 
 }

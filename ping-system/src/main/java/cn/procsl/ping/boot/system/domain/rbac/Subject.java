@@ -1,10 +1,7 @@
 package cn.procsl.ping.boot.system.domain.rbac;
 
 import cn.procsl.ping.boot.common.jpa.RepositoryCreator;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,6 +18,7 @@ import java.util.*;
 @RepositoryCreator
 public class Subject extends AbstractPersistable<Long> implements Serializable {
 
+    @Column(updatable = false)
     Long subject;
 
     @ManyToMany

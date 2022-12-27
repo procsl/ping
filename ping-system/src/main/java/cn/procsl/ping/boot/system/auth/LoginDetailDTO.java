@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.system.auth.login;
+package cn.procsl.ping.boot.system.auth;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

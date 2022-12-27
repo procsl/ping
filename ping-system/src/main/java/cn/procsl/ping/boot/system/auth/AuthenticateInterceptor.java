@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.system.auth.login;
+package cn.procsl.ping.boot.system.auth;
 
 import cn.procsl.ping.boot.common.web.AbstractMethodAnnotationInterceptor;
 import cn.procsl.ping.boot.system.domain.user.AuthenticateException;
@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.method.HandlerMethod;
 
-import static cn.procsl.ping.boot.system.auth.login.SessionController.session_key;
+import static cn.procsl.ping.boot.system.auth.SessionController.session_key;
 
 public class AuthenticateInterceptor extends AbstractMethodAnnotationInterceptor<PermitAll> {
 

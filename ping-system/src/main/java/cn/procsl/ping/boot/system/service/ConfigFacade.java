@@ -1,5 +1,6 @@
-package cn.procsl.ping.boot.system.domain.conf;
+package cn.procsl.ping.boot.system.service;
 
+import cn.procsl.ping.boot.system.domain.config.Config;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ import java.util.Optional;
 @Validated
 @Transactional
 @RequiredArgsConstructor
-public class ConfigOptionService {
+public class ConfigFacade {
 
     final JpaRepository<Config, Long> jpaRepository;
     final JpaSpecificationExecutor<Config> jpaSpecificationExecutor;

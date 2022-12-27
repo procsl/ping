@@ -4,10 +4,7 @@ import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.common.jpa.RepositoryCreator;
 import cn.procsl.ping.boot.common.jpa.state.Stateful;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -25,8 +22,9 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @RepositoryCreator
 public class Account extends AbstractPersistable<Long> implements Stateful<AccountState> {
 
-    @Schema(description = "账户名称")
     @NotBlank
+    @Column(updatable = false)
+    @Schema(description = "账户名称")
     String name;
 
     @Schema(description = "账户密码")

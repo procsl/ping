@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.system.domain.conf;
+package cn.procsl.ping.boot.system.domain.config;
 
 import cn.procsl.ping.boot.common.jpa.RepositoryCreator;
 import jakarta.persistence.Column;

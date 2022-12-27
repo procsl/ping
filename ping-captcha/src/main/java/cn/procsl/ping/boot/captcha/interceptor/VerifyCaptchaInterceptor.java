@@ -20,6 +20,10 @@ public class VerifyCaptchaInterceptor extends AbstractMethodAnnotationIntercepto
     @Override
     protected boolean doPreHandle(HttpServletRequest request, HttpServletResponse response, HandlerMethod handler,
                                   VerifyCaptcha annotation) {
+
+        if (annotation == null) {
+            return true;
+        }
         verifyCaptchaService.verifyForStrategy(request, response, handler, annotation);
         return true;
     }

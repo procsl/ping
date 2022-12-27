@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.system.auth.login;
+package cn.procsl.ping.boot.system.auth;
 
 import cn.procsl.ping.boot.captcha.domain.CaptchaType;
 import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
@@ -9,7 +9,7 @@ import cn.procsl.ping.boot.common.web.Created;
 import cn.procsl.ping.boot.common.web.Deleted;
 import cn.procsl.ping.boot.common.web.Query;
 import cn.procsl.ping.boot.system.domain.session.Session;
-import cn.procsl.ping.boot.system.domain.session.UserLoginHandler;
+import cn.procsl.ping.boot.system.domain.session.UserLoginService;
 import cn.procsl.ping.boot.system.domain.user.AuthenticateException;
 import cn.procsl.ping.boot.system.domain.user.User;
 import cn.procsl.ping.boot.system.domain.user.UserSpecification;
@@ -53,7 +53,7 @@ public class SessionController {
 
     final MapStructMapper mapStructMapper = Mappers.getMapper(MapStructMapper.class);
 
-    final UserLoginHandler handler = new UserLoginHandler();
+    final UserLoginService handler = new UserLoginService();
 
     @Query(path = "/v1/system/session", summary = "获取用户当前登录信息")
     public SessionUserDetail currentSession(HttpServletRequest request) {
@@ -90,8 +90,7 @@ public class SessionController {
                 new UserSpecification(details.getAccount()));
 
         optional.orElseThrow(() -> new AuthenticateException("用户名或密码错误"));
-        Session session = this.handler.doLogin(request.getSession().getId(), request.getRemoteAddr(),
-                details.getPassword(), optional.get());
+        Session session = this.handler.doLogin(request.getSession().getId(), details.getPassword(), optional.get());
 
         this.sessionLongJpaRepository.save(session);
 

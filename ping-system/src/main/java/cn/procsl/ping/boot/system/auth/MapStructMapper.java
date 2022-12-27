@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.system.auth.login;
+package cn.procsl.ping.boot.system.auth;
 
 import cn.procsl.ping.boot.system.domain.session.Session;
 import org.mapstruct.Mapper;
