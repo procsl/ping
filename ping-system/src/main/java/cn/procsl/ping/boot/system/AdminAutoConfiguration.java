@@ -40,7 +40,7 @@ public class AdminAutoConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new AuthenticateInterceptor()).addPathPatterns("/**");
+        registry.addInterceptor(new AuthenticateInterceptor()).addPathPatterns("/v1/**");
     }
 
 }

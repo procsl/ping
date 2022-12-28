@@ -574,6 +574,7 @@
                 </pluginManagement>
             </build>
         </profile>
+
         <profile>
             <id>nativeTest</id>
             <dependencies>
