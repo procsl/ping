@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.jpa.domain.AbstractPersistable;
 
 import java.io.Serializable;
 import java.util.*;
@@ -16,7 +15,11 @@ import java.util.*;
 @Table(name = "i_subject")
 @NoArgsConstructor
 @RepositoryCreator
-public class Subject extends AbstractPersistable<Long> implements Serializable {
+public class Subject implements Serializable {
+
+    @Id
+    @GeneratedValue
+    Long id;
 
     @Column(updatable = false)
     Long subject;

@@ -3,6 +3,8 @@ package cn.procsl.ping.app;
 
 //import de.codecentric.boot.admin.server.config.EnableAdminServer;
 
+import cn.procsl.ping.boot.captcha.CaptchaAutoConfiguration;
+import de.codecentric.boot.admin.server.config.EnableAdminServer;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.info.License;
@@ -11,11 +13,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import static cn.procsl.ping.app.DistributeApplication.*;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = CaptchaAutoConfiguration.class)
 @OpenAPIDefinition(info = @Info(title = "接口文档", version = "1.0", license = @License(url = apache, name = name),
         description = desc))
 //@EnableHypermediaSupport(type = {EnableHypermediaSupport.HypermediaType.HAL})
-//@EnableAdminServer
+@EnableAdminServer
 public class DistributeApplication {
 
     final static String name = "Apache License 2.0";

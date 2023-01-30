@@ -7,7 +7,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.jpa.domain.AbstractPersistable;
 
 import java.io.Serializable;
 
@@ -17,7 +16,11 @@ import java.io.Serializable;
 @Table(name = "i_user")
 @NoArgsConstructor
 @RepositoryCreator
-public class User extends AbstractPersistable<Long> implements Serializable {
+public class User implements Serializable {
+
+    @Id
+    @GeneratedValue
+    Long id;
 
     @Schema(defaultValue = "用户名称")
     String name;

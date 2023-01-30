@@ -1,14 +1,11 @@
 package cn.procsl.ping.boot.system.domain.rbac;
 
 import cn.procsl.ping.boot.common.jpa.RepositoryCreator;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.jpa.domain.AbstractPersistable;
 
 import javax.annotation.Nullable;
 import java.io.Serializable;
@@ -23,8 +20,11 @@ import java.util.stream.Collectors;
 @RepositoryCreator
 @Table(name = "i_role")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Role extends AbstractPersistable<Long> implements Serializable {
+public class Role implements Serializable {
 
+    @Id
+    @GeneratedValue
+    Long id;
     String name;
 
     @ManyToMany

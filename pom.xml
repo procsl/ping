@@ -4,6 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.0.2</version>
+        <relativePath/>
+    </parent>
+
     <groupId>cn.procsl</groupId>
     <artifactId>ping</artifactId>
     <packaging>pom</packaging>
@@ -16,7 +23,7 @@
         <maven.compiler.compilerVersion>${java.version}</maven.compiler.compilerVersion>
         <compiler.version>${java.version}</compiler.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <springboot.version>3.0.1</springboot.version>
+        <springboot.version>3.0.2</springboot.version>
         <native-plugin.version>0.9.18</native-plugin.version>
         <querydsl.version>5.0.0</querydsl.version>
         <springdoc.version>1.6.12</springdoc.version>
@@ -484,14 +491,14 @@
                     <dependency>
                         <groupId>de.codecentric</groupId>
                         <artifactId>spring-boot-admin-starter-client</artifactId>
-                        <version>3.0.0-M5</version>
+                        <version>3.0.0-M8</version>
                         <!--                        <version>${springboot.version}</version>-->
                     </dependency>
 
                     <dependency>
                         <groupId>de.codecentric</groupId>
                         <artifactId>spring-boot-admin-starter-server</artifactId>
-                        <version>3.0.0-M5</version>
+                        <version>3.0.0-M8</version>
                         <!--                        <version>${springboot.version}</version>-->
                     </dependency>
                 </dependencies>

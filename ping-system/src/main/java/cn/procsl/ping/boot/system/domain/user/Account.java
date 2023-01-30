@@ -8,7 +8,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
  * 用户账户
@@ -20,7 +19,11 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @NoArgsConstructor
 @AllArgsConstructor
 @RepositoryCreator
-public class Account extends AbstractPersistable<Long> implements Stateful<AccountState> {
+public class Account implements Stateful<AccountState> {
+
+    @Id
+    @GeneratedValue
+    Long id;
 
     @NotBlank
     @Column(updatable = false)
@@ -77,5 +80,11 @@ public class Account extends AbstractPersistable<Long> implements Stateful<Accou
 
     public void resetPassword(String password) {
         this.password = password;
+    }
+
+    public Account(String name, String password, AccountState state) {
+        this.name = name;
+        this.password = password;
+        this.state = state;
     }
 }

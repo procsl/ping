@@ -1,9 +1,6 @@
 package cn.procsl.ping.boot.system.domain.rbac;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Transient;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
@@ -21,6 +18,11 @@ import static org.springframework.http.server.PathContainer.parsePath;
 @DiscriminatorValue("http")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class HttpPermission extends Permission {
+
+
+    @Id
+    @GeneratedValue
+    Long id;
 
     @NotBlank
     @Column(updatable = false)

@@ -5,10 +5,10 @@ import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
 import cn.procsl.ping.boot.captcha.domain.image.ImageCaptcha;
 import cn.procsl.ping.boot.captcha.domain.image.ImageCaptchaBuilderService;
 import cn.procsl.ping.boot.captcha.handler.EmailCaptchaHandler;
-import cn.procsl.ping.boot.common.web.Accepted;
-import cn.procsl.ping.boot.common.web.Created;
+import cn.procsl.ping.boot.common.web.VersionControl;
 import com.wf.captcha.SpecCaptcha;
 import com.wf.captcha.base.Captcha;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.http.Cookie;
@@ -17,10 +17,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicLong;
@@ -47,7 +46,10 @@ public class CaptchaController {
     }
 
     @PermitAll
-    @Created(path = "/v1/captcha/image", produces = MediaType.IMAGE_GIF_VALUE, summary = "创建图形验证码")
+    @VersionControl
+    @Operation(summary = "创建图形验证码")
+    @PostMapping(path = "/v1/captcha/image", produces = MediaType.IMAGE_GIF_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
     public void createImageCaptcha(HttpServletRequest request, HttpServletResponse response,
                                    @RequestParam(defaultValue = "130", required = false) Integer width,
                                    @RequestParam(defaultValue = "48", required = false) Integer height)
@@ -79,7 +81,10 @@ public class CaptchaController {
 
     @PermitAll
     @VerifyCaptcha(type = CaptchaType.image)
-    @Accepted(path = "/v1/captcha/email", summary = "发送邮件验证码", httpStatus = HttpStatus.NO_CONTENT)
+    @Operation(summary = "发送邮件验证码")
+    @PostMapping(path = "/v1/captcha/email")
+    @ResponseStatus(code = HttpStatus.NO_CONTENT)
+    @Transactional(rollbackFor = Exception.class)
     public void sendEmailCaptcha(HttpServletRequest request, @RequestBody @Validated EmailSenderDTO sender) {
         this.emailCaptchaHandler.createEmailCaptcha(getTarget(request), sender.getEmail());
     }

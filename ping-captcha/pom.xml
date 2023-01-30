@@ -34,32 +34,4 @@
 
     </dependencies>
 
-    <profiles>
-        <profile>
-            <id>native</id>
-
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.graalvm.buildtools</groupId>
-                        <artifactId>native-maven-plugin</artifactId>
-                        <configuration>
-                            <mainClass>cn.procsl.ping.app.DistributeApplication</mainClass>
-                            <buildArgs>
-                                --initialize-at-build-time=org.slf4j.LoggerFactory,ch.qos.logback
-                            </buildArgs>
-                            <buildArgs>
-                                --initialize-at-run-time=io.netty
-                            </buildArgs>
-                            <buildArgs>
-                                -H:-CheckToolchain
-                            </buildArgs>
-                        </configuration>
-                    </plugin>
-
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
 </project>

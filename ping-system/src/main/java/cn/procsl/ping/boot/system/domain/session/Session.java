@@ -1,11 +1,8 @@
 package cn.procsl.ping.boot.system.domain.session;
 
 import cn.procsl.ping.boot.common.jpa.RepositoryCreator;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.jpa.domain.AbstractPersistable;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -19,7 +16,11 @@ import java.util.Date;
 @RepositoryCreator(repositoryName = "pingAdminSessionRepository")
 @Table(name = "i_session")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Session extends AbstractPersistable<Long> implements Serializable {
+public class Session implements Serializable {
+
+    @Id
+    @GeneratedValue
+    Long id;
 
     @Column(updatable = false)
     Long userId;
@@ -30,7 +31,7 @@ public class Session extends AbstractPersistable<Long> implements Serializable {
     @Column(length = 50)
     String nickName;
 
-    @Column(length = 32, updatable = false)
+    @Column(length = 36, updatable = false)
     String sessionId;
 
     @Column(updatable = false)

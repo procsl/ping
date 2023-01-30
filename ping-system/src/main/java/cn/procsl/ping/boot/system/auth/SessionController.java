@@ -25,6 +25,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Indexed;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -56,10 +57,11 @@ public class SessionController {
     final UserLoginService handler = new UserLoginService();
 
     @Query(path = "/v1/system/session", summary = "获取用户当前登录信息")
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public SessionUserDetail currentSession(HttpServletRequest request) {
-        Session session = findCurrentSession(request);
+        Session session = this.findCurrentSession(request);
+        session.logout();
         return mapStructMapper.mapper(session);
-
     }
 
     Session findCurrentSession(HttpServletRequest request) {
@@ -78,13 +80,15 @@ public class SessionController {
     @VerifyCaptcha(type = CaptchaType.image)
     @Publisher(name = USER_LOGIN, parameter = "#details.account")
     @Created(path = "/v1/system/session", summary = "用户登录")
+    @Transactional(rollbackFor = Exception.class)
     public SessionUserDetail authenticate(HttpServletRequest request, HttpServletResponse response,
                                           @Validated @RequestBody LoginDetailDTO details)
             throws AuthenticateException {
 
         Object auth = request.getSession().getAttribute(session_key);
         if (auth != null) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "002", "用户已登录, 请先注销登录");
+//            throw new BusinessException(HttpStatus.BAD_REQUEST, "002", "用户已登录, 请先注销登录");
+            this.deleteSession(request, response);
         }
         Optional<User> optional = this.userJpaSpecificationExecutor.findOne(
                 new UserSpecification(details.getAccount()));
@@ -101,12 +105,14 @@ public class SessionController {
 
     @Publisher(name = USER_LOGOUT, parameter = "#root[currentAccount].get()?.id")
     @Deleted(path = "/v1/system/session", summary = "用户注销")
+    @Transactional(rollbackFor = Exception.class)
     public MessageVO deleteSession(HttpServletRequest request, HttpServletResponse response) {
-
-        Session session = this.findCurrentSession(request);
-        session.logout();
         request.getSession().invalidate();
-
+        try {
+            Session session = this.findCurrentSession(request);
+            session.logout();
+        } catch (Exception ignore) {
+        }
         return new MessageVO("用户已成功注销登录");
     }
 

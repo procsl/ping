@@ -1,13 +1,9 @@
 package cn.procsl.ping.boot.system.domain.config;
 
 import cn.procsl.ping.boot.common.jpa.RepositoryCreator;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Version;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.springframework.data.jpa.domain.AbstractPersistable;
 
 import java.io.Serializable;
 
@@ -17,7 +13,11 @@ import java.io.Serializable;
 @Table(name = "i_config")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @RepositoryCreator
-public class Config extends AbstractPersistable<Long> implements Serializable {
+public class Config implements Serializable {
+
+    @Id
+    @GeneratedValue
+    Long id;
 
     @Column(unique = true)
     String name;
@@ -44,10 +44,5 @@ public class Config extends AbstractPersistable<Long> implements Serializable {
         this.description = description;
     }
 
-
-    @Override
-    public void setId(Long id) {
-        super.setId(id);
-    }
 
 }

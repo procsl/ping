@@ -4,7 +4,6 @@ import cn.procsl.ping.boot.common.jpa.DiscriminatorValueFinder;
 import cn.procsl.ping.boot.common.jpa.RepositoryCreator;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.util.ObjectUtils;
 
 import java.io.Serializable;
@@ -21,7 +20,11 @@ import java.util.function.Function;
 @DiscriminatorColumn(name = "type")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public abstract class Permission extends AbstractPersistable<Long> implements Serializable, DiscriminatorValueFinder {
+public abstract class Permission implements Serializable, DiscriminatorValueFinder {
+
+    @Id
+    @GeneratedValue
+    Long id;
 
     @Override
     public @NonNull String toString() {
