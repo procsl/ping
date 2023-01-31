@@ -1,13 +1,13 @@
 package cn.procsl.ping.boot.system.domain.rbac;
 
 import cn.procsl.ping.boot.common.jpa.RepositoryCreator;
-import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.annotation.Nullable;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;

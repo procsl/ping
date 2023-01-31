@@ -1,9 +1,9 @@
 package cn.procsl.ping.boot.system.domain.session;
 
 import cn.procsl.ping.boot.common.jpa.RepositoryCreator;
-import jakarta.persistence.*;
 import lombok.*;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 

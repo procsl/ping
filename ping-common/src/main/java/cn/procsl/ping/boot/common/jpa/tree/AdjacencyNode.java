@@ -1,9 +1,9 @@
 package cn.procsl.ping.boot.common.jpa.tree;
 
-import jakarta.persistence.*;
 import lombok.NonNull;
 import org.springframework.util.ObjectUtils;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Set;
 

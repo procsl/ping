@@ -1,7 +1,8 @@
 package cn.procsl.ping.boot.common.event;
 
-import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
+
+import javax.inject.Inject;
 
 public class SubscriberMethodRegisterTest {
 

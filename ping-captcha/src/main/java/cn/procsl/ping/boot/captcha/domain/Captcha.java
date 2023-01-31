@@ -1,12 +1,12 @@
 package cn.procsl.ping.boot.captcha.domain;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.MappedSuperclass;
 import lombok.*;
 import org.springframework.data.domain.Persistable;
 import org.springframework.util.ObjectUtils;
 
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

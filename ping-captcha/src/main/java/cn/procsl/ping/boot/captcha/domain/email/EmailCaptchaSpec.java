@@ -1,7 +1,8 @@
 package cn.procsl.ping.boot.captcha.domain.email;
 
 import cn.procsl.ping.boot.captcha.domain.CaptchaSpecification;
-import jakarta.persistence.criteria.*;
+
+import javax.persistence.criteria.*;
 
 public class EmailCaptchaSpec extends CaptchaSpecification<EmailCaptcha> {
 

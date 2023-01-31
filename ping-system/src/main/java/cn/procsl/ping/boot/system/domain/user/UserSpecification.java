@@ -1,9 +1,10 @@
 package cn.procsl.ping.boot.system.domain.user;
 
-import jakarta.persistence.criteria.*;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
+
+import javax.persistence.criteria.*;
 
 @RequiredArgsConstructor
 public class UserSpecification implements Specification<User> {

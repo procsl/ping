@@ -14,9 +14,6 @@ import com.querydsl.core.types.QBean;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.JPQLQueryFactory;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.groups.Default;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.mapstruct.factory.Mappers;
@@ -29,6 +26,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.ConstraintViolationException;
+import javax.validation.constraints.NotNull;
+import javax.validation.groups.Default;
 import java.util.List;
 
 import static cn.procsl.ping.boot.system.constant.EventPublisherConstant.*;

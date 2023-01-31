@@ -1,13 +1,14 @@
 package cn.procsl.ping.boot.system.domain.rbac;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.springframework.http.server.PathContainer;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 
 import static java.util.regex.Pattern.compile;
 import static org.springframework.http.server.PathContainer.parsePath;
