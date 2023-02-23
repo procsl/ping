@@ -24,6 +24,7 @@ public final class PublisherMethodInterceptor extends AbstractMethodInterceptor<
     final ExpressionParser parser = new SpelExpressionParser();
 
     final Map<String, Object> rootAttributes = new HashMap<>();
+    final StandardReflectionParameterNameDiscoverer discoverer = new StandardReflectionParameterNameDiscoverer();
 
     public PublisherMethodInterceptor(EventBusBridge eventBusBridge,
                                       Collection<PublisherRootAttributeConfigurer> configurers) {
@@ -94,7 +95,6 @@ public final class PublisherMethodInterceptor extends AbstractMethodInterceptor<
 
     Object evaluation(Publisher publisher, MethodInvocation invocation, Object returnValue) {
         String param = publisher.parameter();
-        StandardReflectionParameterNameDiscoverer discoverer = new StandardReflectionParameterNameDiscoverer();
         EvaluationContext context = new MethodBasedEvaluationContext(this.rootAttributes, invocation.getMethod(),
                 invocation.getArguments(), discoverer);
         context.setVariable("return", returnValue);
