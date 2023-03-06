@@ -8,17 +8,17 @@ public class VerifyFailureException extends BusinessException {
     boolean ticketError;
 
     public VerifyFailureException(String format, Object... arguments) {
-        super(HttpStatus.FORBIDDEN, "003", format, arguments);
+        super(HttpStatus.FORBIDDEN.value(), "003", format, arguments);
         this.ticketError = false;
     }
 
     public VerifyFailureException(boolean ticketError, String format, Object... arguments) {
-        super(HttpStatus.FORBIDDEN, "003", format, arguments);
+        super(HttpStatus.FORBIDDEN.value(), "003", format, arguments);
         this.ticketError = ticketError;
     }
 
     public VerifyFailureException(Exception e, boolean ticketError, String format, Object... arguments) {
-        super(e, HttpStatus.FORBIDDEN, "003", format, arguments);
+        super(e, HttpStatus.FORBIDDEN.value(), "003", format, arguments);
         this.ticketError = ticketError;
     }
 

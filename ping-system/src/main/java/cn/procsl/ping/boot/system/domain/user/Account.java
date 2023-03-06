@@ -1,8 +1,8 @@
 package cn.procsl.ping.boot.system.domain.user;
 
 import cn.procsl.ping.boot.common.error.BusinessException;
-import cn.procsl.ping.boot.common.jpa.RepositoryCreator;
-import cn.procsl.ping.boot.common.jpa.state.Stateful;
+import cn.procsl.ping.boot.jpa.RepositoryCreator;
+import cn.procsl.ping.boot.jpa.state.Stateful;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 

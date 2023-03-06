@@ -1,9 +1,11 @@
 package cn.procsl.ping.boot.system.web.rbac;
 
 import cn.procsl.ping.boot.common.error.BusinessException;
-import cn.procsl.ping.boot.common.web.Changed;
-import cn.procsl.ping.boot.common.web.Query;
-import cn.procsl.ping.boot.system.domain.rbac.*;
+import cn.procsl.ping.boot.system.domain.rbac.Role;
+import cn.procsl.ping.boot.system.domain.rbac.Subject;
+import cn.procsl.ping.boot.system.domain.rbac.SubjectRoleSpecification;
+import cn.procsl.ping.boot.web.Changed;
+import cn.procsl.ping.boot.web.Query;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPQLQueryFactory;
 import io.swagger.v3.oas.annotations.media.Schema;

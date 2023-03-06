@@ -1,11 +1,12 @@
 package cn.procsl.ping.boot.system.web.config;
 
 import cn.procsl.ping.boot.common.error.BusinessException;
-import cn.procsl.ping.boot.common.utils.QueryBuilder;
-import cn.procsl.ping.boot.common.web.*;
+import cn.procsl.ping.boot.jpa.FormatPage;
+import cn.procsl.ping.boot.jpa.QueryBuilder;
 import cn.procsl.ping.boot.system.domain.config.Config;
 import cn.procsl.ping.boot.system.domain.config.QConfig;
 import cn.procsl.ping.boot.system.service.ConfigFacade;
+import cn.procsl.ping.boot.web.*;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.QBean;
 import com.querydsl.jpa.JPQLQuery;

@@ -5,14 +5,14 @@ import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
 import cn.procsl.ping.boot.common.dto.MessageVO;
 import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.common.event.Publisher;
-import cn.procsl.ping.boot.common.web.Created;
-import cn.procsl.ping.boot.common.web.Deleted;
-import cn.procsl.ping.boot.common.web.Query;
 import cn.procsl.ping.boot.system.domain.session.Session;
 import cn.procsl.ping.boot.system.domain.session.UserLoginService;
 import cn.procsl.ping.boot.system.domain.user.AuthenticateException;
 import cn.procsl.ping.boot.system.domain.user.User;
 import cn.procsl.ping.boot.system.domain.user.UserSpecification;
+import cn.procsl.ping.boot.web.Created;
+import cn.procsl.ping.boot.web.Deleted;
+import cn.procsl.ping.boot.web.Query;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -65,11 +65,11 @@ public class SessionController {
     Session findCurrentSession(HttpServletRequest request) {
         HttpSession httpSession = request.getSession(false);
         if (httpSession == null) {
-            throw new BusinessException(HttpStatus.UNAUTHORIZED, "002", "尚未登录,请登录");
+            throw new BusinessException(HttpStatus.UNAUTHORIZED.value(), "002", "尚未登录,请登录");
         }
         Long id = (Long) httpSession.getAttribute(session_key);
         if (id == null) {
-            throw new BusinessException(HttpStatus.UNAUTHORIZED, "002", "尚未登录,请登录");
+            throw new BusinessException(HttpStatus.UNAUTHORIZED.value(), "002", "尚未登录,请登录");
         }
         return this.sessionLongJpaRepository.getReferenceById(id);
     }
@@ -85,7 +85,7 @@ public class SessionController {
 
         Object auth = request.getSession().getAttribute(session_key);
         if (auth != null) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "002", "用户已登录, 请先注销登录");
+            throw new BusinessException(HttpStatus.BAD_REQUEST.value(), "002", "用户已登录, 请先注销登录");
 //            this.deleteSession(request, response);
         }
         Optional<User> optional = this.userJpaSpecificationExecutor.findOne(

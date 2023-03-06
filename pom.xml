@@ -38,6 +38,9 @@
         <module>ping-apt</module>
         <module>ping-parent</module>
         <module>ping-distribute</module>
+        <module>ping-momo</module>
+        <module>ping-web</module>
+        <module>ping-jpa</module>
     </modules>
 
     <name>Ping 父模块</name>
@@ -93,6 +96,18 @@
             <dependency>
                 <groupId>cn.procsl</groupId>
                 <artifactId>ping-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.procsl</groupId>
+                <artifactId>ping-jpa</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.procsl</groupId>
+                <artifactId>ping-web</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

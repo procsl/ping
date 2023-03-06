@@ -31,7 +31,7 @@ class SimpleVerifyCommand implements VerifyCaptchaCommand {
         String ticket = request.getHeader(VerifyCaptcha.header);
 
         if (ObjectUtils.isEmpty(ticket)) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "001", "请输入邮件验证码");
+            throw new BusinessException(HttpStatus.BAD_REQUEST.value(), "001", "请输入邮件验证码");
         }
 
         return ticket;

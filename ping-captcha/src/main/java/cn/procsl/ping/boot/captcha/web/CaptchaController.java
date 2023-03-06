@@ -5,7 +5,7 @@ import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
 import cn.procsl.ping.boot.captcha.domain.image.ImageCaptcha;
 import cn.procsl.ping.boot.captcha.domain.image.ImageCaptchaBuilderService;
 import cn.procsl.ping.boot.captcha.handler.EmailCaptchaHandler;
-import cn.procsl.ping.boot.common.web.VersionControl;
+import cn.procsl.ping.boot.web.VersionControl;
 import com.wf.captcha.SpecCaptcha;
 import com.wf.captcha.base.Captcha;
 import io.swagger.v3.oas.annotations.Operation;
