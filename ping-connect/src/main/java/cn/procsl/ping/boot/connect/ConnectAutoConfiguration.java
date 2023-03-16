@@ -52,7 +52,6 @@ public class ConnectAutoConfiguration implements WebSocketConfigurer, WebMvcConf
     }
 
     @Override
-    @SneakyThrows
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/socket/**").addResourceLocations("classpath:/META-INF/resources/socketio/")
                 .setCacheControl(CacheControl.noCache()).resourceChain(true);

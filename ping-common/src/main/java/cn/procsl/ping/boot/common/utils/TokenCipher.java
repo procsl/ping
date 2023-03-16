@@ -2,10 +2,9 @@ package cn.procsl.ping.boot.common.utils;
 
 import lombok.SneakyThrows;
 
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
+import javax.crypto.*;
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
@@ -24,18 +23,29 @@ public class TokenCipher {
         this.generator = generator;
     }
 
-    @SneakyThrows
     public byte[] encrypt(byte[] content) {
-        Cipher cipher = Cipher.getInstance("AES");
-        cipher.init(Cipher.ENCRYPT_MODE, privateKey);
-        return cipher.doFinal(content);
+        Cipher cipher;
+        try {
+            cipher = Cipher.getInstance("AES");
+            cipher.init(Cipher.ENCRYPT_MODE, privateKey);
+            return cipher.doFinal(content);
+
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException |
+                 InvalidKeyException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    @SneakyThrows
     public byte[] decrypt(byte[] content) {
-        Cipher cipher = Cipher.getInstance("AES");
-        cipher.init(Cipher.DECRYPT_MODE, privateKey);
-        return cipher.doFinal(content);
+        Cipher cipher;
+        try {
+            cipher = Cipher.getInstance("AES");
+            cipher.init(Cipher.DECRYPT_MODE, privateKey);
+            return cipher.doFinal(content);
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException |
+                 InvalidKeyException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
