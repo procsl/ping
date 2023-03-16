@@ -18,7 +18,7 @@ public class Product implements Serializable {
 
     @Id
     @TableGenerator(name = "table_sequence",
-            table = "mcc_table_sequence",
+            table = "ping_table_sequence",
             initialValue = 10,
             allocationSize = 100,
             valueColumnName = "column_value",
