@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.product.domain;
 
-import cn.procsl.ping.boot.common.jpa.RepositoryCreator;
+import cn.procsl.ping.boot.jpa.RepositoryCreator;
 import lombok.*;
 
 import javax.persistence.*;
@@ -17,8 +17,14 @@ import static javax.persistence.GenerationType.TABLE;
 public class Product implements Serializable {
 
     @Id
-    @TableGenerator(name = "id_gen", table = "id_gen", initialValue = 10)
-    @GeneratedValue(strategy = TABLE, generator = "id_gen")
+    @TableGenerator(name = "table_sequence",
+            table = "mcc_table_sequence",
+            initialValue = 10,
+            allocationSize = 100,
+            valueColumnName = "column_value",
+            pkColumnValue = "p_product_id",
+            pkColumnName = "column_name")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "table_sequence")
     Long id;
 
     @Column(length = 100)

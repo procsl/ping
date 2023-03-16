@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @RequiredArgsConstructor
 @EnableTransactionManagement
 @ConditionalOnMissingBean({ProductAutoConfiguration.class})
-@EntityScan(basePackages = "cn.procsl.ping.boot.system.domain")
+@EntityScan(basePackages = "cn.procsl.ping.boot.product.domain")
 @EnableJpaRepositories(basePackages = "cn.procsl.ping.boot.product.domain", bootstrapMode = BootstrapMode.LAZY)
 public class ProductAutoConfiguration {
 
