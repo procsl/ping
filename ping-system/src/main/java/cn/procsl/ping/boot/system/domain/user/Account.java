@@ -4,10 +4,11 @@ import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.common.jpa.RepositoryCreator;
 import cn.procsl.ping.boot.common.jpa.state.Stateful;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
 
 /**
  * 用户账户

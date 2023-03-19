@@ -1,24 +1,19 @@
 package cn.procsl.ping.boot.system.web.config;
 
 import cn.procsl.ping.boot.common.error.BusinessException;
-import cn.procsl.ping.boot.common.utils.QueryBuilder;
-import cn.procsl.ping.boot.common.web.*;
+import cn.procsl.ping.boot.common.web.Changed;
+import cn.procsl.ping.boot.common.web.Deleted;
+import cn.procsl.ping.boot.common.web.Patch;
+import cn.procsl.ping.boot.common.web.Query;
 import cn.procsl.ping.boot.system.domain.config.Config;
-import cn.procsl.ping.boot.system.domain.config.QConfig;
 import cn.procsl.ping.boot.system.service.ConfigFacade;
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.QBean;
-import com.querydsl.jpa.JPQLQuery;
-import com.querydsl.jpa.JPQLQueryFactory;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Indexed;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -31,10 +26,6 @@ public class ConfigController {
     final ConfigFacade configFacade;
 
     final JpaRepository<Config, Long> jpaRepository;
-
-    final JPQLQueryFactory queryFactory;
-
-    final QConfig qconfig = QConfig.config;
 
     @Changed(path = "/v1/system/configs/{id}", summary = "编辑配置项")
     public void edit(@PathVariable Long id, @RequestBody @Validated ConfigDTO config) throws BusinessException {
@@ -58,18 +49,18 @@ public class ConfigController {
         return new ConfigNameValueDTO(name, this.configFacade.get(name));
     }
 
-    @MarkPageable
-    @Query(path = "/v1/system/configs", summary = "获取配置内容")
-    public FormatPage<ConfigVO> findConfig(Pageable pageable, @RequestParam(required = false) String name) {
-        QBean<ConfigVO> select = Projections.fields(ConfigVO.class, qconfig.id, qconfig.name, qconfig.content,
-                qconfig.description);
-
-        JPQLQuery<ConfigVO> query = this.queryFactory.select(select).from(qconfig);
-
-        QueryBuilder<ConfigVO> builder = QueryBuilder.builder(query)
-                                                     .and(name, () -> qconfig.name.like(String.format("%%%s%%", name)));
-
-        return FormatPage.page(builder, pageable);
-    }
+//    @MarkPageable
+//    @Query(path = "/v1/system/configs", summary = "获取配置内容")
+//    public FormatPage<ConfigVO> findConfig(Pageable pageable, @RequestParam(required = false) String name) {
+//        QBean<ConfigVO> select = Projections.fields(ConfigVO.class, qconfig.id, qconfig.name, qconfig.content,
+//                qconfig.description);
+//
+//        JPQLQuery<ConfigVO> query = this.queryFactory.select(select).from(qconfig);
+//
+//        QueryBuilder<ConfigVO> builder = QueryBuilder.builder(query)
+//                                                     .and(name, () -> qconfig.name.like(String.format("%%%s%%", name)));
+//
+//        return FormatPage.page(builder, pageable);
+//    }
 
 }

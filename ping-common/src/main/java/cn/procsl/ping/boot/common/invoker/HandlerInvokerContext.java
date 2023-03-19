@@ -1,7 +1,6 @@
 package cn.procsl.ping.boot.common.invoker;
 
 import jakarta.validation.constraints.NotNull;
-
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 

@@ -1,9 +1,9 @@
 package cn.procsl.ping.boot.system.domain.session;
 
 import cn.procsl.ping.boot.common.jpa.RepositoryCreator;
-import jakarta.persistence.*;
 import lombok.*;
 
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -28,7 +28,7 @@ public class Session implements Serializable {
     @Column(length = 50, updatable = false)
     String account;
 
-    @Column(length = 50)
+    @Column(length = 50, updatable = false)
     String nickName;
 
     @Column(length = 36, updatable = false)

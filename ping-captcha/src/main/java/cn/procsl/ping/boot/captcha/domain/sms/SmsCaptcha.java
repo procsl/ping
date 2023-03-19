@@ -2,14 +2,15 @@ package cn.procsl.ping.boot.captcha.domain.sms;
 
 import cn.procsl.ping.boot.captcha.domain.Captcha;
 import cn.procsl.ping.boot.captcha.domain.VerifyFailureException;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Getter
 @Setter

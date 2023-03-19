@@ -4,29 +4,23 @@ package cn.procsl.ping.boot.system.web.rbac;
 import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.common.error.ExceptionResolver;
 import cn.procsl.ping.boot.common.event.Publisher;
-import cn.procsl.ping.boot.common.utils.QueryBuilder;
-import cn.procsl.ping.boot.common.web.*;
+import cn.procsl.ping.boot.common.web.Changed;
+import cn.procsl.ping.boot.common.web.Created;
+import cn.procsl.ping.boot.common.web.Deleted;
+import cn.procsl.ping.boot.common.web.Query;
 import cn.procsl.ping.boot.system.domain.rbac.Permission;
-import cn.procsl.ping.boot.system.domain.rbac.QRole;
 import cn.procsl.ping.boot.system.domain.rbac.Role;
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.QBean;
-import com.querydsl.jpa.JPQLQuery;
-import com.querydsl.jpa.JPQLQueryFactory;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.groups.Default;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import org.mapstruct.factory.Mappers;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Indexed;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -39,14 +33,9 @@ import static cn.procsl.ping.boot.system.constant.EventPublisherConstant.*;
 @Tag(name = "roles", description = "角色管理模块")
 public class RoleController {
 
-
     final JpaRepository<Role, Long> roleRepository;
 
     final JpaRepository<Permission, Long> permissionJpaRepository;
-
-    final JPQLQueryFactory queryFactory;
-
-    final QRole qrole = QRole.role;
 
     final MapStructMapper mapStructMapper = Mappers.getMapper(MapStructMapper.class);
 
@@ -84,16 +73,16 @@ public class RoleController {
         return this.mapStructMapper.mapperDetails(role);
     }
 
-    @MarkPageable
-    @Query(path = "/v1/system/roles", summary = "查询角色权限")
-    public FormatPage<RoleVO> findRoles(Pageable pageable, @RequestParam(required = false) String name) {
-        QBean<RoleVO> details = Projections.bean(RoleVO.class, qrole.id, qrole.name);
-
-        JPQLQuery<RoleVO> query = this.queryFactory.select(details).from(qrole);
-
-        val builder = QueryBuilder.builder(query).and(name, () -> qrole.name.like(String.format("%%%s%%", name)));
-
-        return FormatPage.page(builder, pageable);
-    }
+//    @MarkPageable
+//    @Query(path = "/v1/system/roles", summary = "查询角色权限")
+//    public FormatPage<RoleVO> findRoles(Pageable pageable, @RequestParam(required = false) String name) {
+//        QBean<RoleVO> details = Projections.bean(RoleVO.class, qrole.id, qrole.name);
+//
+//        JPQLQuery<RoleVO> query = this.queryFactory.select(details).from(qrole);
+//
+//        val builder = QueryBuilder.builder(query).and(name, () -> qrole.name.like(String.format("%%%s%%", name)));
+//
+//        return FormatPage.page(builder, pageable);
+//    }
 
 }

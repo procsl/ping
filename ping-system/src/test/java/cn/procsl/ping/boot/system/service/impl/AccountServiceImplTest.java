@@ -3,7 +3,6 @@ package cn.procsl.ping.boot.system.service.impl;
 import cn.procsl.ping.boot.system.TestSystemApplication;
 import cn.procsl.ping.boot.system.domain.user.Account;
 import cn.procsl.ping.boot.system.domain.user.AccountState;
-import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
 
 @Slf4j
 @DisplayName("用户账户服务单元测试")

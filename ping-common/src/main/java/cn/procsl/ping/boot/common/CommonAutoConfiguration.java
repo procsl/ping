@@ -4,12 +4,6 @@ import cn.procsl.ping.boot.common.advice.AnnotationPointcutAdvisor;
 import cn.procsl.ping.boot.common.event.*;
 import cn.procsl.ping.boot.common.utils.ContextHolder;
 import cn.procsl.ping.boot.common.web.AccessLoggerFilter;
-import com.querydsl.jpa.Hibernate5Templates;
-import com.querydsl.jpa.JPQLQueryFactory;
-import com.querydsl.jpa.hibernate.HibernateQueryFactory;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceException;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
@@ -28,6 +22,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.repository.config.BootstrapMode;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceException;
 import java.util.Collection;
 import java.util.List;
 
@@ -50,17 +46,6 @@ public class CommonAutoConfiguration implements ApplicationContextAware {
     @Override
     public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
         ContextHolder.setApplicationContext(applicationContext);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public JPQLQueryFactory jpaQueryFactory(EntityManager entityManager) {
-        try {
-            return new HibernateQueryFactory(Hibernate5Templates.DEFAULT, () -> entityManager.unwrap(Session.class));
-        } catch (PersistenceException e) {
-            return new JPAQueryFactory(entityManager);
-        }
-
     }
 
     @Bean("accessLoggerFilterBean")

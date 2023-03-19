@@ -1,8 +1,6 @@
 package cn.procsl.ping.boot.common.web;
 
-import cn.procsl.ping.boot.common.utils.QueryBuilder;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.querydsl.core.QueryResults;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -30,10 +28,10 @@ public class FormatPage<T> extends PageImpl<T> {
         return new FormatPage<>(content, pageable, total);
     }
 
-    public static <T> FormatPage<T> page(QueryBuilder<T> query, Pageable pageable) {
-        QueryResults<T> result = query.build(pageable).fetchResults();
-        return new FormatPage<>(result.getResults(), pageable, result.getTotal());
-    }
+//    public static <T> FormatPage<T> page(QueryBuilder<T> query, Pageable pageable) {
+//        QueryResults<T> result = query.build(pageable).fetchResults();
+//        return new FormatPage<>(result.getResults(), pageable, result.getTotal());
+//    }
 
     public <E> FormatPage<E> transform(Function<T, E> convert) {
         List<E> content = this.getContent().stream().map(convert).collect(Collectors.toList());

@@ -7,7 +7,6 @@ import cn.procsl.ping.boot.system.web.LoginUtils;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.github.javafaker.Faker;
 import com.github.jsonzou.jmockdata.MockConfig;
-import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.jupiter.api.Assertions;
@@ -20,6 +19,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.inject.Inject;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.github.jsonzou.jmockdata.JMockData.mock;

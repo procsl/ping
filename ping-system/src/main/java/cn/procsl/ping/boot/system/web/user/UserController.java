@@ -1,16 +1,10 @@
 package cn.procsl.ping.boot.system.web.user;
 
 import cn.procsl.ping.boot.common.service.PasswordEncoderService;
-import cn.procsl.ping.boot.common.utils.QueryBuilder;
 import cn.procsl.ping.boot.common.web.*;
 import cn.procsl.ping.boot.system.domain.rbac.Role;
 import cn.procsl.ping.boot.system.domain.rbac.Subject;
 import cn.procsl.ping.boot.system.domain.user.*;
-import com.querydsl.core.types.Expression;
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.QBean;
-import com.querydsl.jpa.JPQLQuery;
-import com.querydsl.jpa.JPQLQueryFactory;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -34,17 +28,11 @@ import java.util.List;
 @Tag(name = "users", description = "用户管理模块接口")
 public class UserController {
 
-    final static QUser quser = QUser.user;
-
-    final static QAccount qaccount = QAccount.account;
-
     final JpaRepository<User, Long> jpaRepository;
 
     final JpaSpecificationExecutor<Role> jpaSpecificationExecutor;
 
     final JpaRepository<Subject, Long> subjectLongJpaRepository;
-
-    final JPQLQueryFactory queryFactory;
 
     final PasswordEncoderService passwordEncoderService;
 
@@ -79,30 +67,30 @@ public class UserController {
         user.updateSelf(userPropDTO.getName(), userPropDTO.getGender(), userPropDTO.getRemark());
     }
 
-    @MarkPageable
-    @Query(path = "/v1/system/users", summary = "获取用户列表")
-    public FormatPage<UserDetailsVO> findUsers(Pageable pageable,
-                                               @RequestParam(required = false) String name,
-                                               @RequestParam(required = false, name = "account.name") String account,
-                                               @RequestParam(required = false, name = "account.state") AccountState state,
-                                               @RequestParam(required = false) Gender gender) {
-
-        Expression<AccountVO> accountProjection = Projections.bean(AccountVO.class, qaccount.name, qaccount.state)
-                                                             .as("account");
-        QBean<UserDetailsVO> projections = Projections.bean(UserDetailsVO.class, quser.id, quser.name, quser.gender,
-                quser.remark, accountProjection);
-
-        JPQLQuery<UserDetailsVO> query = queryFactory.select(projections).from(quser).innerJoin(qaccount)
-                                                     .on(quser.account.id.eq(qaccount.id));
-
-        val builder = QueryBuilder.builder(query)
-                                  .and(name, () -> quser.name.like(String.format("%%%s%%", name)))
-                                  .and(account, () -> qaccount.name.like(String.format("%%%s%%", account)))
-                                  .and(state != null, () -> qaccount.state.eq(state))
-                                  .and(gender != null, () -> quser.gender.eq(gender));
-
-        return FormatPage.page(builder, pageable);
-    }
+//    @MarkPageable
+//    @Query(path = "/v1/system/users", summary = "获取用户列表")
+//    public FormatPage<UserDetailsVO> findUsers(Pageable pageable,
+//                                               @RequestParam(required = false) String name,
+//                                               @RequestParam(required = false, name = "account.name") String account,
+//                                               @RequestParam(required = false, name = "account.state") AccountState state,
+//                                               @RequestParam(required = false) Gender gender) {
+//
+//        Expression<AccountVO> accountProjection = Projections.bean(AccountVO.class, qaccount.name, qaccount.state)
+//                                                             .as("account");
+//        QBean<UserDetailsVO> projections = Projections.bean(UserDetailsVO.class, quser.id, quser.name, quser.gender,
+//                quser.remark, accountProjection);
+//
+//        JPQLQuery<UserDetailsVO> query = queryFactory.select(projections).from(quser).innerJoin(qaccount)
+//                                                     .on(quser.account.id.eq(qaccount.id));
+//
+//        val builder = QueryBuilder.builder(query)
+//                                  .and(name, () -> quser.name.like(String.format("%%%s%%", name)))
+//                                  .and(account, () -> qaccount.name.like(String.format("%%%s%%", account)))
+//                                  .and(state != null, () -> qaccount.state.eq(state))
+//                                  .and(gender != null, () -> quser.gender.eq(gender));
+//
+//        return FormatPage.page(builder, pageable);
+//    }
 
 
 }

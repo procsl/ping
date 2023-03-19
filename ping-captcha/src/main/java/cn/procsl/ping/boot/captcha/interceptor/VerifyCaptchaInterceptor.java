@@ -3,9 +3,10 @@ package cn.procsl.ping.boot.captcha.interceptor;
 import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
 import cn.procsl.ping.boot.captcha.handler.VerifyCaptchaHandlerStrategy;
 import cn.procsl.ping.boot.common.web.AbstractMethodAnnotationInterceptor;
+import org.springframework.web.method.HandlerMethod;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.web.method.HandlerMethod;
 
 public class VerifyCaptchaInterceptor extends AbstractMethodAnnotationInterceptor<VerifyCaptcha> {
 

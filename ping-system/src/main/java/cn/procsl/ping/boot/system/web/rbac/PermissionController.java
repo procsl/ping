@@ -3,23 +3,19 @@ package cn.procsl.ping.boot.system.web.rbac;
 import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.common.error.ExceptionResolver;
 import cn.procsl.ping.boot.common.event.Publisher;
-import cn.procsl.ping.boot.common.utils.QueryBuilder;
-import cn.procsl.ping.boot.common.web.*;
+import cn.procsl.ping.boot.common.web.Changed;
+import cn.procsl.ping.boot.common.web.Created;
+import cn.procsl.ping.boot.common.web.Deleted;
 import cn.procsl.ping.boot.system.domain.rbac.Permission;
-import cn.procsl.ping.boot.system.domain.rbac.QPermission;
-import com.querydsl.jpa.JPQLQueryFactory;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import org.mapstruct.factory.Mappers;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Indexed;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import static cn.procsl.ping.boot.system.constant.EventPublisherConstant.*;
@@ -32,10 +28,6 @@ import static cn.procsl.ping.boot.system.constant.EventPublisherConstant.*;
 public class PermissionController {
 
     final JpaRepository<Permission, Long> permissionJpaRepository;
-
-    final JPQLQueryFactory queryFactory;
-
-    final QPermission qpermission = QPermission.permission;
 
     final MapStructMapper mapStructMapper = Mappers.getMapper(MapStructMapper.class);
 
@@ -59,26 +51,26 @@ public class PermissionController {
     public void update(@PathVariable Long id, @Validated @RequestBody PermissionUpdateDTO permission)
             throws BusinessException {
         permissionJpaRepository.getReferenceById(id)
-                               .update(permission.getOperate(),
-                                       permission.getResource());
+                .update(permission.getOperate(),
+                        permission.getResource());
     }
 
-    @MarkPageable
-    @Query(path = "/v1/system/permissions", summary = "查询角色权限")
-    public FormatPage<PermissionVO> findPermissions(Pageable pageable,
-                                                    @RequestParam(required = false) String resource,
-                                                    @RequestParam(required = false) PermissionType type) {
-        val query = this.queryFactory.select(qpermission).from(qpermission);
-
-        val builder = QueryBuilder
-                .builder(query)
-                .and(resource, () -> qpermission.operate.like(String.format("%%%s%%", resource)))
-                .and(type != null, () -> {
-                    assert type != null;
-                    return qpermission.instanceOf(type.getType());
-                });
-
-        return FormatPage.page(builder, pageable).transform(this.mapStructMapper::mapper);
-    }
+//    @MarkPageable
+//    @Query(path = "/v1/system/permissions", summary = "查询角色权限")
+//    public FormatPage<PermissionVO> findPermissions(Pageable pageable,
+//                                                    @RequestParam(required = false) String resource,
+//                                                    @RequestParam(required = false) PermissionType type) {
+//        val query = this.queryFactory.select(qpermission).from(qpermission);
+//
+//        val builder = QueryBuilder
+//                .builder(query)
+//                .and(resource, () -> qpermission.operate.like(String.format("%%%s%%", resource)))
+//                .and(type != null, () -> {
+//                    assert type != null;
+//                    return qpermission.instanceOf(type.getType());
+//                });
+//
+//        return FormatPage.page(builder, pageable).transform(this.mapStructMapper::mapper);
+//    }
 
 }

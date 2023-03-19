@@ -5,13 +5,13 @@ import cn.procsl.ping.boot.captcha.domain.VerifyFailureException;
 import cn.procsl.ping.boot.captcha.domain.image.ImageCaptcha;
 import cn.procsl.ping.boot.captcha.domain.image.ImageCaptchaBuilderService;
 import cn.procsl.ping.boot.captcha.domain.image.ImageCaptchaRepository;
-import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import javax.inject.Inject;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 

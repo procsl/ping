@@ -2,10 +2,11 @@ package cn.procsl.ping.boot.captcha.handler;
 
 import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
 import cn.procsl.ping.boot.common.error.BusinessException;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.ObjectUtils;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @RequiredArgsConstructor
 class SimpleVerifyCommand implements VerifyCaptchaCommand {

@@ -14,10 +14,6 @@ import cn.procsl.ping.boot.system.domain.user.AuthenticateException;
 import cn.procsl.ping.boot.system.domain.user.User;
 import cn.procsl.ping.boot.system.domain.user.UserSpecification;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.security.PermitAll;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
@@ -31,10 +27,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import jakarta.annotation.security.PermitAll;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.util.Optional;
 
 import static cn.procsl.ping.boot.system.constant.EventPublisherConstant.USER_LOGIN;
-import static cn.procsl.ping.boot.system.constant.EventPublisherConstant.USER_LOGOUT;
 
 
 @Slf4j
@@ -60,7 +59,6 @@ public class SessionController {
     @Transactional(rollbackFor = Exception.class, readOnly = true)
     public SessionUserDetail currentSession(HttpServletRequest request) {
         Session session = this.findCurrentSession(request);
-        session.logout();
         return mapStructMapper.mapper(session);
     }
 
@@ -87,8 +85,8 @@ public class SessionController {
 
         Object auth = request.getSession().getAttribute(session_key);
         if (auth != null) {
-//            throw new BusinessException(HttpStatus.BAD_REQUEST, "002", "用户已登录, 请先注销登录");
-            this.deleteSession(request, response);
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "002", "用户已登录, 请先注销登录");
+//            this.deleteSession(request, response);
         }
         Optional<User> optional = this.userJpaSpecificationExecutor.findOne(
                 new UserSpecification(details.getAccount()));
@@ -103,15 +101,17 @@ public class SessionController {
         return dto;
     }
 
-    @Publisher(name = USER_LOGOUT, parameter = "#root[currentAccount].get()?.id")
+    //    @Publisher(name = USER_LOGOUT, parameter = "#root[currentAccount].get()?.id")
     @Deleted(path = "/v1/system/session", summary = "用户注销")
     @Transactional(rollbackFor = Exception.class)
     public MessageVO deleteSession(HttpServletRequest request, HttpServletResponse response) {
-        request.getSession().invalidate();
         try {
             Session session = this.findCurrentSession(request);
             session.logout();
         } catch (Exception ignore) {
+            log.warn("注销失败 ", ignore);
+        } finally {
+            request.getSession().invalidate();
         }
         return new MessageVO("用户已成功注销登录");
     }

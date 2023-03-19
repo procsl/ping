@@ -5,7 +5,6 @@ import cn.procsl.ping.boot.system.domain.session.Session;
 import cn.procsl.ping.boot.system.domain.session.SessionSpecification;
 import cn.procsl.ping.boot.system.domain.session.SessionState;
 import cn.procsl.ping.boot.system.web.LoginUtils;
-import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -16,6 +15,7 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
+import javax.inject.Inject;
 import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;

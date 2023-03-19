@@ -1,9 +1,10 @@
 package cn.procsl.ping.boot.system.web.rbac;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import jakarta.validation.constraints.NotBlank;
 
 @Data
 @NoArgsConstructor
