@@ -3,7 +3,7 @@ package cn.procsl.ping.boot.captcha.domain.image;
 import cn.procsl.ping.boot.captcha.domain.Captcha;
 import cn.procsl.ping.boot.captcha.domain.CaptchaType;
 import cn.procsl.ping.boot.captcha.domain.VerifyFailureException;
-import cn.procsl.ping.boot.common.jpa.RepositoryCreator;
+import cn.procsl.ping.boot.jpa.RepositoryCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 

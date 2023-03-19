@@ -2,7 +2,7 @@ package cn.procsl.ping.boot.captcha.domain.email;
 
 import cn.procsl.ping.boot.captcha.domain.Captcha;
 import cn.procsl.ping.boot.captcha.domain.CaptchaType;
-import cn.procsl.ping.boot.common.jpa.RepositoryCreator;
+import cn.procsl.ping.boot.jpa.RepositoryCreator;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

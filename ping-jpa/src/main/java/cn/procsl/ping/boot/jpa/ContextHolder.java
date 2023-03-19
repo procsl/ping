@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.common.utils;
+package cn.procsl.ping.boot.jpa;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

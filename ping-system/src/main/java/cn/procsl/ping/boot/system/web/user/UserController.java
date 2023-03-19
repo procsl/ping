@@ -1,14 +1,14 @@
 package cn.procsl.ping.boot.system.web.user;
 
 import cn.procsl.ping.boot.common.service.PasswordEncoderService;
-import cn.procsl.ping.boot.common.web.*;
 import cn.procsl.ping.boot.system.domain.rbac.Role;
 import cn.procsl.ping.boot.system.domain.rbac.Subject;
-import cn.procsl.ping.boot.system.domain.user.*;
+import cn.procsl.ping.boot.system.domain.user.RoleSettingService;
+import cn.procsl.ping.boot.system.domain.user.User;
+import cn.procsl.ping.boot.web.Changed;
+import cn.procsl.ping.boot.web.Created;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Indexed;
@@ -16,7 +16,6 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;

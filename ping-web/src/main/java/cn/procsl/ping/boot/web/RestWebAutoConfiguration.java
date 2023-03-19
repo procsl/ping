@@ -12,7 +12,6 @@ import java.util.List;
  * 自动配置 用于注册加载时依赖注入和包扫描
  *
  * @author procsl
- * @date 2020/03/21
  */
 @Slf4j
 @ConditionalOnMissingBean(RestWebAutoConfiguration.class)

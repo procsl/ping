@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.system.domain.rbac;
 
-import cn.procsl.ping.boot.common.jpa.RepositoryCreator;
+import cn.procsl.ping.boot.jpa.RepositoryCreator;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

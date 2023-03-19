@@ -1,10 +1,13 @@
-package cn.procsl.ping.boot.common.error;
+package cn.procsl.ping.boot.web;
 
 import cn.procsl.ping.boot.common.dto.MessageVO;
+import cn.procsl.ping.boot.common.error.ErrorVO;
+import cn.procsl.ping.boot.common.error.ParameterErrorVO;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.transaction.TransactionSystemException;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -16,11 +19,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import jakarta.persistence.RollbackException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -44,14 +42,14 @@ public class GlobalExceptionHandler {
         return new MessageVO("服务器内部错误");
     }
 
-    @ResponseBody
-    @ExceptionHandler(value = BusinessException.class)
-    public ErrorVO businessExceptionHandler(HttpServletRequest request, HttpServletResponse response,
-                                            BusinessException businessException) {
-        response.setStatus(businessException.getHttpStatus());
-        return ErrorVO.builder(businessException.getHttpStatus() + businessException.getCode(),
-                businessException.getMessage());
-    }
+//    @ResponseBody
+//    @ExceptionHandler(value = BusinessException.class)
+//    public ErrorVO businessExceptionHandler(HttpServletRequest request, HttpServletResponse response,
+//                                            BusinessException businessException) {
+//        response.setStatus(businessException.getHttpStatus());
+//        return ErrorVO.builder(businessException.getHttpStatus() + businessException.getCode(),
+//                businessException.getMessage());
+//    }
 
     @ResponseBody
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
@@ -106,26 +104,26 @@ public class GlobalExceptionHandler {
         return ErrorVO.builder(s, "server error!");
     }
 
-    @ResponseBody
-    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(value = RollbackException.class)
-    public ErrorVO rollbackException(RollbackException rollbackException) {
-        Throwable cause = rollbackException.getCause();
-        if (cause instanceof ConstraintViolationException) {
-            return this.constraintViolationException((ConstraintViolationException) cause);
-        }
-        return ErrorVO.builder("400001", "参数校验失败");
-    }
+//    @ResponseBody
+//    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+//    @ExceptionHandler(value = RollbackException.class)
+//    public ErrorVO rollbackException(RollbackException rollbackException) {
+//        Throwable cause = rollbackException.getCause();
+//        if (cause instanceof ConstraintViolationException) {
+//            return this.constraintViolationException((ConstraintViolationException) cause);
+//        }
+//        return ErrorVO.builder("400001", "参数校验失败");
+//    }
 
-    @ResponseBody
-    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(value = TransactionSystemException.class)
-    public ErrorVO transactionSystemException(TransactionSystemException transactionSystemException) {
-        if (!(transactionSystemException.getCause() instanceof RollbackException)) {
-            return getDefaultErrorCode(500, transactionSystemException);
-        }
-        return this.rollbackException((RollbackException) transactionSystemException.getCause());
-    }
+//    @ResponseBody
+//    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+//    @ExceptionHandler(value = TransactionSystemException.class)
+//    public ErrorVO transactionSystemException(TransactionSystemException transactionSystemException) {
+//        if (!(transactionSystemException.getCause() instanceof RollbackException)) {
+//            return getDefaultErrorCode(500, transactionSystemException);
+//        }
+//        return this.rollbackException((RollbackException) transactionSystemException.getCause());
+//    }
 
 
     @ResponseBody

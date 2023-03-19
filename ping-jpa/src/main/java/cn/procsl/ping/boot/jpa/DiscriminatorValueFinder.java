@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.common.jpa;
+package cn.procsl.ping.boot.jpa;
 
 import lombok.val;
 

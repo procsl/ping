@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.product.domain;
 
-import cn.procsl.ping.boot.common.jpa.RepositoryCreator;
+import cn.procsl.ping.boot.jpa.RepositoryCreator;
 import lombok.*;
 
 import jakarta.persistence.*;
