@@ -26,7 +26,6 @@
         <springboot.version>3.0.4</springboot.version>
         <native-plugin.version>0.9.18</native-plugin.version>
         <springdoc.version>2.0.0</springdoc.version>
-        <jpa-streamer-version>1.0.2</jpa-streamer-version>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
         <web.server.port>10000</web.server.port>
         <spring-dev>false</spring-dev>
@@ -212,7 +211,7 @@
             <plugin>
                 <groupId>org.hibernate.orm.tooling</groupId>
                 <artifactId>hibernate-enhance-maven-plugin</artifactId>
-                <version>${hibernate.version}</version>
+                <version>6.1.7.Final</version>
                 <executions>
                     <execution>
                         <configuration>
@@ -288,31 +287,6 @@
 
             </resource>
         </resources>
-
-        <pluginManagement>
-
-            <plugins>
-
-                <plugin>
-                    <groupId>org.owasp</groupId>
-                    <artifactId>dependency-check-maven</artifactId>
-                    <version>7.3.2</version>
-                    <configuration>
-                        <skipProvidedScope>true</skipProvidedScope>
-                    </configuration>
-
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-
-            </plugins>
-
-        </pluginManagement>
 
     </build>
 
