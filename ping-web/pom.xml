@@ -9,6 +9,8 @@
 
     <artifactId>ping-web</artifactId>
 
+    <name>Ping 接口模块</name>
+
     <dependencies>
 
         <dependency>

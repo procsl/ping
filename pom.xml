@@ -82,6 +82,12 @@
             </dependency>
 
             <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-common</artifactId>
+                <version>${springdoc.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>cn.procsl</groupId>
                 <artifactId>ping-common</artifactId>
                 <version>${project.version}</version>
@@ -108,18 +114,6 @@
             <dependency>
                 <groupId>cn.procsl</groupId>
                 <artifactId>ping-captcha</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cn.procsl</groupId>
-                <artifactId>ping-connect</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cn.procsl</groupId>
-                <artifactId>ping-im</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

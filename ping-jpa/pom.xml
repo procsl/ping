@@ -9,6 +9,8 @@
 
     <artifactId>ping-jpa</artifactId>
 
+    <name>Ping JPA 模块</name>
+
     <dependencies>
 
         <dependency>
