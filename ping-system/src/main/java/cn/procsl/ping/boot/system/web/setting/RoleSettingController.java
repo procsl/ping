@@ -1,8 +1,8 @@
 package cn.procsl.ping.boot.system.web.setting;
 
-import cn.procsl.ping.boot.common.web.Patch;
-import cn.procsl.ping.boot.common.web.Query;
 import cn.procsl.ping.boot.system.domain.user.RoleSettingService;
+import cn.procsl.ping.boot.web.Patch;
+import cn.procsl.ping.boot.web.Query;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Indexed;

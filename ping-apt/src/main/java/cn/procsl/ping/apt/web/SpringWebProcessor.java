@@ -11,7 +11,7 @@ import javax.tools.Diagnostic;
 import java.util.Set;
 
 //@AutoService(Processor.class)
-@SupportedAnnotationTypes("cn.procsl.ping.boot.common.web.*")
+@SupportedAnnotationTypes("cn.procsl.ping.boot.web.*")
 public class SpringWebProcessor extends AbstractProcessor {
 
 

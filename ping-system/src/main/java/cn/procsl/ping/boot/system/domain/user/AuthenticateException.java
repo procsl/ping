@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.UNAUTHORIZED)
 public class AuthenticateException extends BusinessException {
     public AuthenticateException(String format, Object... arguments) {
-        super(HttpStatus.UNAUTHORIZED, "001", format, arguments);
+        super(HttpStatus.UNAUTHORIZED.value(), "001", format, arguments);
     }
 }

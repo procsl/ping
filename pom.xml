@@ -37,6 +37,8 @@
         <module>ping-apt</module>
         <module>ping-parent</module>
         <module>ping-distribute</module>
+        <module>ping-web</module>
+        <module>ping-jpa</module>
     </modules>
 
     <name>Ping 父模块</name>
@@ -82,6 +84,18 @@
             <dependency>
                 <groupId>cn.procsl</groupId>
                 <artifactId>ping-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.procsl</groupId>
+                <artifactId>ping-jpa</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.procsl</groupId>
+                <artifactId>ping-web</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -189,6 +203,7 @@
                     <compilerVersion>${compiler.version}</compilerVersion>
                     <verbose>true</verbose>
                     <showWarnings>true</showWarnings>
+                    <!--                    <fork>true</fork>-->
                     <!--保留参数名称-->
                     <maxmem>2048m</maxmem>
                     <compilerArgs>
@@ -359,8 +374,8 @@
             </properties>
             <dependencies>
                 <dependency>
-                    <groupId>mysql</groupId>
-                    <artifactId>mysql-connector-java</artifactId>
+                    <groupId>com.mysql</groupId>
+                    <artifactId>mysql-connector-j</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -606,41 +621,5 @@
         Ping项目, 基于DDD思想设计
     </description>
 
-    <repositories>
-        <repository>
-            <id>spring-milestones</id>
-            <name>Spring Milestones</name>
-            <url>https://repo.spring.io/milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>spring-snapshots</id>
-            <name>Spring Snapshots</name>
-            <url>https://repo.spring.io/snapshot</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>spring-milestones</id>
-            <name>Spring Milestones</name>
-            <url>https://repo.spring.io/milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-        <pluginRepository>
-            <id>spring-snapshots</id>
-            <name>Spring Snapshots</name>
-            <url>https://repo.spring.io/snapshot</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </pluginRepository>
-    </pluginRepositories>
 
 </project>

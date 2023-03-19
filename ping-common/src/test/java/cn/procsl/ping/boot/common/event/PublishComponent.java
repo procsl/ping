@@ -2,7 +2,6 @@ package cn.procsl.ping.boot.common.event;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 import java.util.function.Supplier;
@@ -11,7 +10,6 @@ import java.util.function.Supplier;
 @Slf4j
 public class PublishComponent {
 
-    @Transactional
     @Publisher(name = "test", parameter = "静态参数")
     public void callable() {
         log.info("被调用了");

@@ -1,8 +1,8 @@
 package cn.procsl.ping.boot.system.web.user;
 
 import cn.procsl.ping.boot.common.service.PasswordEncoderService;
-import cn.procsl.ping.boot.common.web.Changed;
 import cn.procsl.ping.boot.system.domain.user.User;
+import cn.procsl.ping.boot.web.Changed;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;

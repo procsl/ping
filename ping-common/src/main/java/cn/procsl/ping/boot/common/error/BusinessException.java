@@ -1,7 +1,6 @@
 package cn.procsl.ping.boot.common.error;
 
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
 
 /**
  * 业务异常
@@ -21,19 +20,19 @@ public class BusinessException extends RuntimeException implements ErrorEntity {
         super(String.format(format, arguments), null, true, true);
     }
 
-    public BusinessException(HttpStatus httpStatus, String code, String format, Object... arguments) {
+    public BusinessException(Integer httpStatus, String code, String format, Object... arguments) {
         super(String.format(format, arguments), null, true, true);
         this.code = code;
-        this.httpStatus = httpStatus.value();
+        this.httpStatus = httpStatus;
     }
 
     public BusinessException(Exception e, String format, Object... arguments) {
         super(String.format(format, arguments), e, true, true);
     }
 
-    public BusinessException(Exception e, HttpStatus httpStatus, String code, String format, Object... arguments) {
+    public BusinessException(Exception e, Integer httpStatus, String code, String format, Object... arguments) {
         super(String.format(format, arguments), e, true, true);
         this.code = code;
-        this.httpStatus = httpStatus.value();
+        this.httpStatus = httpStatus;
     }
 }
