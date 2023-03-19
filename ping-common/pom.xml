@@ -38,10 +38,6 @@
             <optional>true</optional>
         </dependency>
 
-        <dependency>
-            <groupId>com.github.wenhao</groupId>
-            <artifactId>jpa-spec</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
