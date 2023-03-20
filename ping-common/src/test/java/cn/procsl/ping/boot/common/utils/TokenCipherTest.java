@@ -13,23 +13,32 @@ public class TokenCipherTest {
     TokenCipher cipher;
 
     {
-        try {
-            cipher = new TokenCipher("12345678");
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
+        cipher = new TokenCipher("12345678");
     }
 
     @Test
     public void encrypt() {
-        byte[] res = cipher.encrypt("hello world".getBytes(StandardCharsets.UTF_8));
-        log.info(Base64.getEncoder().encodeToString(res));
+        {
+            byte[] res = cipher.encrypt("hello world".getBytes(StandardCharsets.UTF_8));
+            log.info(Base64.getEncoder().encodeToString(res));
+        }
+
+        {
+            byte[] res = cipher.encrypt("helloworld".getBytes(StandardCharsets.UTF_8));
+            log.info(Base64.getEncoder().encodeToString(res));
+        }
+
+        {
+            byte[] res = cipher.encrypt("helloorld".getBytes(StandardCharsets.UTF_8));
+            log.info(Base64.getEncoder().encodeToString(res));
+        }
     }
 
     @Test
     public void decrypt() {
-        String text = "1045Ne2itTyfg7IbIniIlg==";
+        String text = "TcP6zkOOF47Q67iC3uVcGA==";
         byte[] res = cipher.decrypt(Base64.getDecoder().decode(text.getBytes(StandardCharsets.UTF_8)));
         log.info(new String(res));
     }
+
 }

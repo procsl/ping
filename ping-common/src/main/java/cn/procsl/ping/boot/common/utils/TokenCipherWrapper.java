@@ -1,29 +1,49 @@
 package cn.procsl.ping.boot.common.utils;
 
-import lombok.RequiredArgsConstructor;
-
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-@RequiredArgsConstructor
 public class TokenCipherWrapper {
 
     final TokenCipher tokenCipher;
 
-    final Base64.Encoder encoder = Base64.getEncoder();
+    final Encoder encoder;
 
-    final Base64.Decoder decoder = Base64.getDecoder();
+    final Decoder decoder;
+
+    public TokenCipherWrapper(TokenCipher tokenCipher) {
+        this(tokenCipher, false);
+    }
+
+    public TokenCipherWrapper(TokenCipher tokenCipher, boolean isBase62) {
+        this.tokenCipher = tokenCipher;
+        if (isBase62) {
+            Base62 base62 = Base62.createInstance();
+            encoder = base62::encodeToString;
+            decoder = base62::decode;
+        } else {
+            encoder = Base64.getEncoder()::encodeToString;
+            decoder = Base64.getDecoder()::decode;
+        }
+    }
 
 
-    public String encrypt(String content) {
-        byte[] res = tokenCipher.encrypt(content.getBytes(StandardCharsets.UTF_8));
+    public String encrypt(byte[] content) {
+        byte[] res = tokenCipher.encrypt(content);
         return encoder.encodeToString(res);
     }
 
-    public String decrypt(String content) {
+    public byte[] decrypt(String content) {
         byte[] res = decoder.decode(content.getBytes(StandardCharsets.UTF_8));
-        byte[] decode = tokenCipher.decrypt(res);
-        return new String(decode);
+        return tokenCipher.decrypt(res);
+    }
+
+    public interface Encoder {
+        String encodeToString(byte[] input);
+    }
+
+    public interface Decoder {
+        byte[] decode(byte[] bytes);
     }
 
 }
