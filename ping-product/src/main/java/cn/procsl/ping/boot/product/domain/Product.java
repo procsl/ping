@@ -4,6 +4,7 @@ import cn.procsl.ping.boot.jpa.RepositoryCreator;
 import lombok.*;
 
 import jakarta.persistence.*;
+
 import java.io.Serializable;
 
 import static jakarta.persistence.GenerationType.TABLE;
@@ -17,8 +18,8 @@ import static jakarta.persistence.GenerationType.TABLE;
 public class Product implements Serializable {
 
     @Id
-    @TableGenerator(name = "id_gen", table = "id_gen", initialValue = 10)
-    @GeneratedValue(strategy = TABLE, generator = "id_gen")
+    @TableGenerator(name = "table_sequence")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "table_sequence")
     Long id;
 
     @Column(length = 100)

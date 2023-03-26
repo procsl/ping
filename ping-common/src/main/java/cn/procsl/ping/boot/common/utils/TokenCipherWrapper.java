@@ -33,9 +33,20 @@ public class TokenCipherWrapper {
         return encoder.encodeToString(res);
     }
 
+    public String encrypt(Long content) {
+        byte[] bytes = Scale62.longToBytesBig(content);
+        return this.encrypt(bytes);
+    }
+
     public byte[] decrypt(String content) {
         byte[] res = decoder.decode(content.getBytes(StandardCharsets.UTF_8));
         return tokenCipher.decrypt(res);
+    }
+
+    public Long decryptToLong(String content) {
+        byte[] res = this.decrypt(content);
+        long l = Scale62.bytesToLongBig(res);
+        return l;
     }
 
     public interface Encoder {

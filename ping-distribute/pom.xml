@@ -135,7 +135,6 @@
             </dependencies>
         </profile>
 
-
         <profile>
             <id>openapi</id>
             <dependencies>
