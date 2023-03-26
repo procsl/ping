@@ -6,7 +6,7 @@
     <parent>
         <artifactId>ping-parent</artifactId>
         <groupId>cn.procsl</groupId>
-        <version>0.0.7-SNAPSHOT</version>
+        <version>1.0.0</version>
         <relativePath>../ping-parent</relativePath>
     </parent>
 
