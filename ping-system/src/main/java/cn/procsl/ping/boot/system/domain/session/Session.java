@@ -13,7 +13,7 @@ import java.util.Date;
 @Getter
 @Setter
 @Entity
-@RepositoryCreator(repositoryName = "pingAdminSessionRepository")
+@RepositoryCreator(repositoryName = "PingAdminSessionRepository")
 @Table(name = "i_session")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Session implements Serializable {
