@@ -320,9 +320,43 @@
                                 --initialize-at-build-time=org.slf4j.impl.StaticLoggerBinder
                                 --initialize-at-build-time=ch.qos.logback.classic.spi.ThrowableProxy
                                 --initialize-at-build-time=ch.qos.logback.core.CoreConstants
-                                --initialize-at-build-time=ch.qos.logback.classic.PatternLayout,ch.qos.logback.core.util.Duration
-                                --trace-class-initialization=ch.qos.logback.classic.PatternLayout,ch.qos.logback.core.util.Duration
+                                --initialize-at-build-time=ch.qos.logback.classic.PatternLayout
+                                --initialize-at-build-time=ch.qos.logback.core.util.Duration
+                                --trace-class-initialization=ch.qos.logback.classic.PatternLayout
+                                --trace-class-initialization=ch.qos.logback.core.util.Duration
+
+                                --initialize-at-run-time=io.netty.channel.epoll.Epoll
+                                --initialize-at-run-time=io.netty.channel.epoll.Native
+                                --initialize-at-run-time=io.netty.channel.epoll.EpollEventLoop
+                                --initialize-at-run-time=io.netty.channel.epoll.EpollEventArray
+                                --initialize-at-run-time=io.netty.channel.DefaultFileRegion
+                                --initialize-at-run-time=io.netty.channel.kqueue.KQueueEventArray
+                                --initialize-at-run-time=io.netty.channel.kqueue.KQueveEventLoop
+                                --initialize-at-run-time=io.netty.channel.kqueue.Native
+                                --initialize-at-run-time=io.netty.channel.unix.Errors
+                                --initialize-at-run-time=io.netty.channel.unix.1ovArray
+                                --initialize-at-run-time=io.netty.channel.unix.Limits
+                                --initialize-at-run-time=io.netty.util.internal.logging.Log4JLogger
+                                --initialize-at-run-time=io.netty.channel.unix.Socket
+                                --initialize-at-run-time=io.netty.channel.ChannelHandlerMask
+
+                                --initialize-at-build-time=ch.qos.logback
+                                --initialize-at-build-time=com.ctc.wstx
+
+                                --enable-url-protocols=http
+                                -H:EnableURLProtocols=http
+                                -H:EnableURLProtocols=https
+
+                                --trace-class-initialization=org.apache.log4j.Layout
+                                --trace-class-initialization=java.beans.Introspector
+                                --trace-class-initialization=com.sun.beans.introspect.ClassInfo
+
+                                -Dio.netty.tryReflectionSetAccessible=true
+                                --add-exports=java.base/java.nio=ALL-UNNAMED
+                                --add-opens java.base/java.nio=ALL-UNNAMED
+
                                 --report-unsupported-elements-at-runtime
+
                                 --allow-incomplete-classpath
                                 -H:+ReportExceptionStackTraces
                             </buildArgs>
