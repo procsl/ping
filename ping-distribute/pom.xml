@@ -49,15 +49,22 @@
 
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <!--                <version>${springboot.version}</version>-->
-                <!--                <configuration>-->
-                <!--                    <excludes>-->
-                <!--                        <exclude>-->
-                <!--                            <groupId>org.projectlombok</groupId>-->
-                <!--                            <artifactId>lombok</artifactId>-->
-                <!--                        </exclude>-->
-                <!--                    </excludes>-->
-                <!--                </configuration>-->
+                <version>${springboot.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
             </plugin>
 
         </plugins>
@@ -327,39 +334,45 @@
                                 --trace-class-initialization=ch.qos.logback.classic.PatternLayout
                                 --trace-class-initialization=ch.qos.logback.core.util.Duration
 
-                                --initialize-at-run-time=io.netty.channel.epoll.Epoll
-                                --initialize-at-run-time=io.netty.channel.epoll.Native
-                                --initialize-at-run-time=io.netty.channel.epoll.EpollEventLoop
-                                --initialize-at-run-time=io.netty.channel.epoll.EpollEventArray
-                                --initialize-at-run-time=io.netty.channel.DefaultFileRegion
-                                --initialize-at-run-time=io.netty.channel.kqueue.KQueueEventArray
-                                --initialize-at-run-time=io.netty.channel.kqueue.KQueveEventLoop
-                                --initialize-at-run-time=io.netty.channel.kqueue.Native
-                                --initialize-at-run-time=io.netty.channel.unix.Errors
-                                --initialize-at-run-time=io.netty.channel.unix.1ovArray
-                                --initialize-at-run-time=io.netty.channel.unix.Limits
-                                --initialize-at-run-time=io.netty.util.internal.logging.Log4JLogger
-                                --initialize-at-run-time=io.netty.channel.unix.Socket
-                                --initialize-at-run-time=io.netty.channel.ChannelHandlerMask
+                                <!--                                &#45;&#45;initialize-at-run-time=io.netty.channel.epoll.Epoll-->
+                                <!--                                &#45;&#45;initialize-at-run-time=io.netty.channel.epoll.Native-->
+                                <!--                                &#45;&#45;initialize-at-run-time=io.netty.channel.epoll.EpollEventLoop-->
+                                <!--                                &#45;&#45;initialize-at-run-time=io.netty.channel.epoll.EpollEventArray-->
+                                <!--                                &#45;&#45;initialize-at-run-time=io.netty.channel.DefaultFileRegion-->
+                                <!--                                &#45;&#45;initialize-at-run-time=io.netty.channel.kqueue.KQueueEventArray-->
+                                <!--                                &#45;&#45;initialize-at-run-time=io.netty.channel.kqueue.KQueveEventLoop-->
+                                <!--                                &#45;&#45;initialize-at-run-time=io.netty.channel.kqueue.Native-->
+                                <!--                                &#45;&#45;initialize-at-run-time=io.netty.channel.unix.Errors-->
+                                <!--                                &#45;&#45;initialize-at-run-time=io.netty.channel.unix.1ovArray-->
+                                <!--                                &#45;&#45;initialize-at-run-time=io.netty.channel.unix.Limits-->
+                                <!--                                &#45;&#45;initialize-at-run-time=io.netty.util.internal.logging.Log4JLogger-->
+                                <!--                                &#45;&#45;initialize-at-run-time=io.netty.channel.unix.Socket-->
+                                <!--                                &#45;&#45;initialize-at-run-time=io.netty.channel.ChannelHandlerMask-->
 
                                 --initialize-at-build-time=ch.qos.logback
                                 --initialize-at-build-time=com.ctc.wstx
 
-                                --enable-url-protocols=http
-                                -H:EnableURLProtocols=http
-                                -H:EnableURLProtocols=https
+                                <!--                                &#45;&#45;enable-url-protocols=http-->
+                                <!--                                -H:EnableURLProtocols=http-->
+                                <!--                                -H:EnableURLProtocols=https-->
 
-                                --trace-class-initialization=org.apache.log4j.Layout
-                                --trace-class-initialization=java.beans.Introspector
-                                --trace-class-initialization=com.sun.beans.introspect.ClassInfo
+                                <!--                                &#45;&#45;trace-class-initialization=org.apache.log4j.Layout-->
+                                <!--                                &#45;&#45;trace-class-initialization=java.beans.Introspector-->
+                                <!--                                &#45;&#45;trace-class-initialization=com.sun.beans.introspect.ClassInfo-->
 
-                                -Dio.netty.tryReflectionSetAccessible=true
-                                --add-exports=java.base/java.nio=ALL-UNNAMED
-                                --add-opens java.base/java.nio=ALL-UNNAMED
+                                <!--                                -Dio.netty.tryReflectionSetAccessible=true-->
+                                <!--                                &#45;&#45;add-exports=java.base/java.nio=ALL-UNNAMED-->
+                                <!--                                &#45;&#45;add-opens java.base/java.nio=ALL-UNNAMED-->
 
-                                --report-unsupported-elements-at-runtime
+                                --native-image-info
+                                --verbose
 
-                                --allow-incomplete-classpath
+                                <!--                                -H:DashboardDump=fortune-->
+                                -H:+DashboardAll
+
+                                -H:TraceClassInitialization=/
+                                -H:TraceObjectInstantiation=/
+
                                 -H:+ReportExceptionStackTraces
                             </buildArgs>
                             <debug>true</debug>
@@ -392,7 +405,6 @@
 
 
         </profile>
-
 
 
         <profile>
@@ -436,6 +448,7 @@
                     <plugin>
                         <groupId>org.graalvm.buildtools</groupId>
                         <artifactId>native-maven-plugin</artifactId>
+                        <version>${native-plugin.version}</version>
                         <configuration>
                             <buildArgs>
                                 --no-fallback
