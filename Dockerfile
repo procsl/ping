@@ -2,7 +2,7 @@
 FROM openjdk:17
 # 将当前目录下的jar包复制到docker容器的/目录下
 
-ADD ./ping-distribute/target/ping-distribute-1.0.0.jar ~/ping-distribute.jar
+ADD ./ping-distribute/target/ping-distribute-1.0.0.jar  /ping-distribute.jar
 
 # 运行过程中创建一个mall-tiny-docker-file.jar文件
 ENV DB_USERNAME root
@@ -13,7 +13,7 @@ ENV spring.profiles.dev=monitor,dev
 EXPOSE 10000
 
 # 指定docker容器启动时运行jar包
-ENTRYPOINT ["java", "-jar","~/ping-distribute.jar"]
+ENTRYPOINT ["java", "-jar","/ping-distribute.jar"]
 
 # 指定维护者的名字
 MAINTAINER procsl
