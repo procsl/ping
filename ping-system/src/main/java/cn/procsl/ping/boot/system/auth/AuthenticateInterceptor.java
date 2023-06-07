@@ -1,7 +1,7 @@
 package cn.procsl.ping.boot.system.auth;
 
 import cn.procsl.ping.boot.system.domain.user.AuthenticateException;
-import cn.procsl.ping.boot.web.AbstractMethodAnnotationInterceptor;
+import cn.procsl.ping.boot.web.component.AbstractMethodAnnotationInterceptor;
 import org.springframework.web.method.HandlerMethod;
 
 import jakarta.annotation.security.PermitAll;

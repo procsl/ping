@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.web.encrypt;
 
-import cn.procsl.ping.boot.web.SpringContextHolder;
+import cn.procsl.ping.boot.web.component.SpringContextHolder;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;

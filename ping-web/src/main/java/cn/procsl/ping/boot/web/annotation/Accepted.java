@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.web;
+package cn.procsl.ping.boot.web.annotation;
 
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.core.annotation.AliasFor;

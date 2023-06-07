@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.web;
+package cn.procsl.ping.boot.web.component;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.method.HandlerMethod;

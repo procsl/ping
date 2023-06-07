@@ -1,6 +1,5 @@
 package cn.procsl.ping.boot.web.encrypt;
 
-import cn.procsl.ping.boot.web.VersionControl;
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

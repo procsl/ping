@@ -6,10 +6,10 @@ import cn.procsl.ping.boot.common.error.ExceptionResolver;
 import cn.procsl.ping.boot.common.event.Publisher;
 import cn.procsl.ping.boot.system.domain.rbac.Permission;
 import cn.procsl.ping.boot.system.domain.rbac.Role;
-import cn.procsl.ping.boot.web.Changed;
-import cn.procsl.ping.boot.web.Created;
-import cn.procsl.ping.boot.web.Deleted;
-import cn.procsl.ping.boot.web.Query;
+import cn.procsl.ping.boot.web.annotation.Changed;
+import cn.procsl.ping.boot.web.annotation.Created;
+import cn.procsl.ping.boot.web.annotation.Deleted;
+import cn.procsl.ping.boot.web.annotation.Query;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.constraints.NotNull;
@@ -41,7 +41,7 @@ public class RoleController {
 
 
     @Created(path = "/v1/system/roles", summary = "创建角色")
-    @Publisher(name = ROLE_CREATE_EVENT, parameter = "#details.name")
+    @Publisher(eventName = ROLE_CREATE_EVENT, parameter = "#details.name")
     @ExceptionResolver(matcher = ConstraintViolationException.class, message = "角色已存在")
     public RoleVO createRole(@Validated @RequestBody RoleGrantDTO details) throws BusinessException {
         List<Permission> permissions = this.permissionJpaRepository.findAllById(details.getPermissions());
@@ -52,13 +52,13 @@ public class RoleController {
 
     @Deleted(path = "/v1/system/roles/{id}", summary = "删除角色")
     @ExceptionResolver(message = "该角色正在使用中,无法删除", code = "409001")
-    @Publisher(name = ROLE_DELETE_EVENT, parameter = "#id")
+    @Publisher(eventName = ROLE_DELETE_EVENT, parameter = "#id")
     public void deleteRole(@PathVariable Long id) throws BusinessException {
         this.roleRepository.deleteById(id);
     }
 
     @Changed(path = "/v1/system/roles/{id}", summary = "修改指定角色信息")
-    @Publisher(name = ROLE_CHANGED_EVENT, parameter = "#id")
+    @Publisher(eventName = ROLE_CHANGED_EVENT, parameter = "#id")
     public void changeRole(@PathVariable("id") Long id,
                            @Validated({Default.class}) @RequestBody @NotNull RoleGrantDTO details)
             throws BusinessException {

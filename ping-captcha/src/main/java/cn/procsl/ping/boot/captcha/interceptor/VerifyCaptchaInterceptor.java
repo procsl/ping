@@ -2,7 +2,7 @@ package cn.procsl.ping.boot.captcha.interceptor;
 
 import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
 import cn.procsl.ping.boot.captcha.handler.VerifyCaptchaHandlerStrategy;
-import cn.procsl.ping.boot.web.AbstractMethodAnnotationInterceptor;
+import cn.procsl.ping.boot.web.component.AbstractMethodAnnotationInterceptor;
 import org.springframework.web.method.HandlerMethod;
 
 import jakarta.servlet.http.HttpServletRequest;

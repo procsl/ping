@@ -10,16 +10,15 @@ import cn.procsl.ping.boot.system.domain.session.UserLoginService;
 import cn.procsl.ping.boot.system.domain.user.AuthenticateException;
 import cn.procsl.ping.boot.system.domain.user.User;
 import cn.procsl.ping.boot.system.domain.user.UserSpecification;
-import cn.procsl.ping.boot.web.Created;
-import cn.procsl.ping.boot.web.Deleted;
-import cn.procsl.ping.boot.web.Query;
+import cn.procsl.ping.boot.web.annotation.Created;
+import cn.procsl.ping.boot.web.annotation.Deleted;
+import cn.procsl.ping.boot.web.annotation.Query;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Indexed;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -31,6 +30,7 @@ import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+
 import java.util.Optional;
 
 import static cn.procsl.ping.boot.system.constant.EventPublisherConstant.USER_LOGIN;
@@ -65,31 +65,28 @@ public class SessionController {
     Session findCurrentSession(HttpServletRequest request) {
         HttpSession httpSession = request.getSession(false);
         if (httpSession == null) {
-            throw new BusinessException(HttpStatus.UNAUTHORIZED.value(), "002", "尚未登录,请登录");
+            throw new BusinessException("尚未登录,请登录");
         }
         Long id = (Long) httpSession.getAttribute(session_key);
         if (id == null) {
-            throw new BusinessException(HttpStatus.UNAUTHORIZED.value(), "002", "尚未登录,请登录");
+            throw new BusinessException("尚未登录,请登录");
         }
         return this.sessionLongJpaRepository.getReferenceById(id);
     }
 
     @PermitAll
     @VerifyCaptcha(type = CaptchaType.image)
-    @Publisher(name = USER_LOGIN, parameter = "#details.account")
+    @Publisher(eventName = USER_LOGIN, parameter = "#details.account")
     @Created(path = "/v1/system/session", summary = "用户登录")
     @Transactional(rollbackFor = Exception.class)
-    public SessionUserDetail authenticate(HttpServletRequest request, HttpServletResponse response,
-                                          @Validated @RequestBody LoginDetailDTO details)
-            throws AuthenticateException {
+    public SessionUserDetail authenticate(HttpServletRequest request, HttpServletResponse response, @Validated @RequestBody LoginDetailDTO details) throws AuthenticateException {
 
         Object auth = request.getSession().getAttribute(session_key);
         if (auth != null) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST.value(), "002", "用户已登录, 请先注销登录");
+            throw new BusinessException("用户已登录, 请先注销登录");
 //            this.deleteSession(request, response);
         }
-        Optional<User> optional = this.userJpaSpecificationExecutor.findOne(
-                new UserSpecification(details.getAccount()));
+        Optional<User> optional = this.userJpaSpecificationExecutor.findOne(new UserSpecification(details.getAccount()));
 
         optional.orElseThrow(() -> new AuthenticateException("用户名或密码错误"));
         Session session = this.handler.doLogin(request.getSession().getId(), details.getPassword(), optional.get());
@@ -108,8 +105,8 @@ public class SessionController {
         try {
             Session session = this.findCurrentSession(request);
             session.logout();
-        } catch (Exception ignore) {
-            log.warn("注销失败 ", ignore);
+        } catch (Exception e) {
+            log.warn("注销失败", e);
         } finally {
             request.getSession().invalidate();
         }

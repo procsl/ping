@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.ObjectUtils;
 
+import java.io.IOException;
+
 @Slf4j
 @RequiredArgsConstructor
 class ImageVerifyCaptchaHandler implements VerifyCaptchaHandler<VerifyCaptchaCommand> {
@@ -25,14 +27,14 @@ class ImageVerifyCaptchaHandler implements VerifyCaptchaHandler<VerifyCaptchaCom
         String token = context.token();
         if (ObjectUtils.isEmpty(token)) {
             log.warn("图形验证码 token 为 null");
-            throw new VerifyFailureException("图形验证码错误");
+            throw new VerifyFailureException("图形验证码已过期");
         }
 
         ImageCaptcha imageCaptcha;
         try {
             imageCaptcha = imageCaptchaBuilderService.buildForToken(context.key(), token);
-        } catch (RuntimeException e) {
-            log.debug("图形验证码解码失败");
+        } catch (IOException e) {
+            log.warn("图形验证码解码失败", e);
             throw new VerifyFailureException("图形验证码错误");
         }
 

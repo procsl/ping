@@ -1,8 +1,8 @@
 package cn.procsl.ping.boot.common;
 
 import cn.procsl.ping.boot.common.advice.AnnotationPointcutAdvisor;
+import cn.procsl.ping.boot.common.error.CommonErrorAttributes;
 import cn.procsl.ping.boot.common.event.*;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -19,7 +19,6 @@ import java.util.Collection;
  * @author procsl
  * @date 2020/03/21
  */
-@Slf4j
 @AutoConfiguration(before = {JpaBaseConfiguration.class, ErrorMvcAutoConfiguration.class})
 @ConditionalOnMissingBean(CommonAutoConfiguration.class)
 public class CommonAutoConfiguration {
@@ -42,5 +41,11 @@ public class CommonAutoConfiguration {
     public EventBusBridge eventBusBridge(ApplicationContext applicationContext) {
         return new SpringEventBusBridge(applicationContext);
     }
+
+    @Bean
+    public CommonErrorAttributes errorAttributes() {
+        return new CommonErrorAttributes();
+    }
+
 
 }

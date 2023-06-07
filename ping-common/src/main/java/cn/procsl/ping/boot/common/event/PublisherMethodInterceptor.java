@@ -70,24 +70,24 @@ public final class PublisherMethodInterceptor extends AbstractMethodInterceptor<
 
             Serializable parameter = publisher.parameter();
             if (publisher.parameter().isEmpty()) {
-                eventBusBridge.publisher(publisher.name(), parameter);
+                eventBusBridge.publisher(publisher.eventName(), parameter);
                 return;
             }
 
             boolean isSpringEL = publisher.parameter().startsWith("#") || publisher.parameter().startsWith("$");
             if (!isSpringEL) {
-                eventBusBridge.publisher(publisher.name(), parameter);
+                eventBusBridge.publisher(publisher.eventName(), parameter);
                 return;
             }
 
             Object value = evaluation(publisher, invocation, returnedValue);
             if (value != null && !(value instanceof Serializable)) {
                 log.warn(String.format("未实现序列化接口:%s ", value.getClass()));
-                eventBusBridge.publisher(publisher.name(), parameter);
+                eventBusBridge.publisher(publisher.eventName(), parameter);
                 return;
             }
 
-            eventBusBridge.publisher(publisher.name(), (Serializable) value);
+            eventBusBridge.publisher(publisher.eventName(), (Serializable) value);
         } catch (Exception e) {
             log.error("事件发布出现错误:", e);
         }

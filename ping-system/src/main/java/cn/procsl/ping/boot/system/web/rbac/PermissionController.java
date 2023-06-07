@@ -4,9 +4,9 @@ import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.common.error.ExceptionResolver;
 import cn.procsl.ping.boot.common.event.Publisher;
 import cn.procsl.ping.boot.system.domain.rbac.Permission;
-import cn.procsl.ping.boot.web.Changed;
-import cn.procsl.ping.boot.web.Created;
-import cn.procsl.ping.boot.web.Deleted;
+import cn.procsl.ping.boot.web.annotation.Changed;
+import cn.procsl.ping.boot.web.annotation.Created;
+import cn.procsl.ping.boot.web.annotation.Deleted;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.mapstruct.factory.Mappers;
@@ -32,7 +32,7 @@ public class PermissionController {
     final MapStructMapper mapStructMapper = Mappers.getMapper(MapStructMapper.class);
 
     @Created(path = "/v1/system/permissions", summary = "创建权限")
-    @Publisher(name = PERMISSION_CREATE_EVENT, parameter = "#id")
+    @Publisher(eventName = PERMISSION_CREATE_EVENT, parameter = "#id")
     public PermissionVO create(@Validated @RequestBody PermissionCreateDTO permission) throws BusinessException {
         Permission entity = permission.convert();
         permissionJpaRepository.save(entity);
@@ -41,13 +41,13 @@ public class PermissionController {
 
     @Deleted(path = "/v1/system/permissions/{id}", summary = "删除权限")
     @ExceptionResolver(message = "该角色已被关联, 角色删除失败", code = "409001", matcher = DataIntegrityViolationException.class)
-    @Publisher(name = PERMISSION_DELETE_EVENT, parameter = "#id")
+    @Publisher(eventName = PERMISSION_DELETE_EVENT, parameter = "#id")
     public void delete(@PathVariable Long id) throws BusinessException {
         this.permissionJpaRepository.deleteById(id);
     }
 
     @Changed(path = "/v1/system/permissions/{id}", summary = "更新权限")
-    @Publisher(name = PERMISSION_UPDATE_EVENT, parameter = "#id")
+    @Publisher(eventName = PERMISSION_UPDATE_EVENT, parameter = "#id")
     public void update(@PathVariable Long id, @Validated @RequestBody PermissionUpdateDTO permission)
             throws BusinessException {
         permissionJpaRepository.getReferenceById(id)

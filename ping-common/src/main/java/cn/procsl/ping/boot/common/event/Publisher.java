@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @ExtensionProperty(name = "X-Event-Publisher", value = "")
 public @interface Publisher {
 
-    String name() default "";
+    String eventName() default "";
 
     String parameter() default "";
 

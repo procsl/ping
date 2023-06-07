@@ -10,23 +10,23 @@ import java.util.function.Supplier;
 @Slf4j
 public class PublishComponent {
 
-    @Publisher(name = "test", parameter = "静态参数")
+    @Publisher(eventName = "test", parameter = "静态参数")
     public void callable() {
         log.info("被调用了");
     }
 
-    @Publisher(name = "love", parameter = "#p0")
+    @Publisher(eventName = "love", parameter = "#p0")
     public void forLiPing(String love) {
         log.info("ok:{}", love);
     }
 
-    @Publisher(name = "love", parameter = "#p0 + ' ' + #return ")
+    @Publisher(eventName = "love", parameter = "#p0 + ' ' + #return ")
     public String forLiPing2(String love) {
         log.info("ok:{}", love);
         return "me too";
     }
 
-    @Publisher(name = "test", parameter = "#root[callback]?.get()")
+    @Publisher(eventName = "test", parameter = "#root[callback]?.get()")
     public void callable1() {
         log.info("被调用了2222");
     }

@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.web;
+package cn.procsl.ping.boot.web.annotation;
 
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.core.annotation.AliasFor;
@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.lang.annotation.*;
 
-@Documented
 @Operation
+@Documented
 @VersionControl
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@RequestMapping(method = RequestMethod.GET)
-@ResponseStatus(HttpStatus.OK)
-public @interface Query {
+@RequestMapping(method = RequestMethod.PUT)
+@ResponseStatus(HttpStatus.NO_CONTENT)
+public @interface Changed {
 
     @AliasFor(annotation = RequestMapping.class, attribute = "path") String[] path();
 
@@ -31,5 +31,8 @@ public @interface Query {
     @AliasFor(annotation = Operation.class, attribute = "summary") String summary();
 
     @AliasFor(annotation = Operation.class, attribute = "description") String description() default "";
+
+    @AliasFor(annotation = ResponseStatus.class, attribute = "code")
+    HttpStatus httpStatus() default HttpStatus.ACCEPTED;
 
 }

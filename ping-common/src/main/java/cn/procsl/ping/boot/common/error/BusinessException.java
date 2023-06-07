@@ -11,28 +11,14 @@ import lombok.Getter;
 public class BusinessException extends RuntimeException implements ErrorEntity {
 
     @Getter
-    Integer httpStatus = 501;
+    String code = "SYSTEM_ERROR";
 
-    @Getter
-    String code = "001";
-
-    public BusinessException(String format, Object... arguments) {
-        super(String.format(format, arguments), null, true, true);
+    public BusinessException(String message) {
+        super(message, null, true, true);
     }
 
-    public BusinessException(Integer httpStatus, String code, String format, Object... arguments) {
-        super(String.format(format, arguments), null, true, true);
-        this.code = code;
-        this.httpStatus = httpStatus;
+    public BusinessException(String message, Exception e) {
+        super(message, e, true, true);
     }
 
-    public BusinessException(Exception e, String format, Object... arguments) {
-        super(String.format(format, arguments), e, true, true);
-    }
-
-    public BusinessException(Exception e, Integer httpStatus, String code, String format, Object... arguments) {
-        super(String.format(format, arguments), e, true, true);
-        this.code = code;
-        this.httpStatus = httpStatus;
-    }
 }

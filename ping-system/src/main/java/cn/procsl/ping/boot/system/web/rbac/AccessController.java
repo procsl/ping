@@ -4,7 +4,7 @@ import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.system.domain.rbac.Role;
 import cn.procsl.ping.boot.system.domain.rbac.Subject;
 import cn.procsl.ping.boot.system.domain.rbac.SubjectRoleSpecification;
-import cn.procsl.ping.boot.web.Changed;
+import cn.procsl.ping.boot.web.annotation.Changed;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;

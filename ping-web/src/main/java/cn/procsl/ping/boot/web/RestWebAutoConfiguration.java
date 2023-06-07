@@ -1,15 +1,17 @@
 package cn.procsl.ping.boot.web;
 
+import cn.procsl.ping.boot.web.component.AccessLoggerFilter;
+import cn.procsl.ping.boot.web.component.SpringContextHolder;
 import cn.procsl.ping.boot.web.encrypt.DecryptConversionService;
 import cn.procsl.ping.boot.web.encrypt.EncryptDecryptService;
 import cn.procsl.ping.boot.web.encrypt.SimpleEncryptDecryptService;
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.core.jackson.ModelResolver;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeansException;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.format.FormatterRegistry;
@@ -57,4 +59,9 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer {
         return new SimpleEncryptDecryptService();
     }
 
+    @Bean
+    @ConditionalOnClass
+    public ModelResolver modelResolver(ObjectMapper objectMapper) {
+        return new ModelResolver(objectMapper);
+    }
 }

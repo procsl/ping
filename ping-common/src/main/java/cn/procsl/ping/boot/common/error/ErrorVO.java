@@ -6,14 +6,19 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 
 import java.io.Serializable;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author procsl
  * @date 2020/02/19
  */
+@Slf4j
 @Getter
 @Setter
 @ToString
@@ -21,21 +26,45 @@ import java.io.Serializable;
 @Schema(description = "错误信息描述")
 public class ErrorVO extends MessageVO implements Serializable, ErrorEntity {
 
-    @Schema(description = "错误信息编码", example = "001")
-    @NonNull
+    @Schema(description = "错误信息编码", example = "permission_denied")
     private String code;
 
-    public ErrorVO(String message) {
-        super(message);
+    public static ErrorVO build(@NonNull Exception e) {
+        String name = e.getClass().getSimpleName();
+        String code = humpToUnderline(name);
+        return new ErrorVO(code, e.getMessage());
     }
 
-    public ErrorVO() {
-        super("系统内部错误");
-        this.code = "001";
+    public static ErrorVO build(@NonNull Exception e, String message) {
+        String name = e.getClass().getSimpleName();
+        String code = humpToUnderline(name);
+        return new ErrorVO(code, message);
+    }
+
+    public static ErrorVO build(@NonNull String e, String message) {
+        return new ErrorVO(e, message);
+    }
+
+    public static <A extends Exception> ErrorVO build(@NonNull Class<A> e, String message) {
+        String name = e.getName();
+        String code = humpToUnderline(name);
+        return new ErrorVO(code, message);
+    }
+
+    static String humpToUnderline(String str) {
+        String regex = "([A-Z])";
+        Matcher matcher = Pattern.compile(regex).matcher(str);
+        while (matcher.find()) {
+            String target = matcher.group();
+            str = str.replaceAll(target, "_" + target.toLowerCase());
+        }
+        str = str.replaceAll("^_", "");
+        return str.toUpperCase();
     }
 
     public ErrorVO(String code, String message) {
         super(message);
+        code = code.replaceAll("_EXCEPTION$", "_ERROR");
         this.code = code;
     }
 
@@ -49,4 +78,7 @@ public class ErrorVO extends MessageVO implements Serializable, ErrorEntity {
         return new ErrorVO(code, message);
     }
 
+    public Map<String, Object> convertToMap() {
+        return Map.of("code", this.code, "message", this.getMessage());
+    }
 }

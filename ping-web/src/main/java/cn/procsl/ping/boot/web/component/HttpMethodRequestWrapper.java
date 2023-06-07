@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.web;
+package cn.procsl.ping.boot.web.component;
 
 
 import jakarta.servlet.http.HttpServletRequest;

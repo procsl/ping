@@ -1,12 +1,9 @@
 package cn.procsl.ping.boot.captcha.handler;
 
 import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
-import cn.procsl.ping.boot.common.error.BusinessException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.util.ObjectUtils;
-
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import org.springframework.util.ObjectUtils;
 
 @RequiredArgsConstructor
 class SimpleVerifyCommand implements VerifyCaptchaCommand {
@@ -31,7 +28,7 @@ class SimpleVerifyCommand implements VerifyCaptchaCommand {
         String ticket = request.getHeader(VerifyCaptcha.header);
 
         if (ObjectUtils.isEmpty(ticket)) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST.value(), "001", "请输入邮件验证码");
+            throw new CaptchaNotFoundException("请输入邮件验证码");
         }
 
         return ticket;

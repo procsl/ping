@@ -1,10 +1,9 @@
 package cn.procsl.ping.boot.web.encrypt;
 
-import cn.procsl.ping.boot.web.SpringContextHolder;
+import cn.procsl.ping.boot.web.component.SpringContextHolder;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 

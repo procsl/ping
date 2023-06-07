@@ -18,8 +18,8 @@ public class ImageCaptchaBuilderService {
 
     public String buildToken(String key, ImageCaptcha captcha) {
         try {
-            TokenCipher cipher = new TokenCipher(key, true, 256);
             byte[] json = jsonMapper.writeValueAsBytes(captcha);
+            TokenCipher cipher = new TokenCipher(key, true, 256);
             TokenCipherWrapper wrapper = new TokenCipherWrapper(cipher);
             return wrapper.encrypt(json);
         } catch (JsonProcessingException e) {
@@ -27,15 +27,11 @@ public class ImageCaptchaBuilderService {
         }
     }
 
-    public ImageCaptcha buildForToken(String key, String token) {
+    public ImageCaptcha buildForToken(String key, String token) throws IOException {
         TokenCipherWrapper cipher;
-        try {
-            cipher = new TokenCipherWrapper(new TokenCipher(key, true, 256));
-            byte[] json = cipher.decrypt(token);
-            return jsonMapper.readValue(json, ImageCaptcha.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        cipher = new TokenCipherWrapper(new TokenCipher(key, true, 256));
+        byte[] json = cipher.decrypt(token);
+        return jsonMapper.readValue(json, ImageCaptcha.class);
     }
 
 

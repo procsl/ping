@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.web;
+package cn.procsl.ping.boot.web.component;
 
 import org.springframework.context.ApplicationContext;
 
@@ -10,7 +10,7 @@ public final class SpringContextHolder {
         return applicationContext;
     }
 
-    synchronized static void setContext(ApplicationContext applicationContext) {
+    public synchronized static void setContext(ApplicationContext applicationContext) {
         if (SpringContextHolder.applicationContext == null) {
             SpringContextHolder.applicationContext = applicationContext;
         }

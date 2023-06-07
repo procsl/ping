@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.web;
+package cn.procsl.ping.boot.web.component;
 
 import cn.procsl.ping.boot.common.dto.MessageVO;
 import cn.procsl.ping.boot.common.error.ErrorVO;
@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = Exception.class)
     @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
     public MessageVO exceptionHandler(Exception e) {
-        log.warn("未解析的异常:", e);
+        log.warn("未处理的异常:", e);
         return new MessageVO("服务器内部错误");
     }
 
@@ -38,18 +38,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = RuntimeException.class)
     @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
     public MessageVO runtimeExceptionHandler(RuntimeException e) {
-        log.warn("未解析的异常:", e);
+        log.warn("未处理的异常:", e);
         return new MessageVO("服务器内部错误");
     }
-
-//    @ResponseBody
-//    @ExceptionHandler(value = BusinessException.class)
-//    public ErrorVO businessExceptionHandler(HttpServletRequest request, HttpServletResponse response,
-//                                            BusinessException businessException) {
-//        response.setStatus(businessException.getHttpStatus());
-//        return ErrorVO.builder(businessException.getHttpStatus() + businessException.getCode(),
-//                businessException.getMessage());
-//    }
 
     @ResponseBody
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
@@ -69,7 +60,7 @@ public class GlobalExceptionHandler {
                 tmp.put(error.getObjectName(), error.getDefaultMessage());
             }
         });
-        return new ParameterErrorVO("400001", "参数校验失败", tmp);
+        return new ParameterErrorVO("METHOD_ARGUMENT_NOT_VALID", "参数校验失败", tmp);
     }
 
 
@@ -82,55 +73,22 @@ public class GlobalExceptionHandler {
             String key = violation.getPropertyPath().toString();
             tmp.put(key, violation.getMessage());
         }
-        return new ParameterErrorVO("400001", "参数校验失败", tmp);
+        return new ParameterErrorVO("METHOD_ARGUMENT_NOT_VALID", "参数校验失败", tmp);
     }
 
     @ResponseBody
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value = HttpMessageNotReadableException.class)
     public ErrorVO httpMessageNotReadableException() {
-        return ErrorVO.builder("400001", "请求体不可为空");
+        return ErrorVO.build(HttpMessageNotReadableException.class, "请求体不可为空");
     }
-
-    ErrorVO getDefaultErrorCode(int code, Exception e) {
-        String s = String.format("%s001", code);
-        if (e == null) {
-            return ErrorVO.builder(s, "server error!");
-        }
-
-        if (log.isDebugEnabled()) {
-            return ErrorVO.builder(s, e.getMessage());
-        }
-        return ErrorVO.builder(s, "server error!");
-    }
-
-//    @ResponseBody
-//    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
-//    @ExceptionHandler(value = RollbackException.class)
-//    public ErrorVO rollbackException(RollbackException rollbackException) {
-//        Throwable cause = rollbackException.getCause();
-//        if (cause instanceof ConstraintViolationException) {
-//            return this.constraintViolationException((ConstraintViolationException) cause);
-//        }
-//        return ErrorVO.builder("400001", "参数校验失败");
-//    }
-
-//    @ResponseBody
-//    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
-//    @ExceptionHandler(value = TransactionSystemException.class)
-//    public ErrorVO transactionSystemException(TransactionSystemException transactionSystemException) {
-//        if (!(transactionSystemException.getCause() instanceof RollbackException)) {
-//            return getDefaultErrorCode(500, transactionSystemException);
-//        }
-//        return this.rollbackException((RollbackException) transactionSystemException.getCause());
-//    }
 
 
     @ResponseBody
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
     public ErrorVO httpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException exception) {
-        return new ErrorVO("400003", exception.getMessage());
+        return ErrorVO.build(exception, String.format("不支持[%s]请求方式", exception.getMethod()));
     }
 
 }

@@ -1,6 +1,7 @@
 package cn.procsl.ping.boot.common.event;
 
 import cn.procsl.ping.boot.common.dto.ID;
+import cn.procsl.ping.boot.common.utils.TraceIdGenerator;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +12,6 @@ import org.springframework.context.ApplicationListener;
 
 import java.io.Serializable;
 import java.util.EventObject;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
@@ -22,6 +22,8 @@ import java.util.function.Consumer;
 public class SpringEventBusBridge implements EventBusBridge,
         ApplicationListener<SpringEventBusBridge.InnerListenerEvent> {
 
+    final TraceIdGenerator generator = TraceIdGenerator.initTraceId(10);
+
     final ApplicationContext context;
 
     final ConcurrentMap<String, ConcurrentLinkedQueue<Consumer<EventObject>>> tasks =
@@ -29,7 +31,7 @@ public class SpringEventBusBridge implements EventBusBridge,
 
     @Override
     public String publisher(String name, Serializable parameters) {
-        String eventId = UUID.randomUUID().toString().replaceAll("-", "");
+        String eventId = generator.generateId();
         log.debug("开始发布事件:[{}] 名称:[{}], 参数:[{}]", eventId, name, parameters);
         context.publishEvent(new InnerListenerEvent(eventId, name, parameters));
         return eventId;
