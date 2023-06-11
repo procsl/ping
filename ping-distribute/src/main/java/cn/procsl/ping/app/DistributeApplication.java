@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.info.License;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
 
 import static cn.procsl.ping.app.DistributeApplication.*;
 
@@ -20,6 +19,7 @@ public class DistributeApplication {
     final static String apache = "https://www.apache.org/licenses/LICENSE-2.0";
 
     public static void main(String[] args) {
+
         SpringApplication.run(DistributeApplication.class, args);
     }
 

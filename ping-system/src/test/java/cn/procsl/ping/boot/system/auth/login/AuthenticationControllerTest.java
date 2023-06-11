@@ -1,9 +1,9 @@
 package cn.procsl.ping.boot.system.auth.login;
 
 import cn.procsl.ping.boot.system.TestSystemApplication;
-import cn.procsl.ping.boot.system.domain.session.Session;
-import cn.procsl.ping.boot.system.domain.session.SessionSpecification;
-import cn.procsl.ping.boot.system.domain.session.SessionState;
+import cn.procsl.ping.boot.system.domain.auth.Authentication;
+import cn.procsl.ping.boot.system.domain.auth.AuthenticationSpecification;
+import cn.procsl.ping.boot.system.domain.auth.AuthenticationState;
 import cn.procsl.ping.boot.system.web.LoginUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Order;
@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Slf4j
 @AutoConfigureMockMvc
 @SpringBootTest(classes = TestSystemApplication.class, webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-public class SessionControllerTest {
+public class AuthenticationControllerTest {
 
     @Inject
     MockMvc mockMvc;
@@ -46,11 +46,11 @@ public class SessionControllerTest {
     }
 
     @Inject
-    JpaSpecificationExecutor<Session> jpaSpecificationExecutor;
+    JpaSpecificationExecutor<Authentication> jpaSpecificationExecutor;
 
     @Test
     public void currentSession() {
         Optional optional = this.jpaSpecificationExecutor.findOne(
-                new SessionSpecification("1234", SessionState.online));
+                new AuthenticationSpecification("1234", AuthenticationState.online));
     }
 }

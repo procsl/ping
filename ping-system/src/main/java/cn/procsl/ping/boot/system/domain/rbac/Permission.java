@@ -16,7 +16,7 @@ import java.util.function.Function;
 @Getter
 @Entity
 @RepositoryCreator
-@Table(name = "i_permission")
+@Table(name = "s_permission")
 @DiscriminatorColumn(name = "type")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)

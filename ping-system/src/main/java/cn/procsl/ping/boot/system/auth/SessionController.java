@@ -5,8 +5,8 @@ import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
 import cn.procsl.ping.boot.common.dto.MessageVO;
 import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.common.event.Publisher;
-import cn.procsl.ping.boot.system.domain.session.Session;
-import cn.procsl.ping.boot.system.domain.session.UserLoginService;
+import cn.procsl.ping.boot.system.domain.auth.Authentication;
+import cn.procsl.ping.boot.system.domain.auth.UserLoginService;
 import cn.procsl.ping.boot.system.domain.user.AuthenticateException;
 import cn.procsl.ping.boot.system.domain.user.User;
 import cn.procsl.ping.boot.system.domain.user.UserSpecification;
@@ -46,8 +46,8 @@ public class SessionController {
 
     public static final String session_key = "cn.procsl.ping.system.user.session.key";
 
-    final JpaSpecificationExecutor<Session> jpaSpecificationExecutor;
-    final JpaRepository<Session, Long> sessionLongJpaRepository;
+    final JpaSpecificationExecutor<Authentication> jpaSpecificationExecutor;
+    final JpaRepository<Authentication, Long> sessionLongJpaRepository;
 
     final JpaSpecificationExecutor<User> userJpaSpecificationExecutor;
 
@@ -58,11 +58,11 @@ public class SessionController {
     @Query(path = "/v1/system/session", summary = "获取用户当前登录信息")
     @Transactional(rollbackFor = Exception.class, readOnly = true)
     public SessionUserDetail currentSession(HttpServletRequest request) {
-        Session session = this.findCurrentSession(request);
-        return mapStructMapper.mapper(session);
+        Authentication authentication = this.findCurrentSession(request);
+        return mapStructMapper.mapper(authentication);
     }
 
-    Session findCurrentSession(HttpServletRequest request) {
+    Authentication findCurrentSession(HttpServletRequest request) {
         HttpSession httpSession = request.getSession(false);
         if (httpSession == null) {
             throw new BusinessException("尚未登录,请登录");
@@ -89,12 +89,12 @@ public class SessionController {
         Optional<User> optional = this.userJpaSpecificationExecutor.findOne(new UserSpecification(details.getAccount()));
 
         optional.orElseThrow(() -> new AuthenticateException("用户名或密码错误"));
-        Session session = this.handler.doLogin(request.getSession().getId(), details.getPassword(), optional.get());
+        Authentication authentication = this.handler.doLogin(request.getSession().getId(), details.getPassword(), optional.get());
 
-        this.sessionLongJpaRepository.save(session);
+        this.sessionLongJpaRepository.save(authentication);
 
-        SessionUserDetail dto = this.mapStructMapper.mapper(session);
-        request.getSession().setAttribute(session_key, session.getId());
+        SessionUserDetail dto = this.mapStructMapper.mapper(authentication);
+        request.getSession().setAttribute(session_key, authentication.getId());
         return dto;
     }
 
@@ -103,8 +103,8 @@ public class SessionController {
     @Transactional(rollbackFor = Exception.class)
     public MessageVO deleteSession(HttpServletRequest request, HttpServletResponse response) {
         try {
-            Session session = this.findCurrentSession(request);
-            session.logout();
+            Authentication authentication = this.findCurrentSession(request);
+            authentication.logout();
         } catch (Exception e) {
             log.warn("注销失败", e);
         } finally {

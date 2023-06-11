@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Setter
 @Entity
 @RepositoryCreator
-@Table(name = "i_role")
+@Table(name = "s_role")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Role implements Serializable {
 
