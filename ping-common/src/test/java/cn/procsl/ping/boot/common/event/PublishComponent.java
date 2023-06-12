@@ -33,7 +33,7 @@ public class PublishComponent {
 
 
     @Component
-    static class PublicAttrConfigure implements PublisherRootAttributeConfigurer {
+    static class PublicAttrConfigure implements PublisherRootAttributeConfigure {
 
         @Override
         public Map<String, Object> getAttributes() {
