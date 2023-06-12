@@ -13,7 +13,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @Entity
-@Table(name = "i_user")
+@Table(name = "s_user")
 @NoArgsConstructor
 @RepositoryCreator
 public class User implements Serializable {

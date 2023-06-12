@@ -7,6 +7,6 @@ public interface EncryptDecryptService {
 
     String encryptByContext(Long id);
 
-    Long decryptByContext(String code);
+    Long decryptByContext(String code) throws DecryptException;
 
 }

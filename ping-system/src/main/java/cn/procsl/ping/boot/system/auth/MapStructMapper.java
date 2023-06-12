@@ -1,13 +1,13 @@
 package cn.procsl.ping.boot.system.auth;
 
-import cn.procsl.ping.boot.system.domain.session.Session;
+import cn.procsl.ping.boot.system.domain.auth.Authentication;
 import org.mapstruct.Mapper;
 
 
 @Mapper
 public interface MapStructMapper {
 
-    SessionUserDetail mapper(Session session);
+    SessionUserDetail mapper(Authentication authentication);
 
 
 }

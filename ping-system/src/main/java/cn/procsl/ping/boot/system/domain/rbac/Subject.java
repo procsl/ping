@@ -12,7 +12,7 @@ import java.util.*;
 @Getter
 @Setter
 @Entity
-@Table(name = "i_subject")
+@Table(name = "s_subject")
 @NoArgsConstructor
 @RepositoryCreator
 public class Subject implements Serializable {

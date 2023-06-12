@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.system.domain.session;
+package cn.procsl.ping.boot.system.domain.auth;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -10,14 +10,14 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
 @RequiredArgsConstructor
-public class SessionSpecification implements Specification<Session> {
+public class AuthenticationSpecification implements Specification<Authentication> {
 
     final String sessionId;
 
-    final SessionState state;
+    final AuthenticationState state;
 
     @Override
-    public Predicate toPredicate(@NonNull Root<Session> root, @NonNull CriteriaQuery<?> query,
+    public Predicate toPredicate(@NonNull Root<Authentication> root, @NonNull CriteriaQuery<?> query,
                                  @NonNull CriteriaBuilder cb) {
         Predicate cond1 = cb.equal(root.get("sessionId"), sessionId);
         Predicate cond2 = cb.equal(root.get("state"), state);

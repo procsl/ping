@@ -1,16 +1,19 @@
 package cn.procsl.ping.boot.system.domain.config;
 
 import cn.procsl.ping.boot.jpa.RepositoryCreator;
-import lombok.*;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.*;
+
 import java.io.Serializable;
 
+/**
+ * TODO 增加组区分
+ */
 @Getter
 @Setter
 @Entity
-@Table(name = "i_config")
+@Table(name = "s_config")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @RepositoryCreator
 public class Config implements Serializable {

@@ -16,7 +16,7 @@ import jakarta.validation.constraints.NotNull;
 @Getter
 @Setter(value = AccessLevel.PACKAGE)
 @Entity
-@Table(name = "i_account")
+@Table(name = "s_account")
 @NoArgsConstructor
 @AllArgsConstructor
 @RepositoryCreator
