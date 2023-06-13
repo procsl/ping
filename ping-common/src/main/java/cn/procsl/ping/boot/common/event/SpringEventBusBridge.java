@@ -63,7 +63,7 @@ public class SpringEventBusBridge implements EventBusBridge,
         }
     }
 
-    static final class InnerListenerEvent extends ApplicationEvent implements ID {
+    static final class InnerListenerEvent extends ApplicationEvent implements ID<String> {
 
         @Getter
         private final String id;

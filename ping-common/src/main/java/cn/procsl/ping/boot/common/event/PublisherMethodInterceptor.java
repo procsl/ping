@@ -27,13 +27,13 @@ public final class PublisherMethodInterceptor extends AbstractMethodInterceptor<
     final StandardReflectionParameterNameDiscoverer discoverer = new StandardReflectionParameterNameDiscoverer();
 
     public PublisherMethodInterceptor(EventBusBridge eventBusBridge,
-                                      Collection<PublisherRootAttributeConfigurer> configurers) {
+                                      Collection<PublisherRootAttributeConfigure> configurers) {
         super(Publisher.class);
         this.eventBusBridge = eventBusBridge;
         if (configurers == null || configurers.isEmpty()) {
             return;
         }
-        for (PublisherRootAttributeConfigurer configurer : configurers) {
+        for (PublisherRootAttributeConfigure configurer : configurers) {
             rootAttributes.putAll(configurer.getAttributes());
         }
     }

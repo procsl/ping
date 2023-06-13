@@ -25,7 +25,7 @@ public class CommonAutoConfiguration {
 
     @Bean(name = "publishAnnotationPointcutAdvisor")
     public AnnotationPointcutAdvisor publishAnnotationPointcutAdvisor(EventBusBridge eventBusBridge,
-                                                                      @Autowired(required = false) Collection<PublisherRootAttributeConfigurer> configurers) {
+                                                                      @Autowired(required = false) Collection<PublisherRootAttributeConfigure> configurers) {
         PublisherMethodInterceptor interceptor = new PublisherMethodInterceptor(eventBusBridge, configurers);
         return AnnotationPointcutAdvisor.forAnnotation(Publisher.class, interceptor);
     }
