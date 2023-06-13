@@ -4,19 +4,16 @@ import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.common.error.ExceptionResolver;
 import cn.procsl.ping.boot.common.event.Publisher;
 import cn.procsl.ping.boot.system.domain.rbac.Permission;
-import cn.procsl.ping.boot.web.annotation.Changed;
-import cn.procsl.ping.boot.web.annotation.Created;
-import cn.procsl.ping.boot.web.annotation.Deleted;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.mapstruct.factory.Mappers;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Indexed;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static cn.procsl.ping.boot.system.constant.EventPublisherConstant.*;
 
@@ -31,7 +28,9 @@ public class PermissionController {
 
     final MapStructMapper mapStructMapper = Mappers.getMapper(MapStructMapper.class);
 
-    @Created(path = "/v1/system/permissions", summary = "创建权限")
+    @PostMapping(path = "/v1/system/permissions")
+    @Operation(summary = "创建权限")
+    @ResponseStatus(HttpStatus.CREATED)
     @Publisher(eventName = PERMISSION_CREATE_EVENT, parameter = "#id")
     public PermissionVO create(@Validated @RequestBody PermissionCreateDTO permission) throws BusinessException {
         Permission entity = permission.convert();
@@ -39,14 +38,18 @@ public class PermissionController {
         return this.mapStructMapper.mapper(entity);
     }
 
-    @Deleted(path = "/v1/system/permissions/{id}", summary = "删除权限")
-    @ExceptionResolver(message = "该角色已被关联, 角色删除失败", code = "409001", matcher = DataIntegrityViolationException.class)
+    @Operation(summary = "删除权限")
+    @DeleteMapping(path = "/v1/system/permissions/{id}")
+    @ExceptionResolver(message = "该角色已被关联, 角色删除失败", code = "ROLE_CONFLICT",
+            status = HttpStatus.CONFLICT, matcher = DataIntegrityViolationException.class)
     @Publisher(eventName = PERMISSION_DELETE_EVENT, parameter = "#id")
     public void delete(@PathVariable Long id) throws BusinessException {
         this.permissionJpaRepository.deleteById(id);
     }
 
-    @Changed(path = "/v1/system/permissions/{id}", summary = "更新权限")
+    @Operation(summary = "更新权限")
+    @PutMapping(path = "/v1/system/permissions/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @Publisher(eventName = PERMISSION_UPDATE_EVENT, parameter = "#id")
     public void update(@PathVariable Long id, @Validated @RequestBody PermissionUpdateDTO permission)
             throws BusinessException {

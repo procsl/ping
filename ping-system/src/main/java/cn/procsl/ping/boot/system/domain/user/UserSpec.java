@@ -7,7 +7,7 @@ import org.springframework.data.jpa.domain.Specification;
 import jakarta.persistence.criteria.*;
 
 @RequiredArgsConstructor
-public class UserSpecification implements Specification<User> {
+public class UserSpec implements Specification<User> {
 
     final String accountName;
 

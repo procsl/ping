@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.system;
 
-import cn.procsl.ping.boot.system.auth.AuthenticateInterceptor;
+import cn.procsl.ping.boot.system.web.user.AuthenticateInterceptor;
 import cn.procsl.ping.boot.system.domain.user.RoleSettingService;
 import cn.procsl.ping.boot.system.service.ConfigFacade;
 import lombok.RequiredArgsConstructor;

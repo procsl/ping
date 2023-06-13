@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.sql.Timestamp;
 import java.util.Date;
 
 /**
@@ -13,7 +12,7 @@ import java.util.Date;
  */
 @NoArgsConstructor
 @AllArgsConstructor
-public class PrivateKeySpecification implements Specification<PrivateKey> {
+public class PrivateKeySpec implements Specification<PrivateKey> {
 
     Long id;
 

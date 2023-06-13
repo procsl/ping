@@ -1,9 +1,9 @@
 package cn.procsl.ping.boot.system.auth.login;
 
 import cn.procsl.ping.boot.system.TestSystemApplication;
-import cn.procsl.ping.boot.system.domain.auth.Authentication;
-import cn.procsl.ping.boot.system.domain.auth.AuthenticationSpecification;
-import cn.procsl.ping.boot.system.domain.auth.AuthenticationState;
+import cn.procsl.ping.boot.system.domain.user.Authenticate;
+import cn.procsl.ping.boot.system.domain.user.AuthenticateSpec;
+import cn.procsl.ping.boot.system.domain.user.AuthenticateState;
 import cn.procsl.ping.boot.system.web.LoginUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Order;
@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Slf4j
 @AutoConfigureMockMvc
 @SpringBootTest(classes = TestSystemApplication.class, webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-public class AuthenticationControllerTest {
+public class AuthenticateControllerTest {
 
     @Inject
     MockMvc mockMvc;
@@ -46,11 +46,11 @@ public class AuthenticationControllerTest {
     }
 
     @Inject
-    JpaSpecificationExecutor<Authentication> jpaSpecificationExecutor;
+    JpaSpecificationExecutor<Authenticate> jpaSpecificationExecutor;
 
     @Test
     public void currentSession() {
         Optional optional = this.jpaSpecificationExecutor.findOne(
-                new AuthenticationSpecification("1234", AuthenticationState.online));
+                new AuthenticateSpec("1234", AuthenticateState.online));
     }
 }

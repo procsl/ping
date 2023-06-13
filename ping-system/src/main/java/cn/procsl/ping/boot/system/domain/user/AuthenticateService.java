@@ -1,17 +1,15 @@
-package cn.procsl.ping.boot.system.domain.auth;
+package cn.procsl.ping.boot.system.domain.user;
 
-import cn.procsl.ping.boot.system.domain.user.AuthenticateException;
-import cn.procsl.ping.boot.system.domain.user.User;
 import lombok.NonNull;
 
-public class UserLoginService {
+public class AuthenticateService {
 
-    public Authentication doLogin(@NonNull String sessionId, @NonNull String password, User user) {
+    public Authenticate doLogin(@NonNull String sessionId, @NonNull String password, User user) {
         if (user == null) {
             throw new AuthenticateException("用户名或密码错误");
         }
         user.getAccount().authenticate(password);
-        return Authentication.builder()
+        return Authenticate.builder()
                       .userId(user.getId())
                       .account(user.getAccount().getName())
                       .username(user.getName())

@@ -3,11 +3,13 @@ package cn.procsl.ping.boot.system.web.setting;
 import cn.procsl.ping.boot.system.domain.user.RoleSettingService;
 import cn.procsl.ping.boot.web.annotation.Patch;
 import cn.procsl.ping.boot.web.annotation.Query;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Indexed;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 
@@ -19,13 +21,17 @@ public class RoleSettingController {
 
     final RoleSettingService roleSettingService;
 
-    @Patch(path = "/v1/system/setting/default-roles", summary = "设置默认授权角色")
+    @Operation(summary = "设置默认授权角色")
+    @PatchMapping(path = "/v1/system/setting/default-roles")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void defaultRoleSetting(@RequestBody Collection<String> roles) {
         roleSettingService.defaultRoleSetting(roles);
     }
 
 
-    @Query(path = "/v1/system/setting/default-roles", summary = "获取默认角色设置")
+    @Operation(summary = "获取默认角色设置")
+    @GetMapping(path = "/v1/system/setting/default-roles")
+    @Transactional(readOnly = true)
     public Collection<String> getDefaultRoles() {
         return roleSettingService.getDefaultRoles();
     }

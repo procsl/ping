@@ -5,18 +5,17 @@ import cn.procsl.ping.boot.system.domain.rbac.Role;
 import cn.procsl.ping.boot.system.domain.rbac.Subject;
 import cn.procsl.ping.boot.system.domain.user.RoleSettingService;
 import cn.procsl.ping.boot.system.domain.user.User;
-import cn.procsl.ping.boot.web.annotation.Changed;
-import cn.procsl.ping.boot.web.annotation.Created;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Indexed;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -37,7 +36,10 @@ public class UserController {
 
     final RoleSettingService roleSettingService;
 
-    @Created(path = "/v1/system/users", summary = "创建用户", description = "用户昵称可通过后期修改完成, 用户账户不可修改")
+    @Operation(summary = "创建用户", description = "用户昵称可通过后期修改完成, 用户账户不可修改")
+    @PostMapping(path = "/v1/system/users")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Transactional(rollbackFor = Exception.class)
     public void register(@Validated @RequestBody RegisterDTO registerDTO) {
 
         String password = registerDTO.getPassword();
@@ -60,7 +62,10 @@ public class UserController {
 
     }
 
-    @Changed(path = "/v1/system/users/{id}", summary = "更新用户信息")
+    @Operation(summary = "更新用户信息")
+    @PutMapping(path = "/v1/system/users/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Transactional(rollbackFor = Exception.class)
     public void update(@PathVariable Long id, @Validated @RequestBody UserPropDTO userPropDTO) {
         User user = this.jpaRepository.getReferenceById(id);
         user.updateSelf(userPropDTO.getName(), userPropDTO.getGender(), userPropDTO.getRemark());

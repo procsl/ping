@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.system.auth;
+package cn.procsl.ping.boot.system.web.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 @Data
-public class LoginDetailDTO implements Serializable {
+public class AuthenticateDTO implements Serializable {
 
     @NotBlank
     @Schema(description = "用户账户")

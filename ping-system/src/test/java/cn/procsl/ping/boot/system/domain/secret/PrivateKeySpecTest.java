@@ -15,14 +15,12 @@ import javax.inject.Inject;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @Slf4j
 @Rollback
 @Transactional
 @DisplayName("密钥查询测试")
 @SpringBootTest(classes = TestSystemApplication.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
-public class PrivateKeySpecificationTest {
+public class PrivateKeySpecTest {
 
     @Inject
     JpaSpecificationExecutor<PrivateKey> jpaSpecificationExecutor;
@@ -53,10 +51,10 @@ public class PrivateKeySpecificationTest {
         log.info("========================");
         log.info("list1: {}", list);
         log.info("========================");
-        list = jpaSpecificationExecutor.findAll(new PrivateKeySpecification());
+        list = jpaSpecificationExecutor.findAll(new PrivateKeySpec());
         log.info("list2: {}", list);
         log.info("========================");
-        jpaSpecificationExecutor.findAll(new PrivateKeySpecification(100L));
+        jpaSpecificationExecutor.findAll(new PrivateKeySpec(100L));
         log.info("list3: {}", list);
         log.info("========================");
 

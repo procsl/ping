@@ -6,7 +6,7 @@ import org.springframework.data.jpa.domain.Specification;
 import jakarta.persistence.criteria.*;
 
 @RequiredArgsConstructor
-public class SubjectRoleSpecification implements Specification<Subject> {
+public class SubjectRoleSpec implements Specification<Subject> {
 
     final Long subjectId;
     final String roleName;

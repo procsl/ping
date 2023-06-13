@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.system.auth;
+package cn.procsl.ping.boot.system.web.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.EqualsAndHashCode;
@@ -12,7 +12,7 @@ import java.util.Date;
 @EqualsAndHashCode
 @Getter
 @Setter
-public class SessionUserDetail {
+public class AuthenticateVO {
 
     String account;
 

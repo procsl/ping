@@ -73,7 +73,11 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer {
     @Bean
     @ConditionalOnClass(name = MODEL_RESOLVER)
     @ConditionalOnMissingBean(type = MODEL_RESOLVER)
-    public Object modelResolver(ObjectMapper objectMapper) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    public Object modelResolver(ObjectMapper objectMapper) throws ClassNotFoundException,
+            NoSuchMethodException,
+            InvocationTargetException,
+            InstantiationException,
+            IllegalAccessException {
         Class<?> resolver = Class.forName(MODEL_RESOLVER);
         Constructor<?> constructor = resolver.getConstructor(ObjectMapper.class);
         return constructor.newInstance(objectMapper);

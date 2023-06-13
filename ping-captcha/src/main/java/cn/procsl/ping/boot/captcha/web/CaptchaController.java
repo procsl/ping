@@ -49,7 +49,7 @@ public class CaptchaController {
     @PermitAll
     @VersionControl
     @Operation(summary = "创建图形验证码")
-    @PostMapping(path = "/v1/captcha/image", produces = MediaType.IMAGE_GIF_VALUE)
+    @PostMapping(path = "/v1/captcha/images", produces = MediaType.IMAGE_GIF_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public void createImageCaptcha(HttpServletRequest request, HttpServletResponse response,
                                    @RequestParam(defaultValue = "130", required = false) Integer width,
@@ -83,7 +83,7 @@ public class CaptchaController {
     @PermitAll
     @VerifyCaptcha(type = CaptchaType.image)
     @Operation(summary = "发送邮件验证码")
-    @PostMapping(path = "/v1/captcha/email")
+    @PostMapping(path = "/v1/captcha/emails")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     @Transactional(rollbackFor = Exception.class)
     public void sendEmailCaptcha(HttpServletRequest request, @RequestBody @Validated EmailSenderDTO sender) {
