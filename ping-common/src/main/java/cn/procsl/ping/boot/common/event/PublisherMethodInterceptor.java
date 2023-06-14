@@ -10,6 +10,7 @@ import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.util.ReflectionUtils;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -58,7 +59,7 @@ public final class PublisherMethodInterceptor extends AbstractMethodInterceptor<
                     returnedValue = invocation.proceed();
                 } catch (Exception e) {
                     publisher(publisher, invocation, null);
-                    throw e;
+                    ReflectionUtils.handleReflectionException(e);
                 }
                 break;
         }

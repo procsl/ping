@@ -2,18 +2,24 @@ package cn.procsl.ping.boot.system.web.rbac;
 
 import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.common.error.ExceptionResolver;
+import cn.procsl.ping.boot.common.error.ParameterErrorVO;
 import cn.procsl.ping.boot.common.event.Publisher;
 import cn.procsl.ping.boot.system.domain.rbac.Permission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import org.mapstruct.factory.Mappers;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Indexed;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 
 import static cn.procsl.ping.boot.system.constant.EventPublisherConstant.*;
 
@@ -22,6 +28,7 @@ import static cn.procsl.ping.boot.system.constant.EventPublisherConstant.*;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "Permission", description = "权限管理模块")
+@RestControllerAdvice
 public class PermissionController {
 
     final JpaRepository<Permission, Long> permissionJpaRepository;
@@ -32,6 +39,7 @@ public class PermissionController {
     @Operation(summary = "创建权限")
     @ResponseStatus(HttpStatus.CREATED)
     @Publisher(eventName = PERMISSION_CREATE_EVENT, parameter = "#id")
+    @Transactional(rollbackFor = Exception.class)
     public PermissionVO create(@Validated @RequestBody PermissionCreateDTO permission) throws BusinessException {
         Permission entity = permission.convert();
         permissionJpaRepository.save(entity);
@@ -43,6 +51,7 @@ public class PermissionController {
     @ExceptionResolver(message = "该角色已被关联, 角色删除失败", code = "ROLE_CONFLICT",
             status = HttpStatus.CONFLICT, matcher = DataIntegrityViolationException.class)
     @Publisher(eventName = PERMISSION_DELETE_EVENT, parameter = "#id")
+    @Transactional(rollbackFor = Exception.class)
     public void delete(@PathVariable Long id) throws BusinessException {
         this.permissionJpaRepository.deleteById(id);
     }
@@ -51,12 +60,14 @@ public class PermissionController {
     @PutMapping(path = "/v1/system/permissions/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Publisher(eventName = PERMISSION_UPDATE_EVENT, parameter = "#id")
+    @Transactional(rollbackFor = Exception.class)
     public void update(@PathVariable Long id, @Validated @RequestBody PermissionUpdateDTO permission)
             throws BusinessException {
         permissionJpaRepository.getReferenceById(id)
                 .update(permission.getOperate(),
                         permission.getResource());
     }
+
 
 //    @MarkPageable
 //    @Query(path = "/v1/system/permissions", summary = "查询角色权限")

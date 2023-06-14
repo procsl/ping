@@ -1,6 +1,7 @@
 package cn.procsl.ping.boot.web;
 
 import cn.procsl.ping.boot.web.component.AccessLoggerFilter;
+import cn.procsl.ping.boot.web.component.GlobalExceptionHandler;
 import cn.procsl.ping.boot.web.component.SpringContextHolder;
 import cn.procsl.ping.boot.web.encrypt.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -83,4 +84,9 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer {
         return constructor.newInstance(objectMapper);
     }
 
+    @Bean
+    @ConditionalOnMissingBean(name = "globalExceptionHandler")
+    public GlobalExceptionHandler globalExceptionHandler() {
+        return new GlobalExceptionHandler();
+    }
 }

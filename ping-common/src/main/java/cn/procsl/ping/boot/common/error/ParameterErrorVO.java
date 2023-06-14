@@ -1,25 +1,31 @@
 package cn.procsl.ping.boot.common.error;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 
-import java.util.Map;
+import javax.sql.rowset.serial.SerialArray;
+import java.io.Serializable;
+import java.util.*;
 
-@Data
 @Schema(description = "格式化输出参数校验错误信息")
 public class ParameterErrorVO extends ErrorVO {
 
     @Getter
-    @Schema(description = "参数校验信息", example = "{\"field:\":\"不可为空\"}")
-    final Map<String, String> errors;
+    @Schema(description = "参数校验信息")
+    final List<Error> errors = new ArrayList<>(3);
 
 
     @Builder
-    public ParameterErrorVO(String code, String message, Map<String, String> errors) {
+    public ParameterErrorVO(String code, String message) {
         super(code, message);
-        this.errors = errors;
+    }
+
+    public void putErrorTips(String field, String tips) {
+        Error error = new Error(field, tips);
+        this.errors.add(error);
     }
 
     @Override
@@ -33,4 +39,13 @@ public class ParameterErrorVO extends ErrorVO {
     public String getMessage() {
         return super.getMessage();
     }
+
+
+    @AllArgsConstructor
+    @Getter
+    public static class Error implements Serializable {
+        String field;
+        String tips;
+    }
+
 }
