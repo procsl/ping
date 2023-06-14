@@ -1,8 +1,6 @@
 package cn.procsl.ping.boot.system.web.setting;
 
 import cn.procsl.ping.boot.system.domain.user.RoleSettingService;
-import cn.procsl.ping.boot.web.annotation.Patch;
-import cn.procsl.ping.boot.web.annotation.Query;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -16,13 +14,13 @@ import java.util.Collection;
 @Indexed
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "setting", description = "系统设置模块")
+@Tag(name = "Setting", description = "系统设置模块")
 public class RoleSettingController {
 
     final RoleSettingService roleSettingService;
 
     @Operation(summary = "设置默认授权角色")
-    @PatchMapping(path = "/v1/system/setting/default-roles")
+    @PutMapping(path = "/v1/system/setting/default-roles")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void defaultRoleSetting(@RequestBody Collection<String> roles) {
         roleSettingService.defaultRoleSetting(roles);

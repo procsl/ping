@@ -3,48 +3,56 @@ package cn.procsl.ping.boot.system.web.config;
 import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.system.domain.config.Config;
 import cn.procsl.ping.boot.system.service.ConfigFacade;
-import cn.procsl.ping.boot.web.annotation.Changed;
-import cn.procsl.ping.boot.web.annotation.Deleted;
-import cn.procsl.ping.boot.web.annotation.Patch;
-import cn.procsl.ping.boot.web.annotation.Query;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Indexed;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @Indexed
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "config", description = "系统配置接口")
+@Tag(name = "Config", description = "系统配置接口")
 public class ConfigController {
 
     final ConfigFacade configFacade;
 
     final JpaRepository<Config, Long> jpaRepository;
 
-    @Changed(path = "/v1/system/configs/{id}", summary = "编辑配置项")
+    @Operation(summary = "编辑配置项")
+    @PutMapping(path = "/v1/system/configs/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Transactional(rollbackFor = Exception.class)
     public void edit(@PathVariable Long id, @RequestBody @Validated ConfigDTO config) throws BusinessException {
         this.jpaRepository.getReferenceById(id)
-                          .edit(config.getName(), config.getContent(), config.getDescription());
+                .edit(config.getName(), config.getContent(), config.getDescription());
     }
 
-    @Patch(path = "/v1/system/configs", summary = "创建或更新配置项")
+    @Operation(summary = "创建或更新配置项")
+    @PostMapping(path = "/v1/system/configs")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Transactional(rollbackFor = Exception.class)
     public void put(@RequestBody @Validated ConfigDTO config) throws BusinessException {
         configFacade.put(config.getName(), config.getContent(), config.getDescription());
     }
 
 
-    @Deleted(path = "/v1/system/configs/{id}", summary = "删除配置项")
+    @Operation(summary = "删除配置项")
+    @DeleteMapping(path = "/v1/system/configs/{id}")
+    @Transactional(rollbackFor = Exception.class)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) throws BusinessException {
         this.jpaRepository.deleteById(id);
     }
 
-    @Query(path = "/v1/system/configs/{name}", summary = "获取配置内容")
+    @Operation(summary = "获取配置内容")
+    @GetMapping(path = "/v1/system/configs/{name}")
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public ConfigNameValueDTO getConfig(@PathVariable String name) {
         return new ConfigNameValueDTO(name, this.configFacade.get(name));
     }

@@ -34,7 +34,7 @@ import static cn.procsl.ping.boot.system.constant.EventPublisherConstant.USER_LO
 @Indexed
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "authenticate", description = "用户会话信息管理")
+@Tag(name = "Authenticate", description = "用户认证信息管理")
 @RestControllerAdvice
 public class AuthenticateController {
 

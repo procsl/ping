@@ -2,7 +2,6 @@ package cn.procsl.ping.boot.system.web.user;
 
 import cn.procsl.ping.boot.common.service.PasswordEncoderService;
 import cn.procsl.ping.boot.system.domain.user.User;
-import cn.procsl.ping.boot.web.annotation.Changed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
@@ -17,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @Indexed
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "users")
+@Tag(name = "User")
 @Slf4j
 public class AccountController {
 

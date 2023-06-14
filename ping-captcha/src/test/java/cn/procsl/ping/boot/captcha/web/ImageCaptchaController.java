@@ -19,7 +19,7 @@ import java.util.Base64;
 @Slf4j
 @Controller
 @RequestMapping
-@Tag(name = "captcha", description = "图形验证码")
+@Tag(name = "Captcha", description = "图形验证码")
 public class ImageCaptchaController {
 
     @ResponseBody

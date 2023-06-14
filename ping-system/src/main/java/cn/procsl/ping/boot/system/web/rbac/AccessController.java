@@ -4,7 +4,6 @@ import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.system.domain.rbac.Role;
 import cn.procsl.ping.boot.system.domain.rbac.Subject;
 import cn.procsl.ping.boot.system.domain.rbac.SubjectRoleSpec;
-import cn.procsl.ping.boot.web.annotation.Changed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,7 +23,7 @@ import java.util.Optional;
 @Indexed
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "users")
+@Tag(name = "User")
 public class AccessController {
 
     final JpaSpecificationExecutor<Subject> subjectJpaSpecificationExecutor;

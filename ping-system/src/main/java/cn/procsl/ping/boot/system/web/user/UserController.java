@@ -23,7 +23,7 @@ import java.util.List;
 @Indexed
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "users", description = "用户管理模块接口")
+@Tag(name = "User", description = "用户管理模块接口")
 public class UserController {
 
     final JpaRepository<User, Long> jpaRepository;

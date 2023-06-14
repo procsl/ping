@@ -10,17 +10,16 @@ import com.wf.captcha.SpecCaptcha;
 import com.wf.captcha.base.Captcha;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.security.PermitAll;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.annotation.security.PermitAll;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicLong;
@@ -29,7 +28,7 @@ import static cn.procsl.ping.boot.captcha.domain.image.ImageCaptcha.token_key;
 
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "captcha", description = "验证码")
+@Tag(name = "Captcha", description = "验证码")
 public class CaptchaController {
 
     final ImageCaptchaBuilderService imageCaptchaBuilderService = new ImageCaptchaBuilderService();

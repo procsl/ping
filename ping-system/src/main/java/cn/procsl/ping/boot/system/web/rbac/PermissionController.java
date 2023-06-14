@@ -21,7 +21,7 @@ import static cn.procsl.ping.boot.system.constant.EventPublisherConstant.*;
 @Indexed
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "permissions", description = "权限管理模块")
+@Tag(name = "Permission", description = "权限管理模块")
 public class PermissionController {
 
     final JpaRepository<Permission, Long> permissionJpaRepository;
