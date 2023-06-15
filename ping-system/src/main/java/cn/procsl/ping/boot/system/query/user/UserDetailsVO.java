@@ -1,5 +1,7 @@
-package cn.procsl.ping.boot.system.web.user;
+package cn.procsl.ping.boot.system.query;
 
+import cn.procsl.ping.boot.system.web.user.AccountVO;
+import cn.procsl.ping.boot.system.web.user.UserVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
