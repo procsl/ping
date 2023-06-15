@@ -2,7 +2,10 @@ package cn.procsl.ping.boot.system.query.user;
 
 import cn.procsl.ping.boot.system.TestSystemApplication;
 import cn.procsl.ping.boot.system.domain.user.User;
-import jakarta.persistence.criteria.*;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,7 +31,13 @@ public class UserQueryRepositoryTest {
     @Test
     @Transactional(readOnly = true)
     public void findAllByName() {
-        List<UserRecord> user = queryRepository.findAll();
+        Specification<User> tmp = new Specification<User>() {
+            @Override
+            public Predicate toPredicate(Root<User> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+                return criteriaBuilder.equal(root.get("name"), "test");
+            }
+        };
+        List<UserRecord> user = queryRepository.findAllBy(tmp);
         log.info("user 信息:{}", user);
     }
 }

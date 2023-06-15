@@ -1,6 +1,7 @@
 package cn.procsl.ping.boot.system.query.user;
 
 import cn.procsl.ping.boot.system.domain.user.User;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,6 +11,6 @@ import java.util.List;
 public interface UserQueryRepository extends org.springframework.data.repository.Repository<User, Long> {
 
     @Transactional(readOnly = true)
-    List<UserRecord> findAll();
+    List<UserRecord> findAllBy(Specification<User> userSpecification);
 
 }

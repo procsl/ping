@@ -25,7 +25,6 @@ import org.springframework.data.repository.config.BootstrapMode;
 @EntityScan(basePackages = "cn.procsl.ping.boot.jpa")
 public class JpaDataAutoConfiguration implements ApplicationContextAware {
 
-    public final static String SYSTEM_ERROR_CODE_KEY = "SYSTEM_ERROR_CODE_KEY";
 
     @Override
     public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
