@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.system.query;
+package cn.procsl.ping.boot.system.query.user;
 
 import cn.procsl.ping.boot.system.web.user.AccountVO;
 import cn.procsl.ping.boot.system.web.user.UserVO;

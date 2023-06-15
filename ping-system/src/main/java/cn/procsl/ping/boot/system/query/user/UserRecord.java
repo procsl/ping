@@ -1,6 +1,11 @@
 package cn.procsl.ping.boot.system.query.user;
 
-public interface UserDetail {
+import org.springframework.data.web.ProjectedPayload;
+
+@ProjectedPayload
+public interface UserRecord {
+
     String getName();
+
 
 }

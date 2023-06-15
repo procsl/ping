@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.system.query;
+package cn.procsl.ping.boot.system.query.user;
 
 import cn.procsl.ping.boot.jpa.FormatPage;
 import cn.procsl.ping.boot.system.domain.user.AccountState;

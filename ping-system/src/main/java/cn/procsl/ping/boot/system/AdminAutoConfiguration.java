@@ -21,8 +21,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableTransactionManagement
 @ConditionalOnMissingBean({AdminAutoConfiguration.class})
 @EntityScan(basePackages = "cn.procsl.ping.boot.system.domain")
-@EnableJpaRepositories(basePackages = "cn.procsl.ping.boot.system.domain", bootstrapMode = BootstrapMode.LAZY)
-@ComponentScan(basePackages = {"cn.procsl.ping.boot.system.web", "cn.procsl.ping.boot.system.service", "cn.procsl.ping.boot.system.listener", "cn.procsl.ping.boot.system.adapter", "cn.procsl.ping.boot.system.auth"}, basePackageClasses = {ConfigFacade.class, RoleSettingService.class,})
+@EnableJpaRepositories(basePackages = {"cn.procsl.ping.boot.system.domain", "cn.procsl.ping.boot.system.query"}, bootstrapMode = BootstrapMode.LAZY)
+@ComponentScan(basePackages = {"cn.procsl.ping.boot.system.web", "cn.procsl.ping.boot.system.service", "cn.procsl.ping.boot.system.listener", "cn.procsl.ping.boot.system.adapter"}, basePackageClasses = {ConfigFacade.class, RoleSettingService.class,})
 @Order
 public class AdminAutoConfiguration implements WebMvcConfigurer {
 
