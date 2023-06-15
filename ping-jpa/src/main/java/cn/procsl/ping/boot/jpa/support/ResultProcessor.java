@@ -14,14 +14,14 @@ import org.springframework.util.Assert;
 
 import java.util.*;
 
-public class MyResultProcessor {
+public class ResultProcessor {
     private final ProjectingConverter converter;
-    private final ProjectionFactory factory;
+//    private final ProjectionFactory factory;
     private final ReturnedType type;
 
-    public MyResultProcessor(ProjectionFactory factory, ReturnedType type) {
+    public ResultProcessor(ProjectionFactory factory, ReturnedType type) {
         this.converter = new ProjectingConverter(type,factory).withType(type);
-        this.factory = factory;
+//        this.factory = factory;
         this.type = type;
     }
 
@@ -106,22 +106,12 @@ public class MyResultProcessor {
         private final @NonNull ProjectionFactory factory;
         private final @NonNull ConversionService conversionService;
 
-        /**
-         * Creates a new {@link ProjectingConverter} for the given {@link ReturnedType} and {@link ProjectionFactory}.
-         *
-         * @param type must not be {@literal null}.
-         * @param factory must not be {@literal null}.
-         */
+
         ProjectingConverter(ReturnedType type, ProjectionFactory factory) {
             this(type, factory, DefaultConversionService.getSharedInstance());
         }
 
-        /**
-         * Creates a new {@link ProjectingConverter} for the given {@link ReturnedType}.
-         *
-         * @param type must not be {@literal null}.
-         * @return
-         */
+
         ProjectingConverter withType(ReturnedType type) {
 
             Assert.notNull(type, "ReturnedType must not be null!");
@@ -129,10 +119,7 @@ public class MyResultProcessor {
             return new ProjectingConverter(type, factory, conversionService);
         }
 
-        /*
-         * (non-Javadoc)
-         * @see org.springframework.core.convert.converter.Converter#convert(java.lang.Object)
-         */
+
         @Nullable
         @Override
         public Object convert(Object source) {

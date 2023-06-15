@@ -21,7 +21,7 @@ import org.springframework.data.repository.config.BootstrapMode;
 @Slf4j
 @AutoConfiguration(before = {JpaBaseConfiguration.class})
 @ConditionalOnMissingBean(JpaDataAutoConfiguration.class)
-@EnableJpaRepositories(bootstrapMode = BootstrapMode.LAZY, basePackages = "cn.procsl.ping.boot.jpa")
+@EnableJpaRepositories(basePackages = "cn.procsl.ping.boot.jpa", bootstrapMode = BootstrapMode.LAZY)
 @EntityScan(basePackages = "cn.procsl.ping.boot.jpa")
 public class JpaDataAutoConfiguration implements ApplicationContextAware {
 

@@ -56,7 +56,7 @@ public class JpaSpecificationExecutorWithProjectionImpl<T, ID extends Serializab
 
     private final JpaEntityInformation<?, ?> entityInformation;
 
-    public JpaSpecificationExecutorWithProjectionImpl(JpaEntityInformation entityInformation, EntityManager entityManager) {
+    public JpaSpecificationExecutorWithProjectionImpl(JpaEntityInformation<T,ID> entityInformation, EntityManager entityManager) {
         super(entityInformation, entityManager);
         this.entityManager = entityManager;
         this.entityInformation = entityInformation;
@@ -68,10 +68,11 @@ public class JpaSpecificationExecutorWithProjectionImpl<T, ID extends Serializab
         final ReturnedType returnedType = ReturnTypeWarpper.of(projectionType, getDomainClass(), projectionFactory);
         final TypedQuery<Tuple> query = getTupleQuery(spec, Sort.unsorted(), returnedType);
         try {
-            final MyResultProcessor resultProcessor = new MyResultProcessor(projectionFactory, returnedType);
+            final ResultProcessor resultProcessor = new ResultProcessor(projectionFactory, returnedType);
             final R singleResult = resultProcessor.processResult(query.getSingleResult(), new TupleConverter(returnedType));
             return Optional.ofNullable(singleResult);
         } catch (NoResultException e) {
+            log.warn("出现错误: ", e);
             return Optional.empty();
         }
     }
@@ -81,14 +82,14 @@ public class JpaSpecificationExecutorWithProjectionImpl<T, ID extends Serializab
         final ReturnedType returnedType = ReturnTypeWarpper.of(projectionType, getDomainClass(), projectionFactory);
         pageable.getSort();
         final TypedQuery<Tuple> query = getTupleQuery(spec, pageable.getSort().isSorted() ? pageable.getSort() : Sort.unsorted(), returnedType);
-        final MyResultProcessor resultProcessor = new MyResultProcessor(projectionFactory, returnedType);
+        final ResultProcessor resultProcessor = new ResultProcessor(projectionFactory, returnedType);
         if (pageable.isPaged()) {
             query.setFirstResult((int) pageable.getOffset());
             query.setMaxResults(pageable.getPageSize());
         }
         final List<R> resultList = resultProcessor.processResult(query.getResultList(), new TupleConverter(returnedType));
         final Page<R> page = PageableExecutionUtils.getPage(resultList, pageable, () -> executeCountQuery(this.getCountQuery(spec, getDomainClass())));
-        return pageable.isUnpaged() ? new PageImpl(resultList) : page;
+        return pageable.isUnpaged() ? new PageImpl<>(resultList) : page;
     }
 
     static Long executeCountQuery(TypedQuery<Long> query) {
@@ -107,11 +108,11 @@ public class JpaSpecificationExecutorWithProjectionImpl<T, ID extends Serializab
 
     protected TypedQuery<Tuple> getTupleQuery(@Nullable Specification spec, Sort sort, ReturnedType returnedType) {
         if (!returnedType.needsCustomConstruction()) {
-            return getQuery(spec, sort);
+            return this.getQuery(spec, sort);
         }
         CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
         CriteriaQuery<Tuple> query = builder.createQuery(Tuple.class);
-        Root root = this.applySpecificationToCriteria(spec, getDomainClass(), query, builder);
+        Root<T> root = this.applySpecificationToCriteria(spec, getDomainClass(), query, builder);
 
         if (returnedType.needsCustomConstruction()) {
             List<Selection<?>> selections = new ArrayList<>();
