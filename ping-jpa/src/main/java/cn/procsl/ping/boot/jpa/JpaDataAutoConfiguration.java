@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.jpa;
 
+import cn.procsl.ping.boot.jpa.util.ContextHolder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;

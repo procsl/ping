@@ -1,13 +1,11 @@
 package cn.procsl.ping.boot.product.domain;
 
-import cn.procsl.ping.boot.jpa.RepositoryCreator;
+import cn.procsl.ping.boot.jpa.support.RepositoryCreator;
 import lombok.*;
 
 import jakarta.persistence.*;
 
 import java.io.Serializable;
-
-import static jakarta.persistence.GenerationType.TABLE;
 
 @Getter
 @Setter

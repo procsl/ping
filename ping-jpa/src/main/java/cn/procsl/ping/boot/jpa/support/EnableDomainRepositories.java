@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.jpa;
+package cn.procsl.ping.boot.jpa.support;
 
 import cn.procsl.ping.boot.jpa.support.JpaSpecificationExecutorWithProjectionImpl;
 import org.springframework.core.annotation.AliasFor;

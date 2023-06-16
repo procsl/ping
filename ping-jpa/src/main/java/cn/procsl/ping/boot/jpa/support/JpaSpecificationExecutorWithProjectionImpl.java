@@ -24,23 +24,25 @@ import org.springframework.data.repository.query.ReturnedType;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+import org.springframework.util.ReflectionUtils;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.util.*;
 
 import static jakarta.persistence.metamodel.Attribute.PersistentAttributeType.*;
 
 
 @Slf4j
-public class JpaSpecificationExecutorWithProjectionImpl<T, ID extends Serializable> extends SimpleJpaRepository<T, ID> implements JpaSpecificationExecutorWithProjection<T> {
+class JpaSpecificationExecutorWithProjectionImpl<T, ID extends Serializable> extends SimpleJpaRepository<T, ID> implements JpaSpecificationExecutorWithProjection<T> {
 
     private static final Map<Attribute.PersistentAttributeType, Class<? extends Annotation>> ASSOCIATION_TYPES;
 
     static {
-        Map<Attribute.PersistentAttributeType, Class<? extends Annotation>> persistentAttributeTypes = new HashMap<Attribute.PersistentAttributeType, Class<? extends Annotation>>();
+        Map<Attribute.PersistentAttributeType, Class<? extends Annotation>> persistentAttributeTypes = new HashMap<>();
         persistentAttributeTypes.put(ONE_TO_ONE, OneToOne.class);
         persistentAttributeTypes.put(ONE_TO_MANY, null);
         persistentAttributeTypes.put(MANY_TO_ONE, ManyToOne.class);
@@ -50,22 +52,35 @@ public class JpaSpecificationExecutorWithProjectionImpl<T, ID extends Serializab
         ASSOCIATION_TYPES = Collections.unmodifiableMap(persistentAttributeTypes);
     }
 
+    private final Method method;
+
     private final EntityManager entityManager;
 
     private final ProjectionFactory projectionFactory = new SpelAwareProxyProjectionFactory();
 
     private final JpaEntityInformation<?, ?> entityInformation;
 
-    public JpaSpecificationExecutorWithProjectionImpl(JpaEntityInformation<T,ID> entityInformation, EntityManager entityManager) {
+    public JpaSpecificationExecutorWithProjectionImpl(JpaEntityInformation<T, ID> entityInformation, EntityManager entityManager) {
         super(entityInformation, entityManager);
         this.entityManager = entityManager;
         this.entityInformation = entityInformation;
+        try {
+            this.method = ReturnedType.class.getDeclaredMethod("of", Class.class, Class.class, ProjectionFactory.class);
+            method.setAccessible(true);
+        } catch (NoSuchMethodException e) {
+            throw new IllegalArgumentException("找不到of方法");
+        }
     }
 
 
     @Override
     public <R> Optional<R> findOne(Specification<T> spec, Class<R> projectionType) {
-        final ReturnedType returnedType = ReturnTypeWarpper.of(projectionType, getDomainClass(), projectionFactory);
+
+        ReturnedType returnedType = (ReturnedType) ReflectionUtils.invokeMethod(method, null, projectionType,
+                this.getDomainClass(), projectionFactory);
+
+        assert returnedType != null;
+
         final TypedQuery<Tuple> query = getTupleQuery(spec, Sort.unsorted(), returnedType);
         try {
             final ResultProcessor resultProcessor = new ResultProcessor(projectionFactory, returnedType);
@@ -79,8 +94,13 @@ public class JpaSpecificationExecutorWithProjectionImpl<T, ID extends Serializab
 
     @Override
     public <R> Page<R> findAll(Specification<T> spec, Class<R> projectionType, Pageable pageable) {
-        final ReturnedType returnedType = ReturnTypeWarpper.of(projectionType, getDomainClass(), projectionFactory);
-        pageable.getSort();
+
+        ReturnedType returnedType = (ReturnedType) ReflectionUtils.invokeMethod(method, null, projectionType,
+                this.getDomainClass(), projectionFactory);
+
+        assert returnedType != null;
+//        pageable.getSort();
+
         final TypedQuery<Tuple> query = getTupleQuery(spec, pageable.getSort().isSorted() ? pageable.getSort() : Sort.unsorted(), returnedType);
         final ResultProcessor resultProcessor = new ResultProcessor(projectionFactory, returnedType);
         if (pageable.isPaged()) {
@@ -106,9 +126,10 @@ public class JpaSpecificationExecutorWithProjectionImpl<T, ID extends Serializab
     }
 
 
-    protected TypedQuery<Tuple> getTupleQuery(@Nullable Specification spec, Sort sort, ReturnedType returnedType) {
+    protected TypedQuery<Tuple> getTupleQuery(@Nullable Specification<T> spec, Sort sort, ReturnedType returnedType) {
         if (!returnedType.needsCustomConstruction()) {
-            return this.getQuery(spec, sort);
+//            return this.getQuery(spec, sort);
+            throw new UnsupportedOperationException("不支持的方式");
         }
         CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
         CriteriaQuery<Tuple> query = builder.createQuery(Tuple.class);
@@ -273,4 +294,5 @@ public class JpaSpecificationExecutorWithProjectionImpl<T, ID extends Serializab
 
         return false;
     }
+
 }

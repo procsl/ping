@@ -1,6 +1,6 @@
 package cn.procsl.ping.apt.repository;
 
-import cn.procsl.ping.boot.jpa.RepositoryCreator;
+import cn.procsl.ping.boot.jpa.support.RepositoryCreator;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
 

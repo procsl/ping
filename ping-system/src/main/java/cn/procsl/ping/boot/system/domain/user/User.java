@@ -1,7 +1,7 @@
 package cn.procsl.ping.boot.system.domain.user;
 
 
-import cn.procsl.ping.boot.jpa.RepositoryCreator;
+import cn.procsl.ping.boot.jpa.support.RepositoryCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

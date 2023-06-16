@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.system;
 
-import cn.procsl.ping.boot.jpa.EnableDomainRepositories;
+import cn.procsl.ping.boot.jpa.support.EnableDomainRepositories;
 import cn.procsl.ping.boot.system.domain.user.RoleSettingService;
 import cn.procsl.ping.boot.system.service.ConfigFacade;
 import cn.procsl.ping.boot.system.web.user.AuthenticateInterceptor;

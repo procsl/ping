@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.system.query.user;
 
-import cn.procsl.ping.boot.jpa.FormatPage;
+import cn.procsl.ping.boot.jpa.page.FormatPage;
 import cn.procsl.ping.boot.system.domain.user.AccountState;
 import cn.procsl.ping.boot.system.domain.user.Gender;
 import cn.procsl.ping.boot.web.annotation.MarkPageable;

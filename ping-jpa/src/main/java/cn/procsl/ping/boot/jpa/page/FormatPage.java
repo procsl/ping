@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.jpa;
+package cn.procsl.ping.boot.jpa.page;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -1,22 +1,15 @@
 package cn.procsl.ping.boot.system.query.user;
 
-import cn.procsl.ping.boot.jpa.EnableDomainRepositories;
 import cn.procsl.ping.boot.system.TestSystemApplication;
 import cn.procsl.ping.boot.system.domain.user.User;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -41,12 +34,7 @@ public class UserQueryRepositoryTest {
     @Test
     @Transactional(readOnly = true)
     public void findAll2() {
-        Optional<UserRecord> result = queryRepository.findOne(new Specification<User>() {
-            @Override
-            public Predicate toPredicate(Root<User> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
-                return criteriaBuilder.equal(root.get("name"), "admin");
-            }
-        }, UserRecord.class);
+        Optional<UserRecord> result = queryRepository.findOne((Specification<User>) (root, query, cb) -> cb.equal(root.get("name"), "admin"), UserRecord.class);
         log.info("test: {}", result.get());
     }
 }
