@@ -11,17 +11,9 @@ import java.lang.annotation.*;
 @Documented
 @Inherited
 @EnableJpaRepositories(bootstrapMode = BootstrapMode.LAZY, repositoryBaseClass = JpaSpecificationExecutorWithProjectionImpl.class)
-public @interface EnableDomainRepositories {
-
+public @interface EnableJpaExtendRepositories {
 
     @AliasFor(annotation = EnableJpaRepositories.class, attribute = "basePackages")
     String[] basePackages() default {};
-
-
-//    @AliasFor(annotation = EnableJpaRepositories.class, attribute = "repositoryFactoryBeanClass")
-//    Class<?> repositoryFactoryBeanClass() default DomainRepositoryFactoryBean.class;
-
-//    @AliasFor(annotation = EnableJpaRepositories.class, attribute = "repositoryBaseClass")
-//    Class<?> repositoryBaseClass() default JpaSpecificationExecutorWithProjectionImpl.class;
 
 }

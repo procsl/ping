@@ -8,7 +8,7 @@ import org.springframework.data.repository.NoRepositoryBean;
 import java.util.Optional;
 
 @NoRepositoryBean
-public interface JpaSpecificationExecutorWithProjection<T>  {
+public interface JpaSpecificationExecutorWithProjection<T> {
 
     <R> Optional<R> findOne(Specification<T> spec, Class<R> projectionClass);
 
