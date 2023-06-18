@@ -24,6 +24,10 @@ public class FormatPage<T> extends PageImpl<T> {
         super(content, pageable, total);
     }
 
+    public void copy() {
+
+    }
+
     public static <T> FormatPage<T> page(List<T> content, Pageable pageable, long total) {
         return new FormatPage<>(content, pageable, total);
     }

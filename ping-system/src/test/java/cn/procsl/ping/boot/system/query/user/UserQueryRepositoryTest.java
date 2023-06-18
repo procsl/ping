@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,4 +39,11 @@ public class UserQueryRepositoryTest {
         Optional<UserRecord> result = queryRepository.findOne((Specification<User>) (root, query, cb) -> cb.equal(root.get("name"), "admin"), UserRecord.class);
         log.info("test: {}", result.get());
     }
+
+    @Test
+    public void test() {
+        Page<UserRecord> result = queryRepository.findAllByNameAndGenderAndAccountNameAndAccountStateOrderByName("admin", null, null, null, Pageable.ofSize(10));
+        log.info("result: {}", result.get());
+    }
+
 }

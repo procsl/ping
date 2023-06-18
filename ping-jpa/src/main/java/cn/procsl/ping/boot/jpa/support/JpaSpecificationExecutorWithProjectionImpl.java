@@ -37,12 +37,12 @@ import static jakarta.persistence.metamodel.Attribute.PersistentAttributeType.*;
 
 
 @Slf4j
-class JpaSpecificationExecutorWithProjectionImpl<T, ID extends Serializable> extends SimpleJpaRepository<T, ID> implements JpaSpecificationExecutorWithProjection<T> {
+public class JpaSpecificationExecutorWithProjectionImpl<T, ID extends Serializable> extends SimpleJpaRepository<T, ID> implements JpaSpecificationExecutorWithProjection<T, ID> {
 
     private static final Map<Attribute.PersistentAttributeType, Class<? extends Annotation>> ASSOCIATION_TYPES;
 
     static {
-        Map<Attribute.PersistentAttributeType, Class<? extends Annotation>> persistentAttributeTypes = new HashMap<>();
+        Map<Attribute.PersistentAttributeType, Class<? extends Annotation>> persistentAttributeTypes = new HashMap<Attribute.PersistentAttributeType, Class<? extends Annotation>>();
         persistentAttributeTypes.put(ONE_TO_ONE, OneToOne.class);
         persistentAttributeTypes.put(ONE_TO_MANY, null);
         persistentAttributeTypes.put(MANY_TO_ONE, ManyToOne.class);
