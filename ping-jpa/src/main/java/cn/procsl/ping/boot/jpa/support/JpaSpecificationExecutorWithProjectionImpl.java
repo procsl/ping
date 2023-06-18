@@ -35,7 +35,7 @@ import static jakarta.persistence.metamodel.Attribute.PersistentAttributeType.*;
 
 
 @Slf4j
-public class JpaSpecificationExecutorWithProjectionImpl<T, ID extends Serializable> extends SimpleJpaRepository<T, ID> implements JpaSpecificationExecutorWithProjection<T> {
+public class JpaSpecificationExecutorWithProjectionImpl<T, ID extends Serializable> extends SimpleJpaRepository<T, ID> implements JpaSpecificationExecutorWithProjection<T, ID> {
 
     private static final Map<Attribute.PersistentAttributeType, Class<? extends Annotation>> ASSOCIATION_TYPES;
 
@@ -56,7 +56,7 @@ public class JpaSpecificationExecutorWithProjectionImpl<T, ID extends Serializab
 
     private final JpaEntityInformation<?, ?> entityInformation;
 
-    public JpaSpecificationExecutorWithProjectionImpl(JpaEntityInformation<T,ID> entityInformation, EntityManager entityManager) {
+    public JpaSpecificationExecutorWithProjectionImpl(JpaEntityInformation<T, ID> entityInformation, EntityManager entityManager) {
         super(entityInformation, entityManager);
         this.entityManager = entityManager;
         this.entityInformation = entityInformation;
