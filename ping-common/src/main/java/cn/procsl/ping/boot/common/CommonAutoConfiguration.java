@@ -1,7 +1,6 @@
 package cn.procsl.ping.boot.common;
 
 import cn.procsl.ping.boot.common.advice.AnnotationPointcutAdvisor;
-import cn.procsl.ping.boot.common.error.CommonErrorAttributes;
 import cn.procsl.ping.boot.common.event.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -40,11 +39,6 @@ public class CommonAutoConfiguration {
     @ConditionalOnMissingBean
     public EventBusBridge eventBusBridge(ApplicationContext applicationContext) {
         return new SpringEventBusBridge(applicationContext);
-    }
-
-    @Bean
-    public CommonErrorAttributes errorAttributes() {
-        return new CommonErrorAttributes();
     }
 
 

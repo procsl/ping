@@ -24,10 +24,17 @@ public class UserQuerySpec implements Specification<User> {
     public Predicate toPredicate(Root<User> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
 
         final List<Predicate> condition = new ArrayList<>();
+        Join<User, Account> accountField = root.join("account", JoinType.INNER);
 
-        conditionExtracted(condition, name, root, "name", cb);
+        if (StringUtils.hasText(name)) {
+            Path<String> tmp = root.get("name");
+            condition.add(cb.like(tmp, String.format("%%%s%%", name)));
+        }
 
-        conditionExtracted(condition, account, root, "account", cb);
+        if (StringUtils.hasText(account)) {
+            Path<String> tmp = accountField.get("name");
+            condition.add(cb.like(tmp, String.format("%%%s%%", account)));
+        }
 
         if (gender != null) {
             Path<Gender> tmp = root.get("gender");
@@ -35,19 +42,11 @@ public class UserQuerySpec implements Specification<User> {
         }
 
         if (state != null) {
-            Join<User, Account> accountField = root.join("account", JoinType.INNER);
             Path<Gender> tmp = accountField.get("state");
             condition.add(cb.equal(tmp, gender));
         }
 
         return query.where(condition.toArray(Predicate[]::new)).getRestriction();
-    }
-
-    void conditionExtracted(List<Predicate> condition, String account, Root<User> root, String field, CriteriaBuilder cb) {
-        if (StringUtils.hasText(account)) {
-            Path<String> tmp = root.get(field);
-            condition.add(cb.like(tmp, account));
-        }
     }
 
 }

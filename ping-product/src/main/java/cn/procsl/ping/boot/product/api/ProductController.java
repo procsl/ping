@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.product.api;
 
+import cn.procsl.ping.boot.product.domain.Product;
 import cn.procsl.ping.boot.web.encrypt.DecryptDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -10,8 +11,8 @@ import org.springframework.web.bind.annotation.*;
 public class ProductController {
 
     @PostMapping("/v1/products/{id}")
-    public void publishProduct(@PathVariable DecryptDTO id) {
-        log.debug("发布商品");
+    public void publishProduct(@PathVariable(name = "id") Product product) {
+        log.debug("发布商品: {}", product);
     }
 
     @PostMapping("/v1/products")

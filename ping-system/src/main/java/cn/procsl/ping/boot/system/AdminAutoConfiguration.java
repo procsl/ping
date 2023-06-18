@@ -23,13 +23,19 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @ConditionalOnMissingBean({AdminAutoConfiguration.class})
 @EntityScan(basePackages = "cn.procsl.ping.boot.system.domain")
 @EnableJpaRepositories(basePackages = {"cn.procsl.ping.boot.system.domain"}, bootstrapMode = BootstrapMode.LAZY)
-@ComponentScan(basePackages = {"cn.procsl.ping.boot.system.web", "cn.procsl.ping.boot.system.service", "cn.procsl.ping.boot.system.listener", "cn.procsl.ping.boot.system.adapter"}, basePackageClasses = {ConfigFacade.class, RoleSettingService.class,})
+@ComponentScan(basePackages = {
+        "cn.procsl.ping.boot.system.web",
+        "cn.procsl.ping.boot.system.query",
+        "cn.procsl.ping.boot.system.service",
+        "cn.procsl.ping.boot.system.listener",
+        "cn.procsl.ping.boot.system.adapter"},
+        basePackageClasses = {ConfigFacade.class, RoleSettingService.class,})
 public class AdminAutoConfiguration implements WebMvcConfigurer {
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new AuthenticateInterceptor()).addPathPatterns("/v1/**");
-    }
+//    @Override
+//    public void addInterceptors(InterceptorRegistry registry) {
+//        registry.addInterceptor(new AuthenticateInterceptor()).addPathPatterns("/v1/**");
+//    }
 
 
     @Configuration

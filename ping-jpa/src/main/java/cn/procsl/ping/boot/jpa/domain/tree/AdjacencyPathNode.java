@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.jpa.tree;
+package cn.procsl.ping.boot.jpa.domain.tree;
 
 import jakarta.persistence.*;
 

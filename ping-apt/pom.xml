@@ -34,23 +34,27 @@
             <groupId>cn.procsl</groupId>
             <artifactId>ping-common</artifactId>
             <optional>true</optional>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
-            <version>3.1.0</version>
+            <scope>provided</scope>
+            <!--            <version>3.1.0</version>-->
         </dependency>
 
         <dependency>
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service</artifactId>
             <optional>true</optional>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>cn.procsl</groupId>
             <artifactId>ping-jpa</artifactId>
+            <scope>provided</scope>
         </dependency>
 
 

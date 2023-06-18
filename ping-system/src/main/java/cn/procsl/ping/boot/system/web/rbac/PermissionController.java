@@ -49,7 +49,8 @@ public class PermissionController {
     @Operation(summary = "删除权限")
     @DeleteMapping(path = "/v1/system/permissions/{id}")
     @ExceptionResolver(message = "该角色已被关联, 角色删除失败", code = "ROLE_CONFLICT",
-            status = HttpStatus.CONFLICT, matcher = DataIntegrityViolationException.class)
+//            status = HttpStatus.CONFLICT,
+            matcher = DataIntegrityViolationException.class)
     @Publisher(eventName = PERMISSION_DELETE_EVENT, parameter = "#id")
     @Transactional(rollbackFor = Exception.class)
     public void delete(@PathVariable Long id) throws BusinessException {

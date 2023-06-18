@@ -1,8 +1,8 @@
 package cn.procsl.ping.boot.common.error;
 
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+//import org.springframework.http.HttpStatus;
+//import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * 业务异常
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * @author procsl
  * @date 2020/05/15
  */
-@ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR, reason = "SYSTEM_ERROR")
+//@ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR, reason = "SYSTEM_ERROR")
 public class BusinessException extends RuntimeException implements ErrorEntity {
 
     @Getter

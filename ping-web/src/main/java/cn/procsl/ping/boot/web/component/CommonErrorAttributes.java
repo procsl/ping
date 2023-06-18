@@ -1,9 +1,10 @@
-package cn.procsl.ping.boot.common.error;
+package cn.procsl.ping.boot.web.component;
 
+import cn.procsl.ping.boot.common.error.BusinessException;
+import cn.procsl.ping.boot.common.error.ErrorVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.context.request.WebRequest;
 
 import java.util.Map;

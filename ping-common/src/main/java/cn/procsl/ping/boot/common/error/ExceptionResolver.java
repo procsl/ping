@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.common.error;
 
-import org.springframework.http.HttpStatus;
+//import org.springframework.http.HttpStatus;
 
 import java.lang.annotation.*;
 
@@ -9,7 +9,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ExceptionResolver {
 
-    HttpStatus status() default HttpStatus.INTERNAL_SERVER_ERROR;
+//    HttpStatus status() default HttpStatus.INTERNAL_SERVER_ERROR;
 
     String code() default "SERVER_ERROR";
 

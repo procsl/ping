@@ -53,7 +53,9 @@ public class RoleController {
 
     @Operation(summary = "删除角色")
     @DeleteMapping(path = "/v1/system/roles/{id}")
-    @ExceptionResolver(message = "该角色正在使用中,无法删除", status = HttpStatus.CONFLICT, code = "ROLE_CONFLICT")
+    @ExceptionResolver(message = "该角色正在使用中,无法删除",
+//            status = HttpStatus.CONFLICT,
+            code = "ROLE_CONFLICT")
     @Publisher(eventName = ROLE_DELETE_EVENT, parameter = "#id")
     @Transactional(rollbackFor = Exception.class)
     public void deleteRole(@PathVariable Long id) throws BusinessException {

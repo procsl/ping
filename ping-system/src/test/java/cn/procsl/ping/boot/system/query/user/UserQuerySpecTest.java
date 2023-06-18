@@ -1,6 +1,7 @@
 package cn.procsl.ping.boot.system.query.user;
 
 import cn.procsl.ping.boot.system.TestSystemApplication;
+import cn.procsl.ping.boot.system.domain.user.AccountState;
 import cn.procsl.ping.boot.system.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,7 @@ public class UserQuerySpecTest {
 
     @Test
     public void toPredicate() {
-        UserQuerySpec spec = UserQuerySpec.builder().name("admin").build();
+        UserQuerySpec spec = UserQuerySpec.builder().name("admin").account("name").state(AccountState.enable).build();
         List<User> result = jpaSpecificationExecutor.findAll(spec);
         log.info("result {}", result);
     }

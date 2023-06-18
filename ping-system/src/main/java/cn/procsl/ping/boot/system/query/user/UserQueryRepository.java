@@ -15,6 +15,8 @@ public interface UserQueryRepository extends JpaSpecificationExecutorWithProject
 
     List<UserRecord> findAllBy();
 
+    UserDetailsVO findById(Long id);
+
     Page<UserRecord> findAllByNameAndGenderAndAccountNameAndAccountStateOrderByName(String name, Gender gender, String accountName, AccountState accountState, Pageable pageable);
 
 

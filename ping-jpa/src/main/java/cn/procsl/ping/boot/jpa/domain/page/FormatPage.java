@@ -1,97 +1,93 @@
-package cn.procsl.ping.boot.jpa.page;
+package cn.procsl.ping.boot.jpa.domain.page;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.springframework.data.domain.PageImpl;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 
-import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * 分页从第一页开始
  *
  * @param <T>
  */
-public class FormatPage<T> extends PageImpl<T> {
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public class FormatPage<T> implements Page<T> {
 
+    final Page<T> page;
 
-    private FormatPage(List<T> content, Pageable pageable, long total) {
-        super(content, pageable, total);
+    public static <T> FormatPage<T> copy(Page<T> page) {
+        if (page instanceof FormatPage) {
+            return (FormatPage<T>) page;
+        }
+        return new FormatPage<>(page);
     }
 
-    public void copy() {
-
-    }
-
-    public static <T> FormatPage<T> page(List<T> content, Pageable pageable, long total) {
-        return new FormatPage<>(content, pageable, total);
-    }
-
-//    public static <T> FormatPage<T> page(QueryBuilder<T> query, Pageable pageable) {
-//        QueryResults<T> result = query.build(pageable).fetchResults();
-//        return new FormatPage<>(result.getResults(), pageable, result.getTotal());
-//    }
-
-    public <E> FormatPage<E> transform(Function<T, E> convert) {
-        List<E> content = this.getContent().stream().map(convert).collect(Collectors.toList());
-        return page(content, this.getPageable(), this.getTotal());
-    }
-
-    @SuppressWarnings("unused")
-    public <E> Collection<E> convert(Function<T, E> converter) {
-        return this.getContent().stream().map(converter).collect(Collectors.toList());
-    }
 
     @Override
     @NonNull
     public List<T> getContent() {
-        return super.getContent();
+        return page.getContent();
+    }
+
+    @Override
+    public boolean hasContent() {
+        return page.hasContent();
     }
 
     @Override
     @NonNull
     @Schema(example = "true", description = "是否为第一页数据")
     public boolean isFirst() {
-        return super.isFirst();
+        return page.isFirst();
     }
 
     @Override
     @NonNull
     @Schema(example = "true", description = "Content是否为空")
     public boolean isEmpty() {
-        return super.isEmpty();
+        return page.isEmpty();
     }
 
     @Override
     @JsonIgnore
     @Schema(hidden = true)
     public long getTotalElements() {
-        return super.getTotalElements();
+        return page.getTotalElements();
+    }
+
+    @Override
+    @JsonIgnore
+    @Schema(hidden = true)
+    public <U> Page<U> map(Function<? super T, ? extends U> converter) {
+        return page.map(converter);
     }
 
     @NonNull
     @Schema(example = "100", description = "总页数")
     public Long getTotal() {
-        return super.getTotalElements();
+        return page.getTotalElements();
     }
 
     @Override
     @JsonIgnore
     @Schema(hidden = true)
     public int getSize() {
-        return super.getSize();
+        return page.getSize();
     }
 
     @NonNull
     @SuppressWarnings("unused")
     @Schema(example = "10", description = "每页大小")
     public int getLimit() {
-        return super.getSize();
+        return page.getSize();
     }
 
     @NonNull
@@ -106,7 +102,7 @@ public class FormatPage<T> extends PageImpl<T> {
     @JsonIgnore
     @Schema(hidden = true)
     public int getTotalPages() {
-        return super.getTotalPages();
+        return page.getTotalPages();
     }
 
 
@@ -114,21 +110,35 @@ public class FormatPage<T> extends PageImpl<T> {
     @SuppressWarnings("unused")
     @Schema(example = "true", description = "是否存在后续数据")
     public boolean isNext() {
-        return super.hasNext();
+        return page.hasNext();
     }
 
     @Override
     @JsonIgnore
     @Schema(hidden = true)
     public boolean isLast() {
-        return super.isLast();
+        return page.isLast();
+    }
+
+    @Override
+    @JsonIgnore
+    @Schema(hidden = true)
+    public boolean hasNext() {
+        return page.hasNext();
+    }
+
+    @Override
+    @JsonIgnore
+    @Schema(hidden = true)
+    public boolean hasPrevious() {
+        return page.hasPrevious();
     }
 
     @Override
     @JsonIgnore
     @Schema(hidden = true)
     public int getNumber() {
-        return super.getNumber();
+        return page.getNumber();
     }
 
 
@@ -136,7 +146,7 @@ public class FormatPage<T> extends PageImpl<T> {
     @JsonIgnore
     @Schema(hidden = true)
     public int getNumberOfElements() {
-        return super.getNumberOfElements();
+        return page.getNumberOfElements();
     }
 
 
@@ -144,14 +154,14 @@ public class FormatPage<T> extends PageImpl<T> {
     @JsonIgnore
     @Schema(hidden = true)
     public @NonNull Pageable nextPageable() {
-        return super.nextPageable();
+        return page.nextPageable();
     }
 
     @Override
     @JsonIgnore
     @Schema(hidden = true)
     public @NonNull Pageable previousPageable() {
-        return super.previousPageable();
+        return page.previousPageable();
     }
 
 
@@ -159,15 +169,21 @@ public class FormatPage<T> extends PageImpl<T> {
     @JsonIgnore
     @Schema(hidden = true)
     public @NonNull Pageable getPageable() {
-        return super.getPageable();
+        return page.getPageable();
     }
 
     @Override
     @JsonIgnore
     @Schema(hidden = true)
     public @NonNull Sort getSort() {
-        return super.getSort();
+        return page.getSort();
     }
 
 
+    @Override
+    @JsonIgnore
+    @Schema(hidden = true)
+    public Iterator<T> iterator() {
+        return page.iterator();
+    }
 }

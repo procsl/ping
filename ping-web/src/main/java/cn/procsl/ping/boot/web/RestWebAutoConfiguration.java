@@ -1,6 +1,7 @@
 package cn.procsl.ping.boot.web;
 
 import cn.procsl.ping.boot.web.component.AccessLoggerFilter;
+import cn.procsl.ping.boot.web.component.CommonErrorAttributes;
 import cn.procsl.ping.boot.web.component.GlobalExceptionHandler;
 import cn.procsl.ping.boot.web.component.SpringContextHolder;
 import cn.procsl.ping.boot.web.encrypt.*;
@@ -89,4 +90,10 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer {
     public GlobalExceptionHandler globalExceptionHandler() {
         return new GlobalExceptionHandler();
     }
+
+    @Bean
+    public CommonErrorAttributes errorAttributes() {
+        return new CommonErrorAttributes();
+    }
+
 }

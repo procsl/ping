@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.jpa.state;
+package cn.procsl.ping.boot.jpa.domain.state;
 
 import java.beans.Transient;
 
