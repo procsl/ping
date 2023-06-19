@@ -1,12 +1,10 @@
 package cn.procsl.ping.boot.web;
 
-import cn.procsl.ping.boot.web.component.AccessLoggerFilter;
-import cn.procsl.ping.boot.web.component.CommonErrorAttributes;
-import cn.procsl.ping.boot.web.component.GlobalExceptionHandler;
-import cn.procsl.ping.boot.web.component.SpringContextHolder;
+import cn.procsl.ping.boot.web.component.*;
 import cn.procsl.ping.boot.web.encrypt.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.SimpleTypeConverter;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -60,6 +58,7 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer {
         registry.addConverter(new DecryptConversionService(server));
     }
 
+
     @Bean
     @ConditionalOnMissingBean
     public EncryptDecryptService encryptDecryptService() {
@@ -103,9 +102,10 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer {
         return new CommonErrorAttributes();
     }
 
+//    @Bean
+//    @ConditionalOnMissingBean
+//    public DecryptArgumentResolverBeanPostProcessor decryptArgumentResolverBeanPostProcessor() {
+//        return new DecryptArgumentResolverBeanPostProcessor();
+//    }
 
-    @Override
-    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(new SecurityIdHandlerMethodArgumentResolver());
-    }
 }

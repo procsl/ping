@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 @Schema(description = "错误信息描述")
 public class ErrorVO extends MessageVO implements Serializable, ErrorEntity {
 
-    @Schema(description = "错误信息编码", example = "permission_denied")
+    @Schema(description = "错误信息编码", example = "PERMISSION_DENIED")
     private String code;
 
     public static ErrorVO build(@NonNull Exception e) {
