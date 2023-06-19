@@ -15,6 +15,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -24,8 +25,8 @@ import javax.inject.Provider;
 @SpringBootTest(classes = JpaTestApplication.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class JpaExtensionRepositoryImplTest {
 
-//    @Inject
-    Provider<ExtensionRepository> extensionRepository;
+    @Inject
+    ExtensionRepository extensionRepository;
 
     @Inject
     JpaRepository<TestEntity, Long> jpaRepository;
@@ -42,10 +43,16 @@ public class JpaExtensionRepositoryImplTest {
     @Test
     public void test() {
 
-        jpaRepository.deleteById(1L);
+        List<TestEntity> all = this.jpaRepository.findAll();
+        log.info("all: {}", all);
 
-        ExtensionRepository repo = extensionRepository.get();
-        repo.returnInt();
+        all = extensionRepository.findAllBy();
+        log.info("all: {}", all);
+    }
+
+    @Test
+    public void setJpaRepository() {
+
     }
 
 }

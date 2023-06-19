@@ -1,27 +1,29 @@
 package cn.procsl.ping.boot.jpa.support.extension;
 
+import jakarta.annotation.Nonnull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.aop.framework.ProxyFactory;
+import org.aopalliance.aop.Advice;
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.data.repository.core.RepositoryInformation;
 import org.springframework.data.repository.core.support.RepositoryFactoryBeanSupport;
 import org.springframework.data.repository.core.support.RepositoryFactoryCustomizer;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
-import org.springframework.data.repository.core.support.RepositoryProxyPostProcessor;
 
 
 @Slf4j
 public class JpaRepositoryFactoryCustomizer implements RepositoryFactoryCustomizer, BeanPostProcessor {
 
     @Override
-    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+    public Object postProcessBeforeInitialization(@Nonnull Object bean, @Nonnull String beanName) throws BeansException {
         if (bean instanceof RepositoryFactoryBeanSupport<?, ?, ?> repoSupport) {
-
             boolean bool = JpaExtensionRepository.class.isAssignableFrom(repoSupport.getObjectType());
+            log.info("增强接口名称: {}", repoSupport.getObjectType());
             if (bool) {
                 repoSupport.addRepositoryFactoryCustomizer(this);
-                log.info("增强接口名称: {}", repoSupport.getObjectType());
             }
         }
         return bean;
@@ -29,17 +31,23 @@ public class JpaRepositoryFactoryCustomizer implements RepositoryFactoryCustomiz
 
     @Override
     public void customize(RepositoryFactorySupport repositoryFactory) {
-        repositoryFactory.addRepositoryProxyPostProcessor(new RepositoryProxyPostProcessor() {
-            @Override
-            public void postProcess(ProxyFactory factory, RepositoryInformation repositoryInformation) {
-                log.info("test: ");
-                Class<?>[] interfaces = factory.getProxiedInterfaces();
-                for (Class<?> face : interfaces) {
-
-                }
-            }
+        repositoryFactory.addRepositoryProxyPostProcessor((factory, repositoryInformation) -> {
+            factory.addAdvice(new ExtensionMethodInterceptor(repositoryFactory, repositoryInformation));
         });
     }
 
+    @RequiredArgsConstructor
+    static class ExtensionMethodInterceptor implements MethodInterceptor {
+        final RepositoryFactorySupport repositoryFactory;
+        final RepositoryInformation repositoryInformation;
+
+        @Override
+
+        public Object invoke(@Nonnull MethodInvocation invocation) throws Throwable {
+            log.info("进入方法");
+            return "test";
+        }
+
+    }
 
 }
