@@ -21,6 +21,9 @@ public class TestEntity {
     @Column(length = 100)
     String name;
 
+    @Column
+    Integer age;
+
     @Embedded
     DomainAuditable auditable;
 
