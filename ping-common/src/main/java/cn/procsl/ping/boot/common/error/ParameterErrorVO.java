@@ -15,12 +15,12 @@ public class ParameterErrorVO extends ErrorVO {
 
     @Getter
     @Schema(description = "参数校验信息")
-    final List<Error> errors = new ArrayList<>(3);
+    final List<Error> errors = new ArrayList<>(2);
 
 
     @Builder
     public ParameterErrorVO(String code, String message) {
-        super(code, message);
+        super(humpToUnderline(code), message);
     }
 
     public void putErrorTips(String field, String tips) {

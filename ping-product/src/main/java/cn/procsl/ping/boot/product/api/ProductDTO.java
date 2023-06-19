@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.product.api;
 
-import cn.procsl.ping.boot.web.encrypt.Encrypt;
+import cn.procsl.ping.boot.web.encrypt.SecurityId;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,7 +10,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class ProductDTO implements Serializable {
 
-    @Encrypt
+    @SecurityId
     Long id;
 
     String productName;

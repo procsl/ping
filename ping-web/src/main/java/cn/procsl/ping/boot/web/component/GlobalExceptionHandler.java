@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.util.Date;
 import java.util.List;
 
 @Indexed
@@ -48,6 +50,21 @@ public class GlobalExceptionHandler {
 //        log.warn("未处理的异常:", e);
 //        return new MessageVO("服务器内部错误");
 //    }
+
+    @ResponseBody
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(value = MethodArgumentTypeMismatchException.class)
+    public ParameterErrorVO methodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
+        ParameterErrorVO errorVo = new ParameterErrorVO("MethodArgumentTypeMismatchException", "参数解析失败");
+        Object value = e.getValue();
+        if (value instanceof String || value instanceof Number || value instanceof Date) {
+            errorVo.putErrorTips(e.getName(), value.toString());
+        } else {
+            log.warn("参数解析错误: ", e);
+            errorVo.putErrorTips(e.getName(), "参数错误");
+        }
+        return errorVo;
+    }
 
     @ResponseBody
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)

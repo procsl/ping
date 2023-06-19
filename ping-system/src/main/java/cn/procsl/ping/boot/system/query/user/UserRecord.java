@@ -1,14 +1,14 @@
 package cn.procsl.ping.boot.system.query.user;
 
 import cn.procsl.ping.boot.system.domain.user.Gender;
-import cn.procsl.ping.boot.web.encrypt.Encrypt;
+import cn.procsl.ping.boot.web.encrypt.SecurityId;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.data.web.ProjectedPayload;
 
 @ProjectedPayload
 public interface UserRecord {
 
-    @Encrypt
+    @SecurityId
     @Schema(description = "用户ID")
     Long getId();
 

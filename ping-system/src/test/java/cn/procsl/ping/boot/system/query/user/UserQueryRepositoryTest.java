@@ -2,14 +2,14 @@ package cn.procsl.ping.boot.system.query.user;
 
 import cn.procsl.ping.boot.system.TestSystemApplication;
 import cn.procsl.ping.boot.system.domain.user.User;
-import com.blazebit.persistence.Criteria;
-import com.blazebit.persistence.CriteriaBuilder;
-import com.blazebit.persistence.CriteriaBuilderFactory;
-import com.blazebit.persistence.spi.CriteriaBuilderConfiguration;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceUnit;
-import lombok.experimental.StandardException;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -27,7 +27,6 @@ import java.util.Optional;
 
 @Slf4j
 @DisplayName("JPA投影查询测试")
-@Transactional
 @SpringBootTest(classes = TestSystemApplication.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class UserQueryRepositoryTest {
 
@@ -53,9 +52,18 @@ public class UserQueryRepositoryTest {
     @Test
     @Transactional(readOnly = true)
     public void findAll2() {
-        Optional<UserRecord> result = queryRepository.findOne((Specification<User>) (root, query, cb) -> cb.equal(root.get("name"), "admin"), UserRecord.class);
+        Optional<UserRecord> result = queryRepository.findOne(new UserSpec("admin"), UserRecord.class);
         log.info("test: {}", result.get());
     }
+
+    private record UserSpec(String n) implements Specification<User> {
+
+        @Override
+        public Predicate toPredicate(Root<User> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+            return cb.equal(root.get("name"), "admin");
+        }
+    }
+
 
     @Test
     public void test() {
@@ -69,16 +77,5 @@ public class UserQueryRepositoryTest {
     @Inject
     private EntityManager entityManager;
 
-    public CriteriaBuilderFactory createCriteriaBuilderFactory() {
-        CriteriaBuilderConfiguration config = Criteria.getDefault();
-        // do some configuration
-        return config.createCriteriaBuilderFactory(entityManagerFactory);
-    }
-
-    @Test
-    public void test2() {
-        CriteriaBuilderFactory factory = createCriteriaBuilderFactory();
-        CriteriaBuilder<User> create = factory.create(entityManager, User.class);
-    }
 
 }

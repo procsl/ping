@@ -14,5 +14,7 @@ import java.lang.annotation.*;
 @JacksonAnnotationsInside
 @JsonSerialize(using = EncryptProcessor.class)
 @JsonDeserialize(using = DecryptProcessor.class)
-public @interface Encrypt {
+public @interface SecurityId {
+
+
 }

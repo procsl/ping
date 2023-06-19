@@ -18,7 +18,7 @@ import java.util.Collection;
  * @author procsl
  * @date 2020/03/21
  */
-@AutoConfiguration(before = {JpaBaseConfiguration.class, ErrorMvcAutoConfiguration.class})
+@AutoConfiguration(before = {JpaBaseConfiguration.class})
 @ConditionalOnMissingBean(CommonAutoConfiguration.class)
 public class CommonAutoConfiguration {
 

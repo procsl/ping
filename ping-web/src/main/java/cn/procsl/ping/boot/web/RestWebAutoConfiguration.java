@@ -7,13 +7,18 @@ import cn.procsl.ping.boot.web.component.SpringContextHolder;
 import cn.procsl.ping.boot.web.encrypt.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.SearchStrategy;
+import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.format.FormatterRegistry;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.lang.reflect.Constructor;
@@ -26,6 +31,7 @@ import java.util.List;
  * @author procsl
  */
 @Slf4j
+@AutoConfiguration(before = ErrorMvcAutoConfiguration.class)
 @ConditionalOnMissingBean(RestWebAutoConfiguration.class)
 @ComponentScan(basePackages = "cn.procsl.ping.boot.web")
 public class RestWebAutoConfiguration implements WebMvcConfigurer {
@@ -92,8 +98,14 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
+    @ConditionalOnMissingBean(value = ErrorAttributes.class, search = SearchStrategy.CURRENT)
     public CommonErrorAttributes errorAttributes() {
         return new CommonErrorAttributes();
     }
 
+
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(new SecurityIdHandlerMethodArgumentResolver());
+    }
 }
