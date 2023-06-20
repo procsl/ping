@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "j_test_entity")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class TestEntity {
 
     @Id
@@ -27,4 +27,8 @@ public class TestEntity {
     @Embedded
     DomainAuditable auditable;
 
+    public TestEntity(String name, Integer age) {
+        this.name = name;
+        this.age = age;
+    }
 }

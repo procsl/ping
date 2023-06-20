@@ -3,13 +3,18 @@ package cn.procsl.ping.boot.jpa.support.extension;
 import cn.procsl.ping.boot.jpa.JpaTestApplication;
 import cn.procsl.ping.boot.jpa.domain.ExtensionRepository;
 import cn.procsl.ping.boot.jpa.domain.TestEntity;
+import com.github.jsonzou.jmockdata.JMockData;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnit;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -38,9 +43,10 @@ public class JpaExtensionRepositoryImplTest {
     @Inject
     EntityManager entityManager;
 
-    @Test
+    @RepeatedTest(10)
     public void test2() {
-        TestEntity test = entityManager.find(TestEntity.class, 1L);
+        jpaRepository.save(JMockData.mock(TestEntity.class));
+        List<TestEntity> test = jpaRepository.findAll();
         log.info("test: {}", test);
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
