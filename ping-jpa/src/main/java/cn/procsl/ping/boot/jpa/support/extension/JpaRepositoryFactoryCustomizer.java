@@ -21,8 +21,9 @@ public class JpaRepositoryFactoryCustomizer implements RepositoryFactoryCustomiz
     public Object postProcessBeforeInitialization(@Nonnull Object bean, @Nonnull String beanName) throws BeansException {
         if (bean instanceof RepositoryFactoryBeanSupport<?, ?, ?> repoSupport) {
             boolean bool = JpaExtensionRepository.class.isAssignableFrom(repoSupport.getObjectType());
-            log.info("增强接口名称: {}", repoSupport.getObjectType());
+            log.debug("发现repository接口: {}", repoSupport.getObjectType());
             if (bool) {
+                log.info("增强repository接口: {}", repoSupport.getObjectType());
                 repoSupport.addRepositoryFactoryCustomizer(this);
             }
         }

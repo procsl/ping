@@ -8,15 +8,15 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.repository.config.BootstrapMode;
 
-@SpringBootApplication(scanBasePackages = "cn.procsl.ping.boot.jpa")
-@EnableJpaRepositories(value = "cn.procsl.ping.boot.jpa.domain",
+@SpringBootApplication
+@EnableJpaRepositories(value = {"cn.procsl.ping.boot.jpa.domain", "cn.procsl.ping.boot.jpa.jpql"},
         basePackageClasses = {ExtensionRepository.class, StandRepository.class}
         , bootstrapMode = BootstrapMode.LAZY)
 @EntityScan("cn.procsl.ping.boot.jpa.domain")
-public class JpaTestApplication {
+public class TestJpaApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(JpaTestApplication.class, args);
+        SpringApplication.run(TestJpaApplication.class, args);
     }
 
 }

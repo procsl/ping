@@ -22,7 +22,7 @@ final public class DecryptConversionService implements Converter<String, Long>, 
 
 
     @Override
-    public boolean matches(TypeDescriptor sourceType, TypeDescriptor targetType) {
+    public boolean matches(@Nonnull TypeDescriptor sourceType, TypeDescriptor targetType) {
         return targetType.hasAnnotation(SecurityId.class);
     }
 }

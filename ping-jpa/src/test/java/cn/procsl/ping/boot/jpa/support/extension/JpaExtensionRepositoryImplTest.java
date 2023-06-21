@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.jpa.support.extension;
 
-import cn.procsl.ping.boot.jpa.JpaTestApplication;
+import cn.procsl.ping.boot.jpa.TestJpaApplication;
 import cn.procsl.ping.boot.jpa.domain.ExtensionRepository;
 import cn.procsl.ping.boot.jpa.domain.TestEntity;
 import com.github.jsonzou.jmockdata.JMockData;
@@ -12,26 +12,29 @@ import jakarta.persistence.criteria.Root;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnit;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.projection.EntityProjection;
+import org.springframework.data.projection.ProjectionInformation;
+import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
+import org.springframework.data.util.TypeInformation;
 import org.springframework.stereotype.Service;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
 @Validated
 @Transactional
 @Rollback
-@SpringBootTest(classes = JpaTestApplication.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@SpringBootTest(classes = TestJpaApplication.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class JpaExtensionRepositoryImplTest {
 
     @Inject
@@ -72,6 +75,13 @@ public class JpaExtensionRepositoryImplTest {
     @Test
     public void setJpaRepository() {
 
+//        TypeInformation
+        SpelAwareProxyProjectionFactory spelAwareProxyProjectionFactory = new SpelAwareProxyProjectionFactory();
+        ProjectionInformation entity = spelAwareProxyProjectionFactory.getProjectionInformation(TestEntity.class);
+        TypeInformation<TestEntity> type = TypeInformation.of(TestEntity.class);
+
+        EntityProjection<TestEntity, TestEntity> projection = EntityProjection.projecting(type, type, null, EntityProjection.ProjectionType.DTO);
+        List<Optional<String>> result = projection.map(item -> Optional.of("")).stream().toList();
     }
 
 }

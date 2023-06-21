@@ -9,7 +9,7 @@
     <property name="CONSOLE_LOG_PATTERN"
               value="%highlight(%date{yyyy-MM-dd HH:mm:ss}) %highlight(%-5level) %red([%thread]) %boldMagenta(%logger{50}) %highlight(%msg%n)"/>
 
-    <contextName>ping-jpa</contextName>
+    <contextName>ping-web</contextName>
 
     <!-- 控制台输出 -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
@@ -30,5 +30,4 @@
             level="INFO"/>
     <logger name="org.hibernate.hql.internal.ast" level="INFO"/>
     <logger name="cn.procsl.ping" level="TRACE"/>
-    <logger name="org.hibernate.resource.transaction.backend.jdbc.internal.JdbcResourceLocalTransactionCoordinatorImpl" level="INFO"/>
 </configuration>
