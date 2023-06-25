@@ -105,8 +105,8 @@ public class GlobalExceptionHandler {
     @ResponseBody
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value = HttpMessageNotReadableException.class)
-    public ErrorVO httpMessageNotReadableException() {
-        return ErrorVO.build(HttpMessageNotReadableException.class, "请求体不可为空");
+    public ErrorVO httpMessageNotReadableException(HttpMessageNotReadableException e) {
+        return ErrorVO.build(HttpMessageNotReadableException.class, "请求数据解析失败");
     }
 
 

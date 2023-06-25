@@ -1,22 +1,32 @@
 package cn.procsl.ping.boot.web;
 
-import cn.procsl.ping.boot.web.component.*;
+import cn.procsl.ping.boot.web.component.AccessLoggerFilter;
+import cn.procsl.ping.boot.web.component.CommonErrorAttributes;
+import cn.procsl.ping.boot.web.component.GlobalExceptionHandler;
+import cn.procsl.ping.boot.web.component.SpringContextHolder;
 import cn.procsl.ping.boot.web.encrypt.*;
+import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import jakarta.annotation.Nonnull;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.SimpleTypeConverter;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.SearchStrategy;
+import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
+import org.springframework.boot.jackson.JsonComponentModule;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.format.FormatterRegistry;
-import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.lang.reflect.Constructor;
@@ -32,9 +42,11 @@ import java.util.List;
 @AutoConfiguration(before = ErrorMvcAutoConfiguration.class)
 @ConditionalOnMissingBean(RestWebAutoConfiguration.class)
 @ComponentScan(basePackages = "cn.procsl.ping.boot.web")
-public class RestWebAutoConfiguration implements WebMvcConfigurer {
+public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProcessor {
 
     final ApplicationContext applicationContext;
+
+    final CollectionDecryptProcessor collectionDecryptProcessor = new CollectionDecryptProcessor();
 
     public RestWebAutoConfiguration(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
@@ -80,11 +92,8 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer {
     @Bean
     @ConditionalOnClass(name = MODEL_RESOLVER)
     @ConditionalOnMissingBean(type = MODEL_RESOLVER)
-    public Object modelResolver(ObjectMapper objectMapper) throws ClassNotFoundException,
-            NoSuchMethodException,
-            InvocationTargetException,
-            InstantiationException,
-            IllegalAccessException {
+    @SneakyThrows
+    public Object modelResolver(ObjectMapper objectMapper) {
         Class<?> resolver = Class.forName(MODEL_RESOLVER);
         Constructor<?> constructor = resolver.getConstructor(ObjectMapper.class);
         return constructor.newInstance(objectMapper);
@@ -101,11 +110,37 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer {
     public CommonErrorAttributes errorAttributes() {
         return new CommonErrorAttributes();
     }
-
-//    @Bean
-//    @ConditionalOnMissingBean
-//    public DecryptArgumentResolverBeanPostProcessor decryptArgumentResolverBeanPostProcessor() {
-//        return new DecryptArgumentResolverBeanPostProcessor();
+//
+//    @Override
+//    public void customize(Jackson2ObjectMapperBuilder jacksonObjectMapperBuilder) {
+//        jacksonObjectMapperBuilder.modules(modules -> {
+//
+//            SimpleModule simpleModule = null;
+//            for (Module module : modules) {
+//                if (module instanceof SimpleModule) {
+//                    simpleModule = (SimpleModule) module;
+//                    break;
+//                }
+//            }
+//
+//            if (simpleModule == null) {
+//                return;
+//            }
+//
+//
+//            simpleModule.setDeserializers(this.collectionDecryptProcessor.rebuild());
+//
+//        });
 //    }
+
+    @Override
+    public Object postProcessBeforeInitialization(@Nonnull Object bean,
+                                                  @Nonnull String beanName) throws BeansException {
+        if (bean instanceof JsonComponentModule jsonComponent) {
+            jsonComponent.setDeserializers(this.collectionDecryptProcessor.rebuild());
+        }
+
+        return bean;
+    }
 
 }

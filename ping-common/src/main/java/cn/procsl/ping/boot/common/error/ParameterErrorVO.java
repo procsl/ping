@@ -29,7 +29,7 @@ public class ParameterErrorVO extends ErrorVO {
     }
 
     @Override
-    @Schema(example = "E001")
+    @Schema(example = "SYSTEM_ERROR")
     public String getCode() {
         return super.getCode();
     }

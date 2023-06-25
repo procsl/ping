@@ -4,6 +4,8 @@ import cn.procsl.ping.boot.web.encrypt.SecurityId;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
+
 @RestController
 @RequestMapping
 @Slf4j
@@ -16,6 +18,16 @@ public class ProductController {
 
     @PostMapping("/v1/products")
     public void createProduct(@RequestBody ProductDTO productDTO) {
+        log.debug("创建商品: {}", productDTO);
+    }
+
+    @PutMapping("/v1/products")
+    public void createProduct2(@RequestBody Collection<Long> productDTO) {
+        log.debug("创建商品: {}", productDTO);
+    }
+
+    @PatchMapping("/v1/products")
+    public void createProduct3(@RequestBody Collection<String> productDTO) {
         log.debug("创建商品: {}", productDTO);
     }
 

@@ -4,8 +4,8 @@ import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.system.domain.rbac.Role;
 import cn.procsl.ping.boot.system.domain.rbac.Subject;
 import cn.procsl.ping.boot.system.domain.rbac.SubjectRoleSpec;
+import cn.procsl.ping.boot.web.encrypt.SecurityId;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +13,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Indexed;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,8 +34,13 @@ public class AccessController {
     @Operation(summary = "授予角色权限")
     @PostMapping(path = "/v1/system/users/{id}/roles")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void grant(@PathVariable("id") Long id,
-                      @RequestBody @NotNull @Validated @Schema(description = "角色ID") Collection<Long> roleIds) {
+    @Transactional(rollbackFor = Exception.class)
+//    @Schema(description = "角色ID", example = "[]")
+    public void grant(@PathVariable("id")
+                      @SecurityId Long id,
+                      @RequestBody
+                      @NotNull
+                      @Validated Collection<Long> roleIds) {
         Optional<Subject> optional = this.subjectJpaSpecificationExecutor.findOne(
                 new SubjectRoleSpec(id, null));
         Subject subject = optional.orElseThrow(() -> new BusinessException("目标用户不存在"));

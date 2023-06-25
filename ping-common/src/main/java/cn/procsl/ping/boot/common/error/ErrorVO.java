@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 @Schema(description = "错误信息描述")
 public class ErrorVO extends MessageVO implements Serializable, ErrorEntity {
 
-    @Schema(description = "错误信息编码", example = "PERMISSION_DENIED")
+    @Schema(description = "错误信息编码", example = "PERMISSION_DENIED_ERROR")
     private String code;
 
     public static ErrorVO build(@NonNull Exception e) {
@@ -46,7 +46,7 @@ public class ErrorVO extends MessageVO implements Serializable, ErrorEntity {
     }
 
     public static <A extends Exception> ErrorVO build(@NonNull Class<A> e, String message) {
-        String name = e.getName();
+        String name = e.getSimpleName();
         String code = humpToUnderline(name);
         return new ErrorVO(code, message);
     }
