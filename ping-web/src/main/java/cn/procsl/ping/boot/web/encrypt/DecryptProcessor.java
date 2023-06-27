@@ -11,7 +11,7 @@ import org.springframework.context.ApplicationContext;
 import java.io.IOException;
 
 @Slf4j
-final class DecryptProcessor extends JsonDeserializer<Long> {
+public final class DecryptProcessor extends JsonDeserializer<Long> {
 
     private EncryptDecryptService encryptDecryptService;
 

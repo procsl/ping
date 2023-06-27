@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.product.api;
 
-import cn.procsl.ping.boot.web.encrypt.SecurityId;
+import cn.procsl.ping.boot.web.annotation.SecurityId;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

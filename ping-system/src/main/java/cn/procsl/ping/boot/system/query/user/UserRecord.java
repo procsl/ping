@@ -1,7 +1,7 @@
 package cn.procsl.ping.boot.system.query.user;
 
 import cn.procsl.ping.boot.system.domain.user.Gender;
-import cn.procsl.ping.boot.web.encrypt.SecurityId;
+import cn.procsl.ping.boot.web.annotation.SecurityId;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.data.web.ProjectedPayload;
 

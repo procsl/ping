@@ -9,6 +9,9 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import jakarta.annotation.Nonnull;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -27,8 +30,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import javax.inject.Provider;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -45,8 +51,6 @@ import java.util.List;
 public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProcessor {
 
     final ApplicationContext applicationContext;
-
-    final CollectionDecryptProcessor collectionDecryptProcessor = new CollectionDecryptProcessor();
 
     public RestWebAutoConfiguration(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
@@ -74,12 +78,13 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProce
     @Bean
     @ConditionalOnMissingBean
     public EncryptDecryptService encryptDecryptService() {
-        return new EncryptAndDecryptService(new EncryptKeyService() {
-            @Override
-            public String getKey(EncryptContext context) {
-                return "1234567890";
-            }
-        }, new EncryptContextService() {
+        return new EncryptAndDecryptService(
+                new EncryptKeyService() {
+                    @Override
+                    public String getKey(EncryptContext context) {
+                        return "1234567890";
+                    }
+                }, new EncryptContextService() {
             @Override
             public EncryptContext getContext() {
                 return null;
@@ -110,34 +115,12 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProce
     public CommonErrorAttributes errorAttributes() {
         return new CommonErrorAttributes();
     }
-//
-//    @Override
-//    public void customize(Jackson2ObjectMapperBuilder jacksonObjectMapperBuilder) {
-//        jacksonObjectMapperBuilder.modules(modules -> {
-//
-//            SimpleModule simpleModule = null;
-//            for (Module module : modules) {
-//                if (module instanceof SimpleModule) {
-//                    simpleModule = (SimpleModule) module;
-//                    break;
-//                }
-//            }
-//
-//            if (simpleModule == null) {
-//                return;
-//            }
-//
-//
-//            simpleModule.setDeserializers(this.collectionDecryptProcessor.rebuild());
-//
-//        });
-//    }
 
     @Override
     public Object postProcessBeforeInitialization(@Nonnull Object bean,
                                                   @Nonnull String beanName) throws BeansException {
         if (bean instanceof JsonComponentModule jsonComponent) {
-            jsonComponent.setDeserializers(this.collectionDecryptProcessor.rebuild());
+            jsonComponent.setDeserializers(new CollectionSimpleDeserializers());
         }
 
         return bean;
