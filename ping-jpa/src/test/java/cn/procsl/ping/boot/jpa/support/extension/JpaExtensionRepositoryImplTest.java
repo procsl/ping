@@ -3,6 +3,7 @@ package cn.procsl.ping.boot.jpa.support.extension;
 import cn.procsl.ping.boot.jpa.TestJpaApplication;
 import cn.procsl.ping.boot.jpa.domain.ExtensionRepository;
 import cn.procsl.ping.boot.jpa.domain.TestEntity;
+import cn.procsl.ping.boot.jpa.domain.TestProjection;
 import com.github.jsonzou.jmockdata.JMockData;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Tuple;
@@ -10,10 +11,14 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.projection.ProjectionFactory;
+import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
 import org.springframework.data.projection.EntityProjection;
 import org.springframework.data.projection.ProjectionInformation;
 import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
@@ -46,6 +51,9 @@ public class JpaExtensionRepositoryImplTest {
     @Inject
     EntityManager entityManager;
 
+//    @Inject
+//    ConversionService conversionService;
+
     @RepeatedTest(10)
     public void test2() {
         jpaRepository.save(JMockData.mock(TestEntity.class));
@@ -56,7 +64,8 @@ public class JpaExtensionRepositoryImplTest {
         CriteriaQuery<Tuple> tupleQuery = builder.createTupleQuery();
         Root<TestEntity> root = tupleQuery.from(TestEntity.class);
 
-        CriteriaQuery<Tuple> select = tupleQuery.multiselect(root.get("name"), root.get("id"), root.get("auditable").get("createdBy")).where(builder.equal(root.get("name"), "lp"));
+
+        CriteriaQuery<Tuple> select = tupleQuery.multiselect(root.get("name"), root.get("id"), root.get("auditable").get("createdBy"));
 
         List<Tuple> result = entityManager.createQuery(select).getResultList();
         log.info("result: {}", result);
@@ -72,6 +81,19 @@ public class JpaExtensionRepositoryImplTest {
         log.info("all: {}", all);
     }
 
+    @Bean
+    public SpelAwareProxyProjectionFactory spelAwareProxyProjectionFactory() {
+        return new SpelAwareProxyProjectionFactory();
+    }
+
+    @Test
+    public void projection() {
+        final ProjectionFactory projectionFactory = new SpelAwareProxyProjectionFactory();
+        val test = projectionFactory.createProjection(TestProjection.class);
+        log.info("实体: {}", test);
+    }
+
+
     @Test
     public void setJpaRepository() {
 
@@ -83,5 +105,6 @@ public class JpaExtensionRepositoryImplTest {
         EntityProjection<TestEntity, TestEntity> projection = EntityProjection.projecting(type, type, null, EntityProjection.ProjectionType.DTO);
         List<Optional<String>> result = projection.map(item -> Optional.of("")).stream().toList();
     }
+
 
 }
