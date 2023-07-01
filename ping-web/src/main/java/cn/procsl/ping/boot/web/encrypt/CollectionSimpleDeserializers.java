@@ -12,8 +12,8 @@ public class CollectionSimpleDeserializers extends SimpleDeserializers {
     final CollectionDecryptProcessor collectionDecryptProcessor;
 
 
-    public CollectionSimpleDeserializers() {
-        this.collectionDecryptProcessor = new CollectionDecryptProcessor();
+    public CollectionSimpleDeserializers(EncryptDecryptService server) {
+        this.collectionDecryptProcessor = new CollectionDecryptProcessor(server);
     }
 
     // TODO 暂时只处理 collection 的子类型

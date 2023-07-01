@@ -29,7 +29,7 @@ public class ParameterErrorVO extends ErrorVO {
     }
 
     @Override
-    @Schema(example = "SYSTEM_ERROR")
+    @Schema(example = "METHOD_ARGUMENT_NOT_VALID_ERROR")
     public String getCode() {
         return super.getCode();
     }
@@ -44,7 +44,9 @@ public class ParameterErrorVO extends ErrorVO {
     @AllArgsConstructor
     @Getter
     public static class Error implements Serializable {
+        @Schema(description = "对应错误的字段名称", example = "field")
         String field;
+        @Schema(description = "对应的错误提示信息", example = "不可为空")
         String tips;
     }
 
