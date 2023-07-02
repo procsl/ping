@@ -1,4 +1,4 @@
-package cn.procsl.ping.app.web;
+package cn.procsl.ping.app.query;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Indexed;

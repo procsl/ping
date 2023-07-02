@@ -38,7 +38,7 @@ public class JpaRepositoryFactoryCustomizer implements RepositoryFactoryCustomiz
     }
 
     @RequiredArgsConstructor
-    static class ExtensionMethodInterceptor implements MethodInterceptor {
+    final static class ExtensionMethodInterceptor implements MethodInterceptor {
         final RepositoryFactorySupport repositoryFactory;
         final RepositoryInformation repositoryInformation;
 
