@@ -2,6 +2,7 @@ package cn.procsl.ping.boot.web.component;
 
 import cn.procsl.ping.boot.common.error.ErrorVO;
 import cn.procsl.ping.boot.common.error.ParameterErrorVO;
+import cn.procsl.ping.boot.web.encrypt.DecryptException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -115,6 +116,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
     public ErrorVO httpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException exception) {
         return ErrorVO.build(exception, String.format("不支持[%s]请求方式", exception.getMethod()));
+    }
+
+    @ResponseBody
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(value = DecryptException.class)
+    public ErrorVO decryptException(DecryptException exception) {
+        return ErrorVO.build(exception, String.format("请求数据解析失败: %s", exception.getSource()));
     }
 
 }

@@ -16,9 +16,7 @@ final public class DecryptConversionService implements Converter<String, Long>, 
 
     @Override
     public Long convert(@Nonnull String source) {
-//        Long res = decryptService.decryptByContext(source);
-        log.info("test");
-        return 1L;
+        return decryptService.decryptByContext(source);
     }
 
 

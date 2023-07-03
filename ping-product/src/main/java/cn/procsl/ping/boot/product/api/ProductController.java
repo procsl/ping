@@ -1,10 +1,14 @@
 package cn.procsl.ping.boot.product.api;
 
 import cn.procsl.ping.boot.web.annotation.SecurityId;
-import cn.procsl.ping.boot.web.annotation.SecurityIds;
+import cn.procsl.ping.boot.web.annotation.RequestBodySecurityIds;
+import jakarta.servlet.annotation.HttpConstraint;
+import jakarta.servlet.annotation.HttpMethodConstraint;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
@@ -29,7 +33,8 @@ public class ProductController {
     }
 
     @PutMapping("/v1/products")
-    @SecurityIds
+    @RequestBodySecurityIds
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void createProduct2(@RequestBody Collection<Long> ids) {
         log.debug("创建商品: {}", ids);
     }
@@ -40,8 +45,8 @@ public class ProductController {
     }
 
     @GetMapping("/v1/products")
-    public ProductDTO findProduct(@RequestParam(required = false) @SecurityId Long[] ids) {
-        return new ProductDTO(ids[0], "你好啊");
+    public ProductDTO findProduct(@RequestParam(required = false)  @SecurityId Long id) {
+        return new ProductDTO(id, "你好啊");
     }
 
 

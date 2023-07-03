@@ -7,7 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.annotation.Nullable;
+
 import jakarta.persistence.*;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,8 +25,9 @@ import java.util.stream.Collectors;
 public class Role implements Serializable {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.TABLE)
     Long id;
+
     String name;
 
     @ManyToMany
@@ -83,10 +86,10 @@ public class Role implements Serializable {
     @SuppressWarnings("unchecked")
     public <T extends Permission> Collection<T> getPermissions(Class<T> clazz) {
         return this.getPermissions()
-                   .stream()
-                   .filter(item -> item.getClass() == clazz)
-                   .map(item -> (T) item)
-                   .collect(Collectors.toUnmodifiableList());
+                .stream()
+                .filter(item -> item.getClass() == clazz)
+                .map(item -> (T) item)
+                .collect(Collectors.toUnmodifiableList());
     }
 
 }

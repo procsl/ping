@@ -1,0 +1,155 @@
+package cn.procsl.ping.boot.system.api.rbac;
+
+import cn.procsl.ping.boot.system.TestSystemApplication;
+import cn.procsl.ping.boot.system.api.LoginUtils;
+import cn.procsl.ping.boot.system.api.user.RegisterDTO;
+import cn.procsl.ping.boot.system.api.user.UserController;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.github.jsonzou.jmockdata.JMockData;
+import com.github.jsonzou.jmockdata.MockConfig;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockHttpSession;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
+
+import static com.github.jsonzou.jmockdata.JMockData.mock;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@Slf4j
+@Rollback
+@Transactional
+@AutoConfigureMockMvc
+@SpringBootTest(classes = TestSystemApplication.class, webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+public class AccessControllerTest {
+    @Inject
+    MockMvc mockMvc;
+
+    @Inject
+    UserController userController;
+
+    JsonMapper jsonMapper = new JsonMapper();
+    List<String> uid = new ArrayList<>();
+
+    List<String> rid = new ArrayList<>();
+
+    AtomicLong gid = new AtomicLong();
+    MockHttpSession session;
+
+    @BeforeEach
+    void setUp() throws Exception {
+
+        this.session = LoginUtils.toLogin(mockMvc);
+
+        MockConfig config = new MockConfig().stringRegex("[a-zA-Z0-9_]{5,20}");
+        for (int i = 0; i < 10; i++) {
+            String account = mock(String.class, config);
+            RegisterDTO user = new RegisterDTO("随机账户", account, "password");
+            mockMvc.perform(
+                            post("/v1/users")
+                                    .contentType(APPLICATION_JSON)
+                                    .content(jsonMapper.writeValueAsString(user))
+                                    .session(session)
+                    )
+                    .andDo(result -> {
+                        String str = result.getResponse().getContentAsString();
+                        uid.add(str);
+                    });
+
+            List<Long> pid = new ArrayList<>();
+            {
+                val permission = JMockData.mock(PermissionCreateDTO.class);
+                permission.setType(PermissionType.page);
+                mockMvc.perform(
+                                post("/v1/permissions")
+                                        .contentType(APPLICATION_JSON)
+                                        .content(jsonMapper.writeValueAsString(permission))
+                                        .session(session)
+                        )
+                        .andExpect(status().is2xxSuccessful())
+                        .andDo(result -> {
+                            String str = result.getResponse().getContentAsString();
+                            PermissionVO permissionVO = this.jsonMapper.readValue(str, PermissionVO.class);
+                            log.info("PermissionVO:{}", permissionVO);
+                            pid.add(permissionVO.getId());
+                        });
+            }
+
+            RoleGrantDTO role = new RoleGrantDTO(mock(String.class, config), pid);
+            mockMvc.perform(
+                            post("/v1/roles")
+                                    .contentType(APPLICATION_JSON)
+                                    .content(jsonMapper.writeValueAsString(role))
+                                    .session(session)
+                    )
+                    .andExpect(status().is2xxSuccessful())
+                    .andExpect(content().contentType(APPLICATION_JSON))
+                    .andDo(result -> rid.add(role.getName()));
+        }
+        log.info("BeforeEach is end! uid:{}, rid:{}", uid, rid);
+    }
+
+    @Test
+    void grant() throws Exception {
+        MockConfig intRange = new MockConfig().intRange(0, uid.size() - 1);
+        MockConfig nameRange = new MockConfig().intRange(1, uid.size() - 1);
+        Integer index1 = mock(Integer.class, nameRange);
+        Integer index2 = mock(Integer.class, nameRange);
+        List<String> body;
+        if (index1 < index2) {
+            body = rid.subList(index1, index2);
+        } else if (index1 > index2) {
+            body = rid.subList(index2, index1);
+        } else {
+            body = rid.subList(0, 1);
+        }
+        gid.set(Long.parseLong(uid.get(JMockData.mock(Integer.class, intRange))));
+        String json = jsonMapper.writeValueAsString(body);
+        mockMvc.perform(
+                        post("/v1/users/{id}/roles", gid.get())
+                                .contentType(APPLICATION_JSON)
+                                .content(json)
+                                .session(session)
+                )
+                .andExpect(status().is2xxSuccessful());
+    }
+
+    @Test
+    void findSubjects() throws Exception {
+        this.grant();
+        mockMvc.perform(get("/v1/users/{id}/roles", gid.get())
+                        .session(session)
+                        .accept(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isNotEmpty())
+                .andDo(print())
+                .andExpect(result -> {
+                    String json = result.getResponse().getContentAsString();
+                    JsonNode tree = this.jsonMapper.readTree(json);
+                    for (JsonNode node : tree) {
+                        String name = node.get("name").asText();
+                        Assertions.assertTrue(rid.contains(name));
+                    }
+                });
+    }
+
+
+}

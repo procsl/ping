@@ -19,7 +19,7 @@ import java.io.Serializable;
 public class Config implements Serializable {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.TABLE)
     Long id;
 
     @Column(unique = true)

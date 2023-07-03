@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import jakarta.persistence.*;
+
 import java.io.Serializable;
 import java.util.*;
 
@@ -18,7 +19,7 @@ import java.util.*;
 public class Subject implements Serializable {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.TABLE)
     Long id;
 
     @Column(updatable = false)

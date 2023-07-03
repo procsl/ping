@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Schema(description = "消息VO")
 public class MessageVO implements Serializable {
 
-    @Schema(description = "错误信息或提示信息")
+    @Schema(description = "错误信息或提示信息", example = "错误信息")
     @NonNull
     final String message;
 

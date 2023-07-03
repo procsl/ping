@@ -6,6 +6,7 @@ import lombok.*;
 import org.springframework.util.ObjectUtils;
 
 import jakarta.persistence.*;
+
 import java.io.Serializable;
 import java.util.function.Function;
 
@@ -23,7 +24,7 @@ import java.util.function.Function;
 public abstract class Permission implements Serializable, DiscriminatorValueFinder {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.TABLE)
     Long id;
 
     @Override

@@ -16,14 +16,14 @@ import jakarta.validation.constraints.NotNull;
 @Getter
 @Setter(value = AccessLevel.PACKAGE)
 @Entity
-@Table(name = "s_account")
+@Table(name = "s_account", uniqueConstraints = @UniqueConstraint(name = "name", columnNames = {"name"}))
 @NoArgsConstructor
 @AllArgsConstructor
 @RepositoryCreator
 public class Account implements Stateful<AccountState> {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.TABLE)
     Long id;
 
     @NotBlank

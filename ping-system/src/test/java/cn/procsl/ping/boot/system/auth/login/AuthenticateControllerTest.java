@@ -4,7 +4,7 @@ import cn.procsl.ping.boot.system.TestSystemApplication;
 import cn.procsl.ping.boot.system.domain.user.Authenticate;
 import cn.procsl.ping.boot.system.domain.user.AuthenticateSpec;
 import cn.procsl.ping.boot.system.domain.user.AuthenticateState;
-import cn.procsl.ping.boot.system.web.LoginUtils;
+import cn.procsl.ping.boot.system.api.LoginUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;

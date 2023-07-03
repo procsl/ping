@@ -5,13 +5,8 @@ import cn.procsl.ping.boot.web.component.CommonErrorAttributes;
 import cn.procsl.ping.boot.web.component.GlobalExceptionHandler;
 import cn.procsl.ping.boot.web.component.SpringContextHolder;
 import cn.procsl.ping.boot.web.encrypt.*;
-import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import jakarta.annotation.Nonnull;
-import jakarta.servlet.http.HttpServletRequest;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -20,7 +15,6 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.SearchStrategy;
-import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 import org.springframework.boot.jackson.JsonComponentModule;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -29,14 +23,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.format.FormatterRegistry;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
-import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import javax.inject.Provider;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 /**
@@ -120,7 +109,8 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProce
     public Object postProcessBeforeInitialization(@Nonnull Object bean,
                                                   @Nonnull String beanName) throws BeansException {
         if (bean instanceof JsonComponentModule jsonComponent) {
-            jsonComponent.setDeserializers(new CollectionSimpleDeserializers());
+            EncryptDecryptService server = this.applicationContext.getBean(EncryptDecryptService.class);
+            jsonComponent.setDeserializers(new CollectionSimpleDeserializers(server));
         }
 
         return bean;

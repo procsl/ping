@@ -55,7 +55,7 @@ public class CaptchaController {
                                    @RequestParam(defaultValue = "48", required = false) Integer height)
             throws IOException {
 
-        Captcha captcha = new SpecCaptcha();
+        Captcha captcha = new SpecCaptcha(width, height);
 
         long id = System.currentTimeMillis() + auto.getAndIncrement();
 
