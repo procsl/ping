@@ -39,13 +39,13 @@ public class UserController {
 
     final RoleSettingService roleSettingService;
 
-    final AffordanceModelFactory factory;
+//    final AffordanceModelFactory factory;
 
     @Operation(summary = "创建用户")
     @PostMapping(path = "/v1/system/users")
     @ResponseStatus(HttpStatus.CREATED)
     @Transactional(rollbackFor = Exception.class)
-    public RepresentationModel register(@Validated @RequestBody RegisterDTO registerDTO) {
+    public void register(@Validated @RequestBody RegisterDTO registerDTO) {
 
         String password = registerDTO.getPassword();
         User user = User.creator(registerDTO.getNickName(), registerDTO.getAccount(),

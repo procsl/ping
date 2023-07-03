@@ -17,8 +17,12 @@ import java.util.Set;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Menu implements AdjacencyNode<Long, MenuNode> {
 
+    @Transient
+    boolean isNewInstance = false;
+
     @Id
-    @GeneratedValue
+    @Access(AccessType.PROPERTY)
+    @GeneratedValue(strategy = GenerationType.TABLE)
     Long id;
 
     @Column(nullable = false, length = 40)
@@ -31,12 +35,30 @@ public class Menu implements AdjacencyNode<Long, MenuNode> {
     Integer depth;
 
     @ElementCollection
-    @CollectionTable(joinColumns = @JoinColumn(name = "id"))
+    @CollectionTable(joinColumns = @JoinColumn(name = "id", table = "s_menu_path"))
     Set<MenuNode> path;
 
     @Override
     public MenuNode createPathNodeByCurrent() {
         return new MenuNode(id, parentId);
+    }
+
+    public Menu(String name, Long parentId, Integer depth, Set<MenuNode> path) {
+        this.isNewInstance = true;
+        this.name = name;
+        this.parentId = parentId;
+        this.depth = depth;
+        if (!path.isEmpty()) {
+            this.path = new HashSet<>(path);
+        }
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+        if (isNewInstance) {
+            this.addPathNode(this.createPathNodeByCurrent());
+            this.isNewInstance = false;
+        }
     }
 
     @Override
@@ -49,17 +71,16 @@ public class Menu implements AdjacencyNode<Long, MenuNode> {
     }
 
     @Override
-    public void addPathNodes(Collection<MenuNode> nodes) {
+    public void addPathNodes(@NonNull Collection<MenuNode> nodes) {
         initPathCollection();
         this.path.addAll(nodes);
     }
 
     @Override
-    public void addPathNode(MenuNode node) {
+    public void addPathNode(@NonNull MenuNode node) {
         initPathCollection();
         this.path.add(node);
     }
-
 
     void cleanPath() {
         initPathCollection();
@@ -72,5 +93,19 @@ public class Menu implements AdjacencyNode<Long, MenuNode> {
         }
     }
 
+    public static Menu createRoot(String name) {
+        return new Menu(name, SUPER_ROOT_ID, ROOT_DEPTH, new HashSet<>());
+    }
 
+    public Menu createChild(String name) {
+        if (this.isNewInstance) {
+            throw new IllegalArgumentException("需要先持久化生成ID");
+        }
+        return new Menu(name, this.getId(), this.getDepth() + 1, this.getPath());
+    }
+
+    @Override
+    public String toString() {
+        return "{id=" + id + ", name='" + name + '\'' + ", parentId=" + parentId + ", depth=" + depth + '}';
+    }
 }

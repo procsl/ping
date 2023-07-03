@@ -18,6 +18,7 @@ import java.util.Set;
 public interface AdjacencyNode<ID extends Serializable, T extends AdjacencyPathNode<ID>> {
 
     int ROOT_DEPTH = 0;
+    Long SUPER_ROOT_ID = 0L;
 
     @Id
     ID getId();
@@ -67,4 +68,5 @@ public interface AdjacencyNode<ID extends Serializable, T extends AdjacencyPathN
     void addPathNodes(Collection<T> nodes);
 
     void addPathNode(T node);
+
 }

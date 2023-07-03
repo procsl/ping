@@ -8,31 +8,25 @@ import lombok.*;
 @Setter
 @Getter
 @Embeddable
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MenuNode implements AdjacencyPathNode<Long> {
 
-    Long id;
+    @Column(updatable = false, nullable = false)
+    Long currentId;
 
-    @Column(updatable = false)
-    Long pathId;
+    @Column(updatable = false, nullable = false)
+    Long parentId;
 
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        MenuNode menuNode = (MenuNode) o;
-
-        if (!getId().equals(menuNode.getId())) return false;
-        return getPathId().equals(menuNode.getPathId());
+    public MenuNode(@NonNull Long currentId, @NonNull Long parentId) {
+        this.currentId = currentId;
+        this.parentId = parentId;
     }
 
     @Override
-    public int hashCode() {
-        int result = getId().hashCode();
-        result = 31 * result + getPathId().hashCode();
-        return result;
+    public String toString() {
+        return "{" +
+                "currentId=" + currentId +
+                ", parentId=" + parentId +
+                '}';
     }
 }

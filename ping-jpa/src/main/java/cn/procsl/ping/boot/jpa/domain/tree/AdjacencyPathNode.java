@@ -1,6 +1,8 @@
 package cn.procsl.ping.boot.jpa.domain.tree;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.MappedSuperclass;
 
 import java.io.Serializable;
 
@@ -22,23 +24,18 @@ public interface AdjacencyPathNode<ID extends Serializable> extends Serializable
      */
     @Deprecated
     @Column(updatable = false, insertable = false)
-    default ID getId() {
-        return null;
-    }
+    ID getCurrentId();
 
 
-    @Access(value = AccessType.PROPERTY)
-    default void setId(ID id) {
-    }
+    void setCurrentId(ID id);
 
     /**
      * 路径树 父节点ID
      *
      * @return parent id
      */
-    ID getPathId();
+    ID getParentId();
 
-    default void setPathId(ID id) {
-    }
+    void setParentId(ID id);
 
 }
