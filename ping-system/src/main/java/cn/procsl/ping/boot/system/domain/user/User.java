@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import jakarta.persistence.*;
+
 import java.io.Serializable;
 
 @Getter
@@ -19,7 +20,7 @@ import java.io.Serializable;
 public class User implements Serializable {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.TABLE)
     Long id;
 
     @Schema(defaultValue = "用户名称")
@@ -39,7 +40,11 @@ public class User implements Serializable {
 
     public static User creator(String name, String account, String password) {
         User user = new User();
-        user.name = name;
+        if (name == null || name.isEmpty()) {
+            user.name = account;
+        } else {
+            user.name = name;
+        }
         user.gender = Gender.unknown;
         user.account = Account.create(account, password);
         return user;

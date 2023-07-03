@@ -3,12 +3,14 @@ package cn.procsl.ping.boot.system.api.user;
 import cn.procsl.ping.boot.captcha.domain.CaptchaType;
 import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
 import cn.procsl.ping.boot.common.dto.MessageVO;
-import cn.procsl.ping.boot.common.error.BusinessException;
 import cn.procsl.ping.boot.common.event.Publisher;
 import cn.procsl.ping.boot.system.domain.user.*;
-import cn.procsl.ping.boot.system.domain.user.Authenticate;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.security.PermitAll;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
@@ -19,11 +21,6 @@ import org.springframework.stereotype.Indexed;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.annotation.security.PermitAll;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 import java.util.Optional;
 
@@ -61,11 +58,11 @@ public class AuthenticateController {
     Authenticate findCurrentAuthentication(HttpServletRequest request) {
         HttpSession httpSession = request.getSession(false);
         if (httpSession == null) {
-            throw new BusinessException("尚未登录,请登录");
+            throw new AuthenticateException("尚未登录,请登录");
         }
         Long id = (Long) httpSession.getAttribute(AUTHENTICATION_KEY);
         if (id == null) {
-            throw new BusinessException("尚未登录,请登录");
+            throw new AuthenticateException("尚未登录,请登录");
         }
         return this.authenticationLongJpaRepository.getReferenceById(id);
     }
@@ -81,7 +78,7 @@ public class AuthenticateController {
 
         Object auth = request.getSession().getAttribute(AUTHENTICATION_KEY);
         if (auth != null) {
-            throw new BusinessException("用户已登录, 请先注销登录");
+            throw new AuthenticateException("用户已登录, 请先注销登录");
 //            this.deleteSession(request, response);
         }
         Optional<User> optional = this.userJpaSpecificationExecutor.findOne(new UserSpec(details.getAccount()));

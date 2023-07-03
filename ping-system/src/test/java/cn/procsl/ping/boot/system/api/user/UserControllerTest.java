@@ -54,38 +54,38 @@ public class UserControllerTest {
 
         MockConfig config = new MockConfig().stringRegex("[a-zA-Z0-9_]{5,20}");
         String account = mock(String.class, config);
-        RegisterDTO user = new RegisterDTO(account, "password");
+        RegisterDTO user = new RegisterDTO("超级管理员", account, "password");
         mockMvc.perform(
-                       post("/v1/users")
-                               .contentType(APPLICATION_JSON)
-                               .content(jsonMapper.writeValueAsString(user))
-                               .session(this.session)
-               )
-               .andExpect(status().is2xxSuccessful())
-               .andDo(result -> {
-                   String str = result.getResponse().getContentAsString();
-                   log.debug("响应体为:{}", str);
-                   gid.set(Long.parseLong(str));
-               })
-               .andExpect(status().is2xxSuccessful());
+                        post("/v1/users")
+                                .contentType(APPLICATION_JSON)
+                                .content(jsonMapper.writeValueAsString(user))
+                                .session(this.session)
+                )
+                .andExpect(status().is2xxSuccessful())
+                .andDo(result -> {
+                    String str = result.getResponse().getContentAsString();
+                    log.debug("响应体为:{}", str);
+                    gid.set(Long.parseLong(str));
+                })
+                .andExpect(status().is2xxSuccessful());
         log.info("BeforeEach is end!");
     }
 
     @Test
     public void register() throws Exception {
-        RegisterDTO user = new RegisterDTO("program_chen@foxmail.com", "password");
+        RegisterDTO user = new RegisterDTO("普通账户", "program_chen@foxmail.com", "password");
         mockMvc.perform(
-                       post("/v1/users")
-                               .contentType(APPLICATION_JSON)
-                               .content(jsonMapper.writeValueAsString(user))
-                               .session(this.session)
-               )
-               .andExpect(status().is2xxSuccessful())
-               .andExpect(content().contentType(APPLICATION_JSON))
-               .andDo(result -> {
-                   String str = result.getResponse().getContentAsString();
-                   Assertions.assertNotNull(str);
-               });
+                        post("/v1/users")
+                                .contentType(APPLICATION_JSON)
+                                .content(jsonMapper.writeValueAsString(user))
+                                .session(this.session)
+                )
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andDo(result -> {
+                    String str = result.getResponse().getContentAsString();
+                    Assertions.assertNotNull(str);
+                });
 
     }
 
@@ -100,7 +100,7 @@ public class UserControllerTest {
                         .accept(APPLICATION_JSON);
 
         mockMvc.perform(builder)
-               .andExpect(status().is2xxSuccessful());
+                .andExpect(status().is2xxSuccessful());
     }
 
     @Test
@@ -113,18 +113,18 @@ public class UserControllerTest {
                         .accept(APPLICATION_JSON);
 
         mockMvc.perform(builder).andExpect(status().isOk())
-               .andExpect(content().contentType(APPLICATION_JSON))
-               .andExpect(jsonPath("$.content").isNotEmpty())
-               .andExpect(jsonPath("$.content").isArray())
-               .andExpect(jsonPath("$.content[*].id").isNotEmpty())
-               .andExpect(jsonPath("$.content[*].name").isNotEmpty())
-               .andExpect(jsonPath("$.content[*].gender").isNotEmpty())
-               .andExpect(jsonPath("$.content[*].remark").isNotEmpty())
-               .andExpect(jsonPath("$.content[*].account").isNotEmpty())
-               .andExpect(jsonPath("$.content[*].account.name").isNotEmpty())
-               .andExpect(jsonPath("$.content[*].account.state").isNotEmpty())
-               .andExpect(jsonPath("$.limit").value("1"))
-               .andExpect(jsonPath("$.empty").value("false"))
-               .andDo(print());
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.content").isNotEmpty())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content[*].id").isNotEmpty())
+                .andExpect(jsonPath("$.content[*].name").isNotEmpty())
+                .andExpect(jsonPath("$.content[*].gender").isNotEmpty())
+                .andExpect(jsonPath("$.content[*].remark").isNotEmpty())
+                .andExpect(jsonPath("$.content[*].account").isNotEmpty())
+                .andExpect(jsonPath("$.content[*].account.name").isNotEmpty())
+                .andExpect(jsonPath("$.content[*].account.state").isNotEmpty())
+                .andExpect(jsonPath("$.limit").value("1"))
+                .andExpect(jsonPath("$.empty").value("false"))
+                .andDo(print());
     }
 }
