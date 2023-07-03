@@ -41,7 +41,7 @@ public class SystemAutoConfiguration implements WebMvcConfigurer {
 
     @Configuration
     @EnableDomainRepositories(basePackages = "cn.procsl.ping.boot.system.query")
-    public static class DomainRepositoryConfigure {
+    public static class DomainRepositoryConfigurer {
 
     }
 
