@@ -39,7 +39,7 @@ public class UserController {
 
     final RoleSettingService roleSettingService;
 
-    final AffordanceModelFactory factory = new AffordanceModelFactory();
+    final AffordanceModelFactory factory;
 
     @Operation(summary = "创建用户")
     @PostMapping(path = "/v1/system/users")
