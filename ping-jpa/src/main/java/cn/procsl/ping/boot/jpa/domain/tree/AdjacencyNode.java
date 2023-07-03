@@ -5,6 +5,7 @@ import lombok.NonNull;
 import org.springframework.util.ObjectUtils;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -44,7 +45,7 @@ public interface AdjacencyNode<ID extends Serializable, T extends AdjacencyPathN
      *
      * @return 返回当前节点的 path
      */
-    T currentPathNode();
+    T createPathNodeByCurrent();
 
     /**
      * 修改父节点
@@ -54,11 +55,16 @@ public interface AdjacencyNode<ID extends Serializable, T extends AdjacencyPathN
     void changeParent(@NonNull AdjacencyNode<ID, T> parent);
 
     /**
-     * 查找分隔符
+     * 分隔符
      *
      * @return 分隔符
      */
-    default String findDelimiter() {
+    @Transient
+    default String getDelimiter() {
         return "/";
     }
+
+    void addPathNodes(Collection<T> nodes);
+
+    void addPathNode(T node);
 }

@@ -22,12 +22,12 @@ public interface AdjacencyPathNode<ID extends Serializable> extends Serializable
      */
     @Deprecated
     @Column(updatable = false, insertable = false)
-    @Access(value = AccessType.PROPERTY)
     default ID getId() {
         return null;
     }
 
 
+    @Access(value = AccessType.PROPERTY)
     default void setId(ID id) {
     }
 
@@ -41,13 +41,4 @@ public interface AdjacencyPathNode<ID extends Serializable> extends Serializable
     default void setPathId(ID id) {
     }
 
-    /**
-     * 当前节点相对于root节点id的序号, root节点为seq为0
-     *
-     * @return seq
-     */
-    Integer getSeq();
-
-    default void setSeq(Integer seq) {
-    }
 }
