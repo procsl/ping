@@ -11,6 +11,8 @@ import com.wf.captcha.base.Captcha;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.PermitAll;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,6 +37,8 @@ public class CaptchaController {
 
     final EmailCaptchaHandler emailCaptchaHandler;
 
+    final EntityManager entityManager;
+
     final AtomicLong auto = new AtomicLong(0);
 
     public static String getTarget(HttpServletRequest request) {
@@ -57,6 +61,7 @@ public class CaptchaController {
 
         Captcha captcha = new SpecCaptcha(width, height);
 
+        // TODO
         long id = System.currentTimeMillis() + auto.getAndIncrement();
 
         String sessionId = getTarget(request);

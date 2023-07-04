@@ -24,11 +24,11 @@ public class MenuTest {
 
     @Test
     public void createPathNodeByCurrent() {
-        Menu root = jpaRepository.save(Menu.createRoot("root"));
+        Menu root = jpaRepository.save(Menu.createRoot("root", "/root"));
 
-        Menu first = jpaRepository.save(root.createChild("11111"));
+        Menu first = jpaRepository.save(root.createChild("11111", "/111"));
 
-        Menu second = jpaRepository.save(first.createChild("2222222"));
+        Menu second = jpaRepository.save(first.createChild("2222222", "/2222"));
 
         log.info("root -> {}, list -> {}", root, root.getPath());
         log.info("first -> {}, list -> {}", first, first.getPath());

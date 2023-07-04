@@ -28,6 +28,9 @@ public class Menu implements AdjacencyNode<Long, MenuNode> {
     @Column(nullable = false, length = 40)
     String name;
 
+    @Column(nullable = false, length = 150)
+    String router;
+
     @Column(nullable = false)
     Long parentId;
 
@@ -43,11 +46,12 @@ public class Menu implements AdjacencyNode<Long, MenuNode> {
         return new MenuNode(id, parentId);
     }
 
-    public Menu(String name, Long parentId, Integer depth, Set<MenuNode> path) {
+    protected Menu(String name, Long parentId, String router, Integer depth, Set<MenuNode> path) {
         this.isNewInstance = true;
         this.name = name;
         this.parentId = parentId;
         this.depth = depth;
+        this.router = router;
         if (!path.isEmpty()) {
             this.path = new HashSet<>(path);
         }
@@ -93,15 +97,15 @@ public class Menu implements AdjacencyNode<Long, MenuNode> {
         }
     }
 
-    public static Menu createRoot(String name) {
-        return new Menu(name, SUPER_ROOT_ID, ROOT_DEPTH, new HashSet<>());
+    public static Menu createRoot(String name, String router) {
+        return new Menu(name, SUPER_ROOT_ID, router, ROOT_DEPTH, new HashSet<>());
     }
 
-    public Menu createChild(String name) {
+    public Menu createChild(String name, String router) {
         if (this.isNewInstance) {
             throw new IllegalArgumentException("需要先持久化生成ID");
         }
-        return new Menu(name, this.getId(), this.getDepth() + 1, this.getPath());
+        return new Menu(name, this.getId(), router, this.getDepth() + 1, this.getPath());
     }
 
     @Override

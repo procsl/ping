@@ -10,7 +10,9 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
+
 import jakarta.persistence.Entity;
+
 import javax.tools.Diagnostic;
 import javax.tools.StandardLocation;
 import java.io.IOException;
@@ -82,7 +84,7 @@ public class RepositoryProcessor extends AbstractProcessor {
 
     private void initConfig() {
         try (InputStream is = filer.getResource(StandardLocation.CLASS_PATH, "", RepositoryBuilder.processor)
-                                   .openInputStream()) {
+                .openInputStream()) {
 
             Properties properties = new Properties();
             properties.load(is);
@@ -172,7 +174,7 @@ public class RepositoryProcessor extends AbstractProcessor {
             if (type == null) {
                 messager.printMessage(WARNING,
                         "This interface generation failed because the generator returned null:" + builder.getClass()
-                                                                                                         .getName());
+                                .getName());
                 continue;
             }
 
@@ -219,8 +221,8 @@ public class RepositoryProcessor extends AbstractProcessor {
                     "org.springframework.data.repository.Repository");
         } else {
             includes = Arrays.stream(tmp.split(",")).filter(Objects::nonNull).filter(item -> !item.isEmpty())
-                             .map(String::trim).distinct().filter(this::isAvailable).sorted()
-                             .collect(Collectors.toList());
+                    .map(String::trim).distinct().filter(this::isAvailable).sorted()
+                    .collect(Collectors.toList());
             includes.add("org.springframework.data.repository.Repository");
         }
 
@@ -374,8 +376,16 @@ public class RepositoryProcessor extends AbstractProcessor {
      * @return 返回repository对象
      */
     private TypeSpec.Builder buildRepository(String className) throws ClassNotFoundException {
-        Class<?> clazz = Class.forName("org.springframework.stereotype.Repository");
-        return TypeSpec.interfaceBuilder(className).addAnnotation(clazz).addModifiers(Modifier.PUBLIC);
+        TypeSpec.Builder builder = TypeSpec.interfaceBuilder(className).addModifiers(Modifier.PUBLIC);
+        try {
+            Class<?> clazz = Class.forName("org.springframework.stereotype.Repository");
+            builder.addAnnotation(clazz);
+            Class<?> indexed = Class.forName("org.springframework.stereotype.Indexed");
+            builder.addAnnotation(indexed);
+        } catch (Exception e) {
+
+        }
+        return builder;
     }
 
     /**
@@ -393,7 +403,7 @@ public class RepositoryProcessor extends AbstractProcessor {
             if (type == null || type.isEmpty()) {
                 messager.printMessage(WARNING,
                         "This interface generation failed because the generator returned null:" + builder.getClass()
-                                                                                                         .getName());
+                                .getName());
                 continue;
             }
 
