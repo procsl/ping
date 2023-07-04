@@ -22,7 +22,7 @@ public class Menu implements AdjacencyNode<Long, MenuNode> {
 
     @Id
     @Access(AccessType.PROPERTY)
-    @GeneratedValue(strategy = GenerationType.TABLE)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "ping_sequence")
     Long id;
 
     @Column(nullable = false, length = 40)
@@ -35,7 +35,7 @@ public class Menu implements AdjacencyNode<Long, MenuNode> {
     Integer depth;
 
     @ElementCollection
-    @CollectionTable(joinColumns = @JoinColumn(name = "id", table = "s_menu_path"))
+    @CollectionTable(joinColumns = @JoinColumn(name = "id"), name = "s_menu_path")
     Set<MenuNode> path;
 
     @Override

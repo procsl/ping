@@ -19,7 +19,7 @@ import java.io.Serializable;
 public class Config implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "ping_sequence")
     Long id;
 
     @Column(unique = true)

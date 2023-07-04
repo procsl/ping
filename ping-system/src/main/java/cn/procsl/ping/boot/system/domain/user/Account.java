@@ -23,7 +23,7 @@ import jakarta.validation.constraints.NotNull;
 public class Account implements Stateful<AccountState> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "ping_sequence")
     Long id;
 
     @NotBlank

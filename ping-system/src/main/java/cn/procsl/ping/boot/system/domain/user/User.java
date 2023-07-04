@@ -20,7 +20,7 @@ import java.io.Serializable;
 public class User implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "ping_sequence")
     Long id;
 
     @Schema(defaultValue = "用户名称")

@@ -19,7 +19,7 @@ import java.util.*;
 public class Subject implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "ping_sequence")
     Long id;
 
     @Column(updatable = false)

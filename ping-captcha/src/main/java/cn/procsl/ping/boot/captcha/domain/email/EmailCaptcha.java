@@ -20,7 +20,7 @@ import jakarta.persistence.*;
 public class EmailCaptcha extends Captcha {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "ping_sequence")
     Long id;
 
     @Column(updatable = false, length = 50)

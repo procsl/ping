@@ -2,15 +2,11 @@ package cn.procsl.ping.boot.captcha.domain.sms;
 
 import cn.procsl.ping.boot.captcha.domain.Captcha;
 import cn.procsl.ping.boot.captcha.domain.VerifyFailureException;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 
 @Getter
 @Setter
@@ -20,7 +16,7 @@ import jakarta.persistence.Table;
 public class SmsCaptcha extends Captcha {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "ping_sequence")
     Long id;
 
     @Override

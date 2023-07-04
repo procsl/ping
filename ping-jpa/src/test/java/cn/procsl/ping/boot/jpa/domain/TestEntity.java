@@ -14,8 +14,8 @@ import lombok.Setter;
 public class TestEntity {
 
     @Id
-    @TableGenerator(name = "table_sequence")
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "table_sequence")
+    @TableGenerator(name = "ping_sequence")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "ping_sequence")
     Long id;
 
     @Column(length = 100)

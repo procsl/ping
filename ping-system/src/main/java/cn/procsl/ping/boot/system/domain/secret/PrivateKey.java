@@ -19,7 +19,7 @@ import java.util.UUID;
 public class PrivateKey implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "ping_sequence")
     Long id;
 
     @Column(length = 36, updatable = false)
