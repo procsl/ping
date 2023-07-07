@@ -4,3 +4,6 @@
 [submodule "ping-third/swagger-ui"]
 	path = ping-third/swagger-ui
 	url = https://github.com/swagger-api/swagger-ui.git
+[submodule "third/socket.io"]
+	path = third/socket.io
+	url = https://github.com/trinopoty/socket.io-server-java.git
