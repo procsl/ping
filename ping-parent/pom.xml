@@ -15,6 +15,7 @@
         <module>../ping-product</module>
         <module>../ping-system</module>
         <module>../ping-captcha</module>
+        <module>../ping-im</module>
     </modules>
 
     <dependencies>

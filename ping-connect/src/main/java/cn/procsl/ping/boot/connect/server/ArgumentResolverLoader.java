@@ -3,9 +3,9 @@ package cn.procsl.ping.boot.connect.server;
 import cn.procsl.ping.boot.common.invoker.HandlerArgumentResolver;
 import cn.procsl.ping.boot.common.invoker.HandlerArgumentResolverException;
 import cn.procsl.ping.boot.common.load.AbstractServiceProxyLoader;
+import jakarta.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
 
-import jakarta.validation.constraints.NotNull;
 import java.lang.reflect.Parameter;
 
 @Slf4j
@@ -25,7 +25,7 @@ final class ArgumentResolverLoader extends AbstractServiceProxyLoader<SocketIOHa
                     context.getMethod().getName());
         }
 
-        @NotNull Parameter[] parameters = context.getParameters();
+        @Nonnull Parameter[] parameters = context.getParameters();
         Object[] newArgs = HandlerArgumentResolver.createParameterObjectArray(parameters);
 
         if (newArgs == null) {

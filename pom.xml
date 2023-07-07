@@ -38,6 +38,7 @@
         <module>ping-distribute</module>
         <module>ping-web</module>
         <module>ping-jpa</module>
+        <module>ping-connect</module>
     </modules>
 
     <name>Ping 父模块</name>
@@ -113,6 +114,12 @@
             <dependency>
                 <groupId>cn.procsl</groupId>
                 <artifactId>ping-captcha</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.procsl</groupId>
+                <artifactId>ping-connect</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

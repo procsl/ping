@@ -18,6 +18,12 @@
             <groupId>cn.procsl</groupId>
             <artifactId>ping-connect</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>cn.procsl</groupId>
+            <artifactId>ping-jpa</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>
