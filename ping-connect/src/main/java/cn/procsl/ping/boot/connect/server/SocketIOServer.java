@@ -7,8 +7,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.socket.CloseStatus;
@@ -21,6 +23,7 @@ import java.io.IOException;
 import java.util.Map;
 
 @Slf4j
+@Controller
 @RequestMapping
 @RequiredArgsConstructor
 public class SocketIOServer implements HandshakeInterceptor, WebSocketHandler {
@@ -29,6 +32,7 @@ public class SocketIOServer implements HandshakeInterceptor, WebSocketHandler {
     protected static final String ATTRIBUTE_ENGINE_BRIDGE = "engineIo.bridge";
     protected static final String ATTRIBUTE_ENGINE_QUERY = "engineIo.query";
     protected static final String ATTRIBUTE_ENGINE_HEADERS = "engineIo.headers";
+
     final EngineIoServer engineIoServer;
 
     @Hidden
@@ -37,7 +41,8 @@ public class SocketIOServer implements HandshakeInterceptor, WebSocketHandler {
             method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.OPTIONS},
             headers = "Connection!=Upgrade")
     public void httpHandler(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        engineIoServer.handleRequest(request, response);
+        response.getWriter().println(0);
+//        engineIoServer.handleRequest(request, response);
     }
 
 
@@ -79,10 +84,11 @@ public class SocketIOServer implements HandshakeInterceptor, WebSocketHandler {
     public boolean beforeHandshake(@NonNull ServerHttpRequest request, @NonNull ServerHttpResponse response,
                                    @NonNull WebSocketHandler wsHandler,
                                    @NonNull Map<String, Object> attributes) throws Exception {
-
+        log.info("客户端唯一ID: {}", request.getURI().getQuery());
         attributes.put(ATTRIBUTE_ENGINE_QUERY, request.getURI().getQuery());
         attributes.put(ATTRIBUTE_ENGINE_HEADERS, request.getHeaders());
-        return true;
+        response.setStatusCode(HttpStatus.UNAUTHORIZED);
+        return false;
     }
 
     @Override

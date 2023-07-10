@@ -31,6 +31,4 @@ logs
 ### VS Code ###
 .vscode/
 /ping-admin-app/data/ping_app.mv.db
-/ping-distribute/src/main/resources/procsl
-/ping-distribute/src/main/resources/procsl/**
 /data/

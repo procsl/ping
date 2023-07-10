@@ -14,11 +14,17 @@
 <div id="msg"></div>
 
 <script>
-    var socket = io("/single");
+    let socket = io("/single");
+    socket.on('connect_error', function (error) {
+        console.log("不再连接");
+        socket.close();
+    });
+
     socket.on('chat', function (data) {
         console.log(data);
         socket.emit('echo', {my: 'data'})
     });
+
     socket.on('echo', function (data) {
         console.log(data);
     });
