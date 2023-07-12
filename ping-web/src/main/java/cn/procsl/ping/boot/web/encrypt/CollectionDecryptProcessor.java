@@ -29,12 +29,15 @@ class CollectionDecryptProcessor extends JsonDeserializer<Collection<Long>> {
             throw new IllegalArgumentException("请求解析错误");
         }
 
+//        AnnotatedClassResolver.
+
         return ((Collection<?>) result).stream().map(item -> {
             if (item == null) {
                 return null;
             }
             if (item instanceof String) {
-                return encryptDecryptService.decryptByContext((String) item);
+                // TODO
+                return encryptDecryptService.decryptByContext((String) item, null);
             }
             throw new IllegalArgumentException("参数解析失败" + item);
         }).collect(Collectors.toList());

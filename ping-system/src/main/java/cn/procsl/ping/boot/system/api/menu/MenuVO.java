@@ -14,12 +14,12 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class MenuVO implements Serializable {
 
-    @SecurityId
+    @SecurityId(scope = "menu")
     Long id;
 
     String name;
 
-    @SecurityId
+    @SecurityId(scope = "menu")
     Long parentId;
 
     @Schema(description = "路由URL")

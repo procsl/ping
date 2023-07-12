@@ -71,7 +71,7 @@ public class UserController {
     @PutMapping(path = "/v1/system/users/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional(rollbackFor = Exception.class)
-    public void update(@PathVariable @SecurityId Long id, @Validated @RequestBody UserPropDTO userPropDTO) {
+    public void update(@PathVariable @SecurityId(scope = "user") Long id, @Validated @RequestBody UserPropDTO userPropDTO) {
         User user = this.jpaRepository.getReferenceById(id);
         user.updateSelf(userPropDTO.getName(), userPropDTO.getGender(), userPropDTO.getRemark());
     }

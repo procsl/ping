@@ -8,7 +8,7 @@ import org.springframework.data.web.ProjectedPayload;
 @ProjectedPayload
 public interface UserRecord {
 
-    @SecurityId
+    @SecurityId(scope = "user")
     @Schema(description = "用户ID")
     Long getId();
 

@@ -7,6 +7,7 @@ import cn.procsl.ping.boot.web.component.SpringContextHolder;
 import cn.procsl.ping.boot.web.encrypt.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Nonnull;
+import jakarta.servlet.ServletContext;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -16,13 +17,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.SearchStrategy;
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
-import org.springframework.boot.jackson.JsonComponentModule;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.format.FormatterRegistry;
+import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.lang.reflect.Constructor;
@@ -40,11 +41,20 @@ import java.util.List;
 public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProcessor {
 
     final ApplicationContext applicationContext;
+    final SecurityIDAnnotationIntrospector introspector = new SecurityIDAnnotationIntrospector();
+
 
     public RestWebAutoConfiguration(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
         SpringContextHolder.setContext(applicationContext);
+        introspector.setApplicationContext(applicationContext);
     }
+
+//    @Bean
+//    @ConditionalOnMissingBean
+//    public SecurityIDAnnotationIntrospector securityIDAnnotationIntrospector() {
+//        return introspector;
+//    }
 
     @Bean("accessLoggerFilterBean")
     @ConditionalOnMissingBean(name = "accessLoggerFilterBean")
@@ -108,12 +118,11 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProce
     @Override
     public Object postProcessBeforeInitialization(@Nonnull Object bean,
                                                   @Nonnull String beanName) throws BeansException {
-        if (bean instanceof JsonComponentModule jsonComponent) {
-            EncryptDecryptService server = this.applicationContext.getBean(EncryptDecryptService.class);
-            jsonComponent.setDeserializers(new CollectionSimpleDeserializers(server));
+        if (bean instanceof ObjectMapper) {
+            ((ObjectMapper) bean).setAnnotationIntrospector(introspector);
         }
-
         return bean;
     }
+
 
 }

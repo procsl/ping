@@ -13,7 +13,7 @@ import java.io.Serializable;
 @Setter
 public class MenuDTO implements Serializable {
 
-    @SecurityId
+    @SecurityId(scope = "menu")
     @Schema(description = "父节点ID, 如果为空则代表创建根节点", nullable = true, implementation = String.class, example = "Q0GgEiBbxEB4kCNHheTNb", minLength = 22, maxLength = 22)
     Long parentId;
 
