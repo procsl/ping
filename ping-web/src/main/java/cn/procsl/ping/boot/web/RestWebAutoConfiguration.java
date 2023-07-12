@@ -10,12 +10,17 @@ import jakarta.annotation.Nonnull;
 import jakarta.servlet.ServletContext;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.aop.ThrowsAdvice;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.SearchStrategy;
+import org.springframework.boot.autoconfigure.web.format.WebConversionService;
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
@@ -49,12 +54,6 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProce
         SpringContextHolder.setContext(applicationContext);
         introspector.setApplicationContext(applicationContext);
     }
-
-//    @Bean
-//    @ConditionalOnMissingBean
-//    public SecurityIDAnnotationIntrospector securityIDAnnotationIntrospector() {
-//        return introspector;
-//    }
 
     @Bean("accessLoggerFilterBean")
     @ConditionalOnMissingBean(name = "accessLoggerFilterBean")
@@ -118,9 +117,17 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProce
     @Override
     public Object postProcessBeforeInitialization(@Nonnull Object bean,
                                                   @Nonnull String beanName) throws BeansException {
-        if (bean instanceof ObjectMapper) {
-            ((ObjectMapper) bean).setAnnotationIntrospector(introspector);
+        if (bean instanceof ObjectMapper mapper) {
+            mapper.setAnnotationIntrospector(introspector);
         }
+
+        if (beanName.equals("mvcConversionService") && bean instanceof WebConversionService conversionService) {
+            ProxyFactory proxy = new ProxyFactory();
+            proxy.addAdvice(new DecryptConversionService.ErrorProcessProxy());
+            proxy.setTarget(conversionService);
+            return proxy.getProxy();
+        }
+
         return bean;
     }
 

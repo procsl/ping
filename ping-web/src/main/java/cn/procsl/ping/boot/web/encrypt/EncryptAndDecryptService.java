@@ -16,7 +16,7 @@ public final class EncryptAndDecryptService implements EncryptDecryptService {
         String key = getKey();
         TokenCipher cipher = new TokenCipher(key, false, 128);
         TokenCipherWrapper wrapper = new TokenCipherWrapper(cipher, true);
-        return wrapper.encrypt(id);
+        return wrapper.encrypt(id, scope);
     }
 
     private String getKey() {
@@ -30,7 +30,7 @@ public final class EncryptAndDecryptService implements EncryptDecryptService {
         TokenCipher cipher = new TokenCipher(key, false, 128);
         TokenCipherWrapper wrapper = new TokenCipherWrapper(cipher, true);
         try {
-            return wrapper.decryptToLong(source);
+            return wrapper.decryptToLong(source, scope);
         } catch (Exception e) {
             throw new DecryptException(source, "解密失败", e);
         }

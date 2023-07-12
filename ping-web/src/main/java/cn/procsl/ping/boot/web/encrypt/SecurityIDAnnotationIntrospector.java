@@ -10,9 +10,15 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.MethodParameter;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.HandlerMapping;
+
+import java.lang.invoke.MethodHandle;
 
 
 @Slf4j
@@ -30,22 +36,44 @@ public class SecurityIDAnnotationIntrospector extends JacksonAnnotationIntrospec
             return new DecryptProcessor(security, findService());
         }
 
-        boolean bool = Long.TYPE == a.getRawType();
+        boolean bool = Long.TYPE == a.getRawType() || Long.class == a.getRawType();
         if (!bool) {
             return super.findDeserializer(a);
         }
 
-        try {
-            RequestAttributes attr = RequestContextHolder.getRequestAttributes();
-            if (attr != null) {
-                security = (SecurityId) attr.getAttribute(SecurityId.class.getName(), RequestAttributes.SCOPE_REQUEST);
-                if (security != null) {
-                    log.info("找到了");
-                    return new DecryptProcessor(security, findService());
-                }
-            }
-        } catch (BeansException exception) {
+        RequestAttributes attr = RequestContextHolder.getRequestAttributes();
+        if (attr == null) {
+            return super.findDeserializer(a);
         }
+
+        Object handler = attr.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE, RequestAttributes.SCOPE_REQUEST);
+        if (handler == null) {
+            return super.findDeserializer(a);
+        }
+
+        if (!(handler instanceof HandlerMethod)) {
+            return super.findDeserializer(a);
+        }
+        for (MethodParameter parameter : ((HandlerMethod) handler).getMethodParameters()) {
+            boolean isAssignable = Iterable.class.isAssignableFrom(parameter.getParameterType());
+            if (!isAssignable) {
+                continue;
+            }
+
+            security = parameter.getParameterAnnotation(SecurityId.class);
+            if (security == null) {
+                continue;
+            }
+
+            RequestBody body = parameter.getParameterAnnotation(RequestBody.class);
+            if (body == null) {
+                continue;
+            }
+
+            log.info("找到了");
+            return new DecryptProcessor(security, findService());
+        }
+
         return super.findDeserializer(a);
     }
 

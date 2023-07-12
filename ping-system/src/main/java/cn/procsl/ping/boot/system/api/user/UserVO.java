@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class UserVO extends UserPropDTO {
 
     @Schema(description = "用户ID")
-    @SecurityId
+    @SecurityId(scope = "user")
     Long id;
 
 }

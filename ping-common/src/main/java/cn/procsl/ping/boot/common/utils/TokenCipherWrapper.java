@@ -1,6 +1,11 @@
 package cn.procsl.ping.boot.common.utils;
 
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
+
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Base64;
 
 public class TokenCipherWrapper {
@@ -33,9 +38,13 @@ public class TokenCipherWrapper {
         return encoder.encodeToString(res);
     }
 
-    public String encrypt(Long content) {
+    public String encrypt(Long content, String scope) {
         byte[] bytes = Scale62.longToBytesBig(content);
-        return this.encrypt(bytes);
+        byte[] ss = scope.getBytes(StandardCharsets.UTF_8);
+        ByteBuffer buffer = ByteBuffer.allocate(bytes.length + ss.length);
+        buffer.put(bytes);
+        buffer.put(ss);
+        return this.encrypt(buffer.array());
     }
 
     public byte[] decrypt(String content) {
@@ -43,9 +52,16 @@ public class TokenCipherWrapper {
         return tokenCipher.decrypt(res);
     }
 
-    public Long decryptToLong(String content) {
+    public Long decryptToLong(String content, String scope) {
         byte[] res = this.decrypt(content);
-        return Scale62.bytesToLongBig(res);
+
+        byte[] ss = Arrays.copyOfRange(res, 8, res.length);
+        String scopeOrg = new String(ss);
+        if (ObjectUtils.nullSafeEquals(scope, scopeOrg)) {
+            byte[] idArray = Arrays.copyOfRange(res, 0, 8);
+            return Scale62.bytesToLongBig(idArray);
+        }
+        throw new IllegalArgumentException("scope 错误");
     }
 
     public interface Encoder {
