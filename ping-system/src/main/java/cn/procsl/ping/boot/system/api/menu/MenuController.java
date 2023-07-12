@@ -45,7 +45,8 @@ public class MenuController {
     }
 
     @GetMapping(path = {"/v1/system/menus"})
-    public List<MenuVO> findMenus(@RequestParam(name = "parent_id", required = false) @SecurityId Long parentId) {
+    @Transactional(readOnly = true)
+    public List<MenuVO> findMenus(@RequestParam(name = "parent_id", required = false) @SecurityId(scope = "menu") Long parentId) {
 
         if (parentId == null) {
             parentId = SUPER_ROOT_ID;

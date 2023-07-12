@@ -37,7 +37,7 @@ public class AccessController {
     @Transactional(rollbackFor = Exception.class)
 //    @Schema(description = "角色ID", example = "[]")
     public void grant(@PathVariable("id")
-                      @SecurityId Long id,
+                      @SecurityId(scope = "subject") Long id,
                       @RequestBody
                       @NotNull
                       @Validated Collection<Long> roleIds) {

@@ -5,8 +5,8 @@ package cn.procsl.ping.boot.web.encrypt;
  */
 public interface EncryptDecryptService {
 
-    String encryptByContext(Long id);
+    String encryptByContext(Long id, String scope);
 
-    Long decryptByContext(String code) throws DecryptException;
+    Long decryptByContext(String source, String scope) throws DecryptException;
 
 }

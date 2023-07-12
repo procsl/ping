@@ -23,7 +23,7 @@ public class ProductController {
     final HttpServletRequest request;
 
     @PostMapping("/v1/products/{id}")
-    public void publishProduct(@PathVariable(name = "id") @SecurityId Long product) {
+    public void publishProduct(@PathVariable(name = "id") @SecurityId(scope = "product") Long product) {
         log.debug("发布商品: {}", product);
     }
 
@@ -35,7 +35,7 @@ public class ProductController {
     @PutMapping("/v1/products")
     @RequestBodySecurityIds
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void createProduct2(@RequestBody Collection<Long> ids) {
+    public void createProduct2(@RequestBody @SecurityId(scope = "product") Collection<@SecurityId(scope = "product") Long> ids) {
         log.debug("创建商品: {}", ids);
     }
 
@@ -45,7 +45,7 @@ public class ProductController {
     }
 
     @GetMapping("/v1/products")
-    public ProductDTO findProduct(@RequestParam(required = false)  @SecurityId Long id) {
+    public ProductDTO findProduct(@RequestParam(required = false) @SecurityId(scope = "product") Long id) {
         return new ProductDTO(id, "你好啊");
     }
 

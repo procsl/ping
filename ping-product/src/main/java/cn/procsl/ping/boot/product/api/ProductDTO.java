@@ -10,7 +10,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class ProductDTO implements Serializable {
 
-    @SecurityId
+    @SecurityId(scope = "product")
     Long id;
 
     String productName;

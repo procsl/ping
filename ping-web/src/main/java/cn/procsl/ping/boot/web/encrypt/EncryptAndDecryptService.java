@@ -12,7 +12,7 @@ public final class EncryptAndDecryptService implements EncryptDecryptService {
     final EncryptContextService contextService;
 
     @Override
-    public String encryptByContext(Long id) {
+    public String encryptByContext(Long id, String scope) {
         String key = getKey();
         TokenCipher cipher = new TokenCipher(key, false, 128);
         TokenCipherWrapper wrapper = new TokenCipherWrapper(cipher, true);
@@ -25,14 +25,14 @@ public final class EncryptAndDecryptService implements EncryptDecryptService {
     }
 
     @Override
-    public Long decryptByContext(String code) throws DecryptException {
+    public Long decryptByContext(String source, String scope) throws DecryptException {
         String key = getKey();
         TokenCipher cipher = new TokenCipher(key, false, 128);
         TokenCipherWrapper wrapper = new TokenCipherWrapper(cipher, true);
         try {
-            return wrapper.decryptToLong(code);
+            return wrapper.decryptToLong(source);
         } catch (Exception e) {
-            throw new DecryptException(code, "解密失败", e);
+            throw new DecryptException(source, "解密失败", e);
         }
     }
 }
