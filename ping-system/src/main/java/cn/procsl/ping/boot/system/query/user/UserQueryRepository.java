@@ -1,6 +1,7 @@
 package cn.procsl.ping.boot.system.query.user;
 
 import cn.procsl.ping.boot.jpa.support.JpaSpecificationExecutorWithProjection;
+import cn.procsl.ping.boot.system.api.user.UserDetailVO;
 import cn.procsl.ping.boot.system.domain.user.AccountState;
 import cn.procsl.ping.boot.system.domain.user.Gender;
 import cn.procsl.ping.boot.system.domain.user.User;
@@ -15,7 +16,7 @@ public interface UserQueryRepository extends JpaSpecificationExecutorWithProject
 
     List<UserRecord> findAllBy();
 
-    UserDetailsVO findById(Long id);
+    UserDetailVO findById(Long id);
 
     Page<UserRecord> findAllByNameAndGenderAndAccountNameAndAccountStateOrderByName(String name, Gender gender, String accountName, AccountState accountState, Pageable pageable);
 

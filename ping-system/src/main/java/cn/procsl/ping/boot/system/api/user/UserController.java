@@ -9,10 +9,12 @@ import cn.procsl.ping.boot.web.annotation.SecurityId;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.mapstruct.factory.Mappers;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.hateoas.RepresentationModel;
-import org.springframework.hateoas.mediatype.AffordanceModelFactory;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.LinkRelation;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Indexed;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,13 +41,13 @@ public class UserController {
 
     final RoleSettingService roleSettingService;
 
-//    final AffordanceModelFactory factory;
+    final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
     @Operation(summary = "创建用户")
     @PostMapping(path = "/v1/system/users")
     @ResponseStatus(HttpStatus.CREATED)
     @Transactional(rollbackFor = Exception.class)
-    public void register(@Validated @RequestBody RegisterDTO registerDTO) {
+    public EntityModel<UserDetailVO> register(@Validated @RequestBody RegisterDTO registerDTO) {
 
         String password = registerDTO.getPassword();
         User user = User.creator(registerDTO.getNickName(), registerDTO.getAccount(),
@@ -54,17 +56,19 @@ public class UserController {
 
         Collection<String> roleNames = this.roleSettingService.getDefaultRoles();
 
-        if (ObjectUtils.isEmpty(roleNames)) {
-            return;
+        if (!ObjectUtils.isEmpty(roleNames)) {
+            Subject subject = new Subject(user.getId());
+
+            List<Role> roles = this.jpaSpecificationExecutor.findAll(
+                    (root, query, criteriaBuilder) -> root.get("name").in(roleNames));
+            subject.grant(roles);
+            subjectLongJpaRepository.save(subject);
         }
 
-        Subject subject = new Subject(user.getId());
+        UserDetailVO detail = userMapper.mapper(user);
 
-        List<Role> roles = this.jpaSpecificationExecutor.findAll(
-                (root, query, criteriaBuilder) -> root.get("name").in(roleNames));
-        subject.grant(roles);
-        subjectLongJpaRepository.save(subject);
-
+        Link link = Link.of("/v1/users/100", LinkRelation.of("self"));
+        return EntityModel.of(detail);
     }
 
     @Operation(summary = "更新用户信息")

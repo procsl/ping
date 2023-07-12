@@ -1,6 +1,7 @@
 package cn.procsl.ping.boot.system.query.user;
 
 import cn.procsl.ping.boot.system.TestSystemApplication;
+import cn.procsl.ping.boot.system.api.user.UserDetailVO;
 import cn.procsl.ping.boot.system.domain.user.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -9,7 +10,6 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -45,7 +45,7 @@ public class UserQueryRepositoryTest {
     @Disabled
     @Transactional(readOnly = true)
     public void findAll3() {
-        UserDetailsVO result = queryRepository.findById(1L);
+        UserDetailVO result = queryRepository.findById(1L);
         log.info("test: {}", result);
     }
 

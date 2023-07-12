@@ -42,7 +42,7 @@ public class AuthenticateController {
 
     final JpaSpecificationExecutor<User> userJpaSpecificationExecutor;
 
-    final AuthenticateMapper authenticateMapper = Mappers.getMapper(AuthenticateMapper.class);
+    final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
     final AuthenticateService handler = new AuthenticateService();
 
@@ -52,7 +52,7 @@ public class AuthenticateController {
     @Transactional(rollbackFor = Exception.class, readOnly = true)
     public AuthenticateVO currentAuthentication(HttpServletRequest request) {
         Authenticate authenticate = this.findCurrentAuthentication(request);
-        return authenticateMapper.mapper(authenticate);
+        return userMapper.mapper(authenticate);
     }
 
     Authenticate findCurrentAuthentication(HttpServletRequest request) {
@@ -88,7 +88,7 @@ public class AuthenticateController {
 
         this.authenticationLongJpaRepository.save(authenticate);
 
-        AuthenticateVO dto = this.authenticateMapper.mapper(authenticate);
+        AuthenticateVO dto = this.userMapper.mapper(authenticate);
         request.getSession().setAttribute(AUTHENTICATION_KEY, authenticate.getId());
         return dto;
     }
