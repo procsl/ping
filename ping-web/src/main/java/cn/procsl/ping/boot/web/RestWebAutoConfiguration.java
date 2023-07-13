@@ -4,16 +4,11 @@ import cn.procsl.ping.boot.web.component.AccessLoggerFilter;
 import cn.procsl.ping.boot.web.component.CommonErrorAttributes;
 import cn.procsl.ping.boot.web.component.GlobalExceptionHandler;
 import cn.procsl.ping.boot.web.component.SpringContextHolder;
-import cn.procsl.ping.boot.web.encrypt.*;
+import cn.procsl.ping.boot.web.cipher.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Nonnull;
-import jakarta.servlet.ServletContext;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
-import org.springframework.aop.ThrowsAdvice;
-import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -28,10 +23,11 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.format.FormatterRegistry;
-import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.List;
 
 /**
@@ -46,7 +42,7 @@ import java.util.List;
 public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProcessor {
 
     final ApplicationContext applicationContext;
-    final SecurityIDAnnotationIntrospector introspector = new SecurityIDAnnotationIntrospector();
+    final JacksonSecurityIdAnnotationIntrospector introspector = new JacksonSecurityIdAnnotationIntrospector();
 
 
     public RestWebAutoConfiguration(ApplicationContext applicationContext) {
@@ -68,27 +64,10 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProce
 
     @Override
     public void addFormatters(FormatterRegistry registry) {
-        EncryptDecryptService server = this.applicationContext.getBean(EncryptDecryptService.class);
-        registry.addConverter(new DecryptConversionService(server));
+        CipherSecurityService server = this.applicationContext.getBean(CipherSecurityService.class);
+        registry.addConverter(new CipherGenericConverter(server));
     }
 
-
-    @Bean
-    @ConditionalOnMissingBean
-    public EncryptDecryptService encryptDecryptService() {
-        return new EncryptAndDecryptService(
-                new EncryptKeyService() {
-                    @Override
-                    public String getKey(EncryptContext context) {
-                        return "1234567890";
-                    }
-                }, new EncryptContextService() {
-            @Override
-            public EncryptContext getContext() {
-                return null;
-            }
-        });
-    }
 
     final static String MODEL_RESOLVER = "io.swagger.v3.core.jackson.ModelResolver";
 
@@ -114,21 +93,55 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProce
         return new CommonErrorAttributes();
     }
 
+
+    @Bean
+    @ConditionalOnMissingBean(value = CipherSecurityService.class)
+    public CipherSecurityService cipherSecurityService() {
+        return new SimplerCipherSecurityService();
+    }
+
     @Override
-    public Object postProcessBeforeInitialization(@Nonnull Object bean,
-                                                  @Nonnull String beanName) throws BeansException {
+    @SneakyThrows
+    public Object postProcessBeforeInitialization(@Nonnull Object bean, @Nonnull String beanName) throws BeansException {
         if (bean instanceof ObjectMapper mapper) {
             mapper.setAnnotationIntrospector(introspector);
         }
 
         if (beanName.equals("mvcConversionService") && bean instanceof WebConversionService conversionService) {
-            ProxyFactory proxy = new ProxyFactory();
-            proxy.addAdvice(new DecryptConversionService.ErrorProcessProxy());
-            proxy.setTarget(conversionService);
-            return proxy.getProxy();
+            log.info("hook WebConversionService");
+            var wrapper = new CipherGenericConverter.ErrorProcessWevConversionService();
+
+            var targetStart = wrapper.getClass().getSuperclass();
+            do {
+                copyProperties(conversionService, wrapper, targetStart);
+                targetStart = targetStart.getSuperclass();
+            } while (targetStart != null);
+
+            return wrapper;
         }
 
         return bean;
+    }
+
+    protected void copyProperties(Object source, Object target, Class<?> clazz) throws IllegalAccessException {
+        Field[] fields = clazz.getDeclaredFields();
+        for (Field sourceField : fields) {
+
+            if (Modifier.isStatic(sourceField.getModifiers())) {
+                log.debug("跳过static属性: {}", sourceField.getName());
+                continue;
+            }
+
+            boolean able = sourceField.trySetAccessible();
+            if (!able) {
+                sourceField.setAccessible(true);
+            }
+            Object value = sourceField.get(source);
+            sourceField.set(target, value);
+            if (!able) {
+                sourceField.setAccessible(false);
+            }
+        }
     }
 
 

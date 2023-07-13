@@ -1,19 +1,20 @@
-package cn.procsl.ping.boot.web.encrypt;
+package cn.procsl.ping.boot.web.alias;
 
+import cn.procsl.ping.boot.web.cipher.CipherSecurityService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 
 import java.util.Enumeration;
 import java.util.Map;
 
-public class DecryptHttpServletRequestWrapper extends HttpServletRequestWrapper {
+public class AliasHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
-    private final EncryptDecryptService encryptDecryptService;
+    private final CipherSecurityService cipherSecurityService;
     private String requestURI;
 
-    public DecryptHttpServletRequestWrapper(HttpServletRequest request, EncryptDecryptService encryptDecryptService) {
+    public AliasHttpServletRequestWrapper(HttpServletRequest request, CipherSecurityService cipherSecurityService) {
         super(request);
-        this.encryptDecryptService = encryptDecryptService;
+        this.cipherSecurityService = cipherSecurityService;
     }
 
     @Override

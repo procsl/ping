@@ -1,8 +1,9 @@
 package cn.procsl.ping.boot.web.component;
 
+import cn.procsl.ping.boot.common.dto.MessageVO;
 import cn.procsl.ping.boot.common.error.ErrorVO;
 import cn.procsl.ping.boot.common.error.ParameterErrorVO;
-import cn.procsl.ping.boot.web.encrypt.DecryptException;
+import cn.procsl.ping.boot.web.cipher.CipherGenericConverter;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -29,13 +30,14 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-//    @ResponseBody
-//    @ExceptionHandler(value = Exception.class)
-//    @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
-//    public MessageVO exceptionHandler(Exception e) {
-//        log.warn("未处理的异常:", e);
-//        return new MessageVO("服务器内部错误");
-//    }
+    @ResponseBody
+    @ExceptionHandler(value = NullPointerException.class)
+    @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
+    public MessageVO exceptionHandler(NullPointerException e) {
+        log.error("服务器内部错误", e);
+        return new MessageVO("服务器内部错误");
+    }
+
 //
 //    @ResponseBody
 //    @ExceptionHandler(value = Exception.class)
@@ -77,7 +79,7 @@ public class GlobalExceptionHandler {
             log.warn("处理参数校验失败异常时, 找不到参数校验信息", e);
         }
 
-        ParameterErrorVO errorVo = new ParameterErrorVO("METHOD_ARGUMENT_NOT_VALID", "参数校验失败");
+        ParameterErrorVO errorVo = new ParameterErrorVO("MethodArgumentNotValid", "参数校验失败");
 
         errors.forEach(error -> {
             if (error instanceof FieldError) {
@@ -95,7 +97,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = ConstraintViolationException.class)
     public ParameterErrorVO constraintViolationException(ConstraintViolationException constraintViolationException) {
 
-        ParameterErrorVO errorVo = new ParameterErrorVO("METHOD_ARGUMENT_NOT_VALID", "参数校验失败");
+        ParameterErrorVO errorVo = new ParameterErrorVO("MethodArgumentNotValid", "参数校验失败");
         for (ConstraintViolation<?> violation : constraintViolationException.getConstraintViolations()) {
             String key = violation.getPropertyPath().toString();
             errorVo.putErrorTips(key, violation.getMessage());
@@ -106,7 +108,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value = HttpMessageNotReadableException.class)
-    public ErrorVO httpMessageNotReadableException(HttpMessageNotReadableException e) {
+    public ErrorVO httpMessageNotReadableException() {
         return ErrorVO.build(HttpMessageNotReadableException.class, "请求数据解析失败");
     }
 
@@ -120,9 +122,11 @@ public class GlobalExceptionHandler {
 
     @ResponseBody
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(value = DecryptException.class)
-    public ErrorVO decryptException(DecryptException exception) {
-        return ErrorVO.build(exception, String.format("请求数据解析失败: %s", exception.getSource()));
+    @ExceptionHandler(value = CipherGenericConverter.ConverterException.class)
+    public ParameterErrorVO decryptException(CipherGenericConverter.ConverterException exception) {
+        ParameterErrorVO tmp = new ParameterErrorVO("MethodArgumentNotValid", "请求数据解析失败");
+        tmp.putErrorTips(exception.getFiledName(), exception.getSource());
+        return tmp;
     }
 
 }

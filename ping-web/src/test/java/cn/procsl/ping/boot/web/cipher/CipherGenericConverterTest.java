@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.web.encrypt;
+package cn.procsl.ping.boot.web.cipher;
 
 import cn.procsl.ping.boot.web.TestWebApplication;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,7 @@ import org.springframework.validation.annotation.Validated;
 @Transactional
 @Rollback
 @SpringBootTest(classes = TestWebApplication.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
-public class DecryptConversionServiceTest {
+public class CipherGenericConverterTest {
 
 
     @Test

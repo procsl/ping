@@ -5,16 +5,20 @@ import cn.procsl.ping.boot.web.annotation.RequestBodySecurityIds;
 import jakarta.servlet.annotation.HttpConstraint;
 import jakarta.servlet.annotation.HttpMethodConstraint;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 import java.util.List;
 
 @Slf4j
+@Validated
 @RestController
 @RequestMapping
 @RequiredArgsConstructor
@@ -35,7 +39,7 @@ public class ProductController {
     @PutMapping("/v1/products")
     @RequestBodySecurityIds
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void createProduct2(@RequestBody @SecurityId(scope = "product") Collection<@SecurityId(scope = "product") Long> ids) {
+    public void createProduct2(@RequestBody @SecurityId(scope = "product") @Validated @NotEmpty Collection<@NotNull Long> ids) {
         log.debug("创建商品: {}", ids);
     }
 

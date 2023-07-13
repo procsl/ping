@@ -1,11 +1,13 @@
 package cn.procsl.ping.boot.web.component;
 
+import jakarta.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.lang.annotation.Annotation;
 
 @RequiredArgsConstructor
@@ -14,7 +16,7 @@ public abstract class AbstractMethodAnnotationInterceptor<A extends Annotation> 
     final Class<A> annotationClass;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+    public boolean preHandle(@Nonnull HttpServletRequest request, @Nonnull HttpServletResponse response, @Nonnull Object handler)
             throws Exception {
         boolean isHandler = handler instanceof HandlerMethod;
         if (!isHandler) {
