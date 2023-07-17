@@ -1,11 +1,8 @@
 package cn.procsl.ping.boot.product.api;
 
-import cn.procsl.ping.boot.web.annotation.SecurityId;
 import cn.procsl.ping.boot.web.annotation.RequestBodySecurityIds;
-import jakarta.servlet.annotation.HttpConstraint;
-import jakarta.servlet.annotation.HttpMethodConstraint;
+import cn.procsl.ping.boot.web.annotation.SecurityId;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;

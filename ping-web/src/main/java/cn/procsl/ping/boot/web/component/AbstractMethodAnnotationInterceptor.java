@@ -16,8 +16,7 @@ public abstract class AbstractMethodAnnotationInterceptor<A extends Annotation> 
     final Class<A> annotationClass;
 
     @Override
-    public boolean preHandle(@Nonnull HttpServletRequest request, @Nonnull HttpServletResponse response, @Nonnull Object handler)
-            throws Exception {
+    public boolean preHandle(@Nonnull HttpServletRequest request, @Nonnull HttpServletResponse response, @Nonnull Object handler) {
         boolean isHandler = handler instanceof HandlerMethod;
         if (!isHandler) {
             return true;
