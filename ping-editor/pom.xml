@@ -13,10 +13,6 @@
     <packaging>jar</packaging>
     <name>Ping 编辑器模块</name>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>cn.procsl</groupId>
@@ -64,11 +60,11 @@
                         </goals>
                         <configuration>
                             <!--输出文件路径-->
-                            <outputDirectory>${project.basedir}</outputDirectory>
+                            <outputDirectory>${project.build.outputDirectory}/META-INF/resources/editor</outputDirectory>
                             <resources>
                                 <resource>
                                     <!--前端代码地址-->
-                                    <directory>${basedir}</directory>
+                                    <directory>${project.build.directory}/dist</directory>
                                 </resource>
                             </resources>
                         </configuration>
