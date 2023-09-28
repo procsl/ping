@@ -32,3 +32,5 @@ logs
 .vscode/
 /ping-admin-app/data/ping_app.mv.db
 /data/
+*/node_modules/
+*/node_modules/**
