@@ -29,9 +29,8 @@ logs
 
 ### VS Code ###
 .vscode/
-/ping-admin-app/data/ping_app.mv.db
 /data/
-*/node_modules/
-*/node_modules/**
-**/node_modules/
-**/node_modules/**
+/src/test/resources/parser_v4/node_modules/
+/src/test/resources/parser_v4/yarn.lock
+/src/test/resources/parser_v3/node_modules/
+/src/test/resources/parser_v3/yarn.lock

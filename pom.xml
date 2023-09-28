@@ -218,6 +218,7 @@
                         <arg>-Xlint:unchecked</arg>
                         <arg>-Xlint:deprecation</arg>
                         <arg>-parameters</arg>
+                        <arg>-proc:full</arg>
                     </compilerArgs>
                 </configuration>
             </plugin>
