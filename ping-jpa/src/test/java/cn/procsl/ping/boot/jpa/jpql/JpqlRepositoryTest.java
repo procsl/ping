@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.inject.Inject;
+import java.io.BufferedOutputStream;
+import java.io.OutputStream;
 
 @Slf4j
 @Service
@@ -26,6 +28,9 @@ public class JpqlRepositoryTest {
     @Test
     public void query() {
         TestEntity result = jpqlRepository.query(1L, "name");
+        String sql = """ 
+                select * from i_test where id=1
+                """;
         log.info("result {}", result);
     }
 }

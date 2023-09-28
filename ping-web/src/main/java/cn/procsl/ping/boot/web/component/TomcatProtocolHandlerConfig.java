@@ -1,27 +1,47 @@
-package cn.procsl.ping.app.config;
+package cn.procsl.ping.boot.web.component;
 
-import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration;
+import cn.procsl.ping.boot.common.utils.TraceIdGenerator;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.web.embedded.tomcat.TomcatProtocolHandlerCustomizer;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.task.AsyncTaskExecutor;
-import org.springframework.core.task.support.TaskExecutorAdapter;
+import org.springframework.util.IdGenerator;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
-@Configuration
-public class TomcatThreadConfig {
+import static java.util.concurrent.Executors.newThreadPerTaskExecutor;
 
-    @Bean(TaskExecutionAutoConfiguration.APPLICATION_TASK_EXECUTOR_BEAN_NAME)
-    public AsyncTaskExecutor asyncTaskExecutor() {
-        return new TaskExecutorAdapter(Executors.newVirtualThreadPerTaskExecutor());
-    }
+@AutoConfiguration
+public class TomcatProtocolHandlerConfig {
+
 
     @Bean
-    public TomcatProtocolHandlerCustomizer<?> protocolHandlerVirtualThreadExecutorCustomizer() {
+    public TomcatProtocolHandlerCustomizer<?> tomcatProtocolHandlerCustomizer() {
         return protocolHandler -> {
-            protocolHandler.setExecutor(Executors.newVirtualThreadPerTaskExecutor());
+            ExecutorService task = newThreadPerTaskExecutor(new InnerThreadFactory());
+            protocolHandler.setExecutor(task);
         };
+    }
+
+    @Slf4j
+    static class InnerThreadFactory implements ThreadFactory {
+
+        final ThreadFactory factory = Thread.ofVirtual().factory();
+
+        final TraceIdGenerator generator = TraceIdGenerator.initTraceId("yyyyMMdd", 16);
+
+        @Override
+        public Thread newThread(@NonNull Runnable runnable) {
+            return factory.newThread(() -> {
+                Thread.currentThread().setName(generator.generateId());
+                runnable.run();
+                MDC.clear();
+            });
+        }
     }
 
 }

@@ -1,10 +1,13 @@
 package cn.procsl.ping.boot.web;
 
+import cn.procsl.ping.boot.web.cipher.CipherGenericConverter;
+import cn.procsl.ping.boot.web.cipher.CipherSecurityService;
+import cn.procsl.ping.boot.web.cipher.JacksonSecurityIdAnnotationIntrospector;
+import cn.procsl.ping.boot.web.cipher.SimplerCipherSecurityService;
 import cn.procsl.ping.boot.web.component.AccessLoggerFilter;
 import cn.procsl.ping.boot.web.component.CommonErrorAttributes;
 import cn.procsl.ping.boot.web.component.GlobalExceptionHandler;
 import cn.procsl.ping.boot.web.component.SpringContextHolder;
-import cn.procsl.ping.boot.web.cipher.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Nonnull;
 import lombok.SneakyThrows;
@@ -23,6 +26,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.format.FormatterRegistry;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.lang.reflect.Constructor;
@@ -42,8 +47,8 @@ import java.util.List;
 public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProcessor {
 
     final ApplicationContext applicationContext;
-    final JacksonSecurityIdAnnotationIntrospector introspector = new JacksonSecurityIdAnnotationIntrospector();
 
+    final JacksonSecurityIdAnnotationIntrospector introspector = new JacksonSecurityIdAnnotationIntrospector();
 
     public RestWebAutoConfiguration(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
@@ -51,16 +56,16 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProce
         introspector.setApplicationContext(applicationContext);
     }
 
-    @Bean("accessLoggerFilterBean")
-    @ConditionalOnMissingBean(name = "accessLoggerFilterBean")
-    public FilterRegistrationBean<AccessLoggerFilter> accessLoggerFilterFilterRegistrationBean() {
-        FilterRegistrationBean<AccessLoggerFilter> filter = new FilterRegistrationBean<>();
-        filter.setFilter(new AccessLoggerFilter());
-        filter.setName("accessLoggerFilter");
-        filter.setOrder(Integer.MIN_VALUE);
-        filter.setUrlPatterns(List.of("/*"));
-        return filter;
-    }
+//    @Bean("accessLoggerFilterBean")
+//    @ConditionalOnMissingBean(name = "accessLoggerFilterBean")
+//    public FilterRegistrationBean<AccessLoggerFilter> accessLoggerFilterFilterRegistrationBean() {
+//        FilterRegistrationBean<AccessLoggerFilter> filter = new FilterRegistrationBean<>();
+//        filter.setFilter(new AccessLoggerFilter());
+//        filter.setName("accessLoggerFilter");
+//        filter.setOrder(Integer.MIN_VALUE);
+//        filter.setUrlPatterns(List.of("/*"));
+//        return filter;
+//    }
 
     @Override
     public void addFormatters(FormatterRegistry registry) {
@@ -128,7 +133,7 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProce
         for (Field sourceField : fields) {
 
             if (Modifier.isStatic(sourceField.getModifiers())) {
-                log.debug("跳过static属性: {}", sourceField.getName());
+                log.trace("跳过static属性: {}", sourceField.getName());
                 continue;
             }
 
