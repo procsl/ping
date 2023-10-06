@@ -4,8 +4,9 @@ const process = require('process');
 const {CleanWebpackPlugin} = require("clean-webpack-plugin");
 const TerserPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const devMode = process.env.NODE_ENV === 'development' ? 'development' : 'production';
 module.exports = {
-    mode: process.env.NODE_ENV === 'development' ? 'development' : 'production',
+    mode: devMode,
     entry: path.join(__dirname, "./src/main/js/index.js"),
     output: {
         filename: '[name].[contenthash].js', // 使用 [contenthash] 占位符
@@ -15,7 +16,9 @@ module.exports = {
         rules: [
             {
                 test: /\.css$/,
-                use: [MiniCssExtractPlugin.loader, "css-loader", "postcss-loader"]
+                use: [{
+                    loader: devMode ? 'style-loader' : MiniCssExtractPlugin.loader
+                }, "css-loader", "postcss-loader"]
             }
         ]
     },
@@ -29,19 +32,21 @@ module.exports = {
         ],
     },
     plugins: [
+        new CleanWebpackPlugin({
+            cleanOnceBeforeBuildPatterns: ['**/*'],
+        }),
         new HtmlWebpackPlugin({
             filename: 'index.html',
             template: './src/main/js/index.html',
             inject: true,
+            hash: true,
             minify: {
                 removeComments: true,
                 collapseWhitespace: true,
                 removeAttributeQuotes: true
             }
         }),
-        new CleanWebpackPlugin({
-            cleanOnceBeforeBuildPatterns: ['**/*'],
-        }),
+        // new webpack.HotModuleReplacementPlugin(),
         new MiniCssExtractPlugin({
             filename: 'main.css'
         })
