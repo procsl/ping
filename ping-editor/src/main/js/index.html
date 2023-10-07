@@ -6,9 +6,13 @@
 </head>
 <body>
 
-<div class="grid grid-cols-2 gap-4">
-    <div id="editor-content" class="h-screen w-full"></div>
-    <div id="markdown-content" class="h-screen w-full"></div>
+<div class="grid grid-cols-2 gap-4 border border-b-blue-900">
+    <div class="ping-edit h-screen w-full border-2 border-black rounded border-opacity-30  overflow-hidden">
+        <iframe id="ping-edit" src="./edit/index.html" class="h-screen w-full overflow-hidden" frameborder="0"></iframe>
+    </div>
+    <div class="ping-render h-screen w-full  border-2 border-black rounded border-opacity-30">
+        <iframe id="ping-render" src="./render/index.html" class="h-screen w-full" frameborder="0"></iframe>
+    </div>
 </div>
 
 </body>

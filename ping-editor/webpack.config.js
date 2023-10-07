@@ -5,11 +5,16 @@ const {CleanWebpackPlugin} = require("clean-webpack-plugin");
 const TerserPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const devMode = process.env.NODE_ENV === 'development' ? 'development' : 'production';
+
 module.exports = {
     mode: devMode,
-    entry: path.join(__dirname, "./src/main/js/index.js"),
+    entry: {
+        main: path.join(__dirname, "./src/main/js/index.js"),
+        edit: path.join(__dirname, "./src/main/js/edit/index.js"),
+        render: path.join(__dirname, "./src/main/js/render/index.js"),
+    },
     output: {
-        filename: '[name].[contenthash].js', // 使用 [contenthash] 占位符
+        filename: 'js/[name]-[contenthash].js', // 使用 [contenthash] 占位符
         path: path.join(__dirname, './target/dist'),
     },
     module: {
@@ -40,6 +45,30 @@ module.exports = {
             template: './src/main/js/index.html',
             inject: true,
             hash: true,
+            minify: {
+                removeComments: true,
+                collapseWhitespace: true,
+                removeAttributeQuotes: true
+            }
+        }),
+        new HtmlWebpackPlugin({
+            filename: 'edit/index.html',
+            template: './src/main/js/edit/index.html',
+            inject: true,
+            hash: true,
+            chunks: ["edit"],
+            minify: {
+                removeComments: true,
+                collapseWhitespace: true,
+                removeAttributeQuotes: true
+            }
+        }),
+        new HtmlWebpackPlugin({
+            filename: './render/index.html',
+            template: './src/main/js/render/index.html',
+            inject: true,
+            hash: true,
+            chunks: ["render"],
             minify: {
                 removeComments: true,
                 collapseWhitespace: true,
