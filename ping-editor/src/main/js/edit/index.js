@@ -7,10 +7,19 @@ import './edit.css'
 
 // 创建一个 ViewPlugin 以监听内容改变事件
 const contentChangeListener = ViewPlugin.fromClass(class {
+
+    constructor() {
+        this.pub = window.parent?.window?.eventPublish;
+    }
+
     async update(update) {
         if (update.docChanged) {
             // 内容发生改变
-            console.log("内容已改变:", update.state.doc.toString());
+            if (this.pub) {
+                this.pub(update.state.doc);
+            } else {
+                console.warn("未绑定推送事件")
+            }
         }
     }
 });
@@ -18,10 +27,10 @@ const contentChangeListener = ViewPlugin.fromClass(class {
 // 测试
 const vimExtend = vim({status: true})
 const editorState = EditorState.create({
-    doc: "Hello World",
+    doc: "# 我是标题",
     extensions: [vimExtend, basicSetup, contentChangeListener],
 });
-const doc = document.querySelector("#editor-content");
+const doc = document.getElementById("editor-content");
 console.log("测试:", doc);
 
 let editorView = new EditorView({
@@ -29,4 +38,8 @@ let editorView = new EditorView({
     parent: doc
 });
 console.log("编辑器实例: ", editorView);
-window.editorView = editorView;
+// window.parent?.window?.eventPublish();
+
+window.onload = () => {
+    // TODO
+}

@@ -45,6 +45,7 @@ module.exports = {
             template: './src/main/js/index.html',
             inject: true,
             hash: true,
+            chunks: ["main"],
             minify: {
                 removeComments: true,
                 collapseWhitespace: true,
