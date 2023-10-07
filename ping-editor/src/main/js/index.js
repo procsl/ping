@@ -1,4 +1,5 @@
-import './main.css'
+import './index.css'
+import './tailwind.css'
 import EventChannel from "./channel";
 
 const event = new EventChannel();
