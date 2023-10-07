@@ -31,3 +31,10 @@ body {
 .cm-vim-panel > span {
     font-weight: bold;
 }
+
+/*取消行号选择*/
+/*设置鼠标为手型*/
+.cm-gutters {
+    user-select: none;
+    cursor: pointer;
+}
