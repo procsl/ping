@@ -25,7 +25,6 @@
     "@codemirror/theme-one-dark": "^6.1.2",
     "@codemirror/view": "^6.20.2",
     "@replit/codemirror-vim": "^6.0.14",
-    "be-full": "^0.1.4",
     "codemirror": "^6.0.1",
     "highlight.js": "^11.8.0",
     "rehype-highlight": "^7.0.0",
