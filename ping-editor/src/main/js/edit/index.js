@@ -715,7 +715,7 @@ const contentChangeListener = ViewPlugin.fromClass(class {
         if (update.docChanged) {
             // 内容发生改变
             console.log("内容已改变:", update.state.doc.toString());
-            window.parent.eventPublish(update.state.doc);
+            window.parent.onDocumentChanged(update.state.doc);
         }
     }
 });
@@ -736,5 +736,5 @@ let editorView = new EditorView({
 console.log("编辑器实例: ", editorView);
 
 window.parent.onload = () => {
-    window.parent.eventPublish(docs);
+    window.parent.onDocumentChanged(docs);
 }

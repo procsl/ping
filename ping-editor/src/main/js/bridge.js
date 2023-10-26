@@ -1,7 +1,7 @@
-class EventChannel {
+class EventBridge {
 
     constructor() {
-        this.eventListener = {};
+        this.listener = {};
     }
 
     /**
@@ -11,7 +11,7 @@ class EventChannel {
      * @return {void}
      */
     publish(key, obj) {
-        const list = this.eventListener[key];
+        const list = this.listener[key];
         if (list) {
             list.forEach((value) => {
                 try {
@@ -29,12 +29,12 @@ class EventChannel {
      * @param {function} func
      */
     addListener(key, func) {
-        if (!this.eventListener[key]) {
-            this.eventListener[key] = [];
+        if (!this.listener[key]) {
+            this.listener[key] = [];
         }
-        this.eventListener[key].push(func);
+        this.listener[key].push(func);
     }
 
 }
 
-export default EventChannel;
+export default EventBridge;
