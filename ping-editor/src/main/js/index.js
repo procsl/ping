@@ -1,36 +1,7 @@
-import './index.css'
-import './tailwind.css'
-import EventBridge from "./bridge";
+import './index.css';
+import './tailwind.css';
+import './edit/md-edit';
 
-const onDocumentChanged = "onDocumentChanged";
-const onDocumentScroll = "onDocumentScroll";
-const onPreviewScroll = "onPreviewScroll";
-
-const bridge = new EventBridge();
-
-// 文档修改事件
-window.addDocumentChangedListener = (func) => {
-    bridge.addListener(onDocumentChanged, func);
-}
-
-window.onDocumentChanged = (doc) => {
-    bridge.publish(onDocumentChanged, doc);
-}
-
-// 文档滚动事件
-window.addDocumentScrollListener = (func) => {
-    bridge.addListener(onDocumentScroll, func);
-}
-
-window.onDocumentScroll = (doc) => {
-    bridge.publish(onDocumentScroll, doc);
-}
-
-// 预览页面滚动事件
-window.addPreviewScrollListener = (func) => {
-    bridge.addListener(onPreviewScroll, func);
-}
-
-window.onPreviewScroll = (doc) => {
-    bridge.publish(onPreviewScroll, doc);
-}
+// 1. 创建布局组件, 用于放置各种控件
+// 2. 初始化编辑器组件, 导出相关方法, 用于设置控件
+// 3. 初始化预览组件, 导出相关方法, 用于设置控件

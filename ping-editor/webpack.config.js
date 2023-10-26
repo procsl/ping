@@ -9,8 +9,6 @@ module.exports = {
     mode: devMode,
     entry: {
         main: path.join(__dirname, "./src/main/js/index.js"),
-        edit: path.join(__dirname, "./src/main/js/edit/index.js"),
-        render: path.join(__dirname, "./src/main/js/render/index.js"),
     },
     output: {
         filename: '[name]/[contenthash].js', // 使用 [contenthash] 占位符
@@ -47,30 +45,6 @@ module.exports = {
             inject: true,
             hash: true,
             chunks: ["main"],
-            minify: {
-                removeComments: true,
-                collapseWhitespace: true,
-                removeAttributeQuotes: true
-            }
-        }),
-        new HtmlWebpackPlugin({
-            filename: 'edit/index.html',
-            template: './src/main/js/edit/index.html',
-            inject: true,
-            hash: true,
-            chunks: ["edit"],
-            minify: {
-                removeComments: true,
-                collapseWhitespace: true,
-                removeAttributeQuotes: true
-            }
-        }),
-        new HtmlWebpackPlugin({
-            filename: './render/index.html',
-            template: './src/main/js/render/index.html',
-            inject: true,
-            hash: true,
-            chunks: ["render"],
             minify: {
                 removeComments: true,
                 collapseWhitespace: true,
