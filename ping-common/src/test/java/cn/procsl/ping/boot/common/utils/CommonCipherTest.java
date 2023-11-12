@@ -134,5 +134,59 @@ public class CommonCipherTest {
             log.info(result);
         }
 
+        {
+            log.info("解密结果");
+            CommonCipher cipher = CommonCipher.init()
+                    .algorithm("AES")
+                    .cipherMode(CommonCipher.CipherMode.DECRYPT)
+                    .mode("CBC")
+                    .padding("ISO10126Padding")
+                    .privateKey("1234567812345678".getBytes(StandardCharsets.UTF_8))
+                    .iv("1234567812345678")
+                    .build();
+
+            byte[] code = Base64.getDecoder().decode("U2FsdGVkX1/i/Noc9PXUoXyHcKhqllmbHc5ZDTGhcyRQjc11CT//ohz1IXjVCx5zth0cSbDwzOLMYfyG5SkhOoD3mz8JATCTSL0B/UdRYIg=");
+            byte[] output = cipher.doFinal(code);
+            log.info(new String(output));
+        }
+
+
     }
+
+    @Test
+    public void decrypt() {
+        {
+            CommonCipher cipher = CommonCipher.init()
+                    .algorithm("AES")
+                    .cipherMode(CommonCipher.CipherMode.ENCRYPT)
+                    .mode("CBC")
+                    .padding("ISO10126Padding")
+                    .privateKey("1234567812345678".getBytes(StandardCharsets.UTF_8))
+                    .iv("1234567812345678")
+                    .build();
+
+            byte[] input = "你好啊".getBytes(StandardCharsets.UTF_8);
+            byte[] output = cipher.doFinal(input);
+
+            String result = Base64.getEncoder().encodeToString(output);
+            log.info("加密: {}", result);
+        }
+
+        {
+            log.info("解密");
+            CommonCipher cipher = CommonCipher.init()
+                    .algorithm("AES")
+                    .cipherMode(CommonCipher.CipherMode.DECRYPT)
+                    .mode("CBC")
+                    .padding("ISO10126Padding")
+                    .privateKey("1234567812345678".getBytes(StandardCharsets.UTF_8))
+                    .iv("1234567812345678")
+                    .build();
+
+            byte[] output = cipher.doFinal(Base64.getDecoder().decode("NKxqB3bLEaBJvtpge5b9in3FewCgZrtNj+aJ3NFmK0/t3bLULm3HST9ThR9fTvbYpCnXK6Pfdi24ZLoJL+Ln4A=="));
+            log.info("解密: {}", new String(output));
+        }
+
+    }
+
 }

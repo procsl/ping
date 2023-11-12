@@ -32,6 +32,7 @@
         <module>ping-web</module>
         <module>ping-jpa</module>
         <module>ping-connect</module>
+        <module>ping-ui</module>
     </modules>
 
     <name>Ping 父模块</name>
