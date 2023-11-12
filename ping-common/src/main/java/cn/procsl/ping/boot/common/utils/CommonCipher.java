@@ -26,7 +26,7 @@ public class CommonCipher {
                          @NonNull String algorithm,
                          @NonNull String mode,
                          @NonNull String padding,
-                         String iv) {
+                         byte[] iv) {
 
         if (!algorithm.equals("AES")) {
             throw new IllegalArgumentException("不支持的算法");
@@ -44,7 +44,7 @@ public class CommonCipher {
 
         try {
             if (iv != null) {
-                IvParameterSpec ivp = new IvParameterSpec(iv.getBytes(StandardCharsets.UTF_8));
+                IvParameterSpec ivp = new IvParameterSpec(iv);
                 this.cipher.init(cipherMode.mode, spec, ivp);
             } else {
                 this.cipher.init(cipherMode.mode, spec);
@@ -62,7 +62,7 @@ public class CommonCipher {
                          @NonNull String algorithm,
                          @NonNull String mode,
                          @NonNull String padding,
-                         String iv) {
+                         byte[] iv) {
 
         this(privateKey.getBytes(StandardCharsets.UTF_8), cipherMode, algorithm, mode, padding, iv);
     }
