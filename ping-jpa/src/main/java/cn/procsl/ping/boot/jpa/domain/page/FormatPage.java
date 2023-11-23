@@ -12,6 +12,7 @@ import org.springframework.lang.NonNull;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 分页从第一页开始
@@ -22,6 +23,8 @@ import java.util.function.Function;
 public class FormatPage<T> implements Page<T> {
 
     final Page<T> page;
+
+    protected List<T> content;
 
     public static <T> FormatPage<T> copy(Page<T> page) {
         if (page instanceof FormatPage) {
@@ -34,6 +37,9 @@ public class FormatPage<T> implements Page<T> {
     @Override
     @NonNull
     public List<T> getContent() {
+        if (this.content != null) {
+            return this.content;
+        }
         return page.getContent();
     }
 

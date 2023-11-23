@@ -1,0 +1,48 @@
+{
+  "name": "ping-ui",
+  "version": "1.0.0",
+  "license": "MIT",
+  "description": "声明式组件",
+  "main": "src/main/js/index.js",
+  "scripts": {
+    "start": "cross-env NODE_ENV=development npx webpack server",
+    "dev": "cross-env NODE_ENV=development webpack",
+    "build": "cross-env NODE_ENV=production webpack"
+  },
+  "directories": {
+    "doc": "doc"
+  },
+  "browserslist": [
+    "defaults"
+  ],
+  "repository": {
+    "url": "no"
+  },
+  "keywords": [
+    "ui"
+  ],
+  "author": "procsl",
+  "devDependencies": {
+    "autoprefixer": "^10.4.16",
+    "clean-webpack-plugin": "^4.0.0",
+    "cross-env": "^7.0.3",
+    "css-loader": "^6.8.1",
+    "css-minimizer-webpack-plugin": "^5.0.1",
+    "cssnano": "^6.0.1",
+    "html-webpack-plugin": "^5.5.3",
+    "mini-css-extract-plugin": "^2.7.6",
+    "postcss": "^8.4.30",
+    "postcss-import": "^15.1.0",
+    "postcss-loader": "^7.3.3",
+    "postcss-nesting": "^12.0.1",
+    "process": "^0.11.10",
+    "style-loader": "^3.3.3",
+    "tailwindcss": "^3.3.3",
+    "terser-webpack-plugin": "^5.3.9",
+    "ts-loader": "^9.5.0",
+    "typescript": "^5.2.2",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1"
+  }
+}

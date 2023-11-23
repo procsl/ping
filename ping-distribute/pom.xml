@@ -600,7 +600,7 @@
         </profile>
 
         <profile>
-            <id>nativeTest</id>
+            <id>native-test</id>
             <dependencies>
                 <dependency>
                     <groupId>org.junit.platform</groupId>
