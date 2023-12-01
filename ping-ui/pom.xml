@@ -36,4 +36,61 @@
 
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>exec-npm-run-build</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <!--程序名称-->
+                            <executable>npm</executable>
+                            <arguments>
+                                <!-- 程序所执行的命令-->
+                                <argument>run</argument>
+                                <argument>build</argument>
+                            </arguments>
+                            <!--前端代码地址-->
+                            <workingDirectory>${basedir}</workingDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <!--maven-resources-plugin：maven复制文件插件-->
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-resource</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <!--输出文件路径-->
+                            <outputDirectory>${project.build.outputDirectory}/META-INF/resources/ui
+                            </outputDirectory>
+                            <resources>
+                                <resource>
+                                    <!--前端代码地址-->
+                                    <directory>${project.build.directory}/dist</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+
+    </build>
+
+
 </project>

@@ -1,0 +1,60 @@
+{
+  "type": "application",
+  "id": "ping.ui.app",
+  "containers": [
+    {
+      "type": "layout",
+      "layout": "left",
+      "containers": [
+        {
+          "type": "menu",
+          "id": "menu.main.welcome",
+          "name": "欢迎",
+          "router": "https://main.procsl.cn/welcome",
+          "order": 1,
+          "description": "主菜单-欢迎页"
+        },
+        {
+          "type": "menu",
+          "id": "menu.main.user-manager",
+          "name": "欢迎",
+          "router": "https://main.procsl.cn/user-manager",
+          "order": 2,
+          "description": "主菜单-用户管理页"
+        }
+      ]
+    },
+    {
+      "type": "layout",
+      "containers": [
+        {
+          "type": "layout",
+          "layout": "top",
+          "containers": [
+            {
+              "type": "user_info_panel",
+              "id": "user_info_panel",
+              "apis": [
+                {
+                  "method": "GET",
+                  "api": "/v1/system/authentications"
+                }
+              ],
+              "description": "用户信息面板"
+            }
+          ]
+        },
+        {
+          "type": "layout",
+          "layout": "bottom",
+          "containers": [
+            {
+              "type": "main_container"
+            }
+          ]
+        }
+      ],
+      "layout": "right"
+    }
+  ]
+}

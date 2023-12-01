@@ -8,7 +8,10 @@ const devMode = process.env.NODE_ENV === 'development' ? 'development' : 'produc
 module.exports = {
     mode: devMode,
     entry: {
-        main: path.join(__dirname, "./src/main/js/index.js"),
+        main: path.join(__dirname, "./src/main/js/index.tsx"),
+    },
+    resolve: {
+        extensions: [".tsx", ".ts", ".js"]
     },
     output: {
         filename: '[name]/[contenthash].js', // 使用 [contenthash] 占位符
@@ -20,6 +23,11 @@ module.exports = {
                 test: /\.css$/,
                 use: [MiniCssExtractPlugin.loader, "css-loader", "postcss-loader"]
             },
+            {
+                test: /\.tsx?$/,
+                use: "ts-loader",
+                exclude: /node_modules/
+            }
         ]
     },
     devServer: {

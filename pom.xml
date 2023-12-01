@@ -16,7 +16,7 @@
         <maven.compiler.compilerVersion>${java.version}</maven.compiler.compilerVersion>
         <compiler.version>${java.version}</compiler.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <springboot.version>3.1.4</springboot.version>
+        <springboot.version>3.2.0</springboot.version>
         <native-plugin.version>0.9.20</native-plugin.version>
         <springdoc.version>2.1.0</springdoc.version>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
@@ -32,7 +32,6 @@
         <module>ping-web</module>
         <module>ping-jpa</module>
         <module>ping-connect</module>
-        <module>ping-ui</module>
     </modules>
 
     <name>Ping 父模块</name>
