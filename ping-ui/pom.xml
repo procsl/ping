@@ -7,7 +7,7 @@
         <version>1.0.0</version>
         <relativePath>../ping-parent</relativePath>
     </parent>
-
+    <name>Ping UI模块</name>
 
     <artifactId>ping-ui</artifactId>
     <packaging>jar</packaging>

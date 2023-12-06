@@ -61,11 +61,5 @@ module.exports = {
         }),
     ],
     devtool: 'inline-source-map', // 设置开发模式下追踪代码 （展示报错的目标文件）
-    optimization: {
-        minimizer: [
-            // 在 webpack@5 中，你可以使用 `...` 语法来扩展现有的 minimizer（即 `terser-webpack-plugin`），将下一行取消注释
-            `...`,
-        ],
-    },
 
 }

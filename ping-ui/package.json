@@ -3,25 +3,31 @@
   "version": "1.0.0",
   "license": "MIT",
   "description": "声明式组件",
-  "main": "src/main/js/index.tsx",
+  "main": "src/main/js/index.ts",
   "scripts": {
     "start": "cross-env NODE_ENV=development npx webpack server",
     "dev": "cross-env NODE_ENV=development webpack",
-    "build": "cross-env NODE_ENV=production webpack"
+    "build": "cross-env NODE_ENV=production webpack",
+    "start-react": "react-scripts start",
+    "build-react": "react-scripts build",
+    "test-react": "react-scripts test",
+    "eject-react": "react-scripts eject"
   },
-  "type": "module",
   "directories": {
     "doc": "doc"
   },
-  "browserslist": [
-    "defaults"
-  ],
   "repository": {
     "url": "no"
   },
   "keywords": [
     "ui"
   ],
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
   "author": "procsl",
   "devDependencies": {
     "autoprefixer": "^10.4.16",
@@ -48,7 +54,29 @@
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.18.67",
+    "@types/react": "^18.2.42",
+    "@types/react-dom": "^18.2.17",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "typescript": "^4.9.5",
+    "web-vitals": "^2.1.4"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
