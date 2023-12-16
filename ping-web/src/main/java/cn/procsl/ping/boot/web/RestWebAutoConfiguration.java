@@ -1,10 +1,6 @@
 package cn.procsl.ping.boot.web;
 
-import cn.procsl.ping.boot.web.cipher.CipherGenericConverter;
-import cn.procsl.ping.boot.web.cipher.CipherSecurityService;
-import cn.procsl.ping.boot.web.cipher.JacksonSecurityIdAnnotationIntrospector;
-import cn.procsl.ping.boot.web.cipher.SimplerCipherSecurityService;
-import cn.procsl.ping.boot.web.component.AccessLoggerFilter;
+import cn.procsl.ping.boot.web.cipher.*;
 import cn.procsl.ping.boot.web.component.CommonErrorAttributes;
 import cn.procsl.ping.boot.web.component.GlobalExceptionHandler;
 import cn.procsl.ping.boot.web.component.SpringContextHolder;
@@ -26,8 +22,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.format.FormatterRegistry;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.lang.reflect.Constructor;
@@ -56,16 +50,16 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProce
         introspector.setApplicationContext(applicationContext);
     }
 
-//    @Bean("accessLoggerFilterBean")
-//    @ConditionalOnMissingBean(name = "accessLoggerFilterBean")
-//    public FilterRegistrationBean<AccessLoggerFilter> accessLoggerFilterFilterRegistrationBean() {
-//        FilterRegistrationBean<AccessLoggerFilter> filter = new FilterRegistrationBean<>();
-//        filter.setFilter(new AccessLoggerFilter());
-//        filter.setName("accessLoggerFilter");
-//        filter.setOrder(Integer.MIN_VALUE);
-//        filter.setUrlPatterns(List.of("/*"));
-//        return filter;
-//    }
+    @Bean("cipherFilter")
+    @ConditionalOnMissingBean(name = "cipherFilter")
+    public FilterRegistrationBean<CipherFilter> accessLoggerFilterFilterRegistrationBean() {
+        FilterRegistrationBean<CipherFilter> filter = new FilterRegistrationBean<>();
+        filter.setFilter(new CipherFilter((i) -> true,i -> true));
+        filter.setName("cipherFilter");
+        filter.setOrder(Integer.MIN_VALUE + 1);
+        filter.setUrlPatterns(List.of("/*"));
+        return filter;
+    }
 
     @Override
     public void addFormatters(FormatterRegistry registry) {

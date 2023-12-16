@@ -45,9 +45,9 @@ final public class CipherGenericConverter implements GenericConverter, Condition
         }
     }
 
+    @Getter
     public static class ConverterException extends CipherException {
 
-        @Getter
         final String filedName;
 
         public ConverterException(String fieldName, String source, String message, Throwable e) {
