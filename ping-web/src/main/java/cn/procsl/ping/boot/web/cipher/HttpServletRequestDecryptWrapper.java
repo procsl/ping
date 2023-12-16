@@ -21,7 +21,7 @@ import java.util.*;
  * application/vnd.enc;encode=binary;origin=base64
  */
 @Slf4j
-class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
+final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
 
     final static String ORIGIN_TYPE_NAME_ENUM = "origin";
 

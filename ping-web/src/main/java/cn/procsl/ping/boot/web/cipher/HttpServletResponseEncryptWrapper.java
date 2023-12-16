@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletResponseWrapper;
 
 import java.util.Collection;
 
-class HttpServletResponseEncryptWrapper extends HttpServletResponseWrapper {
+final class HttpServletResponseEncryptWrapper extends HttpServletResponseWrapper {
 
 
     public HttpServletResponseEncryptWrapper(HttpServletRequest request, HttpServletResponse response) {
@@ -19,7 +19,7 @@ class HttpServletResponseEncryptWrapper extends HttpServletResponseWrapper {
         return super.getHeaders(name);
     }
 
-    protected void toEncrypt() {
+    void toEncrypt() {
     }
 
 
