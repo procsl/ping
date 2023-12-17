@@ -112,7 +112,7 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
         return this.currentParameter;
     }
 
-    protected void parseParameter() {
+    private void parseParameter() {
         String queryString = this.getHttpServletRequest().getQueryString();
         Map<String, String[]> map = super.getParameterMap();
         this.currentParameter = map;
@@ -134,7 +134,7 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
         return this.currentParameter.get(name);
     }
 
-    protected HttpServletRequest getHttpServletRequest() {
+    private HttpServletRequest getHttpServletRequest() {
         ServletRequest tmp = super.getRequest();
         return (HttpServletRequest) tmp;
     }
@@ -151,7 +151,7 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
         return super.getReader();
     }
 
-    protected static MimeType parseMimeType(String header) {
+    private static MimeType parseMimeType(String header) {
         try {
             return MimeType.valueOf(header);
         } catch (InvalidMimeTypeException e) {
@@ -159,5 +159,8 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
         }
         return null;
     }
+
+
+
 
 }
