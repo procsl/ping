@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 @Slf4j
-public class TransformServletInputStream extends FilterInputStream implements Transform.TransformWriter {
+public class TransformInputStream extends FilterInputStream implements Transform.TransformWriter {
 
 
     private final byte[] readBuffer = new byte[1024];
@@ -18,7 +18,7 @@ public class TransformServletInputStream extends FilterInputStream implements Tr
 
     private int writeOffset = 0;
 
-    protected TransformServletInputStream(InputStream in, Transform transform) {
+    protected TransformInputStream(InputStream in, Transform transform) {
         super(in);
         transform.init(this);
         this.transform = transform;
