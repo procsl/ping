@@ -1,17 +1,12 @@
 import React from "react";
 import {createRoot} from 'react-dom/client';
+import MainContainer from "./ui/antd/MainContainer";
 
-function MyButton({title}: { title: string }) {
-    return (
-        <button>{title}</button>
-    );
-}
-
-export default function MyApp() {
+export default function Application() {
     return (
         <div>
             <h1>欢迎来到我的应用</h1>
-            <MyButton title="我是一个按钮"/>
+            <MainContainer/>
         </div>
     );
 }
@@ -22,5 +17,5 @@ let element = document.getElementById('app');
 if (element != null) {
 // 渲染你的 React 组件
     const root = createRoot(element);
-    root.render(<MyApp/>);
+    root.render(<Application/>);
 }
