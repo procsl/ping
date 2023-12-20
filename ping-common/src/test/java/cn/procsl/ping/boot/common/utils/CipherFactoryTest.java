@@ -11,15 +11,15 @@ import java.security.SecureRandom;
 import java.util.Base64;
 
 @Slf4j
-public class CommonCipherTest {
+public class CipherFactoryTest {
 
     @Test
     public void doFinal() throws NoSuchAlgorithmException {
 
         {
-            CommonCipher cipher = CommonCipher.init()
+            CipherFactory cipher = CipherFactory.init()
                     .algorithm("AES")
-                    .cipherMode(CommonCipher.CipherMode.ENCRYPT)
+                    .cipherMode(CipherFactory.CipherMode.ENCRYPT)
                     .mode("CBC")
                     .padding("PKCS5Padding")
                     .privateKey("1234567812345678".getBytes(StandardCharsets.UTF_8))
@@ -33,9 +33,9 @@ public class CommonCipherTest {
             log.info(result);
         }
         {
-            CommonCipher cipher = CommonCipher.init()
+            CipherFactory cipher = CipherFactory.init()
                     .algorithm("AES")
-                    .cipherMode(CommonCipher.CipherMode.ENCRYPT)
+                    .cipherMode(CipherFactory.CipherMode.ENCRYPT)
                     .mode("ECB")
                     .padding("PKCS5Padding")
                     .privateKey("1234567812345678".getBytes(StandardCharsets.UTF_8))
@@ -49,9 +49,9 @@ public class CommonCipherTest {
         }
 
         {
-            CommonCipher cipher = CommonCipher.init()
+            CipherFactory cipher = CipherFactory.init()
                     .algorithm("AES")
-                    .cipherMode(CommonCipher.CipherMode.ENCRYPT)
+                    .cipherMode(CipherFactory.CipherMode.ENCRYPT)
                     .mode("ECB")
                     .padding("ISO10126Padding")
                     .privateKey("1234567812345678".getBytes(StandardCharsets.UTF_8))
@@ -65,9 +65,9 @@ public class CommonCipherTest {
         }
 
         {
-            CommonCipher cipher = CommonCipher.init()
+            CipherFactory cipher = CipherFactory.init()
                     .algorithm("AES")
-                    .cipherMode(CommonCipher.CipherMode.ENCRYPT)
+                    .cipherMode(CipherFactory.CipherMode.ENCRYPT)
                     .mode("ECB")
                     .padding("ISO10126Padding")
                     .privateKey("1234567812345678".getBytes(StandardCharsets.UTF_8))
@@ -91,9 +91,9 @@ public class CommonCipherTest {
             SecretKey secretKey = generator.generateKey();
             byte[] key = secretKey.getEncoded();
 
-            CommonCipher cipher = CommonCipher.init()
+            CipherFactory cipher = CipherFactory.init()
                     .algorithm("AES")
-                    .cipherMode(CommonCipher.CipherMode.ENCRYPT)
+                    .cipherMode(CipherFactory.CipherMode.ENCRYPT)
                     .mode("ECB")
                     .padding("PKCS5Padding")
                     .privateKey(key)
@@ -118,9 +118,9 @@ public class CommonCipherTest {
             SecretKey secretKey = generator.generateKey();
             byte[] key = secretKey.getEncoded();
 
-            CommonCipher cipher = CommonCipher.init()
+            CipherFactory cipher = CipherFactory.init()
                     .algorithm("AES")
-                    .cipherMode(CommonCipher.CipherMode.ENCRYPT)
+                    .cipherMode(CipherFactory.CipherMode.ENCRYPT)
                     .mode("ECB")
                     .padding("PKCS5Padding")
                     .privateKey(key)
@@ -136,9 +136,9 @@ public class CommonCipherTest {
 
         {
             log.info("解密结果");
-            CommonCipher cipher = CommonCipher.init()
+            CipherFactory cipher = CipherFactory.init()
                     .algorithm("AES")
-                    .cipherMode(CommonCipher.CipherMode.DECRYPT)
+                    .cipherMode(CipherFactory.CipherMode.DECRYPT)
                     .mode("CBC")
                     .padding("ISO10126Padding")
                     .privateKey("1234567812345678".getBytes(StandardCharsets.UTF_8))
@@ -156,9 +156,9 @@ public class CommonCipherTest {
     @Test
     public void decrypt() {
         {
-            CommonCipher cipher = CommonCipher.init()
+            CipherFactory cipher = CipherFactory.init()
                     .algorithm("AES")
-                    .cipherMode(CommonCipher.CipherMode.ENCRYPT)
+                    .cipherMode(CipherFactory.CipherMode.ENCRYPT)
                     .mode("CBC")
                     .padding("ISO10126Padding")
                     .privateKey("1234567812345678".getBytes(StandardCharsets.UTF_8))
@@ -174,9 +174,9 @@ public class CommonCipherTest {
 
         {
             log.info("解密");
-            CommonCipher cipher = CommonCipher.init()
+            CipherFactory cipher = CipherFactory.init()
                     .algorithm("AES")
-                    .cipherMode(CommonCipher.CipherMode.DECRYPT)
+                    .cipherMode(CipherFactory.CipherMode.DECRYPT)
                     .mode("CBC")
                     .padding("ISO10126Padding")
                     .privateKey("1234567812345678".getBytes(StandardCharsets.UTF_8))
@@ -189,9 +189,9 @@ public class CommonCipherTest {
 
         {
             log.info("加密密");
-            CommonCipher cipher = CommonCipher.init()
+            CipherFactory cipher = CipherFactory.init()
                     .algorithm("AES")
-                    .cipherMode(CommonCipher.CipherMode.ENCRYPT)
+                    .cipherMode(CipherFactory.CipherMode.ENCRYPT)
                     .mode("CBC")
                     .padding("ISO10126Padding")
                     .privateKey("1234567812345678".getBytes(StandardCharsets.UTF_8))
@@ -228,9 +228,9 @@ public class CommonCipherTest {
         String out;
         {
             log.info("加密");
-            CommonCipher cipher = CommonCipher.init()
+            CipherFactory cipher = CipherFactory.init()
                     .algorithm("AES")
-                    .cipherMode(CommonCipher.CipherMode.ENCRYPT)
+                    .cipherMode(CipherFactory.CipherMode.ENCRYPT)
                     .mode("CBC")
                     .padding("ISO10126Padding")
                     .privateKey(key)
@@ -245,9 +245,9 @@ public class CommonCipherTest {
 
         {
             log.info("解密");
-            CommonCipher cipher = CommonCipher.init()
+            CipherFactory cipher = CipherFactory.init()
                     .algorithm("AES")
-                    .cipherMode(CommonCipher.CipherMode.DECRYPT)
+                    .cipherMode(CipherFactory.CipherMode.DECRYPT)
                     .mode("CBC")
                     .padding("ISO10126Padding")
                     .privateKey(key)
@@ -262,9 +262,9 @@ public class CommonCipherTest {
         log.info("再加密: {}", out);
         {
             log.info("解密");
-            CommonCipher cipher = CommonCipher.init()
+            CipherFactory cipher = CipherFactory.init()
                     .algorithm("AES")
-                    .cipherMode(CommonCipher.CipherMode.DECRYPT)
+                    .cipherMode(CipherFactory.CipherMode.DECRYPT)
                     .mode("CBC")
                     .padding("ISO10126Padding")
                     .privateKey(key)

@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 
 @Builder
 @RequiredArgsConstructor
-public class HttpServletInputStreamAdapter extends ServletInputStream {
+public final class HttpServletInputStreamAdapter extends ServletInputStream {
 
     private final InputStream inputStream;
     private final Supplier<Boolean> isFinished;
@@ -34,6 +34,7 @@ public class HttpServletInputStreamAdapter extends ServletInputStream {
     public void setReadListener(ReadListener readListener) {
         this.setReadListener.accept(readListener);
     }
+
 
     @Override
     public int read() throws IOException {

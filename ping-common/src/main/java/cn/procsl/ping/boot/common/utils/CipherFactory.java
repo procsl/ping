@@ -2,6 +2,7 @@ package cn.procsl.ping.boot.common.utils;
 
 import cn.procsl.ping.boot.common.error.BusinessException;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NonNull;
 
 import javax.crypto.BadPaddingException;
@@ -15,18 +16,19 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
-public class CommonCipher {
+public final class CipherFactory {
 
+    @Getter
     private final Cipher cipher;
     private final CipherMode m;
 
     @Builder(builderMethodName = "init")
-    private CommonCipher(@NonNull byte[] privateKey,
-                         @NonNull CipherMode cipherMode,
-                         @NonNull String algorithm,
-                         @NonNull String mode,
-                         @NonNull String padding,
-                         byte[] iv) {
+    private CipherFactory(@NonNull byte[] privateKey,
+                          @NonNull CipherMode cipherMode,
+                          @NonNull String algorithm,
+                          @NonNull String mode,
+                          @NonNull String padding,
+                          byte[] iv) {
 
         if (!algorithm.equals("AES")) {
             throw new IllegalArgumentException("不支持的算法");
@@ -57,12 +59,12 @@ public class CommonCipher {
         this.m = cipherMode;
     }
 
-    private CommonCipher(@NonNull String privateKey,
-                         @NonNull CipherMode cipherMode,
-                         @NonNull String algorithm,
-                         @NonNull String mode,
-                         @NonNull String padding,
-                         byte[] iv) {
+    private CipherFactory(@NonNull String privateKey,
+                          @NonNull CipherMode cipherMode,
+                          @NonNull String algorithm,
+                          @NonNull String mode,
+                          @NonNull String padding,
+                          byte[] iv) {
 
         this(privateKey.getBytes(StandardCharsets.UTF_8), cipherMode, algorithm, mode, padding, iv);
     }

@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.web.cipher;
 
-import jakarta.servlet.ReadListener;
+import cn.procsl.ping.boot.common.utils.CipherFactory;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,13 +10,12 @@ import org.springframework.http.MediaType;
 import org.springframework.util.InvalidMimeTypeException;
 import org.springframework.util.MimeType;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
+import java.io.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.function.Consumer;
 
 /**
  * 完整格式
@@ -36,8 +35,13 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
 
     final static String defaultContentType = MediaType.APPLICATION_JSON_VALUE;
 
+    boolean isBase64 = false;
 
     Map<String, String[]> currentParameter;
+
+    private ServletInputStream inputStream = null;
+
+    private BufferedReader reader = null;
 
     public HttpServletRequestDecryptWrapper(HttpServletRequest request) {
         super(request);
@@ -144,16 +148,47 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
 
     @Override
     public ServletInputStream getInputStream() throws IOException {
-        log.info("获取input-stream");
-        ServletInputStream is = super.getInputStream();
-        InputStream dis = Base64.getDecoder().wrap(is);
-        return HttpServletInputStreamAdapter.builder().inputStream(dis).setReadListener(is::setReadListener).build();
+        if (this.inputStream == null) {
+            log.info("获取InputStream");
+            ServletInputStream is = super.getInputStream();
+            // TODO 需要探测是否有编码, 默认 base64
+            InputStream dis = Base64.getDecoder().wrap(is);
+            Cipher cipher = CipherFactory.init().build().getCipher();
+            CipherInputStream cis = new CipherInputStream(dis, cipher);
+            this.inputStream = HttpServletInputStreamAdapter
+                    .builder()
+                    .inputStream(cis)
+                    .setReadListener(is::setReadListener)
+                    .isReady(is::isReady)
+                    .isFinished(() -> {
+                        try {
+                            return cis.available() <= 0 && is.isFinished();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }).build();
+        }
+        return this.inputStream;
+    }
+
+
+    @Override
+    public String getCharacterEncoding() {
+        String enc = super.getCharacterEncoding();
+        return enc != null ? enc : "ISO-8859-1";
     }
 
     @Override
     public BufferedReader getReader() throws IOException {
-        log.info("获取reader");
-        return super.getReader();
+        if (this.reader == null) {
+            log.info("获取reader");
+            // TODO 编码需要进一步探测 Content-Type, 默认为 UTF8
+
+            Reader reader = new InputStreamReader(this.getInputStream(), this.getCharacterEncoding());
+            // TODO 需要探测 Content-Length, 默认 128
+            this.reader = new BufferedReader(reader, 128);
+        }
+        return this.reader;
     }
 
     private static MimeType parseMimeType(String header) {
