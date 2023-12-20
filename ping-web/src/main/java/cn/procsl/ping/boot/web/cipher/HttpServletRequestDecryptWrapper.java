@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.web.cipher;
 
+import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,9 +12,11 @@ import org.springframework.util.MimeType;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * 完整格式
@@ -142,7 +145,9 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
     @Override
     public ServletInputStream getInputStream() throws IOException {
         log.info("获取input-stream");
-        return super.getInputStream();
+        ServletInputStream is = super.getInputStream();
+        InputStream dis = Base64.getDecoder().wrap(is);
+        return HttpServletInputStreamAdapter.builder().inputStream(dis).setReadListener(is::setReadListener).build();
     }
 
     @Override
@@ -159,8 +164,6 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
         }
         return null;
     }
-
-
 
 
 }
