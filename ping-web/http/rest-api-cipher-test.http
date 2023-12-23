@@ -1,0 +1,12 @@
+### 加密测试
+< {%
+
+    const CryptoJS = require('./crypto-js')
+    // import CryptoJS.AES from './crypto-js';
+    // request.variables.set("test-string", AES.toString());
+    // console.log("test");
+
+%}
+
+POST http://localhost:8080/test/cipher/parameter
+Content-Type: application/x-www-form-urlencoded

@@ -7,14 +7,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.util.InvalidMimeTypeException;
 import org.springframework.util.MimeType;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
 import java.io.*;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -57,29 +54,10 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
 
         // 重新解析 Content-Type 头
         if (HTTP_CONTENT_TYPE_ENUM.equalsIgnoreCase(name)) {
-            return parseOriginContentType(header);
+            return CipherRequestUtils.parseOriginContentType(header);
         }
 
         return header;
-    }
-
-    public static String parseOriginContentType(String header) {
-        MimeType type = parseMimeType(header);
-
-        if (type == null) {
-            return header;
-        }
-
-        if (!ENCRYPT_MIME_TYPE.equalsTypeAndSubtype(type)) {
-            return header;
-        }
-
-        String parameter = type.getParameter(ORIGIN_TYPE_NAME_ENUM);
-        if (parameter == null || parameter.isEmpty()) {
-            return defaultContentType;
-        }
-        // 需要解码一次, 防止特殊字符导致参数解析失败
-        return URLDecoder.decode(parameter, StandardCharsets.UTF_8);
     }
 
 
@@ -98,7 +76,7 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
 
         HashSet<String> set = new HashSet<>();
         do {
-            String result = parseOriginContentType(tmp.nextElement());
+            String result = CipherRequestUtils.parseOriginContentType(tmp.nextElement());
             set.add(result);
         } while (tmp.hasMoreElements());
 
@@ -155,18 +133,13 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
             InputStream dis = Base64.getDecoder().wrap(is);
             Cipher cipher = CipherFactory.init().build().getCipher();
             CipherInputStream cis = new CipherInputStream(dis, cipher);
-            this.inputStream = HttpServletInputStreamAdapter
-                    .builder()
-                    .inputStream(cis)
-                    .setReadListener(is::setReadListener)
-                    .isReady(is::isReady)
-                    .isFinished(() -> {
-                        try {
-                            return cis.available() <= 0 && is.isFinished();
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }).build();
+            this.inputStream = HttpServletInputStreamAdapter.builder().inputStream(cis).setReadListener(is::setReadListener).isReady(is::isReady).isFinished(() -> {
+                try {
+                    return cis.available() <= 0 && is.isFinished();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }).build();
         }
         return this.inputStream;
     }
@@ -189,15 +162,6 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
             this.reader = new BufferedReader(reader, 128);
         }
         return this.reader;
-    }
-
-    private static MimeType parseMimeType(String header) {
-        try {
-            return MimeType.valueOf(header);
-        } catch (InvalidMimeTypeException e) {
-            log.warn("解析请求头Content-Type失败:", e);
-        }
-        return null;
     }
 
 
