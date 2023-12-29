@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.InputStream;
 
-import static io.netty.handler.codec.http.HttpHeaders.Values.APPLICATION_JSON;
 
 @Indexed
 @RestController
@@ -32,7 +31,7 @@ public class ComponentController implements InitializingBean {
     private String ui;
 
 
-    @GetMapping(value = "/v1/ui/components", produces = APPLICATION_JSON)
+    @GetMapping(value = "/v1/ui/components", produces = "application/json")
     public String queryComponents() {
         return ui;
     }

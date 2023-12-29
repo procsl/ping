@@ -3,12 +3,11 @@ package cn.procsl.ping.boot.common.error;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 
-import javax.sql.rowset.serial.SerialArray;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Schema(description = "格式化输出参数校验错误信息")
 public class ParameterErrorVO extends ErrorVO {

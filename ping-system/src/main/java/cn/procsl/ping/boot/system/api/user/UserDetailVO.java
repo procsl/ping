@@ -4,7 +4,6 @@ import cn.procsl.ping.boot.system.domain.user.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.hateoas.RepresentationModel;
 
 @Data
 @NoArgsConstructor

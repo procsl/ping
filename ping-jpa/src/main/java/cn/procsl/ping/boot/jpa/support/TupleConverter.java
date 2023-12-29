@@ -4,7 +4,6 @@ import jakarta.persistence.Tuple;
 import jakarta.persistence.TupleElement;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.repository.query.ReturnedType;
-import org.springframework.lang.NonNullApi;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 

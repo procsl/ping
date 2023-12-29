@@ -1,9 +1,8 @@
 package cn.procsl.ping.boot.system.domain.rbac;
 
+import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
-
-import jakarta.persistence.criteria.*;
 
 @RequiredArgsConstructor
 public class SubjectRoleSpec implements Specification<Subject> {

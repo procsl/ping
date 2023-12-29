@@ -1,12 +1,13 @@
 package cn.procsl.ping.apt.repository;
 
+import jakarta.persistence.Id;
+
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
-import jakarta.persistence.Id;
 import javax.tools.Diagnostic;
 import java.util.Collection;
 import java.util.Collections;

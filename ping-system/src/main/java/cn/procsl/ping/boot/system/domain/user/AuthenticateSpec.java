@@ -1,13 +1,12 @@
 package cn.procsl.ping.boot.system.domain.user;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.domain.Specification;
-
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 
 @RequiredArgsConstructor
 public class AuthenticateSpec implements Specification<Authenticate> {

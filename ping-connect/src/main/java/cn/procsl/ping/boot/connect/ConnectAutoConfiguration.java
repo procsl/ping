@@ -4,7 +4,6 @@ import cn.procsl.ping.boot.connect.server.Namespace;
 import cn.procsl.ping.boot.connect.server.SocketIOServer;
 import cn.procsl.ping.boot.connect.server.SocketIOServerBuilder;
 import io.socket.engineio.server.EngineIoServerOptions;
-import lombok.SneakyThrows;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;

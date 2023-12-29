@@ -1,12 +1,11 @@
 package cn.procsl.ping.boot.jpa.util;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
-
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ContextHolder {

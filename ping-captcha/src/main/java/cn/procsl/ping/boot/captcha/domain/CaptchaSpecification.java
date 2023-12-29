@@ -1,13 +1,13 @@
 package cn.procsl.ping.boot.captcha.domain;
 
-import lombok.RequiredArgsConstructor;
-import lombok.val;
-import org.springframework.data.jpa.domain.Specification;
-
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
+import org.springframework.data.jpa.domain.Specification;
+
 import java.util.Date;
 
 @RequiredArgsConstructor

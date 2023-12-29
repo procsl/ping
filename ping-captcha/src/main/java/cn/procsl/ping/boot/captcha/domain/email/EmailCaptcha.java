@@ -3,12 +3,11 @@ package cn.procsl.ping.boot.captcha.domain.email;
 import cn.procsl.ping.boot.captcha.domain.Captcha;
 import cn.procsl.ping.boot.captcha.domain.CaptchaType;
 import cn.procsl.ping.boot.jpa.support.RepositoryCreator;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import jakarta.persistence.*;
 
 
 @Getter

@@ -1,10 +1,9 @@
 package cn.procsl.ping.boot.captcha.handler;
 
-import org.springframework.lang.NonNull;
-import org.springframework.util.ObjectUtils;
-
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.lang.NonNull;
+import org.springframework.util.ObjectUtils;
 
 import static cn.procsl.ping.boot.captcha.domain.image.ImageCaptcha.token_key;
 

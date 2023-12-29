@@ -1,9 +1,8 @@
 package cn.procsl.ping.boot.system.api.user;
 
-import lombok.Data;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
 
 @Data
 public class ResetPasswordDTO {

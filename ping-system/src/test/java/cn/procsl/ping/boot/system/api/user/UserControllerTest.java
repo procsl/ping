@@ -2,8 +2,8 @@ package cn.procsl.ping.boot.system.api.user;
 
 
 import cn.procsl.ping.boot.system.TestSystemApplication;
-import cn.procsl.ping.boot.system.domain.user.Gender;
 import cn.procsl.ping.boot.system.api.LoginUtils;
+import cn.procsl.ping.boot.system.domain.user.Gender;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.github.javafaker.Faker;
 import com.github.jsonzou.jmockdata.MockConfig;

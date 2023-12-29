@@ -1,10 +1,10 @@
 package cn.procsl.ping.boot.system;
 
 import cn.procsl.ping.boot.jpa.support.EnableDomainRepositories;
+import cn.procsl.ping.boot.system.api.user.AuthenticateInterceptor;
 import cn.procsl.ping.boot.system.constant.SystemConfigureProperties;
 import cn.procsl.ping.boot.system.domain.user.RoleSettingService;
 import cn.procsl.ping.boot.system.service.ConfigFacade;
-import cn.procsl.ping.boot.system.api.user.AuthenticateInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

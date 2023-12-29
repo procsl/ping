@@ -11,8 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @Slf4j
 @DisplayName("JPA接口查询测试")
 @Transactional

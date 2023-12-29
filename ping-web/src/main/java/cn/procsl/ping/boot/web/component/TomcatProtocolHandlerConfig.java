@@ -4,7 +4,6 @@ import cn.procsl.ping.boot.common.utils.TraceIdGenerator;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.web.embedded.tomcat.TomcatProtocolHandlerCustomizer;
 import org.springframework.context.annotation.Bean;
 
@@ -13,7 +12,7 @@ import java.util.concurrent.ThreadFactory;
 
 import static java.util.concurrent.Executors.newThreadPerTaskExecutor;
 
-@AutoConfiguration
+//@AutoConfiguration
 public class TomcatProtocolHandlerConfig {
 
 

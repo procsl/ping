@@ -12,7 +12,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.util.MimeType;
 
 import javax.inject.Inject;
-
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 

@@ -1,9 +1,11 @@
 package cn.procsl.ping.boot.product.domain;
 
 import cn.procsl.ping.boot.jpa.support.RepositoryCreator;
-import lombok.*;
-
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.Serializable;
 
