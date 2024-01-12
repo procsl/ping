@@ -32,7 +32,7 @@ public class CipherFilterController {
 
     @PostMapping(path = "/test/cipher/array")
     public String[] test3(@RequestParam String[] b) throws BusinessException {
-        log.info("json: {}", b);
+        log.info("json: {}", (Object[]) b);
         return b;
     }
 

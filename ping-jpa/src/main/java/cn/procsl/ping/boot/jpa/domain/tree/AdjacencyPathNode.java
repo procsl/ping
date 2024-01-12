@@ -22,7 +22,6 @@ public interface AdjacencyPathNode<ID extends Serializable> extends Serializable
      *
      * @return id
      */
-    @Deprecated
     @Column(updatable = false, insertable = false)
     ID getCurrentId();
 
