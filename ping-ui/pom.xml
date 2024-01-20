@@ -38,31 +38,31 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.1.0</version>
-                <executions>
-                    <execution>
-                        <id>exec-npm-run-build</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <!--程序名称-->
-                            <executable>npm</executable>
-                            <arguments>
-                                <!-- 程序所执行的命令-->
-                                <argument>run</argument>
-                                <argument>build</argument>
-                            </arguments>
-                            <!--前端代码地址-->
-                            <workingDirectory>${basedir}</workingDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.codehaus.mojo</groupId>-->
+<!--                <artifactId>exec-maven-plugin</artifactId>-->
+<!--                <version>3.1.0</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>exec-npm-run-build</id>-->
+<!--                        <phase>prepare-package</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>exec</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            &lt;!&ndash;程序名称&ndash;&gt;-->
+<!--                            <executable>npm</executable>-->
+<!--                            <arguments>-->
+<!--                                &lt;!&ndash; 程序所执行的命令&ndash;&gt;-->
+<!--                                <argument>run</argument>-->
+<!--                                <argument>build</argument>-->
+<!--                            </arguments>-->
+<!--                            &lt;!&ndash;前端代码地址&ndash;&gt;-->
+<!--                            <workingDirectory>${basedir}</workingDirectory>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
 
             <plugin>
                 <!--maven-resources-plugin：maven复制文件插件-->
