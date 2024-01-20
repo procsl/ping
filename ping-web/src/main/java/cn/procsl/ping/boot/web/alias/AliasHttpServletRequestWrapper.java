@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.web.alias;
 
-import cn.procsl.ping.boot.web.cipher.CipherSecurityService;
+import cn.procsl.ping.boot.web.cipher.CipherLockupService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 
@@ -9,12 +9,12 @@ import java.util.Map;
 
 public class AliasHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
-    private final CipherSecurityService cipherSecurityService;
+    private final CipherLockupService cipherLockupService;
     private String requestURI;
 
-    public AliasHttpServletRequestWrapper(HttpServletRequest request, CipherSecurityService cipherSecurityService) {
+    public AliasHttpServletRequestWrapper(HttpServletRequest request, CipherLockupService cipherLockupService) {
         super(request);
-        this.cipherSecurityService = cipherSecurityService;
+        this.cipherLockupService = cipherLockupService;
     }
 
     @Override

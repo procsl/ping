@@ -1,21 +1,22 @@
-package cn.procsl.ping.boot.web.cipher;
+package cn.procsl.ping.boot.web.cipher.id;
 
 import cn.procsl.ping.boot.web.annotation.SecurityId;
+import cn.procsl.ping.boot.web.cipher.CipherException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
 import java.io.IOException;
 
-@Slf4j
 @RequiredArgsConstructor
 final class JacksonCipherEncodeSerializer extends JsonSerializer<Long> {
 
     final SecurityId securityId;
 
-    final CipherSecurityService encryptDecryptService;
+    final SecurityIdCipherService cipherService;
 
     @Override
     public void serialize(Long number, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
@@ -23,7 +24,12 @@ final class JacksonCipherEncodeSerializer extends JsonSerializer<Long> {
             return;
         }
 
-        String str = encryptDecryptService.encrypt(number, securityId);
+        String str;
+        try {
+            str = cipherService.encrypt(number, securityId);
+        } catch (IllegalBlockSizeException | BadPaddingException e) {
+            throw new CipherException("加密失败", e);
+        }
         jsonGenerator.writeString(str);
     }
 

@@ -1,14 +1,19 @@
 package cn.procsl.ping.boot.web;
 
-import cn.procsl.ping.boot.web.cipher.*;
+import cn.procsl.ping.boot.web.cipher.CipherLockupService;
+import cn.procsl.ping.boot.web.cipher.SimpleCipherLockupService;
+import cn.procsl.ping.boot.web.cipher.filter.CipherFilter;
+import cn.procsl.ping.boot.web.cipher.filter.CipherRequestResolver;
+import cn.procsl.ping.boot.web.cipher.id.CipherSecurityBuilder;
 import cn.procsl.ping.boot.web.component.CommonErrorAttributes;
 import cn.procsl.ping.boot.web.component.GlobalExceptionHandler;
-import cn.procsl.ping.boot.web.component.SpringContextHolder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -25,8 +30,6 @@ import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.List;
 
 /**
@@ -42,19 +45,17 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProce
 
     final ApplicationContext applicationContext;
 
-    final JacksonSecurityIdAnnotationIntrospector introspector = new JacksonSecurityIdAnnotationIntrospector();
 
     public RestWebAutoConfiguration(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
-        SpringContextHolder.setContext(applicationContext);
-        introspector.setApplicationContext(applicationContext);
     }
 
     @Bean("cipherFilter")
     @ConditionalOnMissingBean(name = "cipherFilter")
-    public FilterRegistrationBean<CipherFilter> accessLoggerFilterFilterRegistrationBean() {
+    public FilterRegistrationBean<CipherFilter> accessLoggerFilterFilterRegistrationBean(@Autowired CipherLockupService lockupService,
+                                                                                         @Autowired(required = false) CipherRequestResolver resolver) {
         FilterRegistrationBean<CipherFilter> filter = new FilterRegistrationBean<>();
-        filter.setFilter(new CipherFilter((i) -> true,i -> true));
+        filter.setFilter(new CipherFilter(resolver, lockupService));
         filter.setName("cipherFilter");
         filter.setOrder(Integer.MIN_VALUE + 1);
         filter.setUrlPatterns(List.of("/*"));
@@ -63,10 +64,16 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProce
 
     @Override
     public void addFormatters(FormatterRegistry registry) {
-        CipherSecurityService server = this.applicationContext.getBean(CipherSecurityService.class);
-        registry.addConverter(new CipherGenericConverter(server));
+        CipherLockupService server = this.applicationContext.getBean(CipherLockupService.class);
+        registry.addConverter(CipherSecurityBuilder.buildConverter(server));
     }
 
+
+    @Bean
+    @ConditionalOnMissingBean(name = "cipherLockupService")
+    public CipherLockupService cipherLockupService() {
+        return new SimpleCipherLockupService();
+    }
 
     final static String MODEL_RESOLVER = "io.swagger.v3.core.jackson.ModelResolver";
 
@@ -93,54 +100,19 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProce
     }
 
 
-    @Bean
-    @ConditionalOnMissingBean(value = CipherSecurityService.class)
-    public CipherSecurityService cipherSecurityService() {
-        return new SimplerCipherSecurityService();
-    }
-
     @Override
     @SneakyThrows
     public Object postProcessBeforeInitialization(@Nonnull Object bean, @Nonnull String beanName) throws BeansException {
         if (bean instanceof ObjectMapper mapper) {
-            mapper.setAnnotationIntrospector(introspector);
+            CipherLockupService server = this.applicationContext.getBean(CipherLockupService.class);
+            mapper.setAnnotationIntrospector(CipherSecurityBuilder.buildJacsonIntrospector(server));
         }
 
         if (beanName.equals("mvcConversionService") && bean instanceof WebConversionService conversionService) {
-            log.info("hook WebConversionService");
-            var wrapper = new CipherGenericConverter.ErrorProcessWevConversionService();
-
-            var targetStart = wrapper.getClass().getSuperclass();
-            do {
-                copyProperties(conversionService, wrapper, targetStart);
-                targetStart = targetStart.getSuperclass();
-            } while (targetStart != null);
-
-            return wrapper;
+            return CipherSecurityBuilder.hookMvcConversionService(conversionService);
         }
 
         return bean;
-    }
-
-    protected void copyProperties(Object source, Object target, Class<?> clazz) throws IllegalAccessException {
-        Field[] fields = clazz.getDeclaredFields();
-        for (Field sourceField : fields) {
-
-            if (Modifier.isStatic(sourceField.getModifiers())) {
-                log.trace("跳过static属性: {}", sourceField.getName());
-                continue;
-            }
-
-            boolean able = sourceField.trySetAccessible();
-            if (!able) {
-                sourceField.setAccessible(true);
-            }
-            Object value = sourceField.get(source);
-            sourceField.set(target, value);
-            if (!able) {
-                sourceField.setAccessible(false);
-            }
-        }
     }
 
 

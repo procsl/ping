@@ -1,10 +1,10 @@
-package cn.procsl.ping.boot.web.cipher;
+package cn.procsl.ping.boot.web.cipher.id;
 
 import cn.procsl.ping.boot.web.annotation.SecurityId;
+import cn.procsl.ping.boot.web.cipher.CipherException;
 import jakarta.annotation.Nonnull;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.web.format.DateTimeFormatters;
 import org.springframework.boot.autoconfigure.web.format.WebConversionService;
 import org.springframework.core.convert.ConversionFailedException;
@@ -15,11 +15,10 @@ import org.springframework.core.convert.converter.GenericConverter;
 import java.util.Collections;
 import java.util.Set;
 
-@Slf4j
 @RequiredArgsConstructor
-final public class CipherGenericConverter implements GenericConverter, ConditionalGenericConverter {
+final class CipherGenericConverter implements GenericConverter, ConditionalGenericConverter {
 
-    final CipherSecurityService cipherSecurityService;
+    final SecurityIdCipherService cipherLockupService;
 
 
     @Override
@@ -39,14 +38,14 @@ final public class CipherGenericConverter implements GenericConverter, Condition
             throw new IllegalArgumentException("找不到指定的注解");
         }
         try {
-            return cipherSecurityService.decrypt((String) source, security);
+            return cipherLockupService.decrypt((String) source, security);
         } catch (Exception e) {
             throw new ConverterException("id", (String) source, e.getMessage(), e);
         }
     }
 
     @Getter
-    public static class ConverterException extends CipherException {
+    static class ConverterException extends CipherException {
 
         final String filedName;
         final String source;
@@ -58,7 +57,7 @@ final public class CipherGenericConverter implements GenericConverter, Condition
         }
     }
 
-    public static class ErrorProcessWevConversionService extends WebConversionService {
+    static class ErrorProcessWevConversionService extends WebConversionService {
 
         public ErrorProcessWevConversionService() {
             super(new DateTimeFormatters());

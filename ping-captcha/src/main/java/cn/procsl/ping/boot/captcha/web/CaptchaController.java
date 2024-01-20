@@ -5,7 +5,7 @@ import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
 import cn.procsl.ping.boot.captcha.domain.image.ImageCaptcha;
 import cn.procsl.ping.boot.captcha.domain.image.ImageCaptchaBuilderService;
 import cn.procsl.ping.boot.captcha.handler.EmailCaptchaHandler;
-import cn.procsl.ping.boot.web.annotation.VersionControl;
+import cn.procsl.ping.boot.web.annotation.VersionController;
 import com.wf.captcha.SpecCaptcha;
 import com.wf.captcha.base.Captcha;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,7 +49,7 @@ public class CaptchaController {
     }
 
     @PermitAll
-    @VersionControl
+    @VersionController
     @Operation(summary = "创建图形验证码")
     @PostMapping(path = "/v1/captcha/images", produces = MediaType.IMAGE_GIF_VALUE)
     @ResponseStatus(HttpStatus.CREATED)

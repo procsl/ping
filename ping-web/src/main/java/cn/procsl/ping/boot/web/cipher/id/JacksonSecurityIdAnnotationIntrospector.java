@@ -1,12 +1,10 @@
-package cn.procsl.ping.boot.web.cipher;
+package cn.procsl.ping.boot.web.cipher.id;
 
 import cn.procsl.ping.boot.web.annotation.SecurityId;
 import com.fasterxml.jackson.databind.introspect.Annotated;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationContext;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.context.request.RequestAttributes;
@@ -16,10 +14,13 @@ import org.springframework.web.servlet.HandlerMapping;
 
 
 @Slf4j
-final public class JacksonSecurityIdAnnotationIntrospector extends JacksonAnnotationIntrospector {
+final class JacksonSecurityIdAnnotationIntrospector extends JacksonAnnotationIntrospector {
 
-    @Setter
-    ApplicationContext applicationContext;
+    final SecurityIdCipherService cipherService;
+
+    public JacksonSecurityIdAnnotationIntrospector(SecurityIdCipherService securityIdCipherService) {
+        this.cipherService = securityIdCipherService;
+    }
 
     @Override
     public Object findDeserializer(Annotated a) {
@@ -27,7 +28,7 @@ final public class JacksonSecurityIdAnnotationIntrospector extends JacksonAnnota
 
         SecurityId security = a.getAnnotation(SecurityId.class);
         if (security != null) {
-            return new JacksonCipherDecodeDeserializer(security, findService());
+            return new JacksonCipherDecodeDeserializer(security, cipherService);
         }
 
         boolean bool = Long.TYPE == a.getRawType() || Long.class == a.getRawType();
@@ -64,7 +65,7 @@ final public class JacksonSecurityIdAnnotationIntrospector extends JacksonAnnota
                 continue;
             }
 
-            return new JacksonCipherDecodeDeserializer(security, findService());
+            return new JacksonCipherDecodeDeserializer(security, this.cipherService);
         }
 
         return super.findDeserializer(a);
@@ -80,13 +81,9 @@ final public class JacksonSecurityIdAnnotationIntrospector extends JacksonAnnota
     public Object findSerializer(Annotated a) {
         SecurityId security = a.getAnnotation(SecurityId.class);
         if (security != null) {
-            return new JacksonCipherEncodeSerializer(security, findService());
+            return new JacksonCipherEncodeSerializer(security, cipherService);
         }
         return super.findSerializer(a);
-    }
-
-    private CipherSecurityService findService() {
-        return this.applicationContext.getBean(CipherSecurityService.class);
     }
 
 

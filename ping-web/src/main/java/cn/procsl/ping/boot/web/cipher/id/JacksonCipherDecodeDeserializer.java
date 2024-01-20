@@ -1,21 +1,22 @@
-package cn.procsl.ping.boot.web.cipher;
+package cn.procsl.ping.boot.web.cipher.id;
 
 import cn.procsl.ping.boot.web.annotation.SecurityId;
+import cn.procsl.ping.boot.web.cipher.CipherException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
 import java.io.IOException;
 
-@Slf4j
 @RequiredArgsConstructor
 final class JacksonCipherDecodeDeserializer extends JsonDeserializer<Long> {
 
     private final SecurityId securityId;
 
-    private final CipherSecurityService cipherSecurityService;
+    private final SecurityIdCipherService service;
 
     @Override
     public Long deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
@@ -23,6 +24,10 @@ final class JacksonCipherDecodeDeserializer extends JsonDeserializer<Long> {
         if (text == null || text.isEmpty()) {
             return null;
         }
-        return cipherSecurityService.decrypt(text.trim(), securityId);
+        try {
+            return service.decrypt(text.trim(), securityId);
+        } catch (IllegalBlockSizeException | BadPaddingException e) {
+            throw new CipherException("字段解密失败", e);
+        }
     }
 }

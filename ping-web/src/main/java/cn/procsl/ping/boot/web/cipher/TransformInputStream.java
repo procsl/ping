@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 @Slf4j
-public class TransformInputStream extends InputStream implements BufferListener {
+class TransformInputStream extends InputStream implements BufferListener {
 
     private final ByteArrayBuffer buffer;
 

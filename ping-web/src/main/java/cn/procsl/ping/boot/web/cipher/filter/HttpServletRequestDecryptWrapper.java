@@ -1,6 +1,7 @@
-package cn.procsl.ping.boot.web.cipher;
+package cn.procsl.ping.boot.web.cipher.filter;
 
-import cn.procsl.ping.boot.common.utils.CipherFactory;
+import cn.procsl.ping.boot.web.cipher.CipherException;
+import cn.procsl.ping.boot.web.cipher.CipherLockupService;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
@@ -10,7 +11,6 @@ import org.springframework.util.MimeType;
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -31,8 +31,14 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
 
     private BufferedReader reader = null;
 
-    public HttpServletRequestDecryptWrapper(HttpServletRequest request) {
+    private final CipherLockupService cipherLockupService;
+
+    private Cipher cipher;
+
+    public HttpServletRequestDecryptWrapper(HttpServletRequest request,
+                                            CipherLockupService cipherLockupService) {
         super(request);
+        this.cipherLockupService = cipherLockupService;
     }
 
     @Override
@@ -95,23 +101,19 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
     private InputStream builderDecodeInputStream(ServletInputStream is) {
         String contentType = super.getHeader(HTTP_CONTENT_TYPE_ENUM);
         try {
-            MimeType parser = CipherRequestUtils.parseMimeType(contentType);
-
-            if (parser == null) {
-                throw new CipherException("未知的请求体格式", null);
-            }
+            MimeType parser = MimeType.valueOf(contentType);
 
             String encode = parser.getParameter("encoder");
 
             EncodeType encoder = EncodeType.valueOf(encode);
             switch (encoder) {
                 case eb64 -> {
-                    Cipher cipher = this.getCipher();
+                    this.cipher = this.cipherLockupService.lockupEncryptCipher(CipherLockupService.CipherScope.session);
                     InputStream wrap = Base64.getDecoder().wrap(is);
                     return new CipherInputStream(wrap, cipher);
                 }
                 case ebin -> {
-                    Cipher cipher = this.getCipher();
+                    this.cipher = this.cipherLockupService.lockupEncryptCipher(CipherLockupService.CipherScope.session);
                     return new CipherInputStream(is, cipher);
                 }
                 case b64 -> {
@@ -125,21 +127,6 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
         } catch (RuntimeException e) {
             throw new CipherException("请求格式解码失败", e);
         }
-    }
-
-    Cipher getCipher() {
-        Object attr = this.getAttribute("CURRENT_REQUEST_PRIVATE_KEY");
-        if (attr == null) {
-            throw new CipherException("解密失败,缺少必要参数", null);
-        }
-        String privateKey = (String) attr;
-        byte[] byt = privateKey.getBytes(StandardCharsets.UTF_8);
-
-        return CipherFactory.init()
-                .algorithm("AES")
-                .mode("ECB")
-                .padding("PKCS5Padding")
-                .iv(byt).privateKey(byt).cipherMode(CipherFactory.CipherMode.DECRYPT).build().getCipher();
     }
 
 
@@ -177,8 +164,19 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
         return this.reader;
     }
 
+    /**
+     * 当请求完成时
+     *
+     * @param hasException 是否发生了异常/错误
+     */
+    void onRequestFinished(boolean hasException) {
+        if (this.cipher != null) {
+            this.cipherLockupService.release(CipherLockupService.CipherScope.session, this.cipher);
+        }
+    }
+
     private enum EncodeType {
-        b64, ebin, base62, eb64, org
+        b64, ebin, b62, eb64, org
     }
 
 }

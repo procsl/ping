@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.web.cipher;
+package cn.procsl.ping.boot.web.cipher.filter;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,7 +19,7 @@ final class HttpServletResponseEncryptWrapper extends HttpServletResponseWrapper
         return super.getHeaders(name);
     }
 
-    void toEncrypt() {
+    void onResponseFinished(boolean hasException) {
     }
 
 

@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.web.cipher;
+package cn.procsl.ping.boot.web.cipher.filter;
 
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletInputStream;

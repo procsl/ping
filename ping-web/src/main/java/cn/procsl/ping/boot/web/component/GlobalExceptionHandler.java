@@ -3,7 +3,7 @@ package cn.procsl.ping.boot.web.component;
 import cn.procsl.ping.boot.common.dto.MessageVO;
 import cn.procsl.ping.boot.common.error.ErrorVO;
 import cn.procsl.ping.boot.common.error.ParameterErrorVO;
-import cn.procsl.ping.boot.web.cipher.CipherGenericConverter;
+import cn.procsl.ping.boot.web.cipher.CipherException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -122,11 +122,9 @@ public class GlobalExceptionHandler {
 
     @ResponseBody
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(value = CipherGenericConverter.ConverterException.class)
-    public ParameterErrorVO decryptException(CipherGenericConverter.ConverterException exception) {
-        ParameterErrorVO tmp = new ParameterErrorVO("MethodArgumentNotValid", "请求数据解析失败");
-        tmp.putErrorTips(exception.getFiledName(), exception.getSource());
-        return tmp;
+    @ExceptionHandler(value = CipherException.class)
+    public ErrorVO decryptException(CipherException exception) {
+        return ErrorVO.build(HttpMessageNotReadableException.class, exception.getMessage());
     }
 
 }

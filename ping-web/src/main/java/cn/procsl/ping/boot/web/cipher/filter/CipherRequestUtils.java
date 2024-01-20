@@ -1,15 +1,14 @@
-package cn.procsl.ping.boot.web.cipher;
+package cn.procsl.ping.boot.web.cipher.filter;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.util.InvalidMimeTypeException;
 import org.springframework.util.MimeType;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
 @Slf4j
-public final class CipherRequestUtils {
+final class CipherRequestUtils {
 
     final static MimeType ENCRYPT_MIME_TYPE = MimeType.valueOf("application/vnd.enc");
 
@@ -17,12 +16,8 @@ public final class CipherRequestUtils {
 
     final static String ORIGIN_TYPE_NAME_ENUM = "origin";
 
-    public static String parseOriginContentType(String header) {
-        MimeType type = parseMimeType(header);
-
-        if (type == null) {
-            return header;
-        }
+    static String parseOriginContentType(String header) {
+        MimeType type = MimeType.valueOf(header);
 
         if (!ENCRYPT_MIME_TYPE.equalsTypeAndSubtype(type)) {
             return header;
@@ -36,15 +31,6 @@ public final class CipherRequestUtils {
         return URLDecoder.decode(parameter, StandardCharsets.UTF_8);
     }
 
-
-    protected static MimeType parseMimeType(String header) {
-        try {
-            return MimeType.valueOf(header);
-        } catch (InvalidMimeTypeException e) {
-            log.warn("解析请求头Content-Type失败:", e);
-        }
-        return null;
-    }
 
 
 }
