@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "DECRYPT_ERROR")
 public class CipherException extends RuntimeException {
 
-    final String source;
 
-    public CipherException(String source, String message, Throwable e) {
+    public CipherException(String message, Throwable e) {
         super(message, e);
-        this.source = source;
     }
+
+
 }

@@ -12,7 +12,6 @@ import java.util.concurrent.ThreadFactory;
 
 import static java.util.concurrent.Executors.newThreadPerTaskExecutor;
 
-//@AutoConfiguration
 public class TomcatProtocolHandlerConfig {
 
 

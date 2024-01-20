@@ -49,10 +49,12 @@ final public class CipherGenericConverter implements GenericConverter, Condition
     public static class ConverterException extends CipherException {
 
         final String filedName;
+        final String source;
 
         public ConverterException(String fieldName, String source, String message, Throwable e) {
-            super(source, message, e);
+            super(message, e);
             this.filedName = fieldName;
+            this.source = source;
         }
     }
 

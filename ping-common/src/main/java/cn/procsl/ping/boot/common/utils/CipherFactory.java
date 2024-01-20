@@ -23,7 +23,7 @@ public final class CipherFactory {
     private final CipherMode m;
 
     @Builder(builderMethodName = "init")
-    private CipherFactory(@NonNull byte[] privateKey,
+    private CipherFactory(byte @NonNull [] privateKey,
                           @NonNull CipherMode cipherMode,
                           @NonNull String algorithm,
                           @NonNull String mode,
@@ -79,7 +79,7 @@ public final class CipherFactory {
         }
     }
 
-    enum CipherMode {
+    public enum CipherMode {
         ENCRYPT(Cipher.ENCRYPT_MODE), DECRYPT(Cipher.DECRYPT_MODE);
 
         final int mode;

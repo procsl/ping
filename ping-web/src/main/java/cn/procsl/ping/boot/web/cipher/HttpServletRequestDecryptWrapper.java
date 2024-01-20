@@ -2,39 +2,30 @@ package cn.procsl.ping.boot.web.cipher;
 
 import cn.procsl.ping.boot.common.utils.CipherFactory;
 import jakarta.servlet.ServletInputStream;
-import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.util.MimeType;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
 import java.io.*;
-import java.util.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashSet;
 
 /**
  * 完整格式
- * application/vnd.enc;encode=base64;origin=base64
- * application/vnd.enc;encode=binary;origin=base64
+ * application/vnd.enc;encoder=base64;origin=application%2Fjson
+ * application/vnd.enc;encoder=binary;origin=text%2Fplan
  */
 @Slf4j
 final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
 
-    final static String ORIGIN_TYPE_NAME_ENUM = "origin";
 
-    final static String ENCODE_TYPE_NAME_ENUM = "encode";
-
-    final static String HTTP_CONTENT_TYPE_ENUM = "content-type";
-
-    final static MimeType ENCRYPT_MIME_TYPE = MimeType.valueOf("application/vnd.enc");
-
-    final static String defaultContentType = MediaType.APPLICATION_JSON_VALUE;
-
-    boolean isBase64 = false;
-
-    Map<String, String[]> currentParameter;
+    final static String HTTP_CONTENT_TYPE_ENUM = "Content-Type";
 
     private ServletInputStream inputStream = null;
 
@@ -83,65 +74,81 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
         return Collections.enumeration(set);
     }
 
-    @Override
-    public String getParameter(String name) {
-        return super.getParameter(name);
-    }
-
-    @Override
-    public Map<String, String[]> getParameterMap() {
-        if (this.currentParameter == null) {
-            this.parseParameter();
-        }
-
-        return this.currentParameter;
-    }
-
-    private void parseParameter() {
-        String queryString = this.getHttpServletRequest().getQueryString();
-        Map<String, String[]> map = super.getParameterMap();
-        this.currentParameter = map;
-    }
-
-    @Override
-    public Enumeration<String> getParameterNames() {
-        if (this.currentParameter == null) {
-            this.parseParameter();
-        }
-        return Collections.enumeration(this.currentParameter.keySet());
-    }
-
-    @Override
-    public String[] getParameterValues(String name) {
-        if (this.currentParameter == null) {
-            this.parseParameter();
-        }
-        return this.currentParameter.get(name);
-    }
-
-    private HttpServletRequest getHttpServletRequest() {
-        ServletRequest tmp = super.getRequest();
-        return (HttpServletRequest) tmp;
-    }
 
     @Override
     public ServletInputStream getInputStream() throws IOException {
-        if (this.inputStream == null) {
-            log.info("获取InputStream");
-            ServletInputStream is = super.getInputStream();
-            // TODO 需要探测是否有编码, 默认 base64
-            InputStream dis = Base64.getDecoder().wrap(is);
-            Cipher cipher = CipherFactory.init().build().getCipher();
-            CipherInputStream cis = new CipherInputStream(dis, cipher);
-            this.inputStream = HttpServletInputStreamAdapter.builder().inputStream(cis).setReadListener(is::setReadListener).isReady(is::isReady).isFinished(() -> {
-                try {
-                    return cis.available() <= 0 && is.isFinished();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }).build();
+        if (this.inputStream != null) {
+            return this.inputStream;
         }
+        ServletInputStream is = super.getInputStream();
+
+        InputStream decoder = this.builderDecodeInputStream(is);
+
+        this.inputStream = HttpServletInputStreamAdapter.builder()
+                .inputStream(decoder)
+                .setReadListener(is::setReadListener)
+                .isReady(is::isReady)
+                .isFinished(() -> finished(decoder, is)).build();
         return this.inputStream;
+    }
+
+    private InputStream builderDecodeInputStream(ServletInputStream is) {
+        String contentType = super.getHeader(HTTP_CONTENT_TYPE_ENUM);
+        try {
+            MimeType parser = CipherRequestUtils.parseMimeType(contentType);
+
+            if (parser == null) {
+                throw new CipherException("未知的请求体格式", null);
+            }
+
+            String encode = parser.getParameter("encoder");
+
+            EncodeType encoder = EncodeType.valueOf(encode);
+            switch (encoder) {
+                case eb64 -> {
+                    Cipher cipher = this.getCipher();
+                    InputStream wrap = Base64.getDecoder().wrap(is);
+                    return new CipherInputStream(wrap, cipher);
+                }
+                case ebin -> {
+                    Cipher cipher = this.getCipher();
+                    return new CipherInputStream(is, cipher);
+                }
+                case b64 -> {
+                    return Base64.getDecoder().wrap(is);
+                }
+                case org -> {
+                    return is;
+                }
+                default -> throw new CipherException("不支持的解码方式: " + encode, null);
+            }
+        } catch (RuntimeException e) {
+            throw new CipherException("请求格式解码失败", e);
+        }
+    }
+
+    Cipher getCipher() {
+        Object attr = this.getAttribute("CURRENT_REQUEST_PRIVATE_KEY");
+        if (attr == null) {
+            throw new CipherException("解密失败,缺少必要参数", null);
+        }
+        String privateKey = (String) attr;
+        byte[] byt = privateKey.getBytes(StandardCharsets.UTF_8);
+
+        return CipherFactory.init()
+                .algorithm("AES")
+                .mode("ECB")
+                .padding("PKCS5Padding")
+                .iv(byt).privateKey(byt).cipherMode(CipherFactory.CipherMode.DECRYPT).build().getCipher();
+    }
+
+
+    boolean finished(InputStream cis, ServletInputStream is) {
+        try {
+            return cis.available() <= 0 && is.isFinished();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -154,15 +161,24 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
     @Override
     public BufferedReader getReader() throws IOException {
         if (this.reader == null) {
-            log.info("获取reader");
-            // TODO 编码需要进一步探测 Content-Type, 默认为 UTF8
-
             Reader reader = new InputStreamReader(this.getInputStream(), this.getCharacterEncoding());
-            // TODO 需要探测 Content-Length, 默认 128
-            this.reader = new BufferedReader(reader, 128);
+            String lenStr = this.getHeader("Content-Length");
+            int len = 256;
+            if (lenStr != null) {
+                try {
+                    len = Integer.parseInt(lenStr);
+                    len = len <= 10 ? 64 : len;
+                    len = len >= 4097 ? 4096 : len;
+                } catch (Exception ignored) {
+                }
+            }
+            this.reader = new BufferedReader(reader, len);
         }
         return this.reader;
     }
 
+    private enum EncodeType {
+        b64, ebin, base62, eb64, org
+    }
 
 }
