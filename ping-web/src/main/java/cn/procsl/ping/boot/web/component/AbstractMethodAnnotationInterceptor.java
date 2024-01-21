@@ -9,21 +9,20 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.lang.annotation.Annotation;
 
-@RequiredArgsConstructor
-public abstract class AbstractMethodAnnotationInterceptor<A extends Annotation> implements HandlerInterceptor {
+public interface AbstractMethodAnnotationInterceptor<A extends Annotation> extends HandlerInterceptor {
 
-    final Class<A> annotationClass;
+    Class<A> getAnnotationClass();
 
     @Override
-    public boolean preHandle(@Nonnull HttpServletRequest request, @Nonnull HttpServletResponse response, @Nonnull Object handler) {
+    default boolean preHandle(@Nonnull HttpServletRequest request, @Nonnull HttpServletResponse response, @Nonnull Object handler) {
         boolean isHandler = handler instanceof HandlerMethod;
         if (!isHandler) {
             return true;
         }
-        A annotation = ((HandlerMethod) handler).getMethodAnnotation(annotationClass);
+        A annotation = ((HandlerMethod) handler).getMethodAnnotation(this.getAnnotationClass());
         return this.doPreHandle(request, response, (HandlerMethod) handler, annotation);
     }
 
-    protected abstract boolean doPreHandle(HttpServletRequest request, HttpServletResponse response,
-                                           HandlerMethod handler, A annotation);
+    boolean doPreHandle(HttpServletRequest request, HttpServletResponse response,
+                        HandlerMethod handler, A annotation);
 }

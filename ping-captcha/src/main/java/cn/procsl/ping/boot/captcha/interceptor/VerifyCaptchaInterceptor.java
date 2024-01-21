@@ -7,19 +7,23 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.method.HandlerMethod;
 
-public class VerifyCaptchaInterceptor extends AbstractMethodAnnotationInterceptor<VerifyCaptcha> {
+public class VerifyCaptchaInterceptor implements AbstractMethodAnnotationInterceptor<VerifyCaptcha> {
 
     final VerifyCaptchaHandlerStrategy verifyCaptchaService;
 
     public VerifyCaptchaInterceptor(VerifyCaptchaHandlerStrategy verifyCaptchaService) {
-        super(VerifyCaptcha.class);
         this.verifyCaptchaService = verifyCaptchaService;
     }
 
 
     @Override
-    protected boolean doPreHandle(HttpServletRequest request, HttpServletResponse response, HandlerMethod handler,
-                                  VerifyCaptcha annotation) {
+    public Class<VerifyCaptcha> getAnnotationClass() {
+        return VerifyCaptcha.class;
+    }
+
+    @Override
+    public boolean doPreHandle(HttpServletRequest request, HttpServletResponse response, HandlerMethod handler,
+                               VerifyCaptcha annotation) {
 
         if (annotation == null) {
             return true;

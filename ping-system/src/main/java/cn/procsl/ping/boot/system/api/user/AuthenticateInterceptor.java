@@ -10,17 +10,21 @@ import org.springframework.web.method.HandlerMethod;
 
 import static cn.procsl.ping.boot.system.api.user.AuthenticateController.AUTHENTICATION_KEY;
 
-public class AuthenticateInterceptor extends AbstractMethodAnnotationInterceptor<PermitAll> {
+public final class AuthenticateInterceptor implements AbstractMethodAnnotationInterceptor<PermitAll> {
 
     private final String[] prefix;
 
     public AuthenticateInterceptor(@Nonnull String[] prefix) {
-        super(PermitAll.class);
         this.prefix = prefix;
     }
 
     @Override
-    protected boolean doPreHandle(HttpServletRequest request, HttpServletResponse response, HandlerMethod handler, PermitAll annotation) {
+    public Class<PermitAll> getAnnotationClass() {
+        return PermitAll.class;
+    }
+
+    @Override
+    public boolean doPreHandle(HttpServletRequest request, HttpServletResponse response, HandlerMethod handler, PermitAll annotation) {
         boolean permit = annotation != null;
         if (permit) {
             return true;
