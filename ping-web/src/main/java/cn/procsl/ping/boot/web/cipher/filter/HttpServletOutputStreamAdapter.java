@@ -49,6 +49,7 @@ public final class HttpServletOutputStreamAdapter extends ServletOutputStream {
         this.outputStream.flush();
     }
 
+    //TODO 需要关注是否已经关闭
     @Override
     public void close() throws IOException {
         this.outputStream.close();
