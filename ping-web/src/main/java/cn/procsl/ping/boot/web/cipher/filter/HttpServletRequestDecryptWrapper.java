@@ -3,6 +3,7 @@ package cn.procsl.ping.boot.web.cipher.filter;
 import cn.procsl.ping.boot.web.cipher.CipherException;
 import cn.procsl.ping.boot.web.cipher.CipherLockupService;
 import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 import lombok.extern.slf4j.Slf4j;
@@ -167,11 +168,31 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
     }
 
     /**
-     * 当请求完成时
+     * 由于是加密解密, 因此此时无法计算请求体长度
      *
-     * @param hasException 是否发生了异常/错误
+     * @return -1
+     * @see ServletRequest#getContentLength()
      */
-    void onRequestFinished(boolean hasException) {
+    @Override
+    public int getContentLength() {
+        return -1;
+    }
+
+    /**
+     * 由于是加密解密, 因此此时无法计算请求体长度
+     *
+     * @return -1
+     * @see ServletRequest#getContentLengthLong
+     */
+    @Override
+    public long getContentLengthLong() {
+        return -1L;
+    }
+
+    /**
+     * 当请求完成时
+     */
+    void onRequestFinished() {
         if (this.cipher != null) {
             this.cipherLockupService.release(CipherLockupService.CipherScope.session, this.cipher);
         }

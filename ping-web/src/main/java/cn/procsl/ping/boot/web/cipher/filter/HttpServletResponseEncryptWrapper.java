@@ -69,10 +69,15 @@ final class HttpServletResponseEncryptWrapper extends HttpServletResponseWrapper
         return this.printWriter;
     }
 
-    void onResponseFinished(boolean hasException) {
-        if (this.cipher != null) {
-            this.cipherLockupService.release(CipherLockupService.CipherScope.request, this.cipher);
+    void onResponseFinished() {
+        if (this.cipher == null) {
+            return;
         }
+        try {
+            this.outputStream.flush();
+        } catch (IOException ignored) {
+        }
+        this.cipherLockupService.release(CipherLockupService.CipherScope.request, this.cipher);
     }
 
 

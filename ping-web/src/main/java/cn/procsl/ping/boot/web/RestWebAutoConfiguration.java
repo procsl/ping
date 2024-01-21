@@ -9,19 +9,21 @@ import cn.procsl.ping.boot.web.component.CommonErrorAttributes;
 import cn.procsl.ping.boot.web.component.GlobalExceptionHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
+import jakarta.servlet.ServletRequestListener;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.SearchStrategy;
 import org.springframework.boot.autoconfigure.web.format.WebConversionService;
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -61,6 +63,15 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProce
         filter.setUrlPatterns(List.of("/*"));
         return filter;
     }
+
+    @Bean
+    @ConditionalOnBean(name = "cipherFilter")
+    public ServletListenerRegistrationBean<ServletRequestListener> cipherCleanRequestListener(@Autowired FilterRegistrationBean<CipherFilter> cipherFilter) {
+        ServletListenerRegistrationBean<ServletRequestListener> listener = new ServletListenerRegistrationBean<>();
+        listener.setListener(cipherFilter.getFilter());
+        return listener;
+    }
+
 
     @Override
     public void addFormatters(FormatterRegistry registry) {

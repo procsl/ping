@@ -2,8 +2,7 @@ package cn.procsl.ping.boot.web.cipher.filter;
 
 import cn.procsl.ping.boot.web.cipher.CipherLockupService;
 import jakarta.annotation.Nonnull;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
+import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +11,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Slf4j
-public final class CipherFilter extends OncePerRequestFilter {
+public final class CipherFilter extends OncePerRequestFilter implements ServletRequestListener {
+
+    final static String ON_REQUEST_DESTROYED = "ping.web.request.destroyed";
+    final static String ON_RESPONSE_DESTROYED = "ping.web.response.destroyed";
 
     final CipherRequestResolver requestResolver;
 
@@ -44,29 +46,37 @@ public final class CipherFilter extends OncePerRequestFilter {
 
         if (requestResolver.isEncryptionRequest(request, response)) {
             request = new HttpServletRequestDecryptWrapper(request, cipherLockupService);
+            HttpServletRequestDecryptWrapper finalRequest = (HttpServletRequestDecryptWrapper) request;
+            request.setAttribute(ON_REQUEST_DESTROYED, (Runnable) finalRequest::onRequestFinished);
         }
 
         boolean needEncrypt = requestResolver.needEncryptResponse(request, response);
         if (needEncrypt) {
             response = new HttpServletResponseEncryptWrapper(request, response, cipherLockupService);
+            HttpServletResponseEncryptWrapper finalResponse = (HttpServletResponseEncryptWrapper) response;
+            request.setAttribute(ON_RESPONSE_DESTROYED, (Runnable) finalResponse::onResponseFinished);
         }
 
-        boolean hasException = true;
-        try {
-            filterChain.doFilter(request, response);
-            hasException = false;
-        } finally {
-            if (needEncrypt) {
-                HttpServletResponseEncryptWrapper wrapper = (HttpServletResponseEncryptWrapper) response;
-                wrapper.onResponseFinished(hasException);
-            }
-
-            if (request instanceof HttpServletRequestDecryptWrapper) {
-                ((HttpServletRequestDecryptWrapper) request).onRequestFinished(hasException);
-            }
-        }
-
-
+        filterChain.doFilter(request, response);
     }
 
+    @Override
+    public void requestDestroyed(ServletRequestEvent sre) {
+        toDestroy(sre, ON_REQUEST_DESTROYED);
+        toDestroy(sre, ON_RESPONSE_DESTROYED);
+    }
+
+    private void toDestroy(ServletRequestEvent sre, String key) {
+        ServletRequest req = sre.getServletRequest();
+        Object onDestroy = req.getAttribute(key);
+        if (onDestroy == null) {
+            return;
+        }
+        Runnable dest = (Runnable) (onDestroy);
+        try {
+            dest.run();
+        } catch (Exception e) {
+            log.warn("回收时失败", e);
+        }
+    }
 }
