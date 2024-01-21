@@ -6,7 +6,6 @@ import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.MimeType;
 
 import javax.crypto.Cipher;
@@ -23,7 +22,6 @@ import static cn.procsl.ping.boot.web.cipher.filter.CipherEncodeType.*;
  * application/vnd.enc;encoder=base64;origin=application%2Fjson
  * application/vnd.enc;encoder=binary;origin=text%2Fplan
  */
-@Slf4j
 final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
 
 
@@ -119,6 +117,9 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
                 default -> throw new CipherException("不支持的解码方式: " + encode, null);
             }
         } catch (RuntimeException e) {
+            if (e instanceof CipherException) {
+                throw e;
+            }
             throw new CipherException("请求格式解码失败", e);
         }
     }

@@ -3,7 +3,6 @@ package cn.procsl.ping.boot.web;
 import cn.procsl.ping.boot.web.cipher.CipherLockupService;
 import cn.procsl.ping.boot.web.cipher.SimpleCipherLockupService;
 import cn.procsl.ping.boot.web.cipher.filter.CipherFilter;
-import cn.procsl.ping.boot.web.cipher.filter.CipherRequestResolver;
 import cn.procsl.ping.boot.web.cipher.id.CipherSecurityBuilder;
 import cn.procsl.ping.boot.web.component.CommonErrorAttributes;
 import cn.procsl.ping.boot.web.component.GlobalExceptionHandler;
