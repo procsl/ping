@@ -3,13 +3,12 @@ package cn.procsl.ping.boot.web.component;
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.lang.annotation.Annotation;
 
-public interface AbstractMethodAnnotationInterceptor<A extends Annotation> extends HandlerInterceptor {
+public interface MethodAnnotationInterceptor<A extends Annotation> extends HandlerInterceptor {
 
     Class<A> getAnnotationClass();
 

@@ -5,14 +5,5 @@ package cn.procsl.ping.boot.web.annotation;
  */
 public @interface Encryption {
 
-    /**
-     * 解密请求
-     */
-    boolean request() default true;
-
-    /**
-     * 加密响应
-     */
-    boolean response() default true;
 
 }

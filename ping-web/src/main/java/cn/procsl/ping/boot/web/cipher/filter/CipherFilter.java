@@ -1,63 +1,72 @@
 package cn.procsl.ping.boot.web.cipher.filter;
 
+import cn.procsl.ping.boot.web.annotation.Encryption;
+import cn.procsl.ping.boot.web.cipher.CipherException;
 import cn.procsl.ping.boot.web.cipher.CipherLockupService;
+import cn.procsl.ping.boot.web.component.MethodAnnotationInterceptor;
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.MimeType;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.method.HandlerMethod;
 
 import java.io.IOException;
 
+import static cn.procsl.ping.boot.web.cipher.filter.CipherEncodeType.ENCRYPT_MIME_TYPE;
+import static cn.procsl.ping.boot.web.cipher.filter.CipherEncodeType.ENCRYPT_MIME_TYPE_VALUE;
+
 @Slf4j
-public final class CipherFilter extends OncePerRequestFilter implements ServletRequestListener {
+public final class CipherFilter extends OncePerRequestFilter implements ServletRequestListener,
+        MethodAnnotationInterceptor<Encryption> {
 
-    final static String ON_REQUEST_DESTROYED = "ping.web.request.destroyed";
-    final static String ON_RESPONSE_DESTROYED = "ping.web.response.destroyed";
+    final static String ON_REQUEST_DESTROYED = "cn.ping.web.request.destroyed";
 
-    final CipherRequestResolver requestResolver;
+    final static String ON_RESPONSE_DESTROYED = "cn.ping.web.response.destroyed";
 
     final CipherLockupService cipherLockupService;
 
-    public CipherFilter(CipherRequestResolver requestResolver, CipherLockupService cipherLockupService) {
+    public CipherFilter(CipherLockupService cipherLockupService) {
         this.cipherLockupService = cipherLockupService;
-        if (requestResolver == null) {
-            log.warn("未加载到加密解密解析器");
-            requestResolver = new CipherRequestResolver() {
-                @Override
-                public boolean isEncryptionRequest(HttpServletRequest request, HttpServletResponse response) {
-                    return false;
-                }
-
-                @Override
-                public boolean needEncryptResponse(HttpServletRequest request, HttpServletResponse response) {
-                    return false;
-                }
-            };
-        }
-        this.requestResolver = requestResolver;
     }
+
+    MimeType mimeResolver(HttpServletRequest request, HttpServletResponse response) {
+        String contentType = request.getContentType();
+        if (!contentType.startsWith(ENCRYPT_MIME_TYPE_VALUE)) {
+            return null;
+        }
+        try {
+            MimeType mime = MimeType.valueOf(contentType);
+            if (ENCRYPT_MIME_TYPE.equalsTypeAndSubtype(mime)) {
+                return mime;
+            }
+        } catch (RuntimeException ignored) {
+        }
+        return null;
+    }
+
 
     @Override
     protected void doFilterInternal(@Nonnull HttpServletRequest request,
                                     @Nonnull HttpServletResponse response,
                                     @Nonnull FilterChain filterChain) throws ServletException, IOException {
 
-        if (requestResolver.isEncryptionRequest(request, response)) {
-            request = new HttpServletRequestDecryptWrapper(request, cipherLockupService);
-            HttpServletRequestDecryptWrapper finalRequest = (HttpServletRequestDecryptWrapper) request;
-            request.setAttribute(ON_REQUEST_DESTROYED, (Runnable) finalRequest::onRequestFinished);
+        MimeType mime = this.mimeResolver(request, response);
+        if (mime == null) {
+            filterChain.doFilter(request, response);
+            return;
         }
+        HttpServletRequestDecryptWrapper finalRequest = new HttpServletRequestDecryptWrapper(request,
+                cipherLockupService, mime);
+        request.setAttribute(ON_REQUEST_DESTROYED, (Runnable) finalRequest::onRequestFinished);
 
-        boolean needEncrypt = requestResolver.needEncryptResponse(request, response);
-        if (needEncrypt) {
-            response = new HttpServletResponseEncryptWrapper(request, response, cipherLockupService);
-            HttpServletResponseEncryptWrapper finalResponse = (HttpServletResponseEncryptWrapper) response;
-            request.setAttribute(ON_RESPONSE_DESTROYED, (Runnable) finalResponse::onResponseFinished);
-        }
+        HttpServletResponseEncryptWrapper finalResponse = new HttpServletResponseEncryptWrapper(request,
+                response, cipherLockupService, mime);
+        request.setAttribute(ON_RESPONSE_DESTROYED, (Runnable) finalResponse::onResponseFinished);
 
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(finalRequest, finalResponse);
     }
 
     @Override
@@ -79,4 +88,23 @@ public final class CipherFilter extends OncePerRequestFilter implements ServletR
             log.warn("回收时失败", e);
         }
     }
+
+    @Override
+    public Class<Encryption> getAnnotationClass() {
+        return Encryption.class;
+    }
+
+    @Override
+    public boolean doPreHandle(HttpServletRequest request, HttpServletResponse response, HandlerMethod handler, Encryption annotation) {
+        if (annotation == null) {
+            return true;
+        }
+
+        boolean requestCheck = (request instanceof HttpServletRequestDecryptWrapper || request.getAttribute(ON_REQUEST_DESTROYED) != null);
+        if (!requestCheck) {
+            throw new CipherException("请求解密失败,缺少必要参数", null);
+        }
+        return false;
+    }
+
 }

@@ -18,6 +18,8 @@ import org.springframework.data.repository.config.BootstrapMode;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import static cn.procsl.ping.boot.web.RestWebAutoConfiguration.PUBLIC_STATIC_RESOURCES;
+
 @AutoConfiguration
 @ComponentScan(basePackages = {
         "cn.procsl.ping.boot.captcha.web",
@@ -33,7 +35,7 @@ public class CaptchaAutoConfiguration implements WebMvcConfigurer, ApplicationCo
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         VerifyCaptchaHandlerStrategy service = this.context.getBean(VerifyCaptchaHandlerStrategy.class);
-        registry.addInterceptor(new VerifyCaptchaInterceptor(service)).addPathPatterns("/**");
+        registry.addInterceptor(new VerifyCaptchaInterceptor(service)).excludePathPatterns(PUBLIC_STATIC_RESOURCES).addPathPatterns("/**");
     }
 
     @Bean

@@ -20,6 +20,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import static cn.procsl.ping.boot.web.RestWebAutoConfiguration.PUBLIC_STATIC_RESOURCES;
+
 @Order
 @AutoConfiguration(after = WebMvcAutoConfiguration.class)
 @EnableTransactionManagement
@@ -35,7 +37,8 @@ public class SystemAutoConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new AuthenticateInterceptor(systemConfigureProperties.getAuthenticatesPrefix())).addPathPatterns("/**");
+        registry.addInterceptor(new AuthenticateInterceptor(systemConfigureProperties.getAuthenticatesPrefix()))
+                .excludePathPatterns(PUBLIC_STATIC_RESOURCES).addPathPatterns("/**");
     }
 
 

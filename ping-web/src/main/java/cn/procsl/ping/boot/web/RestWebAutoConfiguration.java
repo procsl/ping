@@ -9,10 +9,12 @@ import cn.procsl.ping.boot.web.component.CommonErrorAttributes;
 import cn.procsl.ping.boot.web.component.GlobalExceptionHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Nonnull;
+import jakarta.servlet.Filter;
 import jakarta.servlet.ServletRequestListener;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanNotOfRequiredTypeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -29,6 +31,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.format.FormatterRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.lang.reflect.Constructor;
@@ -47,17 +50,28 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProce
 
     final ApplicationContext applicationContext;
 
+    public final static String[] PUBLIC_STATIC_RESOURCES = new String[]{
+            "**.css",
+            "**.html",
+            "**.js",
+            "**.jpeg",
+            "**.jpg",
+            "**.png",
+            "**.gif",
+            "**.pdf",
+            "**.xlsx",
+            "**.xls",
+    };
+
 
     public RestWebAutoConfiguration(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
 
     @Bean("cipherFilter")
-    @ConditionalOnMissingBean(name = "cipherFilter")
-    public FilterRegistrationBean<CipherFilter> accessLoggerFilterFilterRegistrationBean(@Autowired CipherLockupService lockupService,
-                                                                                         @Autowired(required = false) CipherRequestResolver resolver) {
+    public FilterRegistrationBean<CipherFilter> accessLoggerFilterFilterRegistrationBean(@Autowired CipherLockupService lockupService){
         FilterRegistrationBean<CipherFilter> filter = new FilterRegistrationBean<>();
-        filter.setFilter(new CipherFilter(resolver, lockupService));
+        filter.setFilter(new CipherFilter(lockupService));
         filter.setName("cipherFilter");
         filter.setOrder(Integer.MIN_VALUE + 1);
         filter.setUrlPatterns(List.of("/*"));
@@ -65,13 +79,26 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProce
     }
 
     @Bean
-    @ConditionalOnBean(name = "cipherFilter")
+    @ConditionalOnBean(name = "cipherFilter", value = FilterRegistrationBean.class)
     public ServletListenerRegistrationBean<ServletRequestListener> cipherCleanRequestListener(@Autowired FilterRegistrationBean<CipherFilter> cipherFilter) {
         ServletListenerRegistrationBean<ServletRequestListener> listener = new ServletListenerRegistrationBean<>();
         listener.setListener(cipherFilter.getFilter());
         return listener;
     }
 
+
+    @Override
+    public void addInterceptors(@Nonnull InterceptorRegistry registry) {
+        try {
+            FilterRegistrationBean<?> bean = this.applicationContext.getBean("cipherFilter", FilterRegistrationBean.class);
+            Filter filter = bean.getFilter();
+            if (filter instanceof CipherFilter cipherFilter) {
+                registry.addInterceptor(cipherFilter).excludePathPatterns(PUBLIC_STATIC_RESOURCES).addPathPatterns("/**");
+            }
+        } catch (BeanNotOfRequiredTypeException e) {
+
+        }
+    }
 
     @Override
     public void addFormatters(FormatterRegistry registry) {

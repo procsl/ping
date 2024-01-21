@@ -18,7 +18,7 @@ public class CipherFilterController {
 
 
     @PostMapping(path = "/test/cipher/parameter")
-    @Encryption(response = false)
+    @Encryption
     public Map<String, String> test1(@RequestParam Map<String, String> parameter) throws BusinessException {
         log.info("parameter: {}", parameter);
         return parameter;

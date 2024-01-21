@@ -15,9 +15,8 @@ import java.io.*;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashSet;
 
-import static cn.procsl.ping.boot.web.cipher.filter.CipherRequestUtils.HTTP_CONTENT_TYPE_ENUM;
+import static cn.procsl.ping.boot.web.cipher.filter.CipherEncodeType.*;
 
 /**
  * 完整格式
@@ -34,12 +33,15 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
 
     private final CipherLockupService cipherLockupService;
 
+    private final MimeType encryptionType;
+
     private Cipher cipher;
 
     public HttpServletRequestDecryptWrapper(HttpServletRequest request,
-                                            CipherLockupService cipherLockupService) {
+                                            CipherLockupService cipherLockupService, MimeType mime) {
         super(request);
         this.cipherLockupService = cipherLockupService;
+        this.encryptionType = mime;
     }
 
     @Override
@@ -51,34 +53,28 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
         }
 
         // 重新解析 Content-Type 头
-        if (CipherRequestUtils.isContentType(name)) {
-            return CipherRequestUtils.parseOriginContentType(header);
+        if (isContentType(name)) {
+            return parseOriginContentType(encryptionType);
         }
 
         return header;
     }
 
+    @Override
+    public String getContentType() {
+        return parseOriginContentType(encryptionType);
+    }
 
     @Override
     public Enumeration<String> getHeaders(String name) {
 
         Enumeration<String> tmp = super.getHeaders(name);
 
-        if (!CipherRequestUtils.isContentType(name)) {
+        if (!isContentType(name)) {
             return tmp;
         }
 
-        if (tmp == null || !tmp.hasMoreElements()) {
-            return tmp;
-        }
-
-        HashSet<String> set = new HashSet<>();
-        do {
-            String result = CipherRequestUtils.parseOriginContentType(tmp.nextElement());
-            set.add(result);
-        } while (tmp.hasMoreElements());
-
-        return Collections.enumeration(set);
+        return Collections.enumeration(Collections.singleton(parseOriginContentType(this.encryptionType)));
     }
 
 
@@ -100,11 +96,8 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
     }
 
     InputStream builderDecodeInputStream(ServletInputStream is) {
-        String contentType = super.getHeader(HTTP_CONTENT_TYPE_ENUM);
         try {
-            MimeType parser = MimeType.valueOf(contentType);
-
-            String encode = parser.getParameter(CipherRequestUtils.ENCODER_TYPE_NAME_ENUM);
+            String encode = encryptionType.getParameter(ENCODER_TYPE_NAME_ENUM);
 
             CipherEncodeType encoder = CipherEncodeType.valueOf(encode);
             switch (encoder) {

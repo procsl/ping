@@ -11,11 +11,7 @@ import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-
-import static cn.procsl.ping.boot.web.cipher.filter.CipherRequestUtils.ENCRYPT_MIME_TYPE;
 
 final class HttpServletResponseEncryptWrapper extends HttpServletResponseWrapper {
 
@@ -29,7 +25,8 @@ final class HttpServletResponseEncryptWrapper extends HttpServletResponseWrapper
 
     public HttpServletResponseEncryptWrapper(HttpServletRequest request,
                                              HttpServletResponse response,
-                                             CipherLockupService cipherLockupService) {
+                                             CipherLockupService cipherLockupService,
+                                             MimeType mime) {
         super(response);
         this.cipherLockupService = cipherLockupService;
     }
@@ -37,13 +34,9 @@ final class HttpServletResponseEncryptWrapper extends HttpServletResponseWrapper
 
     @Override
     public void setContentType(String type) {
-        String origin = URLEncoder.encode(type, StandardCharsets.UTF_8);
-        HashMap<String, String> parameters = new HashMap<>(2);
-        parameters.put(CipherRequestUtils.ORIGIN_TYPE_NAME_ENUM, origin);
-        parameters.put(CipherRequestUtils.ENCODER_TYPE_NAME_ENUM, CipherEncodeType.eb64.toString());
-        MimeType newType = new MimeType(ENCRYPT_MIME_TYPE, parameters);
-        super.setContentType(newType.toString());
+        super.setContentType(CipherEncodeType.createEncryptionContentType(type, CipherEncodeType.ebin).toString());
     }
+
 
     @Override
     public ServletOutputStream getOutputStream() throws IOException {
