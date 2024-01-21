@@ -16,6 +16,8 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 
+import static cn.procsl.ping.boot.web.cipher.filter.CipherRequestUtils.HTTP_CONTENT_TYPE_ENUM;
+
 /**
  * 完整格式
  * application/vnd.enc;encoder=base64;origin=application%2Fjson
@@ -24,8 +26,6 @@ import java.util.HashSet;
 @Slf4j
 final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
 
-
-    final static String HTTP_CONTENT_TYPE_ENUM = "Content-Type";
 
     private ServletInputStream inputStream = null;
 
@@ -50,7 +50,7 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
         }
 
         // 重新解析 Content-Type 头
-        if (HTTP_CONTENT_TYPE_ENUM.equalsIgnoreCase(name)) {
+        if (CipherRequestUtils.isContentType(name)) {
             return CipherRequestUtils.parseOriginContentType(header);
         }
 
@@ -63,7 +63,7 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
 
         Enumeration<String> tmp = super.getHeaders(name);
 
-        if (!HTTP_CONTENT_TYPE_ENUM.equalsIgnoreCase(name)) {
+        if (!CipherRequestUtils.isContentType(name)) {
             return tmp;
         }
 
@@ -98,22 +98,22 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
         return this.inputStream;
     }
 
-    private InputStream builderDecodeInputStream(ServletInputStream is) {
+    InputStream builderDecodeInputStream(ServletInputStream is) {
         String contentType = super.getHeader(HTTP_CONTENT_TYPE_ENUM);
         try {
             MimeType parser = MimeType.valueOf(contentType);
 
-            String encode = parser.getParameter("encoder");
+            String encode = parser.getParameter(CipherRequestUtils.ENCODER_TYPE_NAME_ENUM);
 
-            EncodeType encoder = EncodeType.valueOf(encode);
+            CipherEncodeType encoder = CipherEncodeType.valueOf(encode);
             switch (encoder) {
                 case eb64 -> {
-                    this.cipher = this.cipherLockupService.lockupEncryptCipher(CipherLockupService.CipherScope.session);
+                    this.cipher = this.cipherLockupService.lockupDecryptCipher(CipherLockupService.CipherScope.request);
                     InputStream wrap = Base64.getDecoder().wrap(is);
                     return new CipherInputStream(wrap, cipher);
                 }
                 case ebin -> {
-                    this.cipher = this.cipherLockupService.lockupEncryptCipher(CipherLockupService.CipherScope.session);
+                    this.cipher = this.cipherLockupService.lockupDecryptCipher(CipherLockupService.CipherScope.request);
                     return new CipherInputStream(is, cipher);
                 }
                 case b64 -> {
@@ -134,7 +134,7 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
         try {
             return cis.available() <= 0 && is.isFinished();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("刷入流失败", e);
         }
     }
 
@@ -147,20 +147,22 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
 
     @Override
     public BufferedReader getReader() throws IOException {
-        if (this.reader == null) {
-            Reader reader = new InputStreamReader(this.getInputStream(), this.getCharacterEncoding());
-            String lenStr = this.getHeader("Content-Length");
-            int len = 256;
-            if (lenStr != null) {
-                try {
-                    len = Integer.parseInt(lenStr);
-                    len = len <= 10 ? 64 : len;
-                    len = len >= 4097 ? 4096 : len;
-                } catch (Exception ignored) {
-                }
-            }
-            this.reader = new BufferedReader(reader, len);
+        if (this.reader != null) {
+            return this.reader;
         }
+
+        Reader reader = new InputStreamReader(this.getInputStream(), this.getCharacterEncoding());
+        String lenStr = this.getHeader("Content-Length");
+        int len = 256;
+        if (lenStr != null) {
+            try {
+                len = Integer.parseInt(lenStr);
+                len = len <= 10 ? 64 : len;
+                len = len >= 4097 ? 4096 : len;
+            } catch (Exception ignored) {
+            }
+        }
+        this.reader = new BufferedReader(reader, len);
         return this.reader;
     }
 
@@ -175,8 +177,5 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
         }
     }
 
-    private enum EncodeType {
-        b64, ebin, b62, eb64, org
-    }
 
 }

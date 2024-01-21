@@ -10,11 +10,13 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 final class CipherRequestUtils {
 
+    final static String HTTP_CONTENT_TYPE_ENUM = "Content-Type";
     final static MimeType ENCRYPT_MIME_TYPE = MimeType.valueOf("application/vnd.enc");
 
     final static String DEFAULT_CONTENT_TYPE = MediaType.APPLICATION_JSON_VALUE;
 
     final static String ORIGIN_TYPE_NAME_ENUM = "origin";
+    final static String ENCODER_TYPE_NAME_ENUM = "encoder";
 
     static String parseOriginContentType(String header) {
         MimeType type = MimeType.valueOf(header);
@@ -31,6 +33,9 @@ final class CipherRequestUtils {
         return URLDecoder.decode(parameter, StandardCharsets.UTF_8);
     }
 
+    public static boolean isContentType(String name) {
+        return HTTP_CONTENT_TYPE_ENUM.equalsIgnoreCase(name);
+    }
 
 
 }

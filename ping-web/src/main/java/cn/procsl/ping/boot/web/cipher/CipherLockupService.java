@@ -8,7 +8,7 @@ import javax.crypto.Cipher;
 public interface CipherLockupService {
 
     enum CipherScope {
-        application, session
+        application, session, request
     }
 
     Cipher lockupEncryptCipher(CipherScope scope);

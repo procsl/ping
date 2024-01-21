@@ -48,7 +48,7 @@ public final class CipherFilter extends OncePerRequestFilter {
 
         boolean needEncrypt = requestResolver.needEncryptResponse(request, response);
         if (needEncrypt) {
-            response = new HttpServletResponseEncryptWrapper(request, response);
+            response = new HttpServletResponseEncryptWrapper(request, response, cipherLockupService);
         }
 
         boolean hasException = true;
