@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.common.event;
 
-import cn.procsl.ping.boot.common.dto.ID;
+import cn.procsl.ping.boot.common.id.ID;
 import cn.procsl.ping.boot.common.utils.TraceIdGenerator;
 import lombok.Getter;
 import lombok.NonNull;

@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.common.advice;
+package cn.procsl.ping.boot.common.aop;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -31,9 +31,6 @@ final class AnnotationPointcut extends StaticMethodMatcherPointcut {
             return false;
         }
         if (name.startsWith("org.apache.")) {
-            return false;
-        }
-        if (name.startsWith("javax.")) {
             return false;
         }
         if (name.startsWith("javax.")) {

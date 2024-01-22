@@ -2,7 +2,7 @@ package cn.procsl.ping.boot.connect.server;
 
 import cn.procsl.ping.boot.common.invoker.HandlerArgumentResolver;
 import cn.procsl.ping.boot.common.invoker.HandlerArgumentResolverException;
-import cn.procsl.ping.boot.common.load.AbstractServiceProxyLoader;
+import cn.procsl.ping.boot.common.utils.AbstractServiceProxyLoader;
 import jakarta.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
 

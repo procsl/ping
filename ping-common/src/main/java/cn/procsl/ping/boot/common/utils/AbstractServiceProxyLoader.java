@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.common.load;
+package cn.procsl.ping.boot.common.utils;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

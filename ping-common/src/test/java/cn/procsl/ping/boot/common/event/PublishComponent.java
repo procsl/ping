@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.common.event;
 
+import cn.procsl.ping.boot.common.annotation.Publisher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

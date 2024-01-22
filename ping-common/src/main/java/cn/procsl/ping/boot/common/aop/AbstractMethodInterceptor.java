@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.common.advice;
+package cn.procsl.ping.boot.common.aop;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

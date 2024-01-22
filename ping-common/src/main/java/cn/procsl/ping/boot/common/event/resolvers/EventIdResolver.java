@@ -1,7 +1,7 @@
 package cn.procsl.ping.boot.common.event.resolvers;
 
-import cn.procsl.ping.boot.common.dto.ID;
-import cn.procsl.ping.boot.common.event.Subscriber;
+import cn.procsl.ping.boot.common.id.ID;
+import cn.procsl.ping.boot.common.annotation.Subscriber;
 import cn.procsl.ping.boot.common.event.SubscriberArgumentResolver;
 import cn.procsl.ping.boot.common.invoker.AnnotationHandlerInvokerContext;
 import com.google.auto.service.AutoService;

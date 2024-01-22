@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.web.component;
 
-import cn.procsl.ping.boot.common.dto.MessageVO;
+import cn.procsl.ping.boot.common.id.MessageVO;
 import cn.procsl.ping.boot.common.error.ErrorVO;
 import cn.procsl.ping.boot.common.error.ParameterErrorVO;
 import cn.procsl.ping.boot.web.cipher.CipherException;

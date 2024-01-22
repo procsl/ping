@@ -1,7 +1,7 @@
 package cn.procsl.ping.boot.system.auth.login;
 
-import cn.procsl.ping.boot.common.event.Subscriber;
-import cn.procsl.ping.boot.common.event.SubscriberRegister;
+import cn.procsl.ping.boot.common.annotation.Subscriber;
+import cn.procsl.ping.boot.common.annotation.SubscriberRegister;
 import lombok.extern.slf4j.Slf4j;
 
 import static cn.procsl.ping.boot.system.constant.EventPublisherConstant.USER_LOGIN;

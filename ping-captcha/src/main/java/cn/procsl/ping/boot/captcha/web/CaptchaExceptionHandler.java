@@ -1,7 +1,7 @@
 package cn.procsl.ping.boot.captcha.web;
 
 import cn.procsl.ping.boot.captcha.domain.VerifyFailureException;
-import cn.procsl.ping.boot.common.dto.MessageVO;
+import cn.procsl.ping.boot.common.id.MessageVO;
 import cn.procsl.ping.boot.common.error.ErrorVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

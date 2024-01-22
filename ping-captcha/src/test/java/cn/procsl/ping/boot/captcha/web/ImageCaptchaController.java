@@ -2,7 +2,7 @@ package cn.procsl.ping.boot.captcha.web;
 
 import cn.procsl.ping.boot.captcha.domain.CaptchaType;
 import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
-import cn.procsl.ping.boot.common.dto.MessageVO;
+import cn.procsl.ping.boot.common.id.MessageVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;

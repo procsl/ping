@@ -1,7 +1,7 @@
 package cn.procsl.ping.boot.connect.server;
 
 import cn.procsl.ping.boot.common.invoker.HandlerInvoker;
-import cn.procsl.ping.boot.common.load.AbstractServiceProxyLoader;
+import cn.procsl.ping.boot.common.utils.AbstractServiceProxyLoader;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.annotation.Annotation;

@@ -3,7 +3,7 @@ package cn.procsl.ping.boot.common.event;
 import cn.procsl.ping.boot.common.invoker.AnnotationHandlerInvokerContext;
 import cn.procsl.ping.boot.common.invoker.HandlerArgumentResolver;
 import cn.procsl.ping.boot.common.invoker.HandlerArgumentResolverException;
-import cn.procsl.ping.boot.common.load.AbstractServiceProxyLoader;
+import cn.procsl.ping.boot.common.utils.AbstractServiceProxyLoader;
 import org.springframework.context.ApplicationContext;
 
 import java.lang.reflect.Parameter;

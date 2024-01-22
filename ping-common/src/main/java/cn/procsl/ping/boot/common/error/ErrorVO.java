@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.common.error;
 
-import cn.procsl.ping.boot.common.dto.MessageVO;
+import cn.procsl.ping.boot.common.id.MessageVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

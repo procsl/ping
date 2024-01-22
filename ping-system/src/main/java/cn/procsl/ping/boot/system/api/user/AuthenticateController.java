@@ -2,8 +2,8 @@ package cn.procsl.ping.boot.system.api.user;
 
 import cn.procsl.ping.boot.captcha.domain.CaptchaType;
 import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
-import cn.procsl.ping.boot.common.dto.MessageVO;
-import cn.procsl.ping.boot.common.event.Publisher;
+import cn.procsl.ping.boot.common.id.MessageVO;
+import cn.procsl.ping.boot.common.annotation.Publisher;
 import cn.procsl.ping.boot.system.domain.user.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
