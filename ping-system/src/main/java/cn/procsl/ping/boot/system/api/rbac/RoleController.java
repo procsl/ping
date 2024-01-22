@@ -2,7 +2,7 @@ package cn.procsl.ping.boot.system.api.rbac;
 
 
 import cn.procsl.ping.boot.common.error.BusinessException;
-import cn.procsl.ping.boot.common.error.ExceptionResolver;
+import cn.procsl.ping.boot.common.annotation.ExceptionResolver;
 import cn.procsl.ping.boot.common.annotation.Publisher;
 import cn.procsl.ping.boot.system.domain.rbac.Permission;
 import cn.procsl.ping.boot.system.domain.rbac.Role;
