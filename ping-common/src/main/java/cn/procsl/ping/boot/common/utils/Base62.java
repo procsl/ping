@@ -1,6 +1,10 @@
 package cn.procsl.ping.boot.common.utils;
 
-import java.io.ByteArrayOutputStream;
+import lombok.NonNull;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DefaultDataBufferFactory;
+
+import java.io.*;
 
 public class Base62 {
 
@@ -191,12 +195,46 @@ public class Base62 {
         }
     }
 
+    public InputStream wrap(@NonNull InputStream in){
+        return new Base62InputStream(in);
+    }
+
+    public OutputStream wrap(@NonNull OutputStream out){
+        return new Base62OutputStream(out);
+    }
+
     private static class CharacterSets {
 
         private static final byte[] GMP = {(byte) '0', (byte) '1', (byte) '2', (byte) '3', (byte) '4', (byte) '5', (byte) '6', (byte) '7', (byte) '8', (byte) '9', (byte) 'A', (byte) 'B', (byte) 'C', (byte) 'D', (byte) 'E', (byte) 'F', (byte) 'G', (byte) 'H', (byte) 'I', (byte) 'J', (byte) 'K', (byte) 'L', (byte) 'M', (byte) 'N', (byte) 'O', (byte) 'P', (byte) 'Q', (byte) 'R', (byte) 'S', (byte) 'T', (byte) 'U', (byte) 'V', (byte) 'W', (byte) 'X', (byte) 'Y', (byte) 'Z', (byte) 'a', (byte) 'b', (byte) 'c', (byte) 'd', (byte) 'e', (byte) 'f', (byte) 'g', (byte) 'h', (byte) 'i', (byte) 'j', (byte) 'k', (byte) 'l', (byte) 'm', (byte) 'n', (byte) 'o', (byte) 'p', (byte) 'q', (byte) 'r', (byte) 's', (byte) 't', (byte) 'u', (byte) 'v', (byte) 'w', (byte) 'x', (byte) 'y', (byte) 'z'};
 
         private static final byte[] INVERTED = {(byte) '0', (byte) '1', (byte) '2', (byte) '3', (byte) '4', (byte) '5', (byte) '6', (byte) '7', (byte) '8', (byte) '9', (byte) 'a', (byte) 'b', (byte) 'c', (byte) 'd', (byte) 'e', (byte) 'f', (byte) 'g', (byte) 'h', (byte) 'i', (byte) 'j', (byte) 'k', (byte) 'l', (byte) 'm', (byte) 'n', (byte) 'o', (byte) 'p', (byte) 'q', (byte) 'r', (byte) 's', (byte) 't', (byte) 'u', (byte) 'v', (byte) 'w', (byte) 'x', (byte) 'y', (byte) 'z', (byte) 'A', (byte) 'B', (byte) 'C', (byte) 'D', (byte) 'E', (byte) 'F', (byte) 'G', (byte) 'H', (byte) 'I', (byte) 'J', (byte) 'K', (byte) 'L', (byte) 'M', (byte) 'N', (byte) 'O', (byte) 'P', (byte) 'Q', (byte) 'R', (byte) 'S', (byte) 'T', (byte) 'U', (byte) 'V', (byte) 'W', (byte) 'X', (byte) 'Y', (byte) 'Z'};
 
+    }
+
+    private static class Base62InputStream extends FilterInputStream{
+
+        final DataBuffer converted = DefaultDataBufferFactory.sharedInstance.allocateBuffer(64);
+
+        protected Base62InputStream(@NonNull InputStream in) {
+            super(in);
+        }
+
+        /**
+         * 填充缓存，如果已经结束则返回false
+         * @return 如果已经填充
+         */
+        private boolean fill(){
+            return false;
+        }
+
+
+    }
+
+    private static class Base62OutputStream extends FilterOutputStream {
+
+        public Base62OutputStream(OutputStream out) {
+            super(out);
+        }
     }
 
 }
