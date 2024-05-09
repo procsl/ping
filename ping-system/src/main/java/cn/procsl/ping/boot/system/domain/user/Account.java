@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.system.domain.user;
 
-import cn.procsl.ping.boot.common.error.BusinessException;
+import cn.procsl.ping.boot.common.BusinessException;
 import cn.procsl.ping.boot.jpa.domain.state.Stateful;
 import cn.procsl.ping.boot.jpa.support.RepositoryCreator;
 import io.swagger.v3.oas.annotations.media.Schema;

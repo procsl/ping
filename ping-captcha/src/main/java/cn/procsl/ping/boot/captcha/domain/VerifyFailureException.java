@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.captcha.domain;
 
-import cn.procsl.ping.boot.common.error.BusinessException;
+import cn.procsl.ping.boot.common.BusinessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 

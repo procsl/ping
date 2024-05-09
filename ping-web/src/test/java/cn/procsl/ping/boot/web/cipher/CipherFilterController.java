@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.web.cipher;
 
-import cn.procsl.ping.boot.common.error.BusinessException;
+import cn.procsl.ping.boot.common.BusinessException;
 import cn.procsl.ping.boot.web.annotation.Encryption;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Indexed;

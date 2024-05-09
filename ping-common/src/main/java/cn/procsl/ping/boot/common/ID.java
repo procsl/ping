@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.common.id;
+package cn.procsl.ping.boot.common;
 
 import java.io.Serializable;
 

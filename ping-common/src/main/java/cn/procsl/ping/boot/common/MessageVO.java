@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.common.id;
+package cn.procsl.ping.boot.common;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;

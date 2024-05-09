@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.common.event;
+package cn.procsl.ping.boot.common.bridge;
 
 public class EventPublishException extends RuntimeException {
 

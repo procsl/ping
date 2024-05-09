@@ -1,6 +1,6 @@
-package cn.procsl.ping.boot.common.event.resolvers;
+package cn.procsl.ping.boot.common.bridge.resolvers;
 
-import cn.procsl.ping.boot.common.event.SubscriberArgumentResolver;
+import cn.procsl.ping.boot.common.bridge.SubscriberArgumentResolver;
 import cn.procsl.ping.boot.common.invoker.AnnotationHandlerInvokerContext;
 import com.google.auto.service.AutoService;
 

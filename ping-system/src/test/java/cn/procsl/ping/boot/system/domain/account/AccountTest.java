@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.system.domain.account;
 
-import cn.procsl.ping.boot.common.error.BusinessException;
+import cn.procsl.ping.boot.common.BusinessException;
 import cn.procsl.ping.boot.system.domain.user.Account;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;

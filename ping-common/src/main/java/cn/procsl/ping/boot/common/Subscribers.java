@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.common.annotation;
+package cn.procsl.ping.boot.common;
 
 import java.lang.annotation.*;
 

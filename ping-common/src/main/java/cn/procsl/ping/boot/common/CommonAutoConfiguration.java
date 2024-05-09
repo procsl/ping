@@ -1,8 +1,7 @@
 package cn.procsl.ping.boot.common;
 
-import cn.procsl.ping.boot.common.annotation.Publisher;
 import cn.procsl.ping.boot.common.aop.AnnotationPointcutAdvisor;
-import cn.procsl.ping.boot.common.event.*;
+import cn.procsl.ping.boot.common.bridge.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

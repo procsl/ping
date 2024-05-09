@@ -1,7 +1,7 @@
-package cn.procsl.ping.boot.common.event;
+package cn.procsl.ping.boot.common.bridge;
 
-import cn.procsl.ping.boot.common.annotation.Subscriber;
-import cn.procsl.ping.boot.common.annotation.SubscriberRegister;
+import cn.procsl.ping.boot.common.Subscriber;
+import cn.procsl.ping.boot.common.SubscriberRegister;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.EventObject;

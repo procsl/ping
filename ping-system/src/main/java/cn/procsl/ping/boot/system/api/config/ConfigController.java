@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.system.api.config;
 
-import cn.procsl.ping.boot.common.error.BusinessException;
+import cn.procsl.ping.boot.common.BusinessException;
 import cn.procsl.ping.boot.system.domain.config.Config;
 import cn.procsl.ping.boot.system.service.ConfigFacade;
 import io.swagger.v3.oas.annotations.Operation;

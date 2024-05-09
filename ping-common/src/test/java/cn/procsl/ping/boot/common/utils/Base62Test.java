@@ -10,7 +10,7 @@ public class Base62Test {
 
     private final Base62 instance = Base62.createInstance();
 
-    private final TokenCipher tokenCipher = new TokenCipher("123", 128);
+    private final TokenCipher tokenCipher = new TokenCipher("123", 256);
 
 
     @Test

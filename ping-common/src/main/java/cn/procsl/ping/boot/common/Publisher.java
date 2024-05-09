@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.common.annotation;
+package cn.procsl.ping.boot.common;
 
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 

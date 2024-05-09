@@ -1,7 +1,7 @@
-package cn.procsl.ping.boot.common.event;
+package cn.procsl.ping.boot.common.bridge;
 
 
-import cn.procsl.ping.boot.common.annotation.Publisher;
+import cn.procsl.ping.boot.common.Publisher;
 import cn.procsl.ping.boot.common.aop.AbstractMethodInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.aopalliance.intercept.MethodInvocation;

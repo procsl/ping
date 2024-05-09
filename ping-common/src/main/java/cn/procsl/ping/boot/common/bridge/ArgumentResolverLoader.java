@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.common.event;
+package cn.procsl.ping.boot.common.bridge;
 
 import cn.procsl.ping.boot.common.invoker.AnnotationHandlerInvokerContext;
 import cn.procsl.ping.boot.common.invoker.HandlerArgumentResolver;

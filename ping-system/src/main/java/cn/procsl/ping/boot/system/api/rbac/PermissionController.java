@@ -1,8 +1,8 @@
 package cn.procsl.ping.boot.system.api.rbac;
 
-import cn.procsl.ping.boot.common.error.BusinessException;
-import cn.procsl.ping.boot.common.annotation.ExceptionResolver;
-import cn.procsl.ping.boot.common.annotation.Publisher;
+import cn.procsl.ping.boot.common.BusinessException;
+import cn.procsl.ping.boot.common.ExceptionResolver;
+import cn.procsl.ping.boot.common.Publisher;
 import cn.procsl.ping.boot.system.domain.rbac.Permission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

@@ -2,7 +2,7 @@ package cn.procsl.ping.boot.common.utils;
 
 public class Scale62 {
 
-    private int scale = 62;
+    private final int scale = 62;
 
     public final static String depository = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 

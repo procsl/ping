@@ -19,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.AlternativeJdkIdGenerator;
+import org.springframework.util.IdGenerator;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +39,8 @@ public class CaptchaController {
     final EmailCaptchaHandler emailCaptchaHandler;
 
     final EntityManager entityManager;
+
+    final IdGenerator id = new AlternativeJdkIdGenerator();
 
     final AtomicLong auto = new AtomicLong(0);
 

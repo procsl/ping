@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.common.utils;
 
-import cn.procsl.ping.boot.common.error.BusinessException;
+import cn.procsl.ping.boot.common.BusinessException;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;

@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.common.error;
+package cn.procsl.ping.boot.common;
 
 import lombok.Getter;
 //import org.springframework.http.HttpStatus;

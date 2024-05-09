@@ -1,8 +1,8 @@
-package cn.procsl.ping.boot.common.event;
+package cn.procsl.ping.boot.common.bridge;
 
-import cn.procsl.ping.boot.common.annotation.Subscriber;
-import cn.procsl.ping.boot.common.annotation.SubscriberRegister;
-import cn.procsl.ping.boot.common.annotation.Subscribers;
+import cn.procsl.ping.boot.common.Subscriber;
+import cn.procsl.ping.boot.common.SubscriberRegister;
+import cn.procsl.ping.boot.common.Subscribers;
 import cn.procsl.ping.boot.common.invoker.AnnotationHandlerInvokerContext;
 import cn.procsl.ping.boot.common.invoker.ScannerAnnotationHandlerResolver;
 import cn.procsl.ping.boot.common.invoker.SimpleHandlerInvoker;

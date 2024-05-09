@@ -1,8 +1,8 @@
 package cn.procsl.ping.boot.web.component;
 
-import cn.procsl.ping.boot.common.id.MessageVO;
-import cn.procsl.ping.boot.common.error.ErrorVO;
-import cn.procsl.ping.boot.common.error.ParameterErrorVO;
+import cn.procsl.ping.boot.common.MessageVO;
+import cn.procsl.ping.boot.common.ErrorVO;
+import cn.procsl.ping.boot.common.ParameterErrorVO;
 import cn.procsl.ping.boot.web.cipher.CipherException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;

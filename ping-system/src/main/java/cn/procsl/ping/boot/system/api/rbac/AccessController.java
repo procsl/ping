@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.system.api.rbac;
 
-import cn.procsl.ping.boot.common.error.BusinessException;
+import cn.procsl.ping.boot.common.BusinessException;
 import cn.procsl.ping.boot.system.domain.rbac.Role;
 import cn.procsl.ping.boot.system.domain.rbac.Subject;
 import cn.procsl.ping.boot.system.domain.rbac.SubjectRoleSpec;
