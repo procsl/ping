@@ -1,33 +1,37 @@
 package cn.procsl.ping.boot.jpa.support.extension;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.Tuple;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Root;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.support.JpaEntityInformation;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 
 import java.io.Serializable;
 
 @Slf4j
-@RequiredArgsConstructor
-class JpaExtensionRepositoryImpl<T, ID extends Serializable> implements JpaExtensionRepository<T, ID> {
+class JpaExtensionRepositoryImpl<T, ID extends Serializable>
+        extends SimpleJpaRepository<T, ID>
+        implements JpaExtensionRepository<T, ID> {
 
-    final EntityManager entityManager;
+    public JpaExtensionRepositoryImpl(JpaEntityInformation<T, ?> entityInformation, EntityManager entityManager) {
+        super(entityInformation, entityManager);
+    }
+
+    public JpaExtensionRepositoryImpl(Class<T> domainClass, EntityManager entityManager) {
+        super(domainClass, entityManager);
+    }
 
     @Override
     public <R> Page<R> queryAll(Specification<T> spec, Pageable pageable) {
 
 
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-
-        CriteriaQuery<Tuple> query = builder.createTupleQuery();
-
-        Root<String> root = query.from(String.class);
+//        CriteriaBuilder builder = .getCriteriaBuilder();
+//
+//        CriteriaQuery<Tuple> query = builder.createTupleQuery();
+//
+//        Root<String> root = query.from(String.class);
 
 
         return null;

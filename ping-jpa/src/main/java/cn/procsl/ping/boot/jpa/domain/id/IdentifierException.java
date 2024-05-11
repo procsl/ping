@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.jpa.support;
+package cn.procsl.ping.boot.jpa.domain.id;
 
 public class IdentifierException extends RuntimeException {
 

@@ -16,4 +16,8 @@ public @interface EnableJpaExtensionRepositories {
     @AliasFor(annotation = EnableJpaRepositories.class, attribute = "basePackages")
     String[] basePackages() default {};
 
+    @AliasFor(annotation = EnableJpaRepositories.class, attribute = "basePackageClasses")
+    Class<?>[] basePackageClasses() default {};
+
+
 }
