@@ -13,7 +13,7 @@ public class ImageCaptchaBuilderServiceTest {
 
     @Test
     public void serializeSecureToken() {
-        String res = imageCaptchaBuilderService.serializeSecureToken("12345", new ImageCaptcha(1L, "测试", "abcdefg", 2));
+        String res = imageCaptchaBuilderService.serializeSecureToken("12345", new ImageCaptcha(1L, "测试", "abcdefg", "POST:/v1/api", 2));
         log.info("res {}", res);
     }
 
@@ -27,7 +27,7 @@ public class ImageCaptchaBuilderServiceTest {
 
     @Test
     public void secondExpired() {
-        ImageCaptcha image = new ImageCaptcha(123L, "123", "ticket", 2);
+        ImageCaptcha image = new ImageCaptcha(123L, "123", "ticket", "POST:/v1/api", 2);
         int second = image.validSecond();
         log.info("second:{}", second);
     }

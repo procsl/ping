@@ -19,4 +19,9 @@ public class SimpleMockCaptchaCommand implements VerifyCaptchaCommand {
     public String getClientTicket() {
         return emailCaptcha.getTicket();
     }
+
+    @Override
+    public String getFunctionId() {
+        return "";
+    }
 }

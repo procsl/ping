@@ -1,17 +1,35 @@
 package cn.procsl.ping.boot.captcha.handler;
 
+import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
+import cn.procsl.ping.boot.captcha.domain.VerifyCaptchaCommand;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.util.ObjectUtils;
 
 import static cn.procsl.ping.boot.captcha.domain.image.ImageCaptcha.TOKEN_KEY;
 
-class ImageVerifyCommand extends SimpleVerifyCommand {
+@RequiredArgsConstructor
+class ImageVerifyCommand implements VerifyCaptchaCommand {
+    final protected HttpServletRequest request;
 
-    public ImageVerifyCommand(HttpServletRequest request) {
-        super(request);
+    @Override
+    public String getClientId() {
+        return WebUtils.getClientSessionId(request);
     }
+
+    @Override
+    public String getClientTicket() {
+        String ticket = request.getHeader(VerifyCaptcha.header);
+
+        if (ObjectUtils.isEmpty(ticket)) {
+            throw new CaptchaNotFoundException("请输入邮件验证码");
+        }
+
+        return ticket;
+    }
+
 
     public String getClientTokenString() {
         Cookie[] cookies = this.request.getCookies();
@@ -30,6 +48,11 @@ class ImageVerifyCommand extends SimpleVerifyCommand {
     @NonNull
     public String key() {
         return "123456";
+    }
+
+    @Override
+    public String getFunctionId() {
+        return request.getMethod() + ":" + request.getRequestURI();
     }
 
 }

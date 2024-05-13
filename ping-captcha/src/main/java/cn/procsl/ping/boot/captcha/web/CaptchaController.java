@@ -5,6 +5,7 @@ import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
 import cn.procsl.ping.boot.captcha.domain.image.ImageCaptcha;
 import cn.procsl.ping.boot.captcha.domain.image.ImageCaptchaBuilderService;
 import cn.procsl.ping.boot.captcha.handler.EmailCaptchaHandler;
+import cn.procsl.ping.boot.captcha.handler.WebUtils;
 import cn.procsl.ping.boot.jpa.support.IdentifierGenerator;
 import cn.procsl.ping.boot.web.annotation.VersionController;
 import com.wf.captcha.SpecCaptcha;
@@ -40,14 +41,6 @@ public class CaptchaController {
 
     final IdentifierGenerator<Long> idGenerator;
 
-    public static String getClientSessionId(HttpServletRequest request) {
-        String sessionId = request.getRequestedSessionId();
-        if (sessionId == null) {
-            sessionId = request.getSession().getId();
-        }
-        return sessionId;
-    }
-
     @PermitAll
     @VersionController
     @Operation(summary = "创建图形验证码")
@@ -60,7 +53,7 @@ public class CaptchaController {
 
         Captcha captcha = new SpecCaptcha(parameter.getWidth(), parameter.getHeight());
 
-        String sessionId = getClientSessionId(request);
+        String sessionId = WebUtils.getClientSessionId(request);
         ImageCaptcha imageCaptcha =
                 ImageCaptcha.builder().id(idGenerator.nextId("captcha-image", 1L))
                         .target(sessionId)
@@ -92,7 +85,7 @@ public class CaptchaController {
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     @Transactional(rollbackFor = Exception.class)
     public void sendEmailCaptcha(HttpServletRequest request, @RequestBody @Validated EmailSenderDTO sender) {
-        this.emailCaptchaHandler.createEmailCaptcha(getClientSessionId(request), sender.getEmail());
+        this.emailCaptchaHandler.createEmailCaptcha(WebUtils.getClientSessionId(request), sender.getEmail());
     }
 
 }
