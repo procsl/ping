@@ -22,13 +22,13 @@
     </appender>
 
     <!-- 设置日志输出级别 -->
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="CONSOLE"/>
     </root>
 
     <logger name="org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLoggingListener"
             level="INFO"/>
     <logger name="org.hibernate.hql.internal.ast" level="INFO"/>
-    <logger name="cn.procsl.ping" level="TRACE"/>
+    <logger name="cn.procsl.ping" level="DEBUG"/>
     <logger name="org.hibernate.resource.transaction.backend.jdbc.internal.JdbcResourceLocalTransactionCoordinatorImpl" level="INFO"/>
 </configuration>

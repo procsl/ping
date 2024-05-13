@@ -1,13 +1,22 @@
 package cn.procsl.ping.boot.jpa.domain.id;
 
 import cn.procsl.ping.boot.jpa.support.IdentifierGenerator;
+import jakarta.transaction.SystemException;
+import jakarta.transaction.Transaction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Supplier;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -22,9 +31,27 @@ public class TableIdentifierGenerator implements IdentifierGenerator<Long> {
 
     final int segmentSize;
 
-    final long initialValue;
+    final int retryTimes;
 
-    final int retryTimes = 5;
+    public TableIdentifierGenerator(IdentifierSegmentRepository repository,
+                                    PlatformTransactionManager transactionManager,
+                                    int segmentSize) {
+        this(repository, transactionManager, segmentSize, 5);
+    }
+
+    public TableIdentifierGenerator(IdentifierSegmentRepository repository,
+                                    PlatformTransactionManager transactionManager,
+                                    int segmentSize, int retryTimes) {
+        this.repository = repository;
+        this.segmentSize = segmentSize;
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        def.setReadOnly(false);
+        def.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);
+        def.setTimeout(1000);
+        this.transactionTemplate = new TransactionTemplate(transactionManager, def);
+        this.retryTimes = retryTimes;
+    }
 
     @Override
     public Long nextId(String name, Long initId) {
@@ -33,13 +60,12 @@ public class TableIdentifierGenerator implements IdentifierGenerator<Long> {
 
             Segment current = map.get(name);
             if (current == null) {
-                Long value = this.nextSegmentValue(name,
-                        segmentSize, initialValue);
-                current = map.putIfAbsent(name, new Segment(value, segmentSize));
-            }
-
-            if (current == null) {
-                continue;
+                Long value = this.nextSegmentValue(name, segmentSize, initId);
+                if (value == null) {
+                    continue;
+                }
+                current = new Segment(value, segmentSize);
+                map.put(name, current);
             }
 
             Long currentValue = current.nextValue();
@@ -66,7 +92,7 @@ public class TableIdentifierGenerator implements IdentifierGenerator<Long> {
 
         public Long nextValue() {
             long current = currentValue.getAndIncrement();
-            if (current > maxValue) {
+            if (current >= maxValue) {
                 return null;
             }
             return current;
@@ -83,27 +109,24 @@ public class TableIdentifierGenerator implements IdentifierGenerator<Long> {
      * @return 返回可分配的数据段起始值, 如返回1, 则可分配数据段值为 1 至 1+size
      * @throws IdentifierException 如果分配重试次数超过指定值,或其他原因
      */
-    protected Long nextSegmentValue(String segmentName, int size, Long initValue) throws IdentifierException {
+    protected Long nextSegmentValue(String segmentName, int size, Long initValue) {
 
-        for (int i = 0; i < retryTimes; i++) {
-            try {
-                return transactionTemplate.execute(status -> {
-
-                    Optional<Long> optional = repository.incrementBy(segmentName, size);
-                    return optional.orElseGet(() -> {
-                        log.debug("保存: {}, {}", segmentName, initValue);
-                        repository.save(segmentName, initValue);
-                        status.flush();
-                        return initValue;
-                    });
-
-                });
-            } catch (RuntimeException e) {
-                log.warn("获取ID段出现异常", e);
+        try {
+            Optional<Long> mtp = transactionTemplate.execute(status -> repository.incrementBy(segmentName, size));
+            if (Objects.requireNonNull(mtp).isPresent()) {
+                return mtp.get();
             }
+        } catch (IdentifierException e) {
+            transactionTemplate.execute(status -> {
+                repository.save(segmentName, initValue);
+                status.flush();
+                return null;
+            });
+            return initValue;
+        } catch (RuntimeException e) {
+            log.warn("获取ID段锁异常", e);
         }
-        throw new IdentifierException("获取ID段失败, 超过重试次数");
+        return null;
     }
-
 
 }
