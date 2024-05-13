@@ -6,16 +6,14 @@ import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
 
 @Slf4j
-@Repository
 @RequiredArgsConstructor
-class IdentifierRepositoryImpl implements IdentifierSegmentRepository {
+public class IdentifierSegmentRepositoryImpl implements IdentifierSegmentRepository {
 
     final EntityManager entityManager;
 
@@ -54,11 +52,6 @@ class IdentifierRepositoryImpl implements IdentifierSegmentRepository {
     public void save(String segmentName, Long idValue) {
         this.entityManager.persist(new InnerIdentifier(segmentName, idValue));
         this.entityManager.flush();
-//        String sql = "insert into ping_sequence (next_val, sequence_name) values (?, ?)";
-//        entityManager.createNativeQuery(sql, Identifier.class)
-//                .setParameter(1, idValue)
-//                .setParameter(2, segmentName)
-//                .executeUpdate();
     }
 
 }

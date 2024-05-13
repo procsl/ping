@@ -12,8 +12,8 @@ public class ImageCaptchaBuilderServiceTest {
 
 
     @Test
-    public void buildToken() {
-        String res = imageCaptchaBuilderService.buildToken("12345", new ImageCaptcha(1L, "测试", "abcdefg", 2));
+    public void serializeSecureToken() {
+        String res = imageCaptchaBuilderService.serializeSecureToken("12345", new ImageCaptcha(1L, "测试", "abcdefg", 2));
         log.info("res {}", res);
     }
 

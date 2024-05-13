@@ -12,27 +12,26 @@ import java.io.IOException;
 
 @Slf4j
 @RequiredArgsConstructor
-class ImageVerifyCaptchaHandler implements VerifyCaptchaHandler<VerifyCaptchaCommand> {
+class ImageVerifyCaptchaHandler implements VerifyCaptchaHandler<ImageVerifyCommand> {
 
     final ImageCaptchaBuilderService imageCaptchaBuilderService = new ImageCaptchaBuilderService();
 
 
     final ImageCaptchaRepository imageCaptchaRepository;
 
-    @Override
-    public void verify(VerifyCaptchaCommand command) throws VerifyFailureException {
-        assert command instanceof ImageVerifyCommand;
-        ImageVerifyCommand context = (ImageVerifyCommand) command;
 
-        String token = context.token();
-        if (ObjectUtils.isEmpty(token)) {
+    @Override
+    public void verify(ImageVerifyCommand command) throws VerifyFailureException {
+
+        String clientTokenString = command.getClientTokenString();
+        if (ObjectUtils.isEmpty(clientTokenString)) {
             log.warn("图形验证码 token 为 null");
             throw new VerifyFailureException("图形验证码已过期");
         }
 
         ImageCaptcha imageCaptcha;
         try {
-            imageCaptcha = imageCaptchaBuilderService.buildForToken(context.key(), token);
+            imageCaptcha = imageCaptchaBuilderService.buildForToken(command.key(), clientTokenString);
         } catch (IOException e) {
             log.warn("图形验证码解码失败", e);
             throw new VerifyFailureException("图形验证码错误");
@@ -42,11 +41,8 @@ class ImageVerifyCaptchaHandler implements VerifyCaptchaHandler<VerifyCaptchaCom
             throw new VerifyFailureException("图形验证码错误");
         }
 
-        assert imageCaptcha.getId() != null;
-        String ticket = context.ticket();
-
         try {
-            imageCaptcha.verify(ticket);
+            imageCaptcha.verify(command);
         } catch (VerifyFailureException e) {
             if (e.isTicketError()) {
                 // 如果是验证码本身错误, 需要保存防止爆破
@@ -62,9 +58,7 @@ class ImageVerifyCaptchaHandler implements VerifyCaptchaHandler<VerifyCaptchaCom
         }
 
         // 再次校验并保存
-        db.verify(ticket);
+        db.verify(command);
         this.imageCaptchaRepository.save(db);
     }
-
-
 }

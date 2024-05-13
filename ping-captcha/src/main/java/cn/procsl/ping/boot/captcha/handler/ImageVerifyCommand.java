@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.lang.NonNull;
 import org.springframework.util.ObjectUtils;
 
-import static cn.procsl.ping.boot.captcha.domain.image.ImageCaptcha.token_key;
+import static cn.procsl.ping.boot.captcha.domain.image.ImageCaptcha.TOKEN_KEY;
 
 class ImageVerifyCommand extends SimpleVerifyCommand {
 
@@ -13,14 +13,14 @@ class ImageVerifyCommand extends SimpleVerifyCommand {
         super(request);
     }
 
-    public String token() {
+    public String getClientTokenString() {
         Cookie[] cookies = this.request.getCookies();
         if (cookies == null) {
             return null;
         }
 
         for (Cookie cookie : cookies) {
-            if (ObjectUtils.nullSafeEquals(cookie.getName(), token_key)) {
+            if (ObjectUtils.nullSafeEquals(cookie.getName(), TOKEN_KEY)) {
                 return cookie.getValue();
             }
         }

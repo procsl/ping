@@ -1,16 +1,20 @@
 package cn.procsl.ping.boot.captcha.handler;
 
 import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
+import cn.procsl.ping.boot.captcha.domain.VerifyCaptchaCommand;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.ObjectUtils;
+
+import java.util.Date;
 
 @RequiredArgsConstructor
 class SimpleVerifyCommand implements VerifyCaptchaCommand {
 
     final protected HttpServletRequest request;
 
-    public static String getTarget(HttpServletRequest request) {
+    @Override
+    public String getClientId() {
         String sessionId = request.getRequestedSessionId();
         if (sessionId == null) {
             sessionId = request.getSession().getId();
@@ -19,12 +23,7 @@ class SimpleVerifyCommand implements VerifyCaptchaCommand {
     }
 
     @Override
-    public String target() {
-        return getTarget(request);
-    }
-
-    @Override
-    public String ticket() {
+    public String getClientTicket() {
         String ticket = request.getHeader(VerifyCaptcha.header);
 
         if (ObjectUtils.isEmpty(ticket)) {
@@ -33,5 +32,6 @@ class SimpleVerifyCommand implements VerifyCaptchaCommand {
 
         return ticket;
     }
+
 
 }

@@ -33,7 +33,7 @@ public class ImageVerifyCaptchaInterceptorTest {
     @Test
     public void verify() {
         log.info("执行方法");
-        ImageCaptcha captcha = new ImageCaptcha(1L, "123", "234567", 2);
+        ImageCaptcha captcha = new ImageCaptcha(1L, "123", "234567", "GET:/v1", 2);
         ImageVerifyCommand successContext = new MockVerifyCommand(captcha, null);
         ImageVerifyCommand errorContext = new MockVerifyCommand(captcha, "0980980");
 
@@ -53,7 +53,7 @@ public class ImageVerifyCaptchaInterceptorTest {
         public MockVerifyCommand(ImageCaptcha captcha, String ticket) {
             super(null);
             this.captcha = captcha;
-            this.token = service.buildToken(this.key(), captcha);
+            this.token = service.serializeSecureToken(this.key(), captcha);
             if (ticket == null) {
                 this.ticket = this.captcha.getTicket();
             } else {
@@ -62,17 +62,17 @@ public class ImageVerifyCaptchaInterceptorTest {
         }
 
         @Override
-        public String target() {
-            return this.captcha.getTarget();
+        public String getClientId() {
+            return this.captcha.getClientId();
         }
 
         @Override
-        public String ticket() {
+        public String getClientTicket() {
             return Base64.getEncoder().encodeToString(ticket.getBytes(StandardCharsets.UTF_8));
         }
 
         @Override
-        public String token() {
+        public String getClientTokenString() {
             return this.token;
         }
 

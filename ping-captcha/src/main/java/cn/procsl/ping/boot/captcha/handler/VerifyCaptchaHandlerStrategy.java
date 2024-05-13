@@ -2,6 +2,7 @@ package cn.procsl.ping.boot.captcha.handler;
 
 import cn.procsl.ping.boot.captcha.domain.CaptchaType;
 import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
+import cn.procsl.ping.boot.captcha.domain.VerifyCaptchaCommand;
 import cn.procsl.ping.boot.captcha.domain.image.ImageCaptchaRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -49,8 +50,9 @@ public class VerifyCaptchaHandlerStrategy implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         {
+            //            TODO
             contexts.put(CaptchaType.image, this::imageContextBuild);
-            ImageVerifyCaptchaHandler image = new ImageVerifyCaptchaHandler(imageCaptchaRepository);
+            VerifyCaptchaHandler image = new ImageVerifyCaptchaHandler(imageCaptchaRepository);
             strategy.put(CaptchaType.image, image);
         }
 

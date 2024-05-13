@@ -5,6 +5,7 @@ import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
 import cn.procsl.ping.boot.captcha.domain.image.ImageCaptcha;
 import cn.procsl.ping.boot.captcha.domain.image.ImageCaptchaBuilderService;
 import cn.procsl.ping.boot.captcha.handler.EmailCaptchaHandler;
+import cn.procsl.ping.boot.jpa.support.IdentifierGenerator;
 import cn.procsl.ping.boot.web.annotation.VersionController;
 import com.wf.captcha.SpecCaptcha;
 import com.wf.captcha.base.Captcha;
@@ -19,15 +20,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.AlternativeJdkIdGenerator;
-import org.springframework.util.IdGenerator;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicLong;
 
-import static cn.procsl.ping.boot.captcha.domain.image.ImageCaptcha.token_key;
+import static cn.procsl.ping.boot.captcha.domain.image.ImageCaptcha.TOKEN_KEY;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,11 +38,9 @@ public class CaptchaController {
 
     final EntityManager entityManager;
 
-    final IdGenerator id = new AlternativeJdkIdGenerator();
+    final IdentifierGenerator<Long> idGenerator;
 
-    final AtomicLong auto = new AtomicLong(0);
-
-    public static String getTarget(HttpServletRequest request) {
+    public static String getClientSessionId(HttpServletRequest request) {
         String sessionId = request.getRequestedSessionId();
         if (sessionId == null) {
             sessionId = request.getSession().getId();
@@ -58,23 +54,25 @@ public class CaptchaController {
     @PostMapping(path = "/v1/captcha/images", produces = MediaType.IMAGE_GIF_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public void createImageCaptcha(HttpServletRequest request, HttpServletResponse response,
-                                   @RequestParam(defaultValue = "130", required = false) Integer width,
-                                   @RequestParam(defaultValue = "48", required = false) Integer height)
+                                   @RequestBody @Validated ImageCaptchaParam parameter
+    )
             throws IOException {
 
-        Captcha captcha = new SpecCaptcha(width, height);
+        Captcha captcha = new SpecCaptcha(parameter.getWidth(), parameter.getHeight());
 
-        // TODO
-        long id = System.currentTimeMillis() + auto.getAndIncrement();
+        String sessionId = getClientSessionId(request);
+        ImageCaptcha imageCaptcha =
+                ImageCaptcha.builder().id(idGenerator.nextId("captcha-image", 1L))
+                        .target(sessionId)
+                        .ticket(captcha.text())
+                        .functionId(parameter.getFunctionId())
+                        .expired(2).build();
+        String token = this.imageCaptchaBuilderService.serializeSecureToken("123456", imageCaptcha);
 
-        String sessionId = getTarget(request);
-        ImageCaptcha imageCaptcha = new ImageCaptcha(id, sessionId, captcha.text(), 2);
-        String token = this.imageCaptchaBuilderService.buildToken("123456", imageCaptcha);
-
-        Cookie cookie = new Cookie(token_key, token);
+        Cookie cookie = new Cookie(TOKEN_KEY, token);
         cookie.setMaxAge(imageCaptcha.validSecond());
         cookie.setHttpOnly(true);
-        cookie.setPath("/");
+        cookie.setPath(imageCaptcha.parsePath());
 
         response.addCookie(cookie);
         response.setHeader("Pragma", "no-cache");
@@ -94,7 +92,7 @@ public class CaptchaController {
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     @Transactional(rollbackFor = Exception.class)
     public void sendEmailCaptcha(HttpServletRequest request, @RequestBody @Validated EmailSenderDTO sender) {
-        this.emailCaptchaHandler.createEmailCaptcha(getTarget(request), sender.getEmail());
+        this.emailCaptchaHandler.createEmailCaptcha(getClientSessionId(request), sender.getEmail());
     }
 
 }

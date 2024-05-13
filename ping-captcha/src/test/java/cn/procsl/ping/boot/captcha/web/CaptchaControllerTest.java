@@ -25,7 +25,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static cn.procsl.ping.boot.captcha.domain.image.ImageCaptcha.token_key;
+import static cn.procsl.ping.boot.captcha.domain.image.ImageCaptcha.TOKEN_KEY;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -66,7 +66,7 @@ public class CaptchaControllerTest {
                    String res = Base64.getEncoder().encodeToString(str);
                    log.info("响应体为:{}", res);
                    Assertions.assertNotNull(res);
-                   Cookie cookie = result.getResponse().getCookie(token_key);
+                   Cookie cookie = result.getResponse().getCookie(TOKEN_KEY);
                    Assertions.assertNotNull(cookie);
                    String value = cookie.getValue();
                    imageReference.set(imageCaptchaBuilderService.buildForToken("123456", value));
@@ -101,7 +101,7 @@ public class CaptchaControllerTest {
         AtomicReference<ImageCaptcha> imageReference = new AtomicReference<>();
         mockMvc.perform(post("/v1/captcha/image").session(session))
                .andDo(result -> {
-                   Cookie cookie = result.getResponse().getCookie(token_key);
+                   Cookie cookie = result.getResponse().getCookie(TOKEN_KEY);
                    Assertions.assertNotNull(cookie);
                    String value = cookie.getValue();
                    imageReference.set(imageCaptchaBuilderService.buildForToken("123456", value));

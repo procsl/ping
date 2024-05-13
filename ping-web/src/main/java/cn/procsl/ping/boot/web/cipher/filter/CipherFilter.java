@@ -34,6 +34,11 @@ public final class CipherFilter extends OncePerRequestFilter implements ServletR
 
     MimeType mimeResolver(HttpServletRequest request, HttpServletResponse response) {
         String contentType = request.getContentType();
+
+        if (contentType == null || contentType.isEmpty()) {
+            return null;
+        }
+
         if (!contentType.startsWith(ENCRYPT_MIME_TYPE_VALUE)) {
             return null;
         }

@@ -16,7 +16,7 @@ public class ImageCaptchaBuilderService {
     final JsonMapper jsonMapper = new JsonMapper();
 
 
-    public String buildToken(String key, ImageCaptcha captcha) {
+    public String serializeSecureToken(String key, ImageCaptcha captcha) {
         try {
             byte[] json = jsonMapper.writeValueAsBytes(captcha);
             TokenCipher cipher = new TokenCipher(key, true, 256);

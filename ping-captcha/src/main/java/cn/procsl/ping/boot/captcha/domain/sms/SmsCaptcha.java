@@ -20,11 +20,6 @@ public class SmsCaptcha extends Captcha {
     Long id;
 
     @Override
-    protected boolean check(String ticket) throws VerifyFailureException {
-        return false;
-    }
-
-    @Override
     public String message() {
         return null;
     }

@@ -1,11 +1,13 @@
 package cn.procsl.ping.boot.jpa;
 
 import cn.procsl.ping.boot.jpa.domain.id.IdentifierSegmentRepository;
+import cn.procsl.ping.boot.jpa.domain.id.IdentifierSegmentRepositoryImpl;
 import cn.procsl.ping.boot.jpa.domain.id.TableIdentifierGenerator;
 import cn.procsl.ping.boot.jpa.support.IdentifierGenerator;
 import cn.procsl.ping.boot.jpa.support.extension.EnableJpaExtensionRepositories;
 import cn.procsl.ping.boot.jpa.support.extension.JpaRepositoryFactoryCustomizer;
 import jakarta.annotation.Nonnull;
+import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -24,7 +26,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Slf4j
 @AutoConfiguration
 @ConditionalOnMissingBean(JpaDataAutoConfiguration.class)
-@EnableJpaExtensionRepositories(basePackages = "cn.procsl.ping.boot.jpa.domain")
+@EnableJpaExtensionRepositories(basePackages = {"cn.procsl.ping.boot.jpa.domain"})
 @EntityScan(basePackages = "cn.procsl.ping.boot.jpa.domain")
 public class JpaDataAutoConfiguration implements BeanPostProcessor {
 
@@ -38,11 +40,18 @@ public class JpaDataAutoConfiguration implements BeanPostProcessor {
         return JpaRepositoryFactoryCustomizer.instance;
     }
 
+    @Bean
+    @ConditionalOnMissingBean
+    public IdentifierSegmentRepository identifierSegmentRepository(EntityManager entityManager) {
+        return new IdentifierSegmentRepositoryImpl(entityManager);
+    }
+
 
     @Bean
+    @ConditionalOnMissingBean
     public IdentifierGenerator<Long> identifierGenerator(IdentifierSegmentRepository repository,
                                                          PlatformTransactionManager transactionManager) {
-        return new TableIdentifierGenerator(repository, transactionManager, 10, 3);
+        return new TableIdentifierGenerator(repository, transactionManager, 200, 3);
     }
 
 

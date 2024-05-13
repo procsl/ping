@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.captcha.handler;
 
+import cn.procsl.ping.boot.captcha.domain.VerifyCaptchaCommand;
 import cn.procsl.ping.boot.captcha.domain.VerifyFailureException;
 
 public interface VerifyCaptchaHandler<C extends VerifyCaptchaCommand> {

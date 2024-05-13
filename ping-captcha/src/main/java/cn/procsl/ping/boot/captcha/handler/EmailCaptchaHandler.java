@@ -3,6 +3,7 @@ package cn.procsl.ping.boot.captcha.handler;
 import cn.procsl.ping.boot.captcha.adapter.EmailSenderAdapter;
 import cn.procsl.ping.boot.captcha.domain.CaptchaSpecification;
 import cn.procsl.ping.boot.captcha.domain.CaptchaType;
+import cn.procsl.ping.boot.captcha.domain.VerifyCaptchaCommand;
 import cn.procsl.ping.boot.captcha.domain.VerifyFailureException;
 import cn.procsl.ping.boot.captcha.domain.email.EmailCaptcha;
 import cn.procsl.ping.boot.captcha.domain.email.EmailCaptchaSpec;
@@ -30,14 +31,15 @@ public class EmailCaptchaHandler implements VerifyCaptchaHandler<VerifyCaptchaCo
     @Override
     @Transactional(rollbackFor = Exception.class, noRollbackFor = VerifyFailureException.class)
     public void verify(VerifyCaptchaCommand context) throws VerifyFailureException {
-        val all = this.jpaSpecificationExecutor.findAll(new CaptchaSpecification<>(context.target()));
+        val all = this.jpaSpecificationExecutor.findAll(new CaptchaSpecification<>(context.getClientId()));
         if (all.isEmpty()) {
             log.info("找不到绑定的邮件验证码信息");
             throw new VerifyFailureException("%s验证码已过期", CaptchaType.email.message);
         }
 
+        // TODO
         EmailCaptcha first = all.get(0);
-        first.verify(context.ticket());
+        first.verify(context);
         log.debug("邮件验证码验证成功:{}", first.getTicket());
     }
 

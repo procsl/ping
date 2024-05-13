@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.captcha.handler;
 
+import cn.procsl.ping.boot.captcha.domain.VerifyCaptchaCommand;
 import cn.procsl.ping.boot.captcha.domain.email.EmailCaptcha;
 
 public class SimpleMockCaptchaCommand implements VerifyCaptchaCommand {
@@ -10,12 +11,12 @@ public class SimpleMockCaptchaCommand implements VerifyCaptchaCommand {
     }
 
     @Override
-    public String target() {
-        return emailCaptcha.getTarget();
+    public String getClientId() {
+        return emailCaptcha.getClientId();
     }
 
     @Override
-    public String ticket() {
+    public String getClientTicket() {
         return emailCaptcha.getTicket();
     }
 }

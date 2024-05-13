@@ -2,6 +2,7 @@ package cn.procsl.ping.boot.captcha.domain.image;
 
 import cn.procsl.ping.boot.captcha.domain.Captcha;
 import cn.procsl.ping.boot.captcha.domain.CaptchaType;
+import cn.procsl.ping.boot.captcha.domain.VerifyCaptchaCommand;
 import cn.procsl.ping.boot.captcha.domain.VerifyFailureException;
 import cn.procsl.ping.boot.jpa.support.RepositoryCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -10,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
 
+import javax.annotation.Nonnull;
 import java.util.Base64;
 
 @Getter
@@ -22,20 +24,32 @@ import java.util.Base64;
         repositoryName = "ImageCaptchaSpecificationExecutor")
 public class ImageCaptcha extends Captcha {
 
-    public final static String token_key = "image-captcha-token";
+    public final static String TOKEN_KEY = "image-captcha-token";
 
     @Id
+    @Nonnull
     Long id;
 
     @Builder
-    public ImageCaptcha(Long id, @NonNull String target, @NonNull String ticket, int expired) {
-        super(target, ticket, expired);
+    public ImageCaptcha(Long id, @NonNull String target, @NonNull String ticket, @NonNull String functionId, int expired) {
+        super(target, ticket, functionId, expired);
         this.id = id;
+        this.verifyFunctionId(functionId);
+    }
+
+    /**
+     * 校验验证码functionId的格式
+     */
+    private void verifyFunctionId(String functionId) {
+        if (functionId == null) {
+            // TODO
+//            @Pattern(regexp = "(GET|POST|DELETE|PATCH|PUT)", message = "仅支持[{regexp}]方法") String operate;
+        }
     }
 
     @Override
-    protected boolean check(String ticket) throws VerifyFailureException {
-        String str = this.parse(ticket);
+    public boolean check(@NonNull VerifyCaptchaCommand param) throws VerifyFailureException {
+        String str = this.parseBase64Ticket(param.getClientTicket());
         return this.ticket.equalsIgnoreCase(str);
     }
 
@@ -44,7 +58,7 @@ public class ImageCaptcha extends Captcha {
         return CaptchaType.image.message;
     }
 
-    protected String parse(String ticket) throws VerifyFailureException {
+    protected String parseBase64Ticket(String ticket) throws VerifyFailureException {
         try {
             byte[] str = Base64.getDecoder().decode(ticket);
             return new String(str);
@@ -54,6 +68,13 @@ public class ImageCaptcha extends Captcha {
 
     }
 
+    public String parseMethod() {
+        return functionId.split(":")[0];
+    }
+
+    public String parsePath() {
+        return functionId.split(":")[1];
+    }
 
     /**
      * 有效秒数

@@ -1,14 +1,10 @@
 package cn.procsl.ping.boot.jpa.domain.id;
 
 import cn.procsl.ping.boot.jpa.support.IdentifierGenerator;
-import jakarta.transaction.SystemException;
-import jakarta.transaction.Transaction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.TransactionManager;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -16,7 +12,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Supplier;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -118,7 +113,7 @@ public class TableIdentifierGenerator implements IdentifierGenerator<Long> {
             }
         } catch (IdentifierException e) {
             transactionTemplate.execute(status -> {
-                repository.save(segmentName, initValue);
+                repository.save(segmentName, initValue + size);
                 status.flush();
                 return null;
             });
