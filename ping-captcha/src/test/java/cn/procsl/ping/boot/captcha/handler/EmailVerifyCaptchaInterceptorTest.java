@@ -26,7 +26,7 @@ public class EmailVerifyCaptchaInterceptorTest {
 
         {
             log.info("开始");
-            EmailCaptcha emailCaptcha = new EmailCaptcha("123456", "test@email.com");
+            EmailCaptcha emailCaptcha = new EmailCaptcha("123456", "aaa", "test@email.com");
             emailCaptchaLongJpaRepository.save(emailCaptcha);
             emailCaptchaHandler.verify(new SimpleMockCaptchaCommand(emailCaptcha));
             Assertions.assertThrowsExactly(VerifyFailureException.class, () -> {
@@ -36,7 +36,7 @@ public class EmailVerifyCaptchaInterceptorTest {
         }
 
         {
-            EmailCaptcha emailCaptcha = new EmailCaptcha("654321", "test@email.com");
+            EmailCaptcha emailCaptcha = new EmailCaptcha("654321", "aaa", "test@email.com");
             Assertions.assertThrowsExactly(VerifyFailureException.class, () -> {
                 emailCaptchaHandler.verify(new SimpleMockCaptchaCommand(emailCaptcha));
             });

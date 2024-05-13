@@ -61,14 +61,14 @@ public abstract class Captcha implements Serializable, Persistable<Long> {
         return buffer.toString();
     }
 
-    public void verify(@NonNull VerifyCaptchaCommand param) throws VerifyFailureException {
+    public void verify(@NonNull VerifyCaptchaCommand command) throws VerifyFailureException {
 
-        if (ObjectUtils.nullSafeEquals(param.getFunctionId(), this.functionId)) {
-            throw new VerifyFailureException("%s验证码已错误", this.message());
+        if (!ObjectUtils.nullSafeEquals(command.getFunctionId(), this.functionId)) {
+            throw new VerifyFailureException("%s验证码错误", this.message());
         }
 
         // 如果当前时间是过期时间之后, 则属于验证码超时
-        if (param.getVerifyDate().after(expiredDate)) {
+        if (command.getVerifyDate().after(expiredDate)) {
             throw new VerifyFailureException("%s验证码已过期", this.message());
         }
 
@@ -82,7 +82,7 @@ public abstract class Captcha implements Serializable, Persistable<Long> {
             throw new VerifyFailureException("%s验证码已失效", this.message());
         }
         this.times++;
-        boolean bool = this.check(param);
+        boolean bool = this.check(command);
         if (!bool) {
             throw new VerifyFailureException(true, "%s验证码错误", this.message());
         }
@@ -90,7 +90,7 @@ public abstract class Captcha implements Serializable, Persistable<Long> {
     }
 
     protected boolean check(VerifyCaptchaCommand param) throws VerifyFailureException {
-        return ObjectUtils.nullSafeEquals(param, this.getTicket());
+        return ObjectUtils.nullSafeEquals(param.getClientTicket(), this.getTicket());
     }
 
     public abstract String message();

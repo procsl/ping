@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.jpa.domain.id;
 
-import cn.procsl.ping.boot.jpa.support.IdentifierGenerator;
+import cn.procsl.ping.boot.common.utils.IdentifierGenerator;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;

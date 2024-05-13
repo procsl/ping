@@ -12,14 +12,14 @@ public class SimpleCipherLockupService implements CipherLockupService {
             .cipherMode(CipherFactory.CipherMode.ENCRYPT)
             .mode("ECB")
             .padding("PKCS5Padding")
-            .privateKey("12345678".getBytes(StandardCharsets.UTF_8));
+            .privateKey("1234567890abcdef".getBytes(StandardCharsets.UTF_8));
 
     final CipherFactory.CipherFactoryBuilder decryptBuilder = CipherFactory.init()
             .algorithm("AES")
             .cipherMode(CipherFactory.CipherMode.DECRYPT)
             .mode("ECB")
             .padding("PKCS5Padding")
-            .privateKey("12345678".getBytes(StandardCharsets.UTF_8));
+            .privateKey("1234567890abcdef".getBytes(StandardCharsets.UTF_8));
 
     @Override
     public Cipher lockupEncryptCipher(CipherScope scope) {

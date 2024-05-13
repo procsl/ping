@@ -124,7 +124,8 @@ public class GlobalExceptionHandler {
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value = CipherException.class)
     public ErrorVO decryptException(CipherException exception) {
-        return ErrorVO.build(HttpMessageNotReadableException.class, exception.getMessage());
+        log.warn("解密错误:", exception);
+        return ErrorVO.build(HttpMessageNotReadableException.class, "错误的请求ID");
     }
 
 }

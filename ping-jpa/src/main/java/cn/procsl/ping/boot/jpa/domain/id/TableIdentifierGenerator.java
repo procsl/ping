@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.jpa.domain.id;
 
-import cn.procsl.ping.boot.jpa.support.IdentifierGenerator;
+import cn.procsl.ping.boot.common.utils.IdentifierGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.PlatformTransactionManager;

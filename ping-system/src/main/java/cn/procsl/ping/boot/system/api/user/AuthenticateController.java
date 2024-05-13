@@ -87,7 +87,7 @@ public class AuthenticateController {
         Authenticate authenticate = this.handler.doLogin(request.getSession().getId(), details.getPassword(), optional.get());
 
         this.authenticationLongJpaRepository.save(authenticate);
-
+        request.getSession().invalidate();
         AuthenticateVO dto = this.userMapper.mapper(authenticate);
         request.getSession().setAttribute(AUTHENTICATION_KEY, authenticate.getId());
         return dto;

@@ -6,7 +6,7 @@ import cn.procsl.ping.boot.captcha.domain.image.ImageCaptcha;
 import cn.procsl.ping.boot.captcha.domain.image.ImageCaptchaBuilderService;
 import cn.procsl.ping.boot.captcha.handler.EmailCaptchaHandler;
 import cn.procsl.ping.boot.captcha.handler.WebUtils;
-import cn.procsl.ping.boot.jpa.support.IdentifierGenerator;
+import cn.procsl.ping.boot.common.utils.IdentifierGenerator;
 import cn.procsl.ping.boot.web.annotation.VersionController;
 import com.wf.captcha.SpecCaptcha;
 import com.wf.captcha.base.Captcha;

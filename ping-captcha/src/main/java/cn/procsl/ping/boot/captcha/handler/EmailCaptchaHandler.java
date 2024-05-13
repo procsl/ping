@@ -47,7 +47,8 @@ public class EmailCaptchaHandler implements VerifyCaptchaHandler<VerifyCaptchaCo
     public void createEmailCaptcha(String target, String email) {
         val all = this.jpaSpecificationExecutor.findAll(new EmailCaptchaSpec(target, email));
         this.emailCaptchaJpaRepository.deleteAll(all);
-        EmailCaptcha emailCaptcha = new EmailCaptcha(target, email);
+        // TODO
+        EmailCaptcha emailCaptcha = new EmailCaptcha(target, "functionId", email);
         emailSenderAdapter.sendEmailCaptcha(emailCaptcha);
         emailCaptchaJpaRepository.save(emailCaptcha);
     }

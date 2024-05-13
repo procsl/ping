@@ -2,6 +2,7 @@ package cn.procsl.ping.boot.common;
 
 import cn.procsl.ping.boot.common.aop.AnnotationPointcutAdvisor;
 import cn.procsl.ping.boot.common.bridge.*;
+import cn.procsl.ping.boot.common.utils.IdentifierGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -42,8 +43,8 @@ public class CommonAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public EventBusBridge eventBusBridge(ApplicationContext applicationContext) {
-        return new SpringEventBusBridge(applicationContext);
+    public EventBusBridge eventBusBridge(ApplicationContext applicationContext, IdentifierGenerator<Long> generator) {
+        return new SpringEventBusBridge(applicationContext, generator);
     }
 
 

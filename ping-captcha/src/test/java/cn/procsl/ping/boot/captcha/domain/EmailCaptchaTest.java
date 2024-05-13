@@ -42,7 +42,7 @@ public class EmailCaptchaTest {
     @Test
     public void check() {
 
-        EmailCaptcha captcha = new EmailCaptcha("123", "test@email.com");
+        EmailCaptcha captcha = new EmailCaptcha("123", "aaa", "test@email.com");
         log.info("邮箱验证码:{}", captcha);
         Assertions.assertNotNull(captcha.getTicket());
 //        Assertions.assertThrowsExactly(VerifyFailureException.class, () -> captcha.verify("123456"));

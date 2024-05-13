@@ -3,7 +3,7 @@ package cn.procsl.ping.boot.jpa;
 import cn.procsl.ping.boot.jpa.domain.id.IdentifierSegmentRepository;
 import cn.procsl.ping.boot.jpa.domain.id.IdentifierSegmentRepositoryImpl;
 import cn.procsl.ping.boot.jpa.domain.id.TableIdentifierGenerator;
-import cn.procsl.ping.boot.jpa.support.IdentifierGenerator;
+import cn.procsl.ping.boot.common.utils.IdentifierGenerator;
 import cn.procsl.ping.boot.jpa.support.extension.EnableJpaExtensionRepositories;
 import cn.procsl.ping.boot.jpa.support.extension.JpaRepositoryFactoryCustomizer;
 import jakarta.annotation.Nonnull;

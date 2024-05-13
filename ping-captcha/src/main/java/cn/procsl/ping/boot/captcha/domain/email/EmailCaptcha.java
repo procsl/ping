@@ -25,8 +25,8 @@ public class EmailCaptcha extends Captcha {
     @Column(updatable = false, length = 50)
     String email;
 
-    public EmailCaptcha(String target, String email) {
-        super(target, random(6, number_chars), 6);
+    public EmailCaptcha(String target, String functionId, String email) {
+        super(target, random(6, number_chars), functionId, 6);
         this.email = email;
     }
 

@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 
 public interface EventBusBridge {
 
-    String publisher(String name, Serializable parameters) throws EventPublishException;
+    Long publisher(String name, Serializable parameters) throws EventPublishException;
 
     void subscriber(String name, Consumer<EventObject> consumer);
 

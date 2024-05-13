@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.jpa.support;
+package cn.procsl.ping.boot.common.utils;
 
 import java.io.Serializable;
 

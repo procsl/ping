@@ -21,13 +21,7 @@ class ImageVerifyCommand implements VerifyCaptchaCommand {
 
     @Override
     public String getClientTicket() {
-        String ticket = request.getHeader(VerifyCaptcha.header);
-
-        if (ObjectUtils.isEmpty(ticket)) {
-            throw new CaptchaNotFoundException("请输入邮件验证码");
-        }
-
-        return ticket;
+        return request.getHeader(VerifyCaptcha.header);
     }
 
 

@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class TraceIdGenerator {
+public class TraceIdGenerator implements IdentifierGenerator<String> {
 
     private final AtomicLong init;
     private final String fmt;
@@ -59,4 +59,8 @@ public class TraceIdGenerator {
         return new TraceIdGenerator(fmt, len);
     }
 
+    @Override
+    public String nextId(String name, String initId) {
+        return this.generateId();
+    }
 }

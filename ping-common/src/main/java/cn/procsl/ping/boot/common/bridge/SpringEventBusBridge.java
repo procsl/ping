@@ -1,17 +1,20 @@
 package cn.procsl.ping.boot.common.bridge;
 
 import cn.procsl.ping.boot.common.ID;
+import cn.procsl.ping.boot.common.utils.IdentifierGenerator;
 import cn.procsl.ping.boot.common.utils.TraceIdGenerator;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 
 import java.io.Serializable;
 import java.util.EventObject;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
@@ -20,18 +23,18 @@ import java.util.function.Consumer;
 @Slf4j
 @RequiredArgsConstructor
 public class SpringEventBusBridge implements EventBusBridge,
-        ApplicationListener<SpringEventBusBridge.InnerListenerEvent> {
-
-    final TraceIdGenerator generator = TraceIdGenerator.initTraceId(10);
+        ApplicationListener<SpringEventBusBridge.InnerListenerEvent>, InitializingBean {
 
     final ApplicationContext context;
 
     final ConcurrentMap<String, ConcurrentLinkedQueue<Consumer<EventObject>>> tasks =
             new ConcurrentHashMap<>();
 
+    final IdentifierGenerator<Long> generator;
+
     @Override
-    public String publisher(String name, Serializable parameters) {
-        String eventId = generator.generateId();
+    public Long publisher(String name, Serializable parameters) {
+        Long eventId = generator.nextId("event-id", 0L);
         log.debug("开始发布事件:[{}] 名称:[{}], 参数:[{}]", eventId, name, parameters);
         context.publishEvent(new InnerListenerEvent(eventId, name, parameters));
         return eventId;
@@ -63,13 +66,19 @@ public class SpringEventBusBridge implements EventBusBridge,
         }
     }
 
-    @Getter
-    public static final class InnerListenerEvent extends ApplicationEvent implements ID<String> {
+    @Override
+    public void afterPropertiesSet() throws Exception {
+//        Map<String, IdentifierGenerator> generators = this.context.getBeansOfType(IdentifierGenerator.class);
+//        this.context.getBean(IdentifierGenerator<Long>.class);
+    }
 
-        private final String id;
+    @Getter
+    public static final class InnerListenerEvent extends ApplicationEvent implements ID<Long> {
+
+        private final Long id;
         private final String name;
 
-        public InnerListenerEvent(String id, String name, Object source) {
+        public InnerListenerEvent(Long id, String name, Object source) {
             super(source);
             this.id = id;
             this.name = name;
