@@ -49,8 +49,8 @@ public class IdentifierSegmentRepositoryImpl implements IdentifierSegmentReposit
     }
 
     @Override
-    public void save(String segmentName, Long idValue) {
-        this.entityManager.persist(new InnerIdentifier(segmentName, idValue));
+    public void save(String segmentName, Long initValue) {
+        this.entityManager.persist(new InnerIdentifier(segmentName, initValue));
         this.entityManager.flush();
     }
 
