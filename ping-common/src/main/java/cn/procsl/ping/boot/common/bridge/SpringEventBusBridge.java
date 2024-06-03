@@ -2,19 +2,17 @@ package cn.procsl.ping.boot.common.bridge;
 
 import cn.procsl.ping.boot.common.ID;
 import cn.procsl.ping.boot.common.utils.IdentifierGenerator;
-import cn.procsl.ping.boot.common.utils.TraceIdGenerator;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
 
 import java.io.Serializable;
 import java.util.EventObject;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
@@ -23,20 +21,22 @@ import java.util.function.Consumer;
 @Slf4j
 @RequiredArgsConstructor
 public class SpringEventBusBridge implements EventBusBridge,
-        ApplicationListener<SpringEventBusBridge.InnerListenerEvent>, InitializingBean {
+        ApplicationListener<SpringEventBusBridge.InnerListenerEvent> {
 
-    final ApplicationContext context;
+
+    final ApplicationEventPublisher applicationEventPublisher;
 
     final ConcurrentMap<String, ConcurrentLinkedQueue<Consumer<EventObject>>> tasks =
             new ConcurrentHashMap<>();
 
     final IdentifierGenerator<Long> generator;
 
+
     @Override
     public Long publisher(String name, Serializable parameters) {
-        Long eventId = generator.nextId("event-id", 0L);
+        Long eventId = generator.nextId();
         log.debug("开始发布事件:[{}] 名称:[{}], 参数:[{}]", eventId, name, parameters);
-        context.publishEvent(new InnerListenerEvent(eventId, name, parameters));
+        applicationEventPublisher.publishEvent(new InnerListenerEvent(eventId, name, parameters));
         return eventId;
     }
 
@@ -64,12 +64,6 @@ public class SpringEventBusBridge implements EventBusBridge,
                 log.error("执行:[{}]发生错误", event.getName(), e);
             }
         }
-    }
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-//        Map<String, IdentifierGenerator> generators = this.context.getBeansOfType(IdentifierGenerator.class);
-//        this.context.getBean(IdentifierGenerator<Long>.class);
     }
 
     @Getter

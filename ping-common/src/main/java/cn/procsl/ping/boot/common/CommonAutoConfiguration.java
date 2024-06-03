@@ -1,21 +1,26 @@
 package cn.procsl.ping.boot.common;
 
 import cn.procsl.ping.boot.common.aop.AnnotationPointcutAdvisor;
-import cn.procsl.ping.boot.common.bridge.*;
+import cn.procsl.ping.boot.common.bridge.EventBusBridge;
+import cn.procsl.ping.boot.common.bridge.PublisherMethodInterceptor;
+import cn.procsl.ping.boot.common.bridge.SpringEventBusBridge;
+import cn.procsl.ping.boot.common.bridge.SubscriberMethodRegister;
 import cn.procsl.ping.boot.common.utils.IdentifierGenerator;
+import cn.procsl.ping.boot.common.utils.SimpleLongIdGenerator;
+import cn.procsl.ping.boot.common.utils.TraceIdGenerator;
+import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Role;
 
-import javax.inject.Provider;
-import java.util.Collection;
+import javax.inject.Inject;
+import javax.inject.Qualifier;
 
 /**
  * 自动配置 用于注册加载时依赖注入和包扫描
@@ -43,8 +48,12 @@ public class CommonAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public EventBusBridge eventBusBridge(ApplicationContext applicationContext, IdentifierGenerator<Long> generator) {
-        return new SpringEventBusBridge(applicationContext, generator);
+    public EventBusBridge eventBusBridge(ApplicationEventPublisher publisher,
+                                         @Autowired(required = false) IdentifierGenerator<Long> generator) {
+        if (generator == null) {
+            generator = new SimpleLongIdGenerator();
+        }
+        return new SpringEventBusBridge(publisher, generator);
     }
 
 

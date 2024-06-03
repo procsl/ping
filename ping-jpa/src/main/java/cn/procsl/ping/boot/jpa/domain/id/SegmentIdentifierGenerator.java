@@ -1,6 +1,8 @@
 package cn.procsl.ping.boot.jpa.domain.id;
 
 import cn.procsl.ping.boot.common.utils.IdentifierGenerator;
+import lombok.Builder;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -16,59 +18,72 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 @Slf4j
-@RequiredArgsConstructor
-public class TableIdentifierGenerator implements IdentifierGenerator<Long> {
+public class SegmentIdentifierGenerator implements IdentifierGenerator<Long> {
 
 
     final ConcurrentHashMap<String, SegmentLock> map = new ConcurrentHashMap<>();
 
     final IdentifierSegmentRepository repository;
 
-    final TransactionTemplate transactionTemplate;
-
     final int segmentSize;
 
     final int retryTimes;
 
-    public TableIdentifierGenerator(IdentifierSegmentRepository repository, PlatformTransactionManager transactionManager, int segmentSize) {
-        this(repository, transactionManager, segmentSize, 5);
-    }
+    final String name;
 
-    public TableIdentifierGenerator(IdentifierSegmentRepository repository, PlatformTransactionManager transactionManager, int segmentSize, int retryTimes) {
+    final long initValue;
+
+
+    @Builder
+    private SegmentIdentifierGenerator(@NonNull IdentifierSegmentRepository repository,
+                                       int segmentSize, int retryTimes, @NonNull String name, long initValue) {
+
+        if (segmentSize <= 0) {
+            throw new IllegalArgumentException("segmentSize must be greater than 0");
+        }
+
+        if (initValue < 0) {
+            throw new IllegalArgumentException("init value must be greater than 0");
+        }
+
+        if (retryTimes <= 0) {
+            throw new IllegalArgumentException("retryTimes must be greater than 0");
+        }
+
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("name must not be empty");
+        }
+
+        this.name = name;
         this.repository = repository;
         this.segmentSize = segmentSize;
-        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-        def.setReadOnly(false);
-        def.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);
-        def.setTimeout(1000);
-        this.transactionTemplate = new TransactionTemplate(transactionManager, def);
+        this.initValue = initValue;
         this.retryTimes = retryTimes;
     }
 
     @Override
-    public Long nextId(String name, Long initId) {
+    public Long nextId() {
 
-        SegmentLock current = map.get(name);
+        SegmentLock current = this.map.get(this.name);
         if (current != null) {
             return current.nextValue();
         }
 
         // ID段回调
         Supplier<Long> supplier = () -> {
-            for (int i = 0; i < retryTimes; i++) {
-                Long next = this.nextSegmentValue(name, segmentSize, initId);
+            for (int i = 0; i < this.retryTimes; i++) {
+                Long next = this.nextSegmentValue(this.name, this.segmentSize, this.initValue);
                 if (next == null) {
                     continue;
                 }
                 return next;
             }
-            throw new IdentifierException("获取ID段超过限定次数: " + retryTimes);
+            throw new IdentifierException("获取ID段超过限定次数: " + this.retryTimes);
         };
 
         // 不存在时调用回调函数
-        map.computeIfPresent(name, (v, o) -> new SegmentLock(segmentSize, supplier));
-        return map.get(name).nextValue();
+        this.map.computeIfPresent(this.name, (v, o) -> new SegmentLock(this.segmentSize, supplier));
+        return this.map.get(this.name).nextValue();
     }
 
     private static class Segment {
@@ -88,7 +103,7 @@ public class TableIdentifierGenerator implements IdentifierGenerator<Long> {
             return null;
         }
 
-      }
+    }
 
     private static class SegmentLock {
         final int segmentSize;
@@ -139,18 +154,13 @@ public class TableIdentifierGenerator implements IdentifierGenerator<Long> {
      * @throws IdentifierException 如果分配重试次数超过指定值,或其他原因
      */
     protected Long nextSegmentValue(String segmentName, int size, Long initValue) {
-
         try {
-            Optional<Long> mtp = transactionTemplate.execute(status -> repository.incrementBy(segmentName, size));
+            Optional<Long> mtp = repository.incrementBy(segmentName, size);
             if (Objects.requireNonNull(mtp).isPresent()) {
                 return mtp.get();
             }
         } catch (IdentifierException e) {
-            transactionTemplate.execute(status -> {
-                repository.save(segmentName, initValue + size);
-                status.flush();
-                return null;
-            });
+            repository.save(segmentName, initValue + size);
             return initValue;
         } catch (RuntimeException e) {
             log.warn("获取ID段锁异常", e);

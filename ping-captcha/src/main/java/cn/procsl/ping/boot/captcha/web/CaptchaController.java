@@ -7,6 +7,8 @@ import cn.procsl.ping.boot.captcha.domain.image.ImageCaptchaBuilderService;
 import cn.procsl.ping.boot.captcha.handler.EmailCaptchaHandler;
 import cn.procsl.ping.boot.captcha.handler.WebUtils;
 import cn.procsl.ping.boot.common.utils.IdentifierGenerator;
+import cn.procsl.ping.boot.jpa.domain.id.IdentifierSegmentRepository;
+import cn.procsl.ping.boot.jpa.domain.id.SegmentIdentifierGenerator;
 import cn.procsl.ping.boot.web.annotation.VersionController;
 import com.wf.captcha.SpecCaptcha;
 import com.wf.captcha.base.Captcha;
@@ -17,19 +19,20 @@ import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 
 import static cn.procsl.ping.boot.captcha.domain.image.ImageCaptcha.TOKEN_KEY;
 
 @RestController
-@RequiredArgsConstructor
 @Tag(name = "Captcha", description = "验证码")
 public class CaptchaController {
 
@@ -40,6 +43,13 @@ public class CaptchaController {
     final EntityManager entityManager;
 
     final IdentifierGenerator<Long> idGenerator;
+
+    public CaptchaController(EmailCaptchaHandler emailCaptchaHandler, EntityManager entityManager,
+                             IdentifierSegmentRepository repo) {
+        this.emailCaptchaHandler = emailCaptchaHandler;
+        this.entityManager = entityManager;
+        this.idGenerator = SegmentIdentifierGenerator.builder().segmentSize(200).retryTimes(5).initValue(1L).name("captcha_id_seg").repository(repo).build();
+    }
 
     @PermitAll
     @VersionController
@@ -55,7 +65,7 @@ public class CaptchaController {
 
         String sessionId = WebUtils.getClientSessionId(request);
         ImageCaptcha imageCaptcha =
-                ImageCaptcha.builder().id(idGenerator.nextId("captcha-image", 1L))
+                ImageCaptcha.builder().id(idGenerator.nextId())
                         .target(sessionId)
                         .ticket(captcha.text())
                         .functionId(parameter.getFunctionId())

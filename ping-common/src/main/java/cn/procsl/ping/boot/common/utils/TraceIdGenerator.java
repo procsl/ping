@@ -60,7 +60,7 @@ public class TraceIdGenerator implements IdentifierGenerator<String> {
     }
 
     @Override
-    public String nextId(String name, String initId) {
+    public String nextId() {
         return this.generateId();
     }
 }

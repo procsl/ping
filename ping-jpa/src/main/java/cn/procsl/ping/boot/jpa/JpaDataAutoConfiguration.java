@@ -1,9 +1,7 @@
 package cn.procsl.ping.boot.jpa;
 
 import cn.procsl.ping.boot.jpa.domain.id.IdentifierSegmentRepository;
-import cn.procsl.ping.boot.jpa.domain.id.IdentifierSegmentRepositoryImpl;
-import cn.procsl.ping.boot.jpa.domain.id.TableIdentifierGenerator;
-import cn.procsl.ping.boot.common.utils.IdentifierGenerator;
+import cn.procsl.ping.boot.jpa.domain.id.TableIdentifierSegmentRepositoryImpl;
 import cn.procsl.ping.boot.jpa.support.extension.EnableJpaExtensionRepositories;
 import cn.procsl.ping.boot.jpa.support.extension.JpaRepositoryFactoryCustomizer;
 import jakarta.annotation.Nonnull;
@@ -42,16 +40,8 @@ public class JpaDataAutoConfiguration implements BeanPostProcessor {
 
     @Bean
     @ConditionalOnMissingBean
-    public IdentifierSegmentRepository identifierSegmentRepository(EntityManager entityManager) {
-        return new IdentifierSegmentRepositoryImpl(entityManager);
-    }
-
-
-    @Bean
-    @ConditionalOnMissingBean
-    public IdentifierGenerator<Long> identifierGenerator(IdentifierSegmentRepository repository,
-                                                         PlatformTransactionManager transactionManager) {
-        return new TableIdentifierGenerator(repository, transactionManager, 200, 3);
+    public IdentifierSegmentRepository identifierSegmentRepository(EntityManager entityManager, PlatformTransactionManager manager) {
+        return new TableIdentifierSegmentRepositoryImpl(entityManager, manager);
     }
 
 
