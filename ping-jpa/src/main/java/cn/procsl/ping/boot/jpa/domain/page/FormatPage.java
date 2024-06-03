@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.NonNullApi;
 
 import java.util.Iterator;
 import java.util.List;
@@ -71,7 +72,7 @@ public class FormatPage<T> implements Page<T> {
     @Override
     @JsonIgnore
     @Schema(hidden = true)
-    public <U> Page<U> map(Function<? super T, ? extends U> converter) {
+    public <U> Page<U> map(@NonNull Function<? super T, ? extends U> converter) {
         return page.map(converter);
     }
 

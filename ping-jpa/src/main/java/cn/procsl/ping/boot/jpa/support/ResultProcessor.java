@@ -1,6 +1,5 @@
 package cn.procsl.ping.boot.jpa.support;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.CollectionFactory;
 import org.springframework.core.convert.ConversionService;
@@ -9,6 +8,7 @@ import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.repository.query.ReturnedType;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
@@ -16,11 +16,11 @@ import java.util.*;
 
 public class ResultProcessor {
     private final ProjectingConverter converter;
-//    private final ProjectionFactory factory;
+    //    private final ProjectionFactory factory;
     private final ReturnedType type;
 
     public ResultProcessor(ProjectionFactory factory, ReturnedType type) {
-        this.converter = new ProjectingConverter(type,factory).withType(type);
+        this.converter = new ProjectingConverter(type, factory).withType(type);
 //        this.factory = factory;
         this.type = type;
     }
@@ -35,13 +35,12 @@ public class ResultProcessor {
 
         ChainingConverter converter = ChainingConverter.of(type.getReturnedType(), preparingConverter).and(this.converter);
 
-        if (source instanceof Slice ) {
+        if (source instanceof Slice) {
             return (T) ((Slice<?>) source).map(converter::convert);
         }
 
-        if (source instanceof Collection ) {
+        if (source instanceof Collection<?> collection) {
 
-            Collection<?> collection = (Collection<?>) source;
             Collection<Object> target = createCollectionFor(collection);
 
             for (Object columns : collection) {
@@ -52,6 +51,7 @@ public class ResultProcessor {
         }
         return (T) converter.convert(source);
     }
+
     @RequiredArgsConstructor(staticName = "of")
     private static class ChainingConverter implements Converter<Object, Object> {
 
@@ -85,10 +85,11 @@ public class ResultProcessor {
          */
         @Nullable
         @Override
-        public Object convert(Object source) {
+        public Object convert(@NonNull Object source) {
             return delegate.convert(source);
         }
     }
+
     private static Collection<Object> createCollectionFor(Collection<?> source) {
 
         try {
@@ -122,7 +123,7 @@ public class ResultProcessor {
 
         @Nullable
         @Override
-        public Object convert(Object source) {
+        public Object convert(@NonNull Object source) {
 
             Class<?> targetType = type.getReturnedType();
 

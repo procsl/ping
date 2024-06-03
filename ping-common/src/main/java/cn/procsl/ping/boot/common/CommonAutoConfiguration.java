@@ -26,7 +26,7 @@ import javax.inject.Qualifier;
  * 自动配置 用于注册加载时依赖注入和包扫描
  *
  * @author procsl
- * @date 2020/03/21
+ * &#064;date  2020/03/21
  */
 @AutoConfiguration
 @AutoConfigureOrder(Integer.MAX_VALUE)

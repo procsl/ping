@@ -42,7 +42,7 @@ public class JpaSpecificationExecutorWithProjectionImpl<T, ID extends Serializab
     private static final Map<Attribute.PersistentAttributeType, Class<? extends Annotation>> ASSOCIATION_TYPES;
 
     static {
-        Map<Attribute.PersistentAttributeType, Class<? extends Annotation>> persistentAttributeTypes = new HashMap<Attribute.PersistentAttributeType, Class<? extends Annotation>>();
+        Map<Attribute.PersistentAttributeType, Class<? extends Annotation>> persistentAttributeTypes = new HashMap<>();
         persistentAttributeTypes.put(ONE_TO_ONE, OneToOne.class);
         persistentAttributeTypes.put(ONE_TO_MANY, null);
         persistentAttributeTypes.put(MANY_TO_ONE, ManyToOne.class);
@@ -198,7 +198,7 @@ public class JpaSpecificationExecutorWithProjectionImpl<T, ID extends Serializab
     static Expression<Object> toExpressionRecursively(Path<Object> path, PropertyPath property) {
 
         Path<Object> result = path.get(property.getSegment());
-        return property.hasNext() ? toExpressionRecursively(result, property.next()) : result;
+        return property.hasNext() ? toExpressionRecursively(result, Objects.requireNonNull(property.next())) : result;
     }
 
     static <T> Expression<T> toExpressionRecursively(From<?, ?> from, PropertyPath property, boolean isForSelection) {
@@ -221,11 +221,11 @@ public class JpaSpecificationExecutorWithProjectionImpl<T, ID extends Serializab
         if (requiresJoin(propertyPathModel, model instanceof PluralAttribute, !property.hasNext(), isForSelection)
                 && !isAlreadyFetched(from, segment)) {
             Join<?, ?> join = getOrCreateJoin(from, segment);
-            return (Expression<T>) (property.hasNext() ? toExpressionRecursively(join, property.next(), isForSelection)
+            return (Expression<T>) (property.hasNext() ? toExpressionRecursively(join, Objects.requireNonNull(property.next()), isForSelection)
                     : join);
         } else {
             Path<Object> path = from.get(segment);
-            return (Expression<T>) (property.hasNext() ? toExpressionRecursively(path, property.next()) : path);
+            return (Expression<T>) (property.hasNext() ? toExpressionRecursively(path, Objects.requireNonNull(property.next())) : path);
         }
     }
 

@@ -84,9 +84,9 @@ public class ConfigFacadeTest {
         conf.setName(key);
         List<Config> all = this.jpaRepository.findAll(Example.of(conf));
         Assertions.assertNotEquals(0, all.size());
-        Assertions.assertEquals(all.get(0).getName(), key);
-        Assertions.assertEquals(all.get(0).getDescription(), desc);
-        Assertions.assertEquals(all.get(0).getContent(), content);
+        Assertions.assertEquals(all.getFirst().getName(), key);
+        Assertions.assertEquals(all.getFirst().getDescription(), desc);
+        Assertions.assertEquals(all.getFirst().getContent(), content);
 
         config.edit(key, null, desc);
         config.edit(key, "", desc);

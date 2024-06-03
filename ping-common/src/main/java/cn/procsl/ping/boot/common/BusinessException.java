@@ -8,7 +8,7 @@ import lombok.Getter;
  * 业务异常
  *
  * @author procsl
- * @date 2020/05/15
+ * &#064;date  2020/05/15
  */
 //@ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR, reason = "SYSTEM_ERROR")
 public class BusinessException extends RuntimeException implements ErrorEntity {

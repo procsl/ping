@@ -13,28 +13,28 @@ public class TraceIdGeneratorTest {
         TraceIdGenerator generator = TraceIdGenerator.initTraceId(4);
         {
             Long num = generator.calcMaxNum(4);
-            log.info("num = {}", num);
+            log.info("num1 = {}", num);
             assertTrue(num > 999);
             assertTrue(num <= 9999);
         }
 
         {
             Long num = generator.calcMaxNum(5);
-            log.info("num = {}", num);
+            log.info("num2 = {}", num);
             assertTrue(num > 9999);
             assertTrue(num <= 99999);
         }
 
         {
             Long num = generator.calcMaxNum(6);
-            log.info("num = {}", num);
+            log.info("num3 = {}", num);
             assertTrue(num > 99999);
             assertTrue(num <= 999999);
         }
 
         {
             Long num = generator.calcMaxNum(7);
-            log.info("num = {}", num);
+            log.info("num4 = {}", num);
             assertTrue(num > 999999);
             assertTrue(num <= 9999999);
         }

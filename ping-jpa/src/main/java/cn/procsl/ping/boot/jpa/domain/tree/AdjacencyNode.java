@@ -12,7 +12,7 @@ import java.util.Set;
  * 邻接表
  *
  * @author procsl
- * @date 2020/07/29
+ * &#064;date  2020/07/29
  */
 @MappedSuperclass
 public interface AdjacencyNode<ID extends Serializable, T extends AdjacencyPathNode<ID>> {

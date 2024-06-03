@@ -12,14 +12,12 @@ charset = utf-8
 # Tab indentation (no size specified)
 [*.java]
 indent_style = space
-spaces_around_brackets
-spaces_around_operators = true
 
 # Indentation override for all java
 [*/**.java]
 indent_size = 4
 
 # Matches the exact files either *.json or *.yml
-[{*.json, *.yml}]
+[{*.json,*.yml}]
 indent_style = space
 indent_size = 2

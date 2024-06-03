@@ -24,6 +24,7 @@ import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.MutableQueryHints;
 import org.springframework.data.jpa.repository.support.QueryHints;
 import org.springframework.data.util.Optionals;
+import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
 import java.util.Optional;
@@ -56,19 +57,21 @@ class DefaultQueryHints implements QueryHints {
 
 
     @Override
-    public QueryHints withFetchGraphs(EntityManager em) {
+    @NonNull
+    public QueryHints withFetchGraphs(@NonNull EntityManager em) {
         return new DefaultQueryHints(this.information, this.metadata, Optional.of(em), this.forCounts);
     }
 
 
     @Override
+    @NonNull
     public QueryHints forCounts() {
         return new DefaultQueryHints(this.information, this.metadata, this.entityManager, true);
     }
 
 
     @Override
-    public void forEach(BiConsumer<String, Object> action) {
+    public void forEach(@NonNull BiConsumer<String, Object> action) {
         combineHints().forEach(action);
     }
 

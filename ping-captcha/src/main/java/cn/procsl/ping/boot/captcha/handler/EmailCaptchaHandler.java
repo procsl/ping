@@ -38,7 +38,7 @@ public class EmailCaptchaHandler implements VerifyCaptchaHandler<VerifyCaptchaCo
         }
 
         // TODO
-        EmailCaptcha first = all.get(0);
+        EmailCaptcha first = all.getFirst();
         first.verify(context);
         log.debug("邮件验证码验证成功:{}", first.getTicket());
     }

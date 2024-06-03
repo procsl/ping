@@ -7,6 +7,7 @@ import cn.procsl.ping.boot.system.domain.user.User;
 import jakarta.persistence.criteria.*;
 import lombok.Builder;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.lang.NonNull;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ public class UserQuerySpec implements Specification<User> {
     final Gender gender;
 
     @Override
-    public Predicate toPredicate(Root<User> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+    public Predicate toPredicate(Root<User> root, @NonNull CriteriaQuery<?> query, @NonNull CriteriaBuilder cb) {
 
         final List<Predicate> condition = new ArrayList<>();
         Join<User, Account> accountField = root.join("account", JoinType.INNER);

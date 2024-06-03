@@ -22,12 +22,12 @@ public class Base62Test {
             byte[] res = tokenCipher.encrypt(max);
             byte[] base62 = instance.encode(res);
             String str = new String(base62);
-            log.info("str:[{}], len={}", str, str.length());
+            log.info("str1:[{}], len={}", str, str.length());
 
             byte[] decode = instance.decode(str.getBytes(StandardCharsets.UTF_8));
             byte[] decrypt = tokenCipher.decrypt(decode);
             long num = Scale62.bytesToLongBig(decrypt);
-            log.info("值为:{} actual={}", num, Long.MAX_VALUE);
+            log.info("值为1:{} actual={}", num, Long.MAX_VALUE);
 
         }
 
@@ -36,12 +36,12 @@ public class Base62Test {
             byte[] res = tokenCipher.encrypt(max);
             byte[] base62 = instance.encode(res);
             String str = new String(base62);
-            log.info("str:[{}], len={}", str, str.length());
+            log.info("str2:[{}], len={}", str, str.length());
 
             byte[] decode = instance.decode(str.getBytes(StandardCharsets.UTF_8));
             byte[] decrypt = tokenCipher.decrypt(decode);
             long num = Scale62.bytesToLongBig(decrypt);
-            log.info("值为:{} actual={}", num, Long.MIN_VALUE);
+            log.info("值为2:{} actual={}", num, Long.MIN_VALUE);
         }
 
         log.info("---------------");
@@ -50,12 +50,12 @@ public class Base62Test {
             byte[] res = tokenCipher.encrypt(max);
             byte[] base62 = instance.encode(res);
             String str = new String(base62);
-            log.info("str:[{}], len={}", str, str.length());
+            log.info("str3:[{}], len={}", str, str.length());
 
             byte[] decode = instance.decode(str.getBytes(StandardCharsets.UTF_8));
             byte[] decrypt = tokenCipher.decrypt(decode);
             long num = Scale62.bytes2IntBig(decrypt);
-            log.info("值为:{} actual={}", num, Integer.MAX_VALUE);
+            log.info("值为3:{} actual={}", num, Integer.MAX_VALUE);
         }
 
     }

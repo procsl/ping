@@ -4,6 +4,7 @@ import jakarta.persistence.Tuple;
 import jakarta.persistence.TupleElement;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.repository.query.ReturnedType;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
@@ -24,7 +25,7 @@ public class TupleConverter implements Converter<Object, Object> {
 
 
     @Override
-    public Object convert(Object source) {
+    public Object convert(@NonNull Object source) {
 
         if (!(source instanceof Tuple tuple)) {
             return source;
@@ -34,7 +35,7 @@ public class TupleConverter implements Converter<Object, Object> {
 
         if (elements.size() == 1) {
 
-            Object value = tuple.get(elements.get(0));
+            Object value = tuple.get(elements.getFirst());
 
             if (type.isInstance(value) || value == null) {
                 return value;

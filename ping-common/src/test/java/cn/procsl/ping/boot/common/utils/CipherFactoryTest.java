@@ -101,7 +101,7 @@ public class CipherFactoryTest {
 
             byte[] output = cipher.doFinal(Scale62.longToBytesLittle(Long.MAX_VALUE));
             String keystr = Base62.createInstance().encodeToString(key);
-            log.info("key: {}", keystr);
+            log.info("key 1: {}", keystr);
 
             String result = Base62.createInstance().encodeToString(output);
             log.info(result);

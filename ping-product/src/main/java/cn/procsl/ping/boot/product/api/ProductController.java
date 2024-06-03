@@ -30,14 +30,14 @@ public class ProductController {
 
     @PostMapping("/v1/products")
     public void createProduct(@RequestBody ProductDTO productDTO) {
-        log.debug("创建商品: {}", productDTO);
+        log.debug("创建商品1: {}", productDTO);
     }
 
     @PutMapping("/v1/products")
     @RequestBodySecurityIds
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void createProduct2(@RequestBody @SecurityId(scope = "product") @Validated @NotEmpty Collection<@NotNull Long> ids) {
-        log.debug("创建商品: {}", ids);
+        log.debug("创建商品2: {}", ids);
     }
 
     @PatchMapping("/v1/products")

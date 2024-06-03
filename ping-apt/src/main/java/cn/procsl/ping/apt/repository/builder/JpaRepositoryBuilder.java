@@ -9,7 +9,7 @@ import com.google.auto.service.AutoService;
  * 创建
  *
  * @author procsl
- * @date 2020/06/21
+ * &#064;date  2020/06/21
  */
 @AutoService(RepositoryBuilder.class)
 public class JpaRepositoryBuilder extends EntityAndIdRepositoryBuilder {

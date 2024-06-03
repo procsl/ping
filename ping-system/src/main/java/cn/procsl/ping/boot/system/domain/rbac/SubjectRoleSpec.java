@@ -3,6 +3,7 @@ package cn.procsl.ping.boot.system.domain.rbac;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.lang.NonNull;
 
 @RequiredArgsConstructor
 public class SubjectRoleSpec implements Specification<Subject> {
@@ -11,7 +12,7 @@ public class SubjectRoleSpec implements Specification<Subject> {
     final String roleName;
 
     @Override
-    public Predicate toPredicate(Root<Subject> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+    public Predicate toPredicate(Root<Subject> root, @NonNull CriteriaQuery<?> query, CriteriaBuilder cb) {
         Predicate condition1 = cb.equal(root.get("subject"), subjectId);
         if (roleName == null) {
             return condition1;

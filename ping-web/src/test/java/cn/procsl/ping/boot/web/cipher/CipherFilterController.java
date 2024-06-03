@@ -26,7 +26,7 @@ public class CipherFilterController {
 
     @PostMapping(path = "/test/cipher/body")
     public Map<String, String> test2(@RequestBody Map<String, String> json) throws BusinessException {
-        log.info("json: {}", json);
+        log.info("json1: {}", json);
         return json;
     }
 

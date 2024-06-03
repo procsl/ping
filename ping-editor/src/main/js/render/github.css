@@ -186,9 +186,8 @@
 
 .markdown-body hr {
     box-sizing: content-box;
-    background: 0 0;
     overflow: hidden;
-    background-color: #e1e4e8;
+    background: #e1e4e8 0 0;
     border: 0;
     height: .25em;
     margin: 24px 0;

@@ -9,7 +9,7 @@ import java.util.Map;
 
 /**
  * @author procsl
- * @date 2020/05/23
+ * &#064;date  2020/05/23
  */
 public abstract class EntityAndIdRepositoryBuilder extends AbstractRepositoryBuilder {
 

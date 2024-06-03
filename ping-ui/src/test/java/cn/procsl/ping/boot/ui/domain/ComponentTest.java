@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 public class ComponentTest {
 
     @Test
-    public void main() {
+    public void test() {
         Stopwatch started = Stopwatch.createUnstarted();
         started.start();
         User user = null;

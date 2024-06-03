@@ -78,6 +78,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-processor</artifactId>
+            <version>7.0.0.Alpha2</version>
+        </dependency>
+
     </dependencies>
 
 </project>

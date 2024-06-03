@@ -8,6 +8,7 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 
+import javax.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -15,7 +16,7 @@ import java.util.regex.Pattern;
 
 /**
  * @author procsl
- * @date 2020/02/19
+ * &#064;date  2020/02/19
  */
 @Slf4j
 @Getter
@@ -69,6 +70,7 @@ public class ErrorVO extends MessageVO implements Serializable, ErrorEntity {
 
     @Override
     @Schema(description = "错误信息", example = "系统内部错误")
+    @Nonnull
     public String getMessage() {
         return super.getMessage();
     }

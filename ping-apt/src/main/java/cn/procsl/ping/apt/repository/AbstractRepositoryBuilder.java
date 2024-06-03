@@ -16,7 +16,7 @@ import java.util.function.Function;
 
 /**
  * @author procsl
- * @date 2020/06/21
+ * &#064;date  2020/06/21
  */
 public abstract class AbstractRepositoryBuilder implements RepositoryBuilder {
 
@@ -81,7 +81,7 @@ public abstract class AbstractRepositoryBuilder implements RepositoryBuilder {
         String start = superClass.toString();
         Element element = processingEnvironment.getTypeUtils().asElement(superClass);
         Messager messager = this.processingEnvironment.getMessager();
-        if (!(superClass instanceof DeclaredType)) {
+        if (!(superClass instanceof DeclaredType type)) {
             messager.printMessage(Diagnostic.Kind.NOTE, "Is not DeclaredType", element);
             return null;
         }
@@ -96,18 +96,17 @@ public abstract class AbstractRepositoryBuilder implements RepositoryBuilder {
             return null;
         }
 
-        DeclaredType type = (DeclaredType) superClass;
         if (start.startsWith("org.springframework.data.jpa.domain.AbstractPersistable")) {
             List<? extends TypeMirror> arguments = type.getTypeArguments();
             if (!arguments.isEmpty()) {
-                return arguments.get(0);
+                return arguments.getFirst();
             }
         }
 
         if (start.startsWith("org.springframework.data.domain.Persistable")) {
             List<? extends TypeMirror> arguments = type.getTypeArguments();
             if (!arguments.isEmpty()) {
-                return arguments.get(0);
+                return arguments.getFirst();
             }
         }
 

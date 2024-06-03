@@ -50,7 +50,7 @@ public class AuthenticateControllerTest {
 
     @Test
     public void currentSession() {
-        Optional optional = this.jpaSpecificationExecutor.findOne(
+        Optional<Authenticate> optional = this.jpaSpecificationExecutor.findOne(
                 new AuthenticateSpec("1234", AuthenticateState.online));
     }
 }

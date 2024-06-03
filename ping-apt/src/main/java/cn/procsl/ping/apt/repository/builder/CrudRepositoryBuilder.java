@@ -4,7 +4,7 @@ import cn.procsl.ping.apt.repository.EntityAndIdRepositoryBuilder;
 
 /**
  * @author procsl
- * @date 2020/06/21
+ * &#064;date  2020/06/21
  */
 //@AutoService(RepositoryBuilder.class)
 public class CrudRepositoryBuilder extends EntityAndIdRepositoryBuilder {

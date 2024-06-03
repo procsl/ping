@@ -38,7 +38,7 @@ public class UserQueryRepositoryTest {
     @Transactional(readOnly = true)
     public void findAll() {
         List<UserRecord> result = queryRepository.findAllBy();
-        log.info("test: {}", result);
+        log.info("test1: {}", result);
     }
 
     @Test
@@ -46,7 +46,7 @@ public class UserQueryRepositoryTest {
     @Transactional(readOnly = true)
     public void findAll3() {
         UserDetailVO result = queryRepository.findById(1L);
-        log.info("test: {}", result);
+        log.info("test2: {}", result);
     }
 
     @Test

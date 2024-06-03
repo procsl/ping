@@ -123,10 +123,8 @@ public class Base62 {
      * Converts a byte array from a source base to a target base using the alphabet.
      */
     private byte[] convert(final byte[] message, final int sourceBase, final int targetBase) {
-        /**
-         * This algorithm is inspired by: http://codegolf.stackexchange.com/a/21672
-         */
 
+        // This algorithm is inspired by: http://codegolf.stackexchange.com/a/21672
         final int estimatedLength = estimateOutputLength(message.length, sourceBase, targetBase);
 
         final ByteArrayOutputStream out = new ByteArrayOutputStream(estimatedLength);
@@ -195,11 +193,11 @@ public class Base62 {
         }
     }
 
-    public InputStream wrap(@NonNull InputStream in){
+    public InputStream wrap(@NonNull InputStream in) {
         return new Base62InputStream(in);
     }
 
-    public OutputStream wrap(@NonNull OutputStream out){
+    public OutputStream wrap(@NonNull OutputStream out) {
         return new Base62OutputStream(out);
     }
 
@@ -211,7 +209,7 @@ public class Base62 {
 
     }
 
-    private static class Base62InputStream extends FilterInputStream{
+    private static class Base62InputStream extends FilterInputStream {
 
         final DataBuffer converted = DefaultDataBufferFactory.sharedInstance.allocateBuffer(64);
 
@@ -221,9 +219,10 @@ public class Base62 {
 
         /**
          * 填充缓存，如果已经结束则返回false
+         *
          * @return 如果已经填充
          */
-        private boolean fill(){
+        private boolean fill() {
             return false;
         }
 

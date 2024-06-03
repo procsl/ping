@@ -53,7 +53,7 @@ public class PermissionControllerTest {
                .andDo(result -> {
                    String str = result.getResponse().getContentAsString();
                    PermissionVO permissionVO = this.jsonMapper.readValue(str, PermissionVO.class);
-                   log.info("PermissionVO:{}", permissionVO);
+                   log.info("PermissionVO 1:{}", permissionVO);
                    gid.set(permissionVO.getId());
                });
 

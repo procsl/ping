@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import javax.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +36,7 @@ public class ParameterErrorVO extends ErrorVO {
 
     @Override
     @Schema(example = "参数校验失败")
+    @Nonnull
     public String getMessage() {
         return super.getMessage();
     }

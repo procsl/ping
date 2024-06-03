@@ -37,9 +37,7 @@ public class EmailVerifyCaptchaInterceptorTest {
 
         {
             EmailCaptcha emailCaptcha = new EmailCaptcha("654321", "aaa", "test@email.com");
-            Assertions.assertThrowsExactly(VerifyFailureException.class, () -> {
-                emailCaptchaHandler.verify(new SimpleMockCaptchaCommand(emailCaptcha));
-            });
+            Assertions.assertThrowsExactly(VerifyFailureException.class, () -> emailCaptchaHandler.verify(new SimpleMockCaptchaCommand(emailCaptcha)));
         }
     }
 

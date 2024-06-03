@@ -10,7 +10,7 @@ import java.io.Serializable;
  * 邻接表关系表
  *
  * @author procsl
- * @date 2020/07/29
+ * &#064;date  2020/07/29
  */
 @MappedSuperclass
 @Embeddable
