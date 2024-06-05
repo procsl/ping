@@ -1,24 +1,21 @@
 package cn.procsl.ping.apt.repository;
 
-import cn.procsl.ping.boot.jpa.support.RepositoryCreator;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
 import jakarta.persistence.Entity;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
+import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
-import javax.tools.StandardLocation;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
 import static javax.tools.Diagnostic.Kind.*;
 
@@ -27,10 +24,9 @@ import static javax.tools.Diagnostic.Kind.*;
  * 1. 扫描所有的实体引用
  * 2. 根据各项条件过滤
  * 3. 根据过滤出的实体对应的 Repository 生成代码
- * TODO 需要重构, 抽离出 javapoet 的依赖, 防止processor初始化失败
  *
  * @author procsl
- * @date 2020/05/18
+ * &#064;date  2020/05/18
  */
 @AutoService(Processor.class)
 public class RepositoryProcessor extends AbstractProcessor {
@@ -45,11 +41,10 @@ public class RepositoryProcessor extends AbstractProcessor {
 
     private List<String> includes;
 
-    private Map<Object, Object> config;
-
     private Map<String, RepositoryNamingStrategy> namingStrategy;
 
-    private boolean init = true;
+    public RepositoryProcessor() {
+    }
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -58,16 +53,13 @@ public class RepositoryProcessor extends AbstractProcessor {
         this.filer = processingEnv.getFiler();
 
         try {
-            initConfig();
-
             initIncludes();
 
             initNamingStrategy();
 
         } catch (Exception e) {
             messager.printMessage(WARNING,
-                    "Initializing the annotation processor failed for a number of reasons: " + e.getMessage());
-            init = false;
+                "Initializing the annotation processor failed for a number of reasons: " + e.getMessage());
         }
 
     }
@@ -75,30 +67,14 @@ public class RepositoryProcessor extends AbstractProcessor {
     void initNamingStrategy() {
         ClassLoader currentClassLoad = this.getClass().getClassLoader();
         ServiceLoader<RepositoryNamingStrategy> services = ServiceLoader.load(RepositoryNamingStrategy.class,
-                currentClassLoad);
+            currentClassLoad);
         this.namingStrategy = new HashMap<>();
         services.forEach(item -> this.namingStrategy.put(item.getClass().getName(), item));
     }
 
-    private void initConfig() {
-        try (InputStream is = filer.getResource(StandardLocation.CLASS_PATH, "", RepositoryBuilder.processor)
-                .openInputStream()) {
-
-            Properties properties = new Properties();
-            properties.load(is);
-            this.config = properties;
-            return;
-
-        } catch (IOException e) {
-            messager.printMessage(WARNING,
-                    "The profile could not be found: '" + RepositoryBuilder.processor + "'. by error:" + e.getMessage());
-        }
-        this.config = emptyMap();
-    }
-
     @Override
     public Set<String> getSupportedAnnotationTypes() {
-        return singleton(RepositoryCreator.class.getName());
+        return singleton("cn.procsl.ping.boot.jpa.support.RepositoryCreator");
     }
 
     @Override
@@ -108,7 +84,7 @@ public class RepositoryProcessor extends AbstractProcessor {
 
     @Override
     public synchronized boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        if (!init || roundEnv.processingOver()) {
+        if (roundEnv.processingOver()) {
             return false;
         }
 
@@ -123,14 +99,16 @@ public class RepositoryProcessor extends AbstractProcessor {
                 String str = entity.asType().toString();
                 if (!(entity instanceof TypeElement)) {
                     messager.printMessage(WARNING,
-                            "The element of the annotation label is not a class type: '" + str + "'", entity);
+                        "The element of the annotation label is not a class type: '" + str + "'", entity);
                     continue;
                 }
 
                 messager.printMessage(Diagnostic.Kind.NOTE, "Process entity: " + str);
 
-                RepositoryCreator repo = entity.getAnnotation(RepositoryCreator.class);
-                if (repo == null) {
+                List<? extends AnnotationMirror> mirrors = entity.getAnnotationMirrors();
+//                mirrors.stream().sorted(item -> item.g)
+//                RepositoryCreator repo = entity.getAnnotation(RepositoryCreator.class);
+                if (mirrors.isEmpty()) {
                     continue;
                 }
 
@@ -143,7 +121,7 @@ public class RepositoryProcessor extends AbstractProcessor {
 
         } catch (Exception e) {
             messager.printMessage(ERROR,
-                    "The build of the source code failed:" + e.getClass().getName() + ":" + e.getMessage());
+                "The build of the source code failed:" + e.getClass().getName() + ":" + e.getMessage());
             return false;
         }
         return true;
@@ -158,7 +136,7 @@ public class RepositoryProcessor extends AbstractProcessor {
      * @throws IOException 当文件写入失败时发生
      */
     private void generateSingletonSourceCode(TypeElement entity, String packageName, RoundEnvironment roundEnv)
-            throws IOException, ClassNotFoundException {
+        throws IOException, ClassNotFoundException {
 
         List<RepositoryBuilder> matcher = this.matcher(this.singletonBuilders, entity);
         if (matcher.isEmpty()) {
@@ -171,8 +149,8 @@ public class RepositoryProcessor extends AbstractProcessor {
             Map<String, List<TypeMirror>> type = builder.generator(entity, roundEnv);
             if (type == null) {
                 messager.printMessage(WARNING,
-                        "This interface generation failed because the generator returned null:" + builder.getClass()
-                                .getName());
+                    "This interface generation failed because the generator returned null:" + builder.getClass()
+                        .getName());
                 continue;
             }
 
@@ -197,7 +175,7 @@ public class RepositoryProcessor extends AbstractProcessor {
             file.writeTo(filer);
         } catch (Exception e) {
             messager.printMessage(NOTE,
-                    " Write java file error: [" + packageName + "." + typeSpec.name + "]" + e.getMessage());
+                " Write java file error: [" + packageName + "." + typeSpec.name + "]" + e.getMessage());
         }
     }
 
@@ -213,14 +191,14 @@ public class RepositoryProcessor extends AbstractProcessor {
 
         if (tmp == null || tmp.isEmpty()) {
             messager.printMessage(WARNING,
-                    "Only the default repositories will be created: [org.springframework.data.jpa.repository" +
-                            ".JpaRepository]");
+                "Only the default repositories will be created: [org.springframework.data.jpa.repository" +
+                    ".JpaRepository]");
             includes = Arrays.asList("org.springframework.data.jpa.repository.JpaRepository",
-                    "org.springframework.data.repository.Repository");
+                "org.springframework.data.repository.Repository");
         } else {
             includes = Arrays.stream(tmp.split(",")).filter(Objects::nonNull).filter(item -> !item.isEmpty())
-                    .map(String::trim).distinct().filter(this::isAvailable).sorted()
-                    .collect(Collectors.toList());
+                .map(String::trim).distinct().filter(this::isAvailable).sorted()
+                .collect(Collectors.toList());
             includes.add("org.springframework.data.repository.Repository");
         }
 
@@ -258,18 +236,18 @@ public class RepositoryProcessor extends AbstractProcessor {
      */
     protected String getConfig(String key) {
         // 首先从config加载
-        Object prop = this.config.get(key);
-        if (prop == null) {
-            return this.processingEnv.getOptions().get(key);
-        }
-
-        if (prop instanceof String) {
-            return (String) prop;
-        }
-
-        if (prop instanceof Number) {
-            return String.valueOf(prop);
-        }
+//        Object prop = this.config.get(key);
+//        if (prop == null) {
+//            return this.processingEnv.getOptions().get(key);
+//        }
+//
+//        if (prop instanceof String) {
+//            return (String) prop;
+//        }
+//
+//        if (prop instanceof Number) {
+//            return String.valueOf(prop);
+//        }
 
         messager.printMessage(WARNING, "This property is not a simple type: " + key);
         return null;
@@ -283,7 +261,7 @@ public class RepositoryProcessor extends AbstractProcessor {
      * @param packageName 包名
      */
     private void generateSourceCode(TypeElement entity, String packageName, RoundEnvironment roundEnv)
-            throws IOException, ClassNotFoundException {
+        throws IOException, ClassNotFoundException {
 
         List<RepositoryBuilder> matcher = this.matcher(this.builders, entity);
         // 如果没有匹配到, 直接退出
@@ -321,19 +299,19 @@ public class RepositoryProcessor extends AbstractProcessor {
             tmp = "";
         }
 
-        RepositoryCreator repositoryCreator = entity.getAnnotation(RepositoryCreator.class);
+//        RepositoryCreator repositoryCreator = entity.getAnnotation(RepositoryCreator.class);
+//
+//        if (repositoryCreator.repositoryName() != null && !repositoryCreator.repositoryName().isEmpty()) {
+//            return repositoryCreator.repositoryName();
+//        }
 
-        if (repositoryCreator.repositoryName() != null && !repositoryCreator.repositoryName().isEmpty()) {
-            return repositoryCreator.repositoryName();
-        }
-
-        RepositoryNamingStrategy strategy = this.namingStrategy.get(repositoryCreator.strategy());
-        if (strategy != null) {
-            String name = strategy.repositoryName(entity, tmp, repository);
-            if (name != null && (!name.isEmpty())) {
-                return name;
-            }
-        }
+//        RepositoryNamingStrategy strategy = this.namingStrategy.get(repositoryCreator.strategy());
+//        if (strategy != null) {
+//            String name = strategy.repositoryName(entity, tmp, repository);
+//            if (name != null && (!name.isEmpty())) {
+//                return name;
+//            }
+//        }
 
         return tmp + entity.getSimpleName() + "Repository";
     }
@@ -346,15 +324,17 @@ public class RepositoryProcessor extends AbstractProcessor {
      */
     private String createPackageName(TypeElement entity) {
 
-        RepositoryCreator repo = entity.getAnnotation(RepositoryCreator.class);
-
-        RepositoryNamingStrategy strategy = this.namingStrategy.get(repo.strategy());
-        if (strategy != null) {
-            String packageName = strategy.repositoryPackageName(entity);
-            if (packageName != null && (!packageName.isEmpty())) {
-                return packageName;
-            }
-        }
+        List<? extends AnnotationMirror> mirrors = entity.getAnnotationMirrors();
+//
+//        RepositoryCreator repo = entity.getAnnotation(RepositoryCreator.class);
+//
+//        RepositoryNamingStrategy strategy = this.namingStrategy.get(repo.strategy());
+//        if (strategy != null) {
+//            String packageName = strategy.repositoryPackageName(entity);
+//            if (packageName != null && (!packageName.isEmpty())) {
+//                return packageName;
+//            }
+//        }
 
         // 全局配置包名
         String packageName = this.getConfig(RepositoryBuilder.pageName);
@@ -400,8 +380,8 @@ public class RepositoryProcessor extends AbstractProcessor {
             Map<String, List<TypeMirror>> type = builder.generator(entity, environment);
             if (type == null || type.isEmpty()) {
                 messager.printMessage(WARNING,
-                        "This interface generation failed because the generator returned null:" + builder.getClass()
-                                .getName());
+                    "This interface generation failed because the generator returned null:" + builder.getClass()
+                        .getName());
                 continue;
             }
 
@@ -442,28 +422,29 @@ public class RepositoryProcessor extends AbstractProcessor {
             return matcher;
         }
 
-        RepositoryCreator repo = entity.getAnnotation(RepositoryCreator.class);
-        if (repo == null) {
-            return matcher;
-        }
+//        RepositoryCreator repo = entity.getAnnotation(RepositoryCreator.class);
+//        if (repo == null) {
+//            return matcher;
+//        }
+//
+//        String[] currentBuilders = repo.builders();
+//        if (currentBuilders.length == 0) {
+//            return matcher;
+//        }
 
-        String[] currentBuilders = repo.builders();
-        if (currentBuilders.length == 0) {
-            return matcher;
-        }
-
-        HashSet<String> configBuilders = new HashSet<>(Arrays.asList(currentBuilders));
-        configBuilders.add("org.springframework.data.repository.Repository");
+//        HashSet<String> configBuilders = new HashSet<>(Arrays.asList(currentBuilders));
+//        configBuilders.add("org.springframework.data.repository.Repository");
 
         // 如果有单独指定, 则再次匹配
-        List<RepositoryBuilder> tmp = new LinkedList<>();
-        for (String builder : configBuilders) {
-            for (RepositoryBuilder repositoryBuilder : matcher) {
-                if (repositoryBuilder.support(builder)) {
-                    tmp.add(repositoryBuilder);
-                }
-            }
-        }
-        return tmp;
+//        List<RepositoryBuilder> tmp = new LinkedList<>();
+//        for (String builder : configBuilders) {
+//            for (RepositoryBuilder repositoryBuilder : matcher) {
+//                if (repositoryBuilder.support(builder)) {
+//                    tmp.add(repositoryBuilder);
+//                }
+//            }
+//        }
+//        return tmp;
+        return null;
     }
 }

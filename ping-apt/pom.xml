@@ -2,62 +2,106 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>ping</artifactId>
-        <groupId>cn.procsl</groupId>
-        <version>1.0.0</version>
-    </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>ping-apt</artifactId>
+    <groupId>cn.procsl</groupId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
     <name>Ping 注解处理器</name>
+
+    <properties>
+        <compiler.version>${java.version}</compiler.version>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.compilerVersion>${java.version}</maven.compiler.compilerVersion>
+        <compiler.version>${java.version}</compiler.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <!-- 从 Spring Boot 导入依赖管理 -->
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>3.2.1</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
 
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
             <groupId>com.squareup</groupId>
             <artifactId>javapoet</artifactId>
+            <version>1.13.0</version>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.procsl</groupId>
-            <artifactId>ping-common</artifactId>
+            <version>3.30.2-GA</version>
             <optional>true</optional>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
             <scope>provided</scope>
-            <!--            <version>3.1.0</version>-->
         </dependency>
 
         <dependency>
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service</artifactId>
+            <version>1.1.1</version>
             <optional>true</optional>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.procsl</groupId>
-            <artifactId>ping-jpa</artifactId>
-            <scope>provided</scope>
         </dependency>
 
 
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+                <configuration>
+                    <generatedSourcesDirectory>
+                        ${project.build.directory}/generated-sources/java
+                    </generatedSourcesDirectory>
+                    <compilerVersion>${compiler.version}</compilerVersion>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </path>
+                        <path>
+                            <groupId>com.google.auto.service</groupId>
+                            <artifactId>auto-service</artifactId>
+                            <version>1.1.1</version>
+                        </path>
+
+                    </annotationProcessorPaths>
+
+                    <verbose>true</verbose>
+                    <showWarnings>true</showWarnings>
+                    <!--                    <fork>true</fork>-->
+                    <!--保留参数名称-->
+                    <maxmem>2048m</maxmem>
+                    <compilerArgs>
+                        <arg>-g</arg>
+                        <arg>-Xlint:unchecked</arg>
+                        <arg>-Xlint:deprecation</arg>
+                        <arg>-parameters</arg>
+                        <arg>-proc:full</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

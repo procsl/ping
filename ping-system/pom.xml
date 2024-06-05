@@ -23,11 +23,6 @@
             <artifactId>ping-captcha</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>cn.procsl</groupId>
-            <artifactId>ping-apt</artifactId>
-        </dependency>
-
     </dependencies>
 
 </project>

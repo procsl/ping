@@ -18,6 +18,7 @@
 
 
     <dependencies>
+
         <dependency>
             <groupId>cn.procsl</groupId>
             <artifactId>ping-web</artifactId>
@@ -26,12 +27,6 @@
         <dependency>
             <groupId>cn.procsl</groupId>
             <artifactId>ping-jpa</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.procsl</groupId>
-            <artifactId>ping-apt</artifactId>
-            <scope>compile</scope>
         </dependency>
 
     </dependencies>

@@ -17,8 +17,6 @@ import java.util.function.Function;
  */
 public interface RepositoryBuilder {
 
-    String processor = "META-INF/processor.config";
-
     String prefix = "processor.repository.prefix";
 
     String pageName = "processor.repository.package.name";

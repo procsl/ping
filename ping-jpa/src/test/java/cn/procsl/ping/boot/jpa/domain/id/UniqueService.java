@@ -20,7 +20,7 @@ public class UniqueService {
     @Transactional
     public void saveService() {
         for (int i = 0; i < 50; i++) {
-            Long a = idGenerator.nextId("test", 10L);
+            Long a = idGenerator.nextId();
             log.info("nextId: {}", a);
             entityManager.persist(new Unique(a, "test"));
         }
@@ -29,7 +29,7 @@ public class UniqueService {
 
     public void test(int times) {
         for (int i = 0; i < times; i++) {
-            idGenerator.nextId("test", 10L);
+            idGenerator.nextId();
         }
     }
 
