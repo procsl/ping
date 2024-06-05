@@ -39,21 +39,24 @@ public class TableIdentifierSegmentRepositoryImpl implements IdentifierSegmentRe
             CriteriaQuery<Tuple> query = builder.createTupleQuery();
             Root<InnerIdentifier> qr = query.from(InnerIdentifier.class);
 
-            query = query.multiselect(qr.get("value").alias("next_value")).where(builder.equal(qr.get("id"), segmentName));
+            final String nextValueKey = "next_value";
+
+            query = query.multiselect(qr.get(InnerIdentifier_.value).alias(nextValueKey))
+                .where(builder.equal(qr.get(InnerIdentifier_.ID), segmentName));
 
             List<Tuple> list = entityManager.createQuery(query).getResultList();
             if (list.isEmpty()) {
                 throw new IdentifierException(segmentName + " not found");
             }
 
-            Tuple identifier = list.getFirst();
             CriteriaUpdate<InnerIdentifier> updater = builder.createCriteriaUpdate(InnerIdentifier.class);
-            Path<Long> valueField = updater.getRoot().get("value");
-            Path<String> segmentFiled = updater.getRoot().get("id");
+            Path<Long> valueField = updater.getRoot().get(InnerIdentifier_.value);
+            Path<String> segmentFiled = updater.getRoot().get(InnerIdentifier_.id);
 
-            Long nextValue = identifier.get("next_value", Long.class);
+            Tuple identifier = list.getFirst();
+            Long nextValue = identifier.get(nextValueKey, Long.class);
             CriteriaUpdate<InnerIdentifier> command = updater.set(valueField, nextValue + size)
-                    .where(builder.equal(valueField, nextValue), builder.equal(segmentFiled, segmentName));
+                .where(builder.equal(valueField, nextValue), builder.equal(segmentFiled, segmentName));
 
             int result = entityManager.createQuery(command).executeUpdate();
             if (result >= 1) {
