@@ -17,6 +17,7 @@ import static javax.tools.Diagnostic.Kind.WARNING;
 
 public final class AptUtils {
 
+
     public static boolean isAvailable(String clazz) {
         try {
             Class.forName(clazz);
@@ -32,10 +33,11 @@ public final class AptUtils {
         }
 
         Name typed = utils.getName(typeName);
+        var vt = ofVisitType((e, p) -> typed.equals(e.getQualifiedName()));
         for (AnnotationMirror mirror : mirrors) {
             DeclaredType type = mirror.getAnnotationType();
             Element element = type.asElement();
-            Boolean bool = element.accept(ofVisitType((e, p) -> typed.equals(e.getQualifiedName())), null);
+            Boolean bool = element.accept(vt, null);
             if (bool != null && bool) {
                 return mirror;
             }
@@ -51,7 +53,7 @@ public final class AptUtils {
         for (ExecutableElement k : values.keySet()) {
             Name simpleName = k.getSimpleName();
             if (!simpleName.equals(named)) {
-                return null;
+                continue;
             }
             return values.get(k);
         }

@@ -82,7 +82,7 @@ final class RepositoryCreatorVisitor implements TargetElementProcessor {
 
     private String createRepositoryClassName(Elements utils, TypeElement entity, AnnotationMirror repo) {
 
-        AnnotationValue annotation = AptUtils.findAnnotationValue(utils, repo, "repositoryName()");
+        AnnotationValue annotation = AptUtils.findAnnotationValue(utils, repo, "repositoryName");
         String name = null;
         if (annotation != null) {
             name = annotation.accept(ofVisitString((s, a) -> s), null);
@@ -94,7 +94,7 @@ final class RepositoryCreatorVisitor implements TargetElementProcessor {
     }
 
     private String createRepositoryPackageName(Elements utils, TypeElement entity, AnnotationMirror repo) {
-        AnnotationValue annotation = AptUtils.findAnnotationValue(utils, repo, "packageName()");
+        AnnotationValue annotation = AptUtils.findAnnotationValue(utils, repo, "packageName");
         String name = null;
         if (annotation != null) {
             name = annotation.accept(ofVisitString((s, a) -> s), null);

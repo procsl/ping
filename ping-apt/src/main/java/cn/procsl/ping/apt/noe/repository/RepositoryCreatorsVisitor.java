@@ -37,7 +37,7 @@ final class RepositoryCreatorsVisitor implements TargetElementProcessor {
             return;
         }
 
-        var values = AptUtils.findAnnotationValue(env.getElementUtils(), mirror, "value()");
+        var values = AptUtils.findAnnotationValue(env.getElementUtils(), mirror, "value");
         if (values == null) {
             return;
         }
