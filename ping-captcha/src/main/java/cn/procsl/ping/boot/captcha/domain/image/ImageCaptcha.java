@@ -10,6 +10,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import javax.annotation.Nonnull;
 import java.util.Base64;
@@ -20,8 +22,9 @@ import java.util.Base64;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "c_captcha_image")
 @JsonIgnoreProperties("new")
-@RepositoryCreator(builders = "org.springframework.data.jpa.repository.JpaSpecificationExecutor",
-        repositoryName = "ImageCaptchaSpecificationExecutor")
+@RepositoryCreator(repositories = JpaSpecificationExecutor.class,
+    repositoryName = "ImageCaptchaSpecificationExecutor")
+@RepositoryCreator
 public class ImageCaptcha extends Captcha {
 
     public final static String TOKEN_KEY = "image-captcha-token";

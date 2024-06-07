@@ -34,10 +34,16 @@
     <dependencies>
 
         <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
             <groupId>com.squareup</groupId>
             <artifactId>javapoet</artifactId>
             <version>1.13.0</version>
-            <optional>true</optional>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -51,6 +57,7 @@
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
             <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <dependency>

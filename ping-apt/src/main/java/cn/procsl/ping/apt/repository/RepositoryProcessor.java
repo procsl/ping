@@ -1,8 +1,6 @@
 package cn.procsl.ping.apt.repository;
 
-import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
-import jakarta.persistence.Entity;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -11,13 +9,13 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
-import javax.tools.Diagnostic;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.singleton;
-import static javax.tools.Diagnostic.Kind.*;
+import static javax.tools.Diagnostic.Kind.NOTE;
+import static javax.tools.Diagnostic.Kind.WARNING;
 
 
 /**
@@ -28,7 +26,7 @@ import static javax.tools.Diagnostic.Kind.*;
  * @author procsl
  * &#064;date  2020/05/18
  */
-@AutoService(Processor.class)
+//@AutoService(Processor.class)
 public class RepositoryProcessor extends AbstractProcessor {
 
     private Messager messager;
@@ -41,9 +39,10 @@ public class RepositoryProcessor extends AbstractProcessor {
 
     private List<String> includes;
 
-    private Map<String, RepositoryNamingStrategy> namingStrategy;
+//    private Map<String, RepositoryNamingStrategy> namingStrategy;
 
     public RepositoryProcessor() {
+        System.out.println("RepositoryProcessor");
     }
 
     @Override
@@ -53,9 +52,9 @@ public class RepositoryProcessor extends AbstractProcessor {
         this.filer = processingEnv.getFiler();
 
         try {
-            initIncludes();
+//            initIncludes();
 
-            initNamingStrategy();
+//            initNamingStrategy();
 
         } catch (Exception e) {
             messager.printMessage(WARNING,
@@ -68,8 +67,8 @@ public class RepositoryProcessor extends AbstractProcessor {
         ClassLoader currentClassLoad = this.getClass().getClassLoader();
         ServiceLoader<RepositoryNamingStrategy> services = ServiceLoader.load(RepositoryNamingStrategy.class,
             currentClassLoad);
-        this.namingStrategy = new HashMap<>();
-        services.forEach(item -> this.namingStrategy.put(item.getClass().getName(), item));
+//        this.namingStrategy = new HashMap<>();
+//        services.forEach(item -> this.namingStrategy.put(item.getClass().getName(), item));
     }
 
     @Override
@@ -84,46 +83,46 @@ public class RepositoryProcessor extends AbstractProcessor {
 
     @Override
     public synchronized boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        if (roundEnv.processingOver()) {
-            return false;
-        }
-
-        if (annotations.isEmpty()) {
-            return true;
-        }
-
-        Set<? extends Element> entities = roundEnv.getElementsAnnotatedWith(Entity.class);
-
-        try {
-            for (Element entity : entities) {
-                String str = entity.asType().toString();
-                if (!(entity instanceof TypeElement)) {
-                    messager.printMessage(WARNING,
-                        "The element of the annotation label is not a class type: '" + str + "'", entity);
-                    continue;
-                }
-
-                messager.printMessage(Diagnostic.Kind.NOTE, "Process entity: " + str);
-
-                List<? extends AnnotationMirror> mirrors = entity.getAnnotationMirrors();
-//                mirrors.stream().sorted(item -> item.g)
-//                RepositoryCreator repo = entity.getAnnotation(RepositoryCreator.class);
-                if (mirrors.isEmpty()) {
-                    continue;
-                }
-
-                String name = this.createPackageName((TypeElement) entity);
-                // 生成多继承源文件
-                this.generateSourceCode((TypeElement) entity, name, roundEnv);
-                // 生成单继承源文件
-                this.generateSingletonSourceCode((TypeElement) entity, name, roundEnv);
-            }
-
-        } catch (Exception e) {
-            messager.printMessage(ERROR,
-                "The build of the source code failed:" + e.getClass().getName() + ":" + e.getMessage());
-            return false;
-        }
+//        if (roundEnv.processingOver()) {
+//            return false;
+//        }
+//
+//        if (annotations.isEmpty()) {
+//            return true;
+//        }
+//
+//        Set<? extends Element> entities = roundEnv.getElementsAnnotatedWith(Entity.class);
+//
+//        try {
+//            for (Element entity : entities) {
+//                String str = entity.asType().toString();
+//                if (!(entity instanceof TypeElement)) {
+//                    messager.printMessage(WARNING,
+//                        "The element of the annotation label is not a class type: '" + str + "'", entity);
+//                    continue;
+//                }
+//
+//                messager.printMessage(Diagnostic.Kind.NOTE, "Process entity: " + str);
+//
+//                List<? extends AnnotationMirror> mirrors = entity.getAnnotationMirrors();
+////                mirrors.stream().sorted(item -> item.g)
+////                RepositoryCreator repo = entity.getAnnotation(RepositoryCreator.class);
+//                if (mirrors.isEmpty()) {
+//                    continue;
+//                }
+//
+//                String name = this.createPackageName((TypeElement) entity);
+//                // 生成多继承源文件
+//                this.generateSourceCode((TypeElement) entity, name, roundEnv);
+//                // 生成单继承源文件
+//                this.generateSingletonSourceCode((TypeElement) entity, name, roundEnv);
+//            }
+//
+//        } catch (Exception e) {
+//            messager.printMessage(ERROR,
+//                "The build of the source code failed:" + e.getClass().getName() + ":" + e.getMessage());
+//            return false;
+//        }
         return true;
     }
 

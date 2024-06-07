@@ -1,6 +1,9 @@
 package cn.procsl.ping.boot.jpa.support;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+
 import java.lang.annotation.Documented;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -11,23 +14,17 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  * jpa repository 生成器
  *
  * @author procsl
- * @date 2020/05/18
+ * &#064;date  2020/05/18
  */
 @Documented
 @Target(TYPE)
 @Retention(SOURCE)
+@Repeatable(value = RepositoryCreators.class)
 public @interface RepositoryCreator {
 
-    /**
-     * 可以手动指定当前实体生成的 builder
-     * 如果未手动指定,则使用全局的builder
-     *
-     * @return 代码生成器实现
-     */
-    String[] builders() default {};
-
-    String strategy() default "cn.procsl.ping.processor.repository.DefaultNamingStrategy";
+    Class<?>[] repositories() default {JpaRepository.class};
 
     String repositoryName() default "";
 
+    String packageName() default "";
 }
