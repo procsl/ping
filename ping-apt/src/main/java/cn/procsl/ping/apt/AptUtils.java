@@ -61,7 +61,7 @@ public final class AptUtils {
     }
 
 
-    public static void writer(Messager messager, Filer filer, String packageName, TypeSpec typeSpec) throws IOException {
+    public static void writer(Messager messager, Filer filer, String packageName, TypeSpec typeSpec) {
         // java 源文件表示
         JavaFile file = JavaFile.builder(packageName, typeSpec).build();
 

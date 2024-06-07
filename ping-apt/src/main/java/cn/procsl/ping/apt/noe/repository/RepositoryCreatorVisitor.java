@@ -31,7 +31,6 @@ final class RepositoryCreatorVisitor implements TargetElementProcessor {
     final SimpleElementVisitor<TypeElement, Object> visitor = SimpleElementVisitor.ofVisitType((e, s) -> e);
 
     @Override
-    @SneakyThrows
     public void build(ProcessingEnvironment env, RoundEnvironment roundEnv,
                       TypeElement anno, Element target) {
 
@@ -61,7 +60,6 @@ final class RepositoryCreatorVisitor implements TargetElementProcessor {
         return false;
     }
 
-    @SneakyThrows
     public void build(ProcessingEnvironment env, RoundEnvironment roundEnv, TypeElement entity, AnnotationMirror annotationMirror) {
         if (check(env, entity)) return;
 
