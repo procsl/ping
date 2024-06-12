@@ -117,6 +117,7 @@ final class RepositoryCreatorVisitor implements TargetElementProcessor {
             }
             var visitType = SimpleAnnotationValueVisitor.ofVisitType((e, o) -> e);
             var declared = ofVisitDeclared((e, o) -> e);
+            TypeMirror idMirror = this.findIdAnnotationMirror(env.getElementUtils(), entity, id);
             for (AnnotationValue item : arrays) {
                 TypeMirror inf = item.accept(visitType, null);
                 if (inf == null) {
@@ -133,7 +134,6 @@ final class RepositoryCreatorVisitor implements TargetElementProcessor {
 
                 try {
                     String key = repositoryType.getQualifiedName().toString();
-                    TypeMirror idMirror = this.findIdAnnotationMirror(env.getElementUtils(), entity, id);
                     this.processor.getOrDefault(key, empty)
                         .processor(env, roundEnv, entity, annotationMirror, builder, repo, repositoryType, idMirror);
                 } catch (RuntimeException ex) {
