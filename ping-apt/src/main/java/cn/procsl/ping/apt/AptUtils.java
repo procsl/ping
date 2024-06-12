@@ -1,5 +1,6 @@
 package cn.procsl.ping.apt;
 
+import com.google.auto.common.MoreElements;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
 
@@ -10,8 +11,12 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.util.Elements;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.BiFunction;
 
-import static cn.procsl.ping.apt.SimpleElementVisitor.ofVisitType;
+import static cn.procsl.ping.apt.SimpleElementVisitor.*;
 import static javax.tools.Diagnostic.Kind.NOTE;
 import static javax.tools.Diagnostic.Kind.WARNING;
 
@@ -45,21 +50,84 @@ public final class AptUtils {
         return null;
     }
 
-    public static AnnotationValue findAnnotationValue(Elements utils, AnnotationMirror repo, String name) {
-
+    public static AnnotationValue findAnnotationValueOrDefaultValue(Elements utils, AnnotationMirror repo, String name) {
         Name named = utils.getName(name);
-
         var values = repo.getElementValues();
+
         for (ExecutableElement k : values.keySet()) {
             Name simpleName = k.getSimpleName();
             if (!simpleName.equals(named)) {
                 continue;
             }
-            return values.get(k);
-        }
-        return null;
-    }
 
+            AnnotationValue v = values.get(k);
+            do {
+                if (v == null) {
+                    break;
+                }
+                if (v.accept(SimpleAnnotationValueVisitor.ofVisitAnnotation((e, s) -> e), null) != null) {
+                    return v;
+                }
+                if (v.accept(SimpleAnnotationValueVisitor.ofVisit((e, s) -> e), null) != null) {
+                    return v;
+                }
+                String str = v.accept(SimpleAnnotationValueVisitor.ofVisitString((e, s) -> e), null);
+                if (str != null && !str.isEmpty()) {
+                    return v;
+                }
+                if (v.accept(SimpleAnnotationValueVisitor.ofVisitType((e, s) -> e), null) != null) {
+                    return v;
+                }
+                if (v.accept(SimpleAnnotationValueVisitor.ofVisitBoolean((e, s) -> e), null) != null) {
+                    return v;
+                }
+                if (v.accept(SimpleAnnotationValueVisitor.ofVisitByte((e, s) -> e), null) != null) {
+                    return v;
+                }
+                if (v.accept(SimpleAnnotationValueVisitor.ofVisitChar((e, s) -> e), null) != null) {
+                    return v;
+                }
+                if (v.accept(SimpleAnnotationValueVisitor.ofVisitDouble((e, s) -> e), null) != null) {
+                    return v;
+                }
+                if (v.accept(SimpleAnnotationValueVisitor.ofVisitFloat((e, s) -> e), null) != null) {
+                    return v;
+                }
+                if (v.accept(SimpleAnnotationValueVisitor.ofVisitInt((e, s) -> e), null) != null) {
+                    return v;
+                }
+                if (v.accept(SimpleAnnotationValueVisitor.ofVisitLong((e, s) -> e), null) != null) {
+                    return v;
+                }
+                var array = v.accept(SimpleAnnotationValueVisitor.ofVisitArray((e, s) -> e), null);
+                if (array != null && !array.isEmpty()) {
+                    return v;
+                }
+                if (v.accept(SimpleAnnotationValueVisitor.ofVisitEnumConstant((e, s) -> e), null) != null) {
+                    return v;
+                }
+                if (v.accept(SimpleAnnotationValueVisitor.ofVisitShort((e, s) -> e), null) != null) {
+                    return v;
+                }
+                if (v.accept(SimpleAnnotationValueVisitor.ofVisitUnknown((e, s) -> e), null) != null) {
+                    return v;
+                }
+            } while (false);
+            return k.getDefaultValue();
+        }
+
+
+        TypeElement tp = repo.getAnnotationType().asElement().accept(ofVisitType((e, s) -> e), null);
+        var self = ofVisitExecutable((e, s) -> e);
+        Optional<ExecutableElement> result = tp.getEnclosedElements()
+            .stream()
+            .map((item) -> item.accept(self, null))
+            .filter(Objects::nonNull)
+            .filter(item -> item.getSimpleName().equals(named))
+            .findFirst();
+
+        return result.map(ExecutableElement::getDefaultValue).orElse(null);
+    }
 
     public static void writer(Messager messager, Filer filer, String packageName, TypeSpec typeSpec) {
         // java 源文件表示

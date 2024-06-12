@@ -1,4 +1,4 @@
-package cn.procsl.ping.apt.noe.repository;
+package cn.procsl.ping.apt.neo.repository;
 
 import com.google.auto.service.AutoService;
 

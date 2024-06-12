@@ -1,4 +1,4 @@
-package cn.procsl.ping.apt.noe.repository;
+package cn.procsl.ping.apt.neo.repository;
 
 import cn.procsl.ping.apt.AptUtils;
 import cn.procsl.ping.apt.SimpleAnnotationValueVisitor;
@@ -37,7 +37,7 @@ final class RepositoryCreatorsVisitor implements TargetElementProcessor {
             return;
         }
 
-        var values = AptUtils.findAnnotationValue(env.getElementUtils(), mirror, "value");
+        var values = AptUtils.findAnnotationValueOrDefaultValue(env.getElementUtils(), mirror, "value");
         if (values == null) {
             return;
         }

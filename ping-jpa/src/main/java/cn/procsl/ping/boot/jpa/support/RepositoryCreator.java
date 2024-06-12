@@ -8,7 +8,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.SOURCE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * jpa repository 生成器
@@ -18,7 +18,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  */
 @Documented
 @Target(TYPE)
-@Retention(SOURCE)
+@Retention(value = RUNTIME)
 @Repeatable(value = RepositoryCreators.class)
 public @interface RepositoryCreator {
 

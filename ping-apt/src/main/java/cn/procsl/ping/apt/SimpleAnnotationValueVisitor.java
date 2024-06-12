@@ -26,9 +26,27 @@ public class SimpleAnnotationValueVisitor<OUT, IN> implements AnnotationValueVis
     private BiFunction<TypeMirror, IN, OUT> visitType;
     private BiFunction<VariableElement, IN, OUT> visitEnumConstant;
     private BiFunction<AnnotationMirror, IN, OUT> visitAnnotation;
-
     private BiFunction<List<? extends AnnotationValue>, IN, OUT> visitArray;
     private BiFunction<AnnotationValue, IN, OUT> visitUnknown;
+
+
+    {
+        BiFunction<AnnotationValue, Object, AnnotationValue> visitSelf = (e, s) -> e;
+        BiFunction<Boolean, Object, Boolean> visitBooleanSelf = (e, s) -> e;
+        BiFunction<Byte, Object, Byte> visitByteSelf = (e, s) -> e;
+        BiFunction<Character, Object, Character> visitCharSelf = (e, s) -> e;
+        BiFunction<Double, Object, Double> visitDoubleSelf = (e, s) -> e;
+        BiFunction<Float, Object, Float> visitFloatSelf = (e, s) -> e;
+        BiFunction<Integer, Object, Integer> visitIntSelf = (e, s) -> e;
+        BiFunction<Long, Object, Long> visitLongSelf = (e, s) -> e;
+        BiFunction<Short, Object, Short> visitShortSelf = (e, s) -> e;
+        BiFunction<String, Object, String> visitStringSelf = (e, s) -> e;
+        BiFunction<TypeMirror, Object, TypeMirror> visitTypeSelf = (e, s) -> e;
+        BiFunction<VariableElement, Object, VariableElement> visitEnumConstantSelf = (e, s) -> e;
+        BiFunction<AnnotationMirror, Object, AnnotationMirror> visitAnnotationSelf = (e, s) -> e;
+        BiFunction<List<? extends AnnotationValue>, Object, List<? extends AnnotationValue>> visitArraySelf = (e, s) -> e;
+        BiFunction<AnnotationValue, Object, AnnotationValue> visitUnknownSelf = (e, s) -> e;
+    }
 
     @Override
     public OUT visit(AnnotationValue av, IN in) {
@@ -154,7 +172,7 @@ public class SimpleAnnotationValueVisitor<OUT, IN> implements AnnotationValueVis
     public static <OUT, IN> SimpleAnnotationValueVisitor<OUT, IN> ofVisit(final BiFunction<AnnotationValue, IN, OUT> visit) {
         SimpleAnnotationValueVisitor<OUT, IN> tmp = new SimpleAnnotationValueVisitor<>();
         tmp.visit = visit;
-        return null;
+        return tmp;
     }
 
     public static <OUT, IN> SimpleAnnotationValueVisitor<OUT, IN> ofVisitBoolean(final BiFunction<Boolean, IN, OUT> visitBoolean) {

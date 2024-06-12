@@ -17,7 +17,7 @@ import java.util.Map;
 @Getter
 @Setter
 @Entity
-@RepositoryCreator
+@RepositoryCreator(repositories = {})
 @Table(name = "s_abac_policy")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DiscriminatorValue("restful")
