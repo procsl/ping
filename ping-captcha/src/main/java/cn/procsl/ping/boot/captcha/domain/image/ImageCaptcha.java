@@ -23,7 +23,6 @@ import java.util.Base64;
 @JsonIgnoreProperties("new")
 @RepositoryCreator(repositories = JpaSpecificationExecutor.class,
     repositoryName = "ImageCaptchaSpecificationExecutor")
-@RepositoryCreator
 public class ImageCaptcha extends Captcha {
 
     public final static String TOKEN_KEY = "image-captcha-token";

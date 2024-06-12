@@ -8,14 +8,16 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 
 @Getter
 @Setter
 @Entity
-@RepositoryCreator
 @Table(name = "c_captcha_email")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@RepositoryCreator
 public class EmailCaptcha extends Captcha {
 
     @Id

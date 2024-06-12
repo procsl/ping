@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.io.Serializable;
 
@@ -15,7 +17,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "s_user")
 @NoArgsConstructor
-@RepositoryCreator
+@RepositoryCreator(repositories = {JpaSpecificationExecutor.class, JpaRepository.class})
 public class User implements Serializable {
 
     @Id

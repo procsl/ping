@@ -1,6 +1,7 @@
 package cn.procsl.ping.boot.jpa.support;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Repeatable;
@@ -22,7 +23,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Repeatable(value = RepositoryCreators.class)
 public @interface RepositoryCreator {
 
-    Class<?>[] repositories() default {JpaRepository.class};
+    Class<?>[] repositories() default {JpaRepository.class, JpaSpecificationExecutor.class};
 
     String repositoryName() default "";
 
