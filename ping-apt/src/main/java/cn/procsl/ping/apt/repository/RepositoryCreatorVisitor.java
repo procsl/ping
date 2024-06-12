@@ -45,12 +45,14 @@ final class RepositoryCreatorVisitor implements TargetElementProcessor {
         var d = new JpaIdAndEntityRepositoryProcessor("org.springframework.data.jpa.repository.CrudRepository");
         var e = new JpaIdAndEntityRepositoryProcessor("org.springframework.data.jpa.repository.Repository");
         var f = new EntityRepositoryProcessor("org.springframework.data.jpa.repository.JpaSpecificationExecutor");
+        var g = new EntityRepositoryProcessor("org.springframework.data.jpa.repository.QueryByExampleExecutor");
         processor.put(a.getName(), a);
         processor.put(b.getName(), b);
         processor.put(c.getName(), c);
         processor.put(d.getName(), d);
         processor.put(e.getName(), e);
         processor.put(f.getName(), f);
+        processor.put(g.getName(), g);
     }
 
 
