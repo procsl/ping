@@ -1,4 +1,4 @@
-package cn.procsl.ping.apt.neo.repository;
+package cn.procsl.ping.apt.repository;
 
 import cn.procsl.ping.apt.AptUtils;
 import cn.procsl.ping.apt.SimpleAnnotationValueVisitor;

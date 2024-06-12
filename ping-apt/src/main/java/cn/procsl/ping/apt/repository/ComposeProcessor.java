@@ -1,4 +1,4 @@
-package cn.procsl.ping.apt.neo.repository;
+package cn.procsl.ping.apt.repository;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
