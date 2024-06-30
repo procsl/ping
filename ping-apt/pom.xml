@@ -11,6 +11,7 @@
     <name>Ping 注解处理器</name>
 
     <properties>
+        <java.version>21</java.version>
         <compiler.version>${java.version}</compiler.version>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven.compiler.source>${java.version}</maven.compiler.source>
