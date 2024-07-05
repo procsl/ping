@@ -1,6 +1,7 @@
 package cn.procsl.ping.boot.jpa.domain.id;
 
 import cn.procsl.ping.boot.common.utils.IdentifierGenerator;
+import cn.procsl.ping.boot.common.utils.SimpleLongIdGenerator;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
@@ -11,8 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UniqueService {
 
-    @Inject
-    IdentifierGenerator<Long> idGenerator;
+    IdentifierGenerator<Long> idGenerator = new SimpleLongIdGenerator();
 
     @Inject
     EntityManager entityManager;
