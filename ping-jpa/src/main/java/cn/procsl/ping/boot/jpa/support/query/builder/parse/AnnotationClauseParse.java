@@ -22,13 +22,14 @@ public class AnnotationClauseParse implements QueryClauseParse {
     public List<SelectClause> parseSelects() {
 
         // 获取select字段
-        List<? extends SelectClause> fields = this.getSelectFields();
+        List<StringSelectClause> fields = this.parseSelectFields();
+        List<AnnotationFieldSelectClause> clause = fields.stream().map(StringSelectClause::convertToAnnotationClause).toList();
 
         return getStringSelectClauses(injectable, clazz);
     }
 
 
-    protected List<? extends SelectClause> getSelectFields() {
+    private List<StringSelectClause> parseSelectFields() {
 
         // 2. 通过类上的 SelectFields 匹配类字段
         // 3. 通过构造函数参数匹配类字段
@@ -51,65 +52,47 @@ public class AnnotationClauseParse implements QueryClauseParse {
 
         // 1. 通过构造函数上的 SelectFields 匹配类字段/get方法;
         if (selectFields != null && selectFields.fields().length != 0) {
-            return getStringSelectClauses(selectFields);
+            return getStringSelectClauses(selectFields, this.clazz);
         }
 
         // 获取类上的 selectFields
         SelectFields clazzFields = AnnotationUtils.findAnnotation(this.clazz, SelectFields.class);
         if (clazzFields != null && clazzFields.fields().length != 0) {
-            return getStringSelectClauses(clazzFields);
+            return getStringSelectClauses(clazzFields, this.clazz);
         }
 
         // 3. 通过构造函数参数匹配类字段
         // 判断是否标注了 SelectFields, 如果被标注了, 就使用被标注的构造方法对应的字段名称
         if (selectFields != null) {
             TypeVariable<? extends Constructor<?>>[] params = markConstructor.getTypeParameters();
-            ArrayList<SelectClause> arr = new ArrayList<>(params.length);
+            Class<?>[] types = markConstructor.getParameterTypes();
+            ArrayList<StringSelectClause> arr = new ArrayList<>(params.length);
             for (int i = 0; i < params.length; i++) {
                 var param = params[i];
                 // TODO 优先通过注解获取名字?
-                name = param.getName();
-                arr.add(new AnnotationFieldSelectClause(i, param.getName(), ));
+                String name = param.getName();
+                arr.add(new AnnotationFieldSelectClause(i, name, types[i], clazz));
             }
+            return arr;
         }
 
-        return null;
-    }
-
-    private static List<SelectClause> getStringSelectClauses(SelectFields selectFields) {
-        ArrayList<SelectClause> arr = new ArrayList<>(selectFields.fields().length);
-        for (int i = 0; i < selectFields.fields().length; i++) {
-            arr.add(new StringSelectClause(i, selectFields.fields()[i]));
+        // 使用默认的方式
+        Field[] fields = this.clazz.getDeclaredFields();
+        ArrayList<StringSelectClause> arr = new ArrayList<>(fields.length);
+        for (int i = 0; i < fields.length; i++) {
+            Field field = fields[i];
+            String name = field.getName();
+            arr.add(new AnnotationFieldSelectClause(i, name, field.getType(), clazz));
         }
         return arr;
     }
 
-    private List<SelectClause> getStringSelectClauses(Constructor<?> constructor, Class<? extends Serializable> clazz) {
-        // 匹配的字段名称和类型需要完全相同
-        // 匹配完成后
-        // 1. 如果存在构造函数, 需要和构造函数参数完全一致的顺序
-        // 否则使用字段/get方法的顺序
-        String[] fields = null;
-        if (constructor != null) {
-            // 如果构造函数
-            SelectFields selectFields = AnnotationUtils.findAnnotation(constructor, SelectFields.class);
-            if (selectFields != null) {
-                fields = selectFields.fields();
-            }
+    private static List<StringSelectClause> getStringSelectClauses(SelectFields selectFields, Class<? extends Serializable> clazz) {
+        ArrayList<StringSelectClause> arr = new ArrayList<>(selectFields.fields().length);
+        for (int i = 0; i < selectFields.fields().length; i++) {
+            arr.add(new StringSelectClause(i, selectFields.fields()[i], clazz));
         }
-
-        TypeVariable<? extends Constructor<?>>[] params = constructor.getTypeParameters();
-        if (params.length == 0) {
-            throw new IllegalArgumentException("被@InjectConstructor注解标注的构造函数无参数: " + this.clazz);
-        }
-
-        List<SelectClause> list = new ArrayList<>();
-        for (int i = 0; i < params.length; i++) {
-            TypeVariable<? extends Constructor<?>> param = params[i];
-            AnnotationFieldSelectClause tem = new AnnotationFieldSelectClause(i, param, this.clazz);
-            list.add(tem);
-        }
-        return list;
+        return arr;
     }
 
     @Override
@@ -132,24 +115,23 @@ public class AnnotationClauseParse implements QueryClauseParse {
         return List.of();
     }
 
-    protected List<Field> getFields() {
-        Field[] fields = this.clazz.getDeclaredFields();
-        return List.of(fields);
-    }
 
-    static class AnnotationFieldSelectClause extends StringSelectClause {
+    private static class AnnotationFieldSelectClause extends StringSelectClause {
 
-        final Class<? extends Serializable> clazz;
+        private final Class<?> paramType;
 
-        AnnotationFieldSelectClause(int index, String name,
-                                    @NonNull Class<? extends Serializable> clazz) {
-            super(index, name);
-            this.clazz = clazz;
+        public AnnotationFieldSelectClause(int index, String name, @NonNull Class<?> paramType, @NonNull Class<?> clazz) {
+            super(index, name, clazz);
+            this.paramType = paramType;
         }
 
         @Override
-        AnnotationFieldSelectClause convertToAnnotationClause(Class<? extends Serializable> clazz) {
+        AnnotationFieldSelectClause convertToAnnotationClause() {
             return this;
+        }
+
+        protected void check() {
+
         }
 
         @Override
@@ -161,18 +143,32 @@ public class AnnotationClauseParse implements QueryClauseParse {
 
     @AllArgsConstructor
     @RequiredArgsConstructor
-    static class StringSelectClause implements SelectClause {
+    private static class StringSelectClause implements SelectClause {
 
-        final int index;
-        final String name;
+        private final int index;
+        private final String name;
+        private final Class<?> clazz;
 
         @Override
         public String toClauseString() {
             throw new UnsupportedOperationException("不支持的生成表达式");
         }
 
-        AnnotationFieldSelectClause convertToAnnotationClause(Class<? extends Serializable> clazz) {
-            return new AnnotationFieldSelectClause(index, name, clazz);
+        AnnotationFieldSelectClause convertToAnnotationClause() {
+
+            ArrayList<Class<?>> types = new ArrayList<>();
+            Field[] fields = clazz.getFields();
+            for (Field field : fields) {
+                if (name.equals(field.getName())) {
+                    types.add(field.getType());
+                }
+            }
+
+            if (types.size() == 0) {
+                // 查找Get方法
+            }
+
+            return new AnnotationFieldSelectClause(index, name, paramType, clazz);
         }
 
     }
