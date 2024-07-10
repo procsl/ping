@@ -16,12 +16,7 @@ public @interface Where {
     /**
      * 大于, 小于, 等于, like等等
      */
-    WherePredicate predicate() default WherePredicate.equal;
-
-    /**
-     * 标识该字段是否仅用于查询
-     */
-    boolean only() default false;
+    Predicate predicate() default Predicate.equal;
 
     /**
      * 查询条件组, 例如 (field1=XX or field2=YY) and (field3=XX or field4=YY)
@@ -32,11 +27,11 @@ public @interface Where {
     String groupName() default "";
 
     /**
-     * 是否强制作为条件查询, 默认下,为null时或String类型为null或空白字符串时不作为查询条件
+     * 是否强制作为条件查询, 该参数必须传递
      */
-    boolean isForce() default false;
+    boolean required() default false;
 
-    enum WherePredicate {
+    enum Predicate {
         equal, like
     }
 }

@@ -1,11 +1,9 @@
-package cn.procsl.ping.boot.jpa.support.query.builder.parse;
+package cn.procsl.ping.boot.jpa.support.query.builder.parser;
 
 import cn.procsl.ping.boot.jpa.support.query.builder.SelectClause;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 @AllArgsConstructor
-@RequiredArgsConstructor
 class StringSelectClause implements SelectClause {
 
     private final int index;
@@ -16,8 +14,6 @@ class StringSelectClause implements SelectClause {
     public String toClauseString() {
         throw new UnsupportedOperationException("不支持的生成表达式");
     }
-
-
 
 
 }

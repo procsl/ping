@@ -3,10 +3,7 @@ package cn.procsl.ping.boot.jpa.support.query;
 import cn.procsl.ping.boot.jpa.TestJpaApplication;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
-import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,6 +34,9 @@ public class ComposeQueryRepositoryTest {
     @Inject
     EntityManager em;
 
+    @Inject
+    MainRepository mainRepository;
+
     @Test
     public void queryProjections() {
 
@@ -62,14 +62,15 @@ public class ComposeQueryRepositoryTest {
 
         {
             log.info("JPQL查询开始");
-            String jpql = "select new cn.procsl.ping.boot.jpa.support.query.ProjectionDTO(e.id, null ) as aa, " +
-                " new cn.procsl.ping.boot.jpa.support.query.ProjectionDTO(1L , e.name ) as bb from MainEntity e " +
-                "inner join SubEntity as s on e.id = s.mainId where e.name like :name";
+            String jpql = "select e from MainEntity e " +
+                    "inner join SubEntity as s on e.id = s.mainId where e.name like :name";
             TypedQuery<ProjectionDTO> query = em.createQuery(jpql, ProjectionDTO.class);
             query.setParameter("name", "朝闻道_%");
             List<?> result = query.getResultList();
             log.info("JPQL查询完成: {}", result);
         }
+
+        MainEntity teser = mainRepository.findGenerated("test");
 
         ProjectionDTO project = new ProjectionDTO();
         project.setName("朝闻道%");

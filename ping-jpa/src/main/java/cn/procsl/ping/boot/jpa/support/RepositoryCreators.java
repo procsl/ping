@@ -10,7 +10,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Target(TYPE)
 @Retention(value = RUNTIME)
-public @interface RepositoryCreators {
+@interface RepositoryCreators {
 
     RepositoryCreator[] value();
 

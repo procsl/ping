@@ -36,8 +36,27 @@ final public class SimpleQueryStringBuilder implements QueryStringBuilder {
         len += this.addTo("from", from, this.from);
     }
 
+
+    int addTo(String name, @NonNull Clause string, List<String> contains) {
+        String clause = string.toClauseString().trim();
+        if (clause.isEmpty()) {
+            return 0;
+        }
+
+        if (clause.contains(",")) {
+            throw new IllegalArgumentException(name + "参数不应存在`,`");
+        }
+
+        if (contains.contains(clause)) {
+            throw new IllegalArgumentException(name + " exists: " + string);
+        }
+        contains.add(clause);
+        return clause.length() + 1;
+    }
+
+
     @Override
-    public String buildQueryString() {
+    public String buildQueryString(QueryClauseParser parse) {
 
         if (this.selects.isEmpty()) {
             throw new IllegalArgumentException("No select specified");
@@ -74,22 +93,4 @@ final public class SimpleQueryStringBuilder implements QueryStringBuilder {
         }
         return sb.toString().trim();
     }
-
-    int addTo(String name, @NonNull Clause string, List<String> contains) {
-        String clause = string.toClauseString().trim();
-        if (clause.isEmpty()) {
-            return 0;
-        }
-
-        if (clause.contains(",")) {
-            throw new IllegalArgumentException(name + "参数不应存在`,`");
-        }
-
-        if (contains.contains(clause)) {
-            throw new IllegalArgumentException(name + " exists: " + string);
-        }
-        contains.add(clause);
-        return clause.length() + 1;
-    }
-
 }

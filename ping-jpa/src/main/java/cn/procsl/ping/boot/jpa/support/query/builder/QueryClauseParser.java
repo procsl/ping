@@ -2,7 +2,7 @@ package cn.procsl.ping.boot.jpa.support.query.builder;
 
 import java.util.List;
 
-public interface QueryClauseParse {
+public interface QueryClauseParser {
 
     List<SelectClause> parseSelects();
 

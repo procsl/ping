@@ -1,8 +1,8 @@
-package cn.procsl.ping.boot.jpa.support.query.builder.parse;
+package cn.procsl.ping.boot.jpa.support.query.builder.parser;
 
 import java.lang.reflect.Field;
 
-class FieldSelectClause extends StringSelectClause {
+final class FieldSelectClause extends StringSelectClause {
 
     final Field field;
 
@@ -10,4 +10,5 @@ class FieldSelectClause extends StringSelectClause {
         super(index, name, field.getDeclaringClass());
         this.field = field;
     }
+
 }

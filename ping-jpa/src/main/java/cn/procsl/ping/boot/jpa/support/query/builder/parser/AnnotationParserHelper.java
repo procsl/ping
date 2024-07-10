@@ -1,21 +1,22 @@
-package cn.procsl.ping.boot.jpa.support.query.builder.parse;
+package cn.procsl.ping.boot.jpa.support.query.builder.parser;
 
 import cn.procsl.ping.boot.jpa.support.query.SelectFields;
 import cn.procsl.ping.boot.jpa.support.query.builder.SelectClause;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.annotation.AnnotationUtils;
 
-import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
 
-class SelectParser {
+final class AnnotationParserHelper {
 
 
-    public Constructor<?> parseMarkedConstructors(Class<?> clazz) {
+    public Constructor<?> parseMarkedConstructor(Class<?> clazz) {
 
         Constructor<?>[] constructors = clazz.getConstructors();
         Constructor<?> markConstructor = null;
@@ -35,7 +36,7 @@ class SelectParser {
     /**
      * 解析注解
      */
-    public SelectFields parseSelectFields(Class<? extends Serializable> clazz) {
+    public SelectFields parseSelectFields(Class<?> clazz) {
         SelectFields tmp = AnnotationUtils.findAnnotation(clazz, SelectFields.class);
         return getSelectFields(tmp);
     }
@@ -49,7 +50,61 @@ class SelectParser {
         return new DefaultSelectField(array);
     }
 
-    public List<SelectClause> parseClauses(Class<? extends Serializable> clazz, SelectFields tmp) {
+    public Method filterGetter(Method[] methods, String name) {
+        for (Method method : methods) {
+            boolean bool = this.filterGetter(method);
+            if (!bool) {
+                continue;
+            }
+            if (Objects.equals(getName(method), name)) {
+                return method;
+            }
+        }
+        return null;
+    }
+
+    private String getName(Method method) {
+        String name = method.getName();
+        if (name.startsWith("get")) {
+            name = name.replaceAll("^get", "");
+            return name.substring(0, 1).toLowerCase() + name.substring(1);
+        }
+
+        if (method.getReturnType() == boolean.class) {
+            name = method.getName().replaceAll("^is", "");
+            return name.substring(0, 1).toLowerCase() + name.substring(1);
+        }
+        return null;
+    }
+
+    public String getterName(Method method) {
+        boolean bool = this.filterGetter(method);
+        if (bool) {
+            return getName(method);
+        }
+        return null;
+    }
+
+    public boolean filterGetter(Method method) {
+        if (method.getParameterTypes().length != 0) {
+            return false;
+        }
+        if (!method.getName().startsWith("get") || !method.getName().startsWith("is")) {
+            return false;
+        }
+        if (method.getName().length() == 3) {
+            return false;
+        }
+        if (!Modifier.isPublic(method.getModifiers())) {
+            return false;
+        }
+        if (Modifier.isStatic(method.getModifiers())) {
+            return false;
+        }
+        return true;
+    }
+
+    public List<SelectClause> parseClauses(Class<?> clazz, SelectFields tmp) {
 
         String[] ff = tmp.fields();
         ArrayList<SelectClause> arr = new ArrayList<>(ff.length);
@@ -69,11 +124,6 @@ class SelectParser {
         }
         return arr;
     }
-
-
-//    public ArrayList<StringSelectClause> parseClauses(Class<? extends Serializable> clazz, SelectFields tmp) {
-//
-//    }
 
     /**
      * 从被标记的构造函数上解析
@@ -124,29 +174,17 @@ class SelectParser {
 
     private Executable getGetterByNameAndType(Class<?> declaringClass, String name, Class<?> type) {
         Method[] methods = declaringClass.getMethods();
-        for (Method method : methods) {
-            if (!method.getName().equals(name)) {
-                continue;
-            }
-            if (method.getParameterTypes().length != 0) {
-                continue;
-            }
-            if (!method.getName().startsWith("get")) {
-                continue;
-            }
-            if (!Modifier.isPublic(method.getModifiers())) {
-                continue;
-            }
-            if (Modifier.isStatic(method.getModifiers())) {
-                continue;
-            }
 
-            if (type != null) {
-                if (method.getReturnType().isAssignableFrom(type)) {
-                    return method;
-                }
-                continue;
-            }
+        Method method = this.filterGetter(methods, name);
+        if (method == null) {
+            return null;
+        }
+
+        if (type == null) {
+            return method;
+        }
+
+        if (method.getReturnType().isAssignableFrom(type)) {
             return method;
         }
         return null;
@@ -176,6 +214,14 @@ class SelectParser {
         return tmp;
     }
 
+    public <T> T createByElement(AnnotatedElement element, Class<? extends Annotation> clazz,
+                                 Function<AnnotatedElement, T> creator) {
+        Annotation join = AnnotationUtils.findAnnotation(element, clazz);
+        if (join != null) {
+            return creator.apply(element);
+        }
+        return null;
+    }
 
     @RequiredArgsConstructor
     static private class DefaultSelectField implements SelectFields {

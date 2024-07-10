@@ -3,30 +3,32 @@ package cn.procsl.ping.boot.jpa.support.query;
 import jakarta.persistence.Column;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.jpa.repository.Query;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 @Data
 @NoArgsConstructor
 @Projection(entity = MainEntity.class)
 public class ProjectionDTO implements Serializable {
 
-    @OrderBy(order = OrderBy.Sort.desc)
+    @OrderBy
     Long id;
 
-    @Where(predicate = Where.WherePredicate.like)
+    @Where(predicate = Where.Predicate.like)
     String name;
 
     String desc;
 
-//    @JoinOn
-//    SubProjection subProjection;
-//
-//    @JoinOn
-//    Collection<SubProjection> subProjections;
+    @Join
+    SubProjection subProjection;
+
+    @Join
+    Collection<SubProjection> subProjections;
 
 
-    @SelectFields
+    @SelectFields(fields = {"id", "name"})
     public ProjectionDTO(Long id, String name) {
         this.id = id;
         this.name = name;

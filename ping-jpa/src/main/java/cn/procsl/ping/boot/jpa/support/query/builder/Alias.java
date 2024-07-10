@@ -9,11 +9,5 @@ public interface Alias {
         return null;
     }
 
-    /**
-     * 获取原始名称
-     */
-    default String getOriginName() {
-        return null;
-    }
 
 }

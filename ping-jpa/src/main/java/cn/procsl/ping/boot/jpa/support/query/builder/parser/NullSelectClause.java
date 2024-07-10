@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.jpa.support.query.builder.parse;
+package cn.procsl.ping.boot.jpa.support.query.builder.parser;
 
 final public class NullSelectClause extends StringSelectClause {
     public NullSelectClause(int index) {

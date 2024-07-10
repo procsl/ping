@@ -1,8 +1,8 @@
-package cn.procsl.ping.boot.jpa.support.query.builder.parse;
+package cn.procsl.ping.boot.jpa.support.query.builder.parser;
 
 import java.lang.reflect.Executable;
 
-class GetterSelectClause extends StringSelectClause {
+final class GetterSelectClause extends StringSelectClause {
 
     final Executable executable;
 
