@@ -16,7 +16,7 @@ public @interface Where {
     /**
      * 大于, 小于, 等于, like等等
      */
-    Predicate predicate() default Predicate.equal;
+    Predicate predicate() default Predicate.EQUAL;
 
     /**
      * 查询条件组, 例如 (field1=XX or field2=YY) and (field3=XX or field4=YY)
@@ -32,6 +32,6 @@ public @interface Where {
     boolean required() default false;
 
     enum Predicate {
-        equal, like
+        EQUAL, LIKE
     }
 }

@@ -1,0 +1,6 @@
+package cn.procsl.ping.boot.jpa.support.query.ast;
+
+import cn.procsl.ping.boot.jpa.support.query.builder.Clause;
+
+public interface QueryGroupBy extends Clause {
+}

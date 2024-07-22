@@ -19,25 +19,15 @@ public @interface Join {
     /**
      * 对应的实体字段,如果不填,默认为ID
      */
-    String joinField() default "id";
+    String currentField() default "id";
 
     /**
      * 主表实体join字段, 如果不填默认为ID
      */
-    String targetField() default "id";
-
-    /**
-     * 关联的实体
-     */
-    Class<?> joinEntity() default Void.class;
+    String mainField() default "id";
 
     /**
      * 连接类型
      */
     JoinType joinType() default JoinType.INNER;
-
-    /**
-     * 别名
-     */
-    String alias() default "";
 }
