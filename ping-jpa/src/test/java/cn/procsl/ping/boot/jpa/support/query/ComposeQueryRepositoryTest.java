@@ -70,8 +70,6 @@ public class ComposeQueryRepositoryTest {
             log.info("JPQL查询完成: {}", result);
         }
 
-        MainEntity teser = mainRepository.findGenerated("test");
-
         ProjectionDTO project = new ProjectionDTO();
         project.setName("朝闻道%");
         Collection<ProjectionDTO> result = composeQueryRepository.query(project);
