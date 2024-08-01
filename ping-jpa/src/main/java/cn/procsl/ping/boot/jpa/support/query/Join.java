@@ -22,14 +22,11 @@ public @interface Join {
 
     String rightJoinField() default "id";
 
-    /**
-     * 连接类型
-     */
     JoinType joinType() default JoinType.INNER;
 
-    String left();
+    String fromAlias() default "";
 
-    String right();
+    Projection to();
 
 
     @Documented

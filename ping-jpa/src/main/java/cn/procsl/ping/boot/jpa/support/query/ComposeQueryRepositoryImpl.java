@@ -1,6 +1,9 @@
 package cn.procsl.ping.boot.jpa.support.query;
 
 import cn.procsl.ping.boot.jpa.support.query.builder.QueryBuilderParseAdapter;
+import cn.procsl.ping.boot.jpa.support.query.builder.QueryClauseParserImpl;
+import cn.procsl.ping.boot.jpa.support.query.builder.def.PojoDefParser;
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -34,7 +37,13 @@ public class ComposeQueryRepositoryImpl implements ComposeQueryRepository {
 
     @Override
     @SneakyThrows
-    public <T> List<T> query(T query) {
+    public <T> List<T> query(@Nonnull T query) {
+
+        Class<?> clazz = query.getClass();
+        PojoDefParser parser = new PojoDefParser(clazz);
+        QueryClauseParserImpl impl = new QueryClauseParserImpl(parser);
+        String queryString = this.adapter.buildQueryString(impl);
+        log.info("查询语句: {}", queryString);
         return null;
     }
 

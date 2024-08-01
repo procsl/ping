@@ -10,8 +10,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Target({FIELD})
 @Retention(value = RUNTIME)
-public @interface From {
+public @interface Ref {
 
-    String target();
+    String value();
 
 }

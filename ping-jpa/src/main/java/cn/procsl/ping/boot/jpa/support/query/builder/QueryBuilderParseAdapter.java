@@ -2,6 +2,7 @@ package cn.procsl.ping.boot.jpa.support.query.builder;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -14,10 +15,10 @@ public class QueryBuilderParseAdapter implements QueryStringBuilder {
         final SimpleQueryStringBuilder builder = new SimpleQueryStringBuilder();
 
         List<SelectClause> selects = parse.parseSelects();
-        List<Clause> from = parse.parseFrom();
-        List<Clause> where = parse.parseWhere();
-        List<Clause> group = parse.parseGroupBy();
-        List<Clause> order = parse.parseOrderBy();
+        List<Clause> from = new ArrayList<>(parse.parseFrom());
+        List<Clause> where = new ArrayList<>(parse.parseWhere());
+        List<Clause> group = new ArrayList<>(parse.parseGroupBy());
+        List<Clause> order = new ArrayList<>(parse.parseOrderBy());
 
         selects.sort(Comparator.comparingInt(Clause::order));
         from.sort(Comparator.comparingInt(Clause::order));

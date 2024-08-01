@@ -40,35 +40,35 @@ public class ComposeQueryRepositoryTest {
     @Test
     public void queryProjections() {
 
-        {
-            for (int i = 0; i < 100; i++) {
-                MainEntity entity = new MainEntity();
-                entity.setName("朝闻道_%s".formatted(i));
-                entity.setDesc("描述_%s".formatted(i));
-                jpaRepository.save(entity);
+//        {
+//            for (int i = 0; i < 100; i++) {
+//                MainEntity entity = new MainEntity();
+//                entity.setName("朝闻道_%s".formatted(i));
+//                entity.setDesc("描述_%s".formatted(i));
+//                jpaRepository.save(entity);
+//
+//                SubEntity sub = new SubEntity();
+//                sub.setMainId(entity.getId());
+//                sub.setDesc("sub desc_%s".formatted(i));
+//                sub.setName("sub name_%s".formatted(i));
+//
+//                SubEntity sub2 = new SubEntity();
+//                sub2.setMainId(entity.getId());
+//                sub2.setDesc("sub desc_%s".formatted(i + 1));
+//                sub2.setName("sub name_%s".formatted(i + 1));
+//            }
+//        }
+//        jpaRepository.flush();
 
-                SubEntity sub = new SubEntity();
-                sub.setMainId(entity.getId());
-                sub.setDesc("sub desc_%s".formatted(i));
-                sub.setName("sub name_%s".formatted(i));
-
-                SubEntity sub2 = new SubEntity();
-                sub2.setMainId(entity.getId());
-                sub2.setDesc("sub desc_%s".formatted(i + 1));
-                sub2.setName("sub name_%s".formatted(i + 1));
-            }
-        }
-        jpaRepository.flush();
-
-        {
-            log.info("JPQL查询开始");
-            String jpql = "select e from MainEntity e " +
-                    "inner join SubEntity as s on e.id = s.mainId where e.name like :name";
-            TypedQuery<ProjectionDTO> query = em.createQuery(jpql, ProjectionDTO.class);
-            query.setParameter("name", "朝闻道_%");
-            List<?> result = query.getResultList();
-            log.info("JPQL查询完成: {}", result);
-        }
+//        {
+//            log.info("JPQL查询开始");
+//            String jpql = "select e from MainEntity e " +
+//                    "inner join SubEntity as s on e.id = s.mainId where e.name like :name";
+//            TypedQuery<ProjectionDTO> query = em.createQuery(jpql, ProjectionDTO.class);
+//            query.setParameter("name", "朝闻道_%");
+//            List<?> result = query.getResultList();
+//            log.info("JPQL查询完成: {}", result);
+//        }
 
         ProjectionDTO project = new ProjectionDTO();
         project.setName("朝闻道%");
