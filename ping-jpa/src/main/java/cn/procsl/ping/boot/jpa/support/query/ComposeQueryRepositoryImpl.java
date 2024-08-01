@@ -1,7 +1,6 @@
 package cn.procsl.ping.boot.jpa.support.query;
 
 import cn.procsl.ping.boot.jpa.support.query.builder.QueryBuilderParseAdapter;
-import cn.procsl.ping.boot.jpa.support.query.builder.parser.AnnotationClauseParser;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -36,10 +35,6 @@ public class ComposeQueryRepositoryImpl implements ComposeQueryRepository {
     @Override
     @SneakyThrows
     public <T> List<T> query(T query) {
-        final AnnotationClauseParser parser = new AnnotationClauseParser(query.getClass());
-
-        String jpql = this.adapter.buildQueryString(parser);
-
         return null;
     }
 

@@ -20,7 +20,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Target(TYPE)
 @Retention(value = RUNTIME)
-@Repeatable(value = RepositoryCreators.class)
+@Repeatable(value = RepositoryCreator.RepositoryCreators.class)
 public @interface RepositoryCreator {
 
     Class<?>[] repositories() default {JpaRepository.class, JpaSpecificationExecutor.class};
@@ -28,4 +28,13 @@ public @interface RepositoryCreator {
     String repositoryName() default "";
 
     String packageName() default "";
+
+    @Documented
+    @Target(TYPE)
+    @Retention(value = RUNTIME)
+    @interface RepositoryCreators {
+
+        RepositoryCreator[] value();
+
+    }
 }

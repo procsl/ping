@@ -33,7 +33,9 @@ import static cn.procsl.ping.boot.jpa.support.query.Where.Predicate.LIKE;
  */
 @Data
 @NoArgsConstructor
-@Projection(entity = MainEntity.class)
+@Projection(entity = MainEntity.class, alias = "main")
+@Projection(entity = SubEntity.class, alias = "sub")
+@Join(left = "main", right = "sub")
 public class ProjectionDTO implements Serializable {
 
     @OrderBy
@@ -44,15 +46,12 @@ public class ProjectionDTO implements Serializable {
 
     String desc;
 
-    //  如果不是基本类型, 则使用 @Projection 注解标注实体
-    // @Join
-    @Join
+    @From(target = "sub")
     SubProjection subProjection;
 
-    //
     // 单独查询 select subProjections.* from SubEntity as subProjections where subProjections.main_id in (:ids)
     // 必须要包含 main_id字段, 用于内存组装
-    @Join
+    @From(target = "sub")
     Collection<SubProjection> subProjections;
 
 
