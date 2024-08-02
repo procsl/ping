@@ -12,5 +12,5 @@ public interface QueryClauseParser {
 
     List<Clause> parseGroupBy();
 
-    List<Clause> parseFrom();
+    List<FromClause> parseFrom();
 }

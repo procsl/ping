@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import lombok.NonNull;
 import org.springframework.core.annotation.AnnotationUtils;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -74,6 +75,21 @@ public class PojoDefParser implements PojoDef {
             clazz.add(type);
         }
         return names;
+    }
+
+    @Override
+    public List<Annotation> getAnnotations(Class<? extends Annotation> annotation) {
+        ArrayList<Annotation> list = new ArrayList<>();
+
+        AnnotatedElement[] ele = new AnnotatedElement[]{pojoType, stp, parentField};
+        for (AnnotatedElement element : ele) {
+            if (element == null) {
+                continue;
+            }
+            Annotation tmp = AnnotationUtils.findAnnotation(element, annotation);
+            list.add(tmp);
+        }
+        return list;
     }
 
     @Override

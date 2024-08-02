@@ -4,10 +4,8 @@ import cn.procsl.ping.boot.jpa.support.query.builder.def.*;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 final public class QueryClauseParserImpl implements QueryClauseParser {
@@ -27,6 +25,7 @@ final public class QueryClauseParserImpl implements QueryClauseParser {
 
         final List<SelectClause> selectClauses = new ArrayList<>();
         extracted(fields, selectClauses);
+
         return selectClauses;
     }
 
@@ -66,29 +65,26 @@ final public class QueryClauseParserImpl implements QueryClauseParser {
     }
 
     @Override
-    public List<Clause> parseFrom() {
-        ArrayList<Clause> entityClause = new ArrayList<>();
-        {
-            FromClauseImpl clause = new FromClauseImpl(this.pojoDef, 0);
-            entityClause.add(clause);
-        }
-
-        extractedPojo(this.pojoDef.getFields(), entityClause);
-        return entityClause.stream().distinct().toList();
+    public List<FromClause> parseFrom() {
+        ArrayList<FromClause> list = new ArrayList<>();
+        FromClauseImpl root = new FromClauseImpl(null, this.pojoDef, 0);
+        list.add(root);
+        extractedPojo(this.pojoDef.getFields(), pojoDef, list);
+        return list;
     }
 
-    private void extractedPojo(List<FieldDef> def, List<Clause> clauses) {
+    private void extractedPojo(List<FieldDef> def, PojoDef parent, List<FromClause> clauses) {
         for (FieldDef field : def) {
             PojoDef pp = field.accept(pojo, null);
             if (pp == null) {
                 continue;
             }
-            clauses.add(new FromClauseImpl(pp, clauses.size()));
+            clauses.add(new FromClauseImpl(parent, pp, clauses.size()));
             List<FieldDef> newFields = pp.getFields();
             if (newFields == null || newFields.isEmpty()) {
                 continue;
             }
-            this.extractedPojo(newFields, clauses);
+            this.extractedPojo(newFields, pp, clauses);
         }
     }
 
@@ -178,8 +174,9 @@ final public class QueryClauseParserImpl implements QueryClauseParser {
     }
 
     @RequiredArgsConstructor
-    private static class FromClauseImpl implements Clause, Alias {
-        private final PojoDef pojoDef;
+    private static class FromClauseImpl implements FromClause {
+        private final PojoDef parent;
+        private final PojoDef current;
         private final int index;
 
         @Override
@@ -194,7 +191,7 @@ final public class QueryClauseParserImpl implements QueryClauseParser {
 
         @Override
         public String toClauseString() {
-            return "%s as %s".formatted(pojoDef.getEntityClass().getName(), this.getAliasName());
+            return "%s as %s".formatted(current.getEntityClass().getName(), this.getAliasName());
         }
 
         @Override
@@ -204,7 +201,7 @@ final public class QueryClauseParserImpl implements QueryClauseParser {
 
         @Override
         public String getAliasName() {
-            return pojoDef.getEntityAlias();
+            return current.getEntityAlias();
         }
     }
 }
