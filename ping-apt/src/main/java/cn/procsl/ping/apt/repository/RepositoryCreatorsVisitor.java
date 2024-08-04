@@ -16,7 +16,7 @@ import java.util.Set;
 
 final class RepositoryCreatorsVisitor implements TargetElementProcessor {
 
-    final String repository_creators_class = "cn.procsl.ping.boot.jpa.support.RepositoryCreators";
+    final String repository_creators_class = "cn.procsl.ping.boot.jpa.support.RepositoryCreator$RepositoryCreators";
     final RepositoryCreatorVisitor repositoryCreatorsBuilder = new RepositoryCreatorVisitor();
     final SimpleElementVisitor<TypeElement, Object> visitor = SimpleElementVisitor.ofVisitType((e, s) -> e);
     final SimpleAnnotationValueVisitor<List<? extends AnnotationValue>, Object> av = SimpleAnnotationValueVisitor.ofVisitArray((e, s) -> e);
