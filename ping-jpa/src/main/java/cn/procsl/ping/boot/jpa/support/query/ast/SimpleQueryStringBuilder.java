@@ -10,7 +10,7 @@ final public class SimpleQueryStringBuilder implements QueryClause {
 
     private int len = 50;
     private final Map<String, SelectClause> selects = new HashMap<>();
-    private final List<String> from = new ArrayList<>();
+    private final List<FromClause> from = new ArrayList<>();
     private final List<String> wheres = new ArrayList<>();
     private final List<String> orderBy = new ArrayList<>();
     private final List<String> groupBy = new ArrayList<>();
@@ -26,16 +26,22 @@ final public class SimpleQueryStringBuilder implements QueryClause {
             throw new IllegalArgumentException("No from specified");
         }
 
+        Comparator<Order> comparing = Comparator.comparingInt(Order::getOrder);
+
         String selectString = this.selects.values().stream()
-            .sorted(Comparator.comparingInt(SelectClause::getOrder))
-            .map(Clause::toClauseString).collect(Collectors.joining(","));
-        String fromString = String.join(",", this.from);
+            .sorted(comparing)
+            .map(Clause::toClauseString).collect(Collectors.joining(",\n\t"));
+
+        String fromString = this.from.stream()
+            .sorted(comparing)
+            .map(Clause::toClauseString).collect(Collectors.joining(",\n\t"));
 
         StringBuilder sb = new StringBuilder(len);
-        sb.append("select ");
+        sb.append("select \n\t");
         sb.append(selectString);
-        sb.append(" from ");
+        sb.append("\nfrom \n\t");
         sb.append(fromString);
+        sb.append("\n");
         if (!this.wheres.isEmpty()) {
             sb.append(" where ");
             sb.append(String.join(",", this.wheres));
@@ -51,7 +57,7 @@ final public class SimpleQueryStringBuilder implements QueryClause {
             sb.append(String.join(",", this.orderBy));
         }
         if (len < sb.length()) {
-            log.warn("Query string 长度预估错误");
+//            log.warn("Query string 长度预估错误");
         }
         return sb.toString().trim();
     }
@@ -67,7 +73,7 @@ final public class SimpleQueryStringBuilder implements QueryClause {
 
     @Override
     public void addFromClause(FromClause fromClause) {
-
+        this.from.add(fromClause);
     }
 
     @Override

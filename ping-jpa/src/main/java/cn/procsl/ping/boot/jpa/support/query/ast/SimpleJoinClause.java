@@ -3,7 +3,7 @@ package cn.procsl.ping.boot.jpa.support.query.ast;
 import jakarta.persistence.criteria.JoinType;
 import lombok.Getter;
 
-public final class SimpleJoinItemClause implements JoinItemClause {
+public final class SimpleJoinClause implements FromClause {
 
     @Getter
     private final String joinFieldName;
@@ -11,17 +11,18 @@ public final class SimpleJoinItemClause implements JoinItemClause {
     @Getter
     private final FromClause fromClause;
 
+    @Getter
     private final JoinType joinType;
 
     private final String targetAlias;
 
     private final String targetFieldName;
 
-    public SimpleJoinItemClause(FromClause fromClause,
-                                String currentJoinFieldName,
-                                String targetAlias,
-                                String targetFieldName,
-                                JoinType joinType) {
+    public SimpleJoinClause(SimpleFromClause fromClause,
+                            String currentJoinFieldName,
+                            String targetAlias,
+                            String targetFieldName,
+                            JoinType joinType) {
         this.fromClause = fromClause;
         this.joinFieldName = currentJoinFieldName;
         this.targetAlias = targetAlias;
@@ -40,7 +41,9 @@ public final class SimpleJoinItemClause implements JoinItemClause {
     //            INNER JOIN table_d as d on c.id = d.id
     @Override
     public String toClauseString() {
-        return "%s.%s=%s.%s".formatted(this.targetAlias, this.targetFieldName, this.fromClause.getTableAlias(), this.joinFieldName);
+        String main = this.fromClause.toClauseString();
+        return "%s on %s.%s=%s.%s".formatted(main, this.targetAlias, this.targetFieldName,
+            this.fromClause.getTableAlias(), this.joinFieldName);
     }
 
     @Override
@@ -49,9 +52,7 @@ public final class SimpleJoinItemClause implements JoinItemClause {
     }
 
     @Override
-    public JoinType getJoinType() {
-        return this.joinType;
+    public String getTableAlias() {
+        return fromClause.getTableAlias();
     }
-
-
 }

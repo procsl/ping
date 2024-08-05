@@ -26,9 +26,9 @@ public final class SimpleFromClause implements FromClause {
         return this.toClauseString();
     }
 
-    @Override
-    public JoinItemClause toJoinOn(JoinType joinType, FromClause joinClause, String mainField, String targetField) {
-        return new SimpleJoinItemClause(this, mainField, joinClause.getTableAlias(), targetField, joinType);
+    public SimpleJoinClause createJoinFromTo(JoinType joinType, FromClause joinClause,
+                                             String mainField, String targetField) {
+        return new SimpleJoinClause(this, mainField, joinClause.getTableAlias(), targetField, joinType);
     }
 
 }
