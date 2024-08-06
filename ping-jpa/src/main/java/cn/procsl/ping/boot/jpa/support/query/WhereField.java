@@ -11,7 +11,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Target({TYPE, FIELD})
 @Retention(value = RUNTIME)
-public @interface Where {
+public @interface WhereField {
 
     /**
      * 大于, 小于, 等于, like等等

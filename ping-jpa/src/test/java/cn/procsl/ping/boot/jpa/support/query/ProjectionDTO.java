@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.util.Collection;
 
-import static cn.procsl.ping.boot.jpa.support.query.Where.Predicate.LIKE;
+import static cn.procsl.ping.boot.jpa.support.query.WhereField.Predicate.LIKE;
 
 /**
  * ```sql
@@ -34,22 +34,22 @@ import static cn.procsl.ping.boot.jpa.support.query.Where.Predicate.LIKE;
 @Data
 @NoArgsConstructor
 @Projection(entity = MainEntity.class, alias = "main")
-@Join(fromAlias = "main", to = @Projection(entity = SubEntity.class, alias = "sub"))
-@Join(fromAlias = "main", to = @Projection(entity = SubEntity.class, alias = "sub2"))
+@JoinField(fromAlias = "main", to = @Projection(entity = SubEntity.class, alias = "sub"))
+@JoinField(fromAlias = "main", to = @Projection(entity = SubEntity.class, alias = "sub2"))
 public class ProjectionDTO implements Serializable {
 
-    @OrderBy
+    @OrderByField
     Long id;
 
-    @Where(predicate = LIKE)
+    @WhereField(predicate = LIKE)
     String name;
 
     String desc;
 
-    @Ref(value = "sub")
+    @AliasRef(value = "sub")
     SubProjection subProjection;
 
-    @Ref(value = "sub2")
+    @AliasRef(value = "sub2")
     Collection<SubProjection> subProjections;
 
 

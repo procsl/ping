@@ -4,15 +4,13 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import static java.lang.annotation.ElementType.CONSTRUCTOR;
+import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Documented
-@Target({TYPE, CONSTRUCTOR})
+@Target({TYPE, FIELD})
 @Retention(value = RUNTIME)
-public @interface SelectFields {
-
-    String[] fields() default {};
+public @interface OrderByField {
 
 }
