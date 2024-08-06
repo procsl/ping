@@ -7,9 +7,9 @@ public interface QueryClause extends Clause {
 
     void addFromClause(FromClause fromClause);
 
-//    void addWhere();
+    void addWhereClause(WhereClause whereClause);
 
-//    void addOrderBy();
+    void addOrderBy(OrderByClause orderByClause);
 
 //    void addGroupBy();
 

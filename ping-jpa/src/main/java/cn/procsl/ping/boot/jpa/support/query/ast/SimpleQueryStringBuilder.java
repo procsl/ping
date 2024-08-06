@@ -11,8 +11,8 @@ final public class SimpleQueryStringBuilder implements QueryClause {
     private int len = 50;
     private final Map<String, SelectClause> selects = new HashMap<>();
     private final List<FromClause> from = new ArrayList<>();
-    private final List<String> wheres = new ArrayList<>();
-    private final List<String> orderBy = new ArrayList<>();
+    private final List<WhereClause> wheres = new ArrayList<>();
+    private final List<OrderByClause> orderBy = new ArrayList<>();
     private final List<String> groupBy = new ArrayList<>();
 
 
@@ -42,9 +42,14 @@ final public class SimpleQueryStringBuilder implements QueryClause {
         sb.append("\nfrom \n\t");
         sb.append(fromString);
         sb.append("\n");
+
         if (!this.wheres.isEmpty()) {
             sb.append(" where ");
-            sb.append(String.join(",", this.wheres));
+            this.wheres.sort(comparing);
+            String whereString = this.wheres.stream()
+                .sorted(comparing)
+                .map(Clause::toClauseString).collect(Collectors.joining(" "));
+            sb.append(whereString);
         }
 
         if (!this.groupBy.isEmpty()) {
@@ -54,18 +59,23 @@ final public class SimpleQueryStringBuilder implements QueryClause {
 
         if (!this.orderBy.isEmpty()) {
             sb.append(" order by ");
-            sb.append(String.join(",", this.orderBy));
+            this.orderBy.sort(comparing);
+            String orderString = this.wheres.stream()
+                .sorted(comparing)
+                .map(Clause::toClauseString).collect(Collectors.joining(" "));
+            sb.append(orderString);
         }
         if (len < sb.length()) {
 //            log.warn("Query string 长度预估错误");
         }
-        return sb.toString().trim();
+        return sb.toString();
     }
 
     @Override
     public void addSelectClause(SelectClause selectClause) {
         if (this.selects.containsKey(selectClause.getSelectFieldAlias())) {
-            throw new IllegalArgumentException(selectClause.getSelectFieldAlias() + " exists: " + selectClause.toClauseString());
+            throw new IllegalArgumentException(selectClause.getSelectFieldAlias() + " exists: "
+                + selectClause.toClauseString());
         }
 
         this.selects.put(selectClause.getSelectFieldAlias(), selectClause);
@@ -74,6 +84,16 @@ final public class SimpleQueryStringBuilder implements QueryClause {
     @Override
     public void addFromClause(FromClause fromClause) {
         this.from.add(fromClause);
+    }
+
+    @Override
+    public void addWhereClause(WhereClause whereClause) {
+        this.wheres.add(whereClause);
+    }
+
+    @Override
+    public void addOrderBy(OrderByClause orderByClause) {
+        this.orderBy.add(orderByClause);
     }
 
     @Override

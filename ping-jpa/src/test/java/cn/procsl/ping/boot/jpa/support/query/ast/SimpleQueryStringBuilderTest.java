@@ -107,18 +107,19 @@ public class SimpleQueryStringBuilderTest {
         String ANSI_RESET = "\u001B[0m";
         String ANSI_RED = "\u001B[31m";
         String ANSI_GREEN = "\u001B[32m";
+        String BOLD = "\u001B[1m";
         String BLUE = "\u001B[34m";
         String sql = builder.toClauseString();
-        sql = sql.replaceAll("select", ANSI_RED + "select" + ANSI_RESET);
-        sql = sql.replaceAll("as", ANSI_RED + "as" + ANSI_RESET);
-        sql = sql.replaceAll("from", ANSI_RED + "from" + ANSI_RESET);
-        sql = sql.replaceAll("inner", ANSI_RED + "inner" + ANSI_RESET);
-        sql = sql.replaceAll("left", ANSI_RED + "left" + ANSI_RESET);
-        sql = sql.replaceAll("join", ANSI_RED + "join" + ANSI_RESET);
-        sql = sql.replaceAll("=", ANSI_RED + "=" + ANSI_RESET);
-        sql = sql.replaceAll("on", ANSI_RED + "on" + ANSI_RESET);
-        sql = sql.replaceAll("\\(", ANSI_GREEN + "(" + ANSI_RESET);
-        sql = sql.replaceAll("\\)", ANSI_GREEN + ")" + BLUE);
+        sql = sql.replaceAll("select", ANSI_RED + BOLD + "select" + ANSI_RESET);
+        sql = sql.replaceAll("as", ANSI_RED + BOLD + "as" + ANSI_RESET);
+        sql = sql.replaceAll("from", ANSI_RED + BOLD + "from" + ANSI_RESET);
+        sql = sql.replaceAll("inner", ANSI_RED + BOLD + "inner" + ANSI_RESET);
+        sql = sql.replaceAll("left", ANSI_RED + BOLD + "left" + ANSI_RESET);
+        sql = sql.replaceAll("join", ANSI_RED + BOLD + "join" + ANSI_RESET);
+        sql = sql.replaceAll("=", ANSI_RED + BOLD + "=" + ANSI_RESET);
+        sql = sql.replaceAll("on", ANSI_RED + BOLD + "on" + ANSI_RESET);
+        sql = sql.replaceAll("\\(", ANSI_GREEN + BOLD + "(" + ANSI_RESET);
+        sql = sql.replaceAll("\\)", ANSI_GREEN + BOLD + ")" + BLUE);
         log.info("sql [\n{}\n]", sql);
     }
 
