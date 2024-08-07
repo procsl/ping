@@ -61,6 +61,10 @@ public class ProjectionDTO implements Serializable {
 
         String name;
 
+        ProjectionDTO projectionDTO;
+
+        MainEntity mainEntity;
+
         String desc;
     }
 
