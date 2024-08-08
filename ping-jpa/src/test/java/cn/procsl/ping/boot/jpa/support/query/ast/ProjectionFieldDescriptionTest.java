@@ -11,15 +11,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class ProjectionFieldDescriptionParserTest {
+class ProjectionFieldDescriptionTest {
 
-    private static final Logger log = LoggerFactory.getLogger(ProjectionFieldDescriptionParserTest.class);
+    private static final Logger log = LoggerFactory.getLogger(ProjectionFieldDescriptionTest.class);
 
     static class SampleProjection {
         @Setter
@@ -35,32 +34,32 @@ class ProjectionFieldDescriptionParserTest {
 
     @Test
     void testGetParentField() {
-        ProjectionFieldDescriptionParser parser = new ProjectionFieldDescriptionParser("name", SampleProjection.class);
+        ProjectionFieldDescription parser = new ProjectionFieldDescription("name", SampleProjection.class);
         assertEquals(Optional.empty(), parser.getParentField(), "Parent field should be empty");
     }
 
     @Test
     void testGetFieldName() {
-        ProjectionFieldDescriptionParser parser = new ProjectionFieldDescriptionParser("name", SampleProjection.class);
+        ProjectionFieldDescription parser = new ProjectionFieldDescription("name", SampleProjection.class);
         assertEquals("name", parser.getFieldName(), "Field name should be 'name'");
     }
 
     @Test
     void testGetType() {
-        ProjectionFieldDescriptionParser parser = new ProjectionFieldDescriptionParser("name", SampleProjection.class);
+        ProjectionFieldDescription parser = new ProjectionFieldDescription("name", SampleProjection.class);
         assertEquals(SampleProjection.class, parser.getType(), "Type should be SampleProjection.class");
     }
 
     @Test
     void testGetChildren() {
-        ProjectionFieldDescriptionParser parser = new ProjectionFieldDescriptionParser("name", SampleProjection.class);
+        ProjectionFieldDescription parser = new ProjectionFieldDescription("name", SampleProjection.class);
         List<FieldDescription> children = parser.getChildren();
         assertEquals(3, children.size(), "Should find 3 child fields");
     }
 
     @Test
     void testGetAnnotations() {
-        ProjectionFieldDescriptionParser parser = new ProjectionFieldDescriptionParser("name", SampleProjection.class);
+        ProjectionFieldDescription parser = new ProjectionFieldDescription("name", SampleProjection.class);
         Annotation[] annotations = SampleProjection.class.getAnnotations();
         List<Annotation> parserAnnotations = parser.getAnnotations();
 
@@ -71,7 +70,7 @@ class ProjectionFieldDescriptionParserTest {
     void print() throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
-        ProjectionFieldDescriptionParser parser = new ProjectionFieldDescriptionParser(null, ProjectionDTO.class);
+        ProjectionFieldDescription parser = new ProjectionFieldDescription(null, ProjectionDTO.class);
         String res = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(parser);
 
         res = getString(res, "(");

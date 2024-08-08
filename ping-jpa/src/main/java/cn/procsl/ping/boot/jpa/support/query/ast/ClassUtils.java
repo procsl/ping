@@ -1,7 +1,5 @@
 package cn.procsl.ping.boot.jpa.support.query.ast;
 
-import org.springframework.core.annotation.AnnotationUtils;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
@@ -9,7 +7,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
-public final class ClassUtils {
+final class ClassUtils {
 
     /**
      * 提取给定类中的所有 get 方法和 is 方法。

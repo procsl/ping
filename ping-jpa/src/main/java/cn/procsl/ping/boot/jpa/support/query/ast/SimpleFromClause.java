@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @RequiredArgsConstructor
-public final class SimpleFromClause implements FromClause {
+final class SimpleFromClause implements FromClause {
 
     private final Clause subClause;
 

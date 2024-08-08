@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
-class ComposeFieldDescription implements FieldDescription {
+final class ComposeFieldDescription implements FieldDescription {
 
     final FieldDescription compose;
 
@@ -39,7 +39,7 @@ class ComposeFieldDescription implements FieldDescription {
             this.compose = new ContainerFieldDescription(name, field, getter, mainType, parent);
             return;
         }
-        ProjectionFieldDescriptionParser tmp = new ProjectionFieldDescriptionParser(name, mainType, processed);
+        ProjectionFieldDescription tmp = new ProjectionFieldDescription(name, mainType, processed);
         tmp.setField(field);
         tmp.setGetter(getter);
         tmp.setParent(parent);

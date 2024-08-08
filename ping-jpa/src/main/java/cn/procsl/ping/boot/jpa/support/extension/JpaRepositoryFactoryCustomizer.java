@@ -35,7 +35,7 @@ public enum JpaRepositoryFactoryCustomizer implements RepositoryFactoryCustomize
     @Override
     public void customize(RepositoryFactorySupport repositoryFactory) {
         repositoryFactory.addRepositoryProxyPostProcessor((factory, repositoryInformation) ->
-                factory.addAdvice(new ExtensionMethodInterceptor(repositoryFactory, repositoryInformation)));
+            factory.addAdvice(new ExtensionMethodInterceptor(repositoryFactory, repositoryInformation)));
     }
 
     @RequiredArgsConstructor

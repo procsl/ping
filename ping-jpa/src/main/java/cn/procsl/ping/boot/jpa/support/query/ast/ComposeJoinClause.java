@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.function.Function;
 
 @RequiredArgsConstructor
-public final class ComposeJoinClause implements FromClause {
+final class ComposeJoinClause implements FromClause {
 
     final private FromClause baseFrom;
 

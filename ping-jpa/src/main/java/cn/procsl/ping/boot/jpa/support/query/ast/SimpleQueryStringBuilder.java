@@ -6,7 +6,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
-final public class SimpleQueryStringBuilder implements QueryClause {
+final class SimpleQueryStringBuilder implements QueryClause {
 
     private int len = 50;
     private final Map<String, SelectClause> selects = new HashMap<>();

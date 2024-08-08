@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public final class SimpleSelectClause implements SelectClause {
+final class SimpleSelectClause implements SelectClause {
 
     final private Clause subClause;
 

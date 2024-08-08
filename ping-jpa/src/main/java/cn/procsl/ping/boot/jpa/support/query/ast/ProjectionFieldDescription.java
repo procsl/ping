@@ -8,14 +8,14 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Function;
 
-public class ProjectionFieldDescriptionParser implements FieldDescription {
+final class ProjectionFieldDescription implements FieldDescription {
 
     private final String fieldName;
     private final Class<?> projectionClass;
     private final HashSet<String> processed;
     private final boolean finalNode;
 
-    public ProjectionFieldDescriptionParser(String fieldName, Class<?> projectionClass, HashSet<String> processed) {
+    public ProjectionFieldDescription(String fieldName, Class<?> projectionClass, HashSet<String> processed) {
         this.fieldName = fieldName;
         this.projectionClass = projectionClass;
         this.processed = processed;
@@ -23,7 +23,7 @@ public class ProjectionFieldDescriptionParser implements FieldDescription {
         this.processed.add(this.projectionClass.getName());
     }
 
-    public ProjectionFieldDescriptionParser(String fieldName, Class<?> projectionClass) {
+    public ProjectionFieldDescription(String fieldName, Class<?> projectionClass) {
         this(fieldName, projectionClass, new HashSet<>());
     }
 

@@ -3,7 +3,7 @@ package cn.procsl.ping.boot.jpa.support.query.ast;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public final class FragmentClause implements Clause {
+final class FragmentClause implements Clause {
 
     final String clauseString;
 
