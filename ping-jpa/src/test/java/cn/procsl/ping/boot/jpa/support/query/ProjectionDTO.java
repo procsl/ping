@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.util.Collection;
 
-import static cn.procsl.ping.boot.jpa.support.query.WhereField.Predicate.LIKE;
 
 /**
  * ```sql
@@ -41,7 +40,7 @@ public class ProjectionDTO implements Serializable {
     @OrderByField
     Long id;
 
-    @WhereField(predicate = LIKE)
+    @WhereField
     String name;
 
     String desc;

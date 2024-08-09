@@ -18,8 +18,8 @@ class ProjectionSearchRepositoryImpl implements ProjectionSearchRepository {
     public <T> List<T> search(@NonNull T query) {
         ProjectionFieldDescription projection = new ProjectionFieldDescription(query.getClass());
         QueryAnnotationParser parser = new QueryAnnotationParser(projection);
-        String sql = parser.toClauseString();
-        log.debug("生成的SQL语句为: {}", sql);
+//        String sql = parser.toClauseString();
+//        log.debug("生成的SQL语句为: {}", sql);
         return List.of();
     }
 
