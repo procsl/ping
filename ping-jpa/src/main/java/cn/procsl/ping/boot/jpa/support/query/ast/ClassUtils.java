@@ -1,11 +1,14 @@
 package cn.procsl.ping.boot.jpa.support.query.ast;
 
+import cn.procsl.ping.boot.jpa.support.query.Projection;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.stream.Collectors;
 
 final class ClassUtils {
 
@@ -171,6 +174,13 @@ final class ClassUtils {
             list.addAll(List.of(element.getAnnotations()));
         }
         return list;
+    }
+
+    @SuppressWarnings("all")
+    public static <T extends Annotation> List<T> filter(List<Annotation> annotations, Class<T> clazz) {
+        return annotations.stream().filter(item -> {
+            return clazz.isAssignableFrom(item.getClass()) || item.getClass().isAssignableFrom(clazz);
+        }).map((item) -> (T) item).toList();
     }
 
 }

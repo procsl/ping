@@ -10,7 +10,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Target({FIELD})
 @Retention(value = RUNTIME)
-public @interface AliasRef {
+public @interface ReferenceBy {
 
     String value();
 

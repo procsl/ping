@@ -5,10 +5,8 @@ import org.springframework.data.repository.NoRepositoryBean;
 import java.util.List;
 
 @NoRepositoryBean
-public interface ComposeQueryRepository {
+public interface ProjectionSearchRepository {
 
-    <T> List<T> queryProjections(T query);
-
-    <T> List<T> query(T query);
+    <T> List<T> search(T query);
 
 }

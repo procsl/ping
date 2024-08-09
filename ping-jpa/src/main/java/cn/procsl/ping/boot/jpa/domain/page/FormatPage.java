@@ -20,11 +20,11 @@ import java.util.function.Function;
  * @param <T>
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class FormatPage<T> implements Page<T> {
+public final class FormatPage<T> implements Page<T> {
 
     final Page<T> page;
 
-    protected List<T> content;
+    private List<T> content;
 
     public static <T> FormatPage<T> copy(Page<T> page) {
         if (page instanceof FormatPage) {

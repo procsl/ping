@@ -46,10 +46,10 @@ public class ProjectionDTO implements Serializable {
 
     String desc;
 
-    @AliasRef(value = "sub")
+    @ReferenceBy(value = "sub")
     SubProjection subProjection;
 
-    @AliasRef(value = "sub2")
+    @ReferenceBy(value = "sub2")
     Collection<SubProjection> subProjections;
 
 

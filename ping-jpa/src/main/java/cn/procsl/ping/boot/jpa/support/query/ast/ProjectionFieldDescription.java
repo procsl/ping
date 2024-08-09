@@ -27,6 +27,10 @@ final class ProjectionFieldDescription implements FieldDescription {
         this(fieldName, projectionClass, new HashSet<>());
     }
 
+    public ProjectionFieldDescription(Class<?> projectionClass) {
+        this(projectionClass.getSimpleName(), projectionClass, new HashSet<>());
+    }
+
     @Setter
     private Field field;
 

@@ -1,6 +1,7 @@
 package cn.procsl.ping.boot.jpa.support.query;
 
 import java.lang.annotation.Documented;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -11,13 +12,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Target({TYPE, FIELD})
 @Retention(value = RUNTIME)
+@Repeatable(value = WhereField.WhereFields.class)
 public @interface WhereField {
-
-    /**
-     * 大于, 小于, 等于, like等等
-     */
-    Predicate predicate() default Predicate.EQUAL;
-
     /**
      * 查询条件组, 例如 (field1=XX or field2=YY) and (field3=XX or field4=YY)
      * 其中 (field1=XX or field2=YY) 为一组
@@ -27,11 +23,22 @@ public @interface WhereField {
     String groupName() default "";
 
     /**
+     * 条件连接符
+     */
+    String condition() default "=";
+
+    /**
      * 是否强制作为条件查询, 该参数必须传递
      */
     boolean required() default false;
 
-    enum Predicate {
-        EQUAL, LIKE
+    @Documented
+    @Target(TYPE)
+    @Retention(value = RUNTIME)
+    @interface WhereFields {
+
+        WhereField[] value();
+
     }
+
 }
