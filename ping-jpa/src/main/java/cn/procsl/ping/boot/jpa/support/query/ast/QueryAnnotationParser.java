@@ -1,6 +1,5 @@
 package cn.procsl.ping.boot.jpa.support.query.ast;
 
-import cn.procsl.ping.boot.jpa.support.query.Projection;
 import lombok.RequiredArgsConstructor;
 
 import java.lang.annotation.Annotation;
@@ -15,12 +14,14 @@ final class QueryAnnotationParser {
 
 
     public Collection<SelectClause> getSelectClauses() {
+
         List<SelectClause> selectClauseList = new ArrayList<>();
-
         List<Annotation> annotations = this.description.getAnnotations();
-        List<Projection> projections = ClassUtils.filter(annotations, Projection.class);
+//        Projection projection = ClassUtils.createMargeAnnotation(Projection.class, annotations);
+//        Class<?> entity = projection.entity();
 
-        return null;
+
+        return selectClauseList;
     }
 
 }

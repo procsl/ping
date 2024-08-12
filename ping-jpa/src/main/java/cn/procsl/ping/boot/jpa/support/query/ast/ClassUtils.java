@@ -1,14 +1,8 @@
 package cn.procsl.ping.boot.jpa.support.query.ast;
 
-import cn.procsl.ping.boot.jpa.support.query.Projection;
-
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 final class ClassUtils {
 
@@ -181,6 +175,26 @@ final class ClassUtils {
         return annotations.stream().filter(item -> {
             return clazz.isAssignableFrom(item.getClass()) || item.getClass().isAssignableFrom(clazz);
         }).map((item) -> (T) item).toList();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends Annotation> T createMargeAnnotation(Class<T> clazz, List<Annotation> annotations) {
+        return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz}, new InnerInvocationHandler(annotations));
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends Annotation> T createMargeAnnotation(Class<T> clazz, T... element) {
+        List<T> filters = filter(List.of(element), clazz);
+        return filters.isEmpty() ? null : createMargeAnnotation(clazz, (List<Annotation>) filters);
+    }
+
+    private record InnerInvocationHandler(List<Annotation> annotations) implements InvocationHandler {
+
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            return null;
+        }
+
     }
 
 }
