@@ -3,6 +3,8 @@ package cn.procsl.ping.boot.jpa.support.query.ast;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 final class ClassUtils {
 
@@ -179,13 +181,29 @@ final class ClassUtils {
 
     @SuppressWarnings("unchecked")
     public static <T extends Annotation> T createMargeAnnotation(Class<T> clazz, List<Annotation> annotations) {
-        return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz}, new InnerInvocationHandler(annotations));
+        List<T> filters = filter(annotations, clazz);
+        if (filters.isEmpty()) {
+            return null;
+        }
+        return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz}, new InnerInvocationHandler((List<Annotation>) filters));
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends Annotation> T createMargeAnnotationOrDefault(Class<T> clazz, List<Annotation> annotations, Supplier<T> instance) {
+        T anno = createMargeAnnotation(clazz, annotations);
+        if (anno == null) {
+            return instance.get();
+        }
+        return anno;
     }
 
     @SuppressWarnings("unchecked")
     public static <T extends Annotation> T createMargeAnnotation(Class<T> clazz, T... element) {
         List<T> filters = filter(List.of(element), clazz);
-        return filters.isEmpty() ? null : createMargeAnnotation(clazz, (List<Annotation>) filters);
+        if (filters.isEmpty()) {
+            return null;
+        }
+        return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz}, new InnerInvocationHandler((List<Annotation>) filters));
     }
 
     private record InnerInvocationHandler(List<Annotation> annotations) implements InvocationHandler {
