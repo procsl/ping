@@ -1,0 +1,54 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>cn.procsl</groupId>
+    <artifactId>ping-forwarder</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+    <name>Ping-TCP转发</name>
+
+    <properties>
+        <java.version>21</java.version>
+        <compiler.version>${java.version}</compiler.version>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.compilerVersion>${java.version}</maven.compiler.compilerVersion>
+        <compiler.version>${java.version}</compiler.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <!-- 从 Spring Boot 导入依赖管理 -->
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>3.2.6</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-logging</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-core</artifactId>
+            <version>4.4.0</version>
+        </dependency>
+
+    </dependencies>
+
+</project>
