@@ -2,12 +2,18 @@ package cn.procsl.ping.boot.tcp.server;
 
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
-import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.*;
+import io.vertx.core.streams.ReadStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLEngineResult;
+import javax.net.ssl.SSLException;
+import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
 
 @Slf4j
 @RequiredArgsConstructor

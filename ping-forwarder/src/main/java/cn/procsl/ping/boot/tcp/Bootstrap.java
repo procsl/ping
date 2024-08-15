@@ -7,7 +7,7 @@ public class Bootstrap {
     public static void main(String[] args) {
         String targetHost = "127.0.0.1";
         int sourcePort = 10000;
-        int targetPort = 7777;
+        int targetPort = 8889;
         TcpPortForwardSever server = new TcpPortForwardSever(sourcePort, targetPort, targetHost);
         server.start();
     }
