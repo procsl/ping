@@ -79,7 +79,8 @@ final class HttpServletResponseEncryptWrapper extends HttpServletResponseWrapper
                 case b64 -> {
                     return Base64.getEncoder().wrap(out);
                 }
-                case null, default -> throw new CipherException("不支持的编码格式", null);
+//                case null,
+                     default -> throw new CipherException("不支持的编码格式", null);
             }
 
         } catch (RuntimeException e) {

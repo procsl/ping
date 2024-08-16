@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@Indexed
-@RestController
+//@Indexed
+//@RestController
 @RequiredArgsConstructor
 @Tag(name = "User", description = "用户管理模块接口")
 public class UserQueryController {
@@ -32,9 +32,10 @@ public class UserQueryController {
                                             @RequestParam(required = false, name = "account.state") AccountState state,
                                             @RequestParam(required = false) Gender gender) {
 
-        UserQuerySpec spec = UserQuerySpec.builder().state(state).account(account).name(name).gender(gender).build();
-        Page<UserRecord> result = this.userQueryRepository.findAll(spec, UserRecord.class, pageable);
-        return FormatPage.copy(result);
+//        UserQuerySpec spec = UserQuerySpec.builder().state(state).account(account).name(name).gender(gender).build();
+//        Page<UserRecord> result = this.userQueryRepository.findAll(spec, UserRecord.class, pageable);
+//        return FormatPage.copy(result);
+        return null;
     }
 
 }

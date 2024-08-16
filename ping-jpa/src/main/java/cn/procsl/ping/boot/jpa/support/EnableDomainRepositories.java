@@ -10,12 +10,11 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@EnableJpaRepositories(bootstrapMode = BootstrapMode.LAZY, repositoryBaseClass = JpaSpecificationExecutorWithProjectionImpl.class)
+@EnableJpaRepositories(bootstrapMode = BootstrapMode.LAZY)
 public @interface EnableDomainRepositories {
 
 
-    @AliasFor(annotation = EnableJpaRepositories.class, attribute = "basePackages")
-    String[] basePackages() default {};
+    @AliasFor(annotation = EnableJpaRepositories.class, attribute = "basePackages") String[] basePackages() default {};
 
 
 //    @AliasFor(annotation = EnableJpaRepositories.class, attribute = "repositoryFactoryBeanClass")

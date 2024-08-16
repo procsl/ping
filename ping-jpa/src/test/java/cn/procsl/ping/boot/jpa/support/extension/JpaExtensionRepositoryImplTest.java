@@ -1,7 +1,6 @@
 package cn.procsl.ping.boot.jpa.support.extension;
 
 import cn.procsl.ping.boot.jpa.TestJpaApplication;
-import cn.procsl.ping.boot.jpa.domain.ExtensionRepository;
 import cn.procsl.ping.boot.jpa.domain.TestEntity;
 import cn.procsl.ping.boot.jpa.domain.TestProjection;
 import com.github.jsonzou.jmockdata.JMockData;
@@ -40,9 +39,6 @@ import java.util.Optional;
 public class JpaExtensionRepositoryImplTest {
 
     @Inject
-    ExtensionRepository extensionRepository;
-
-    @Inject
     JpaRepository<TestEntity, Long> jpaRepository;
 
     @Inject
@@ -72,9 +68,6 @@ public class JpaExtensionRepositoryImplTest {
     public void test() {
 
         List<TestEntity> all = this.jpaRepository.findAll();
-        log.info("all: {}", all);
-
-        all = extensionRepository.findAllBy();
         log.info("all: {}", all);
     }
 

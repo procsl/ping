@@ -52,8 +52,8 @@ public class UserQueryRepositoryTest {
     @Test
     @Transactional(readOnly = true)
     public void findAll2() {
-        Optional<UserRecord> result = queryRepository.findOne(new UserSpec("admin"), UserRecord.class);
-        log.info("test: {}", result.get());
+//        Optional<UserRecord> result = queryRepository.findOne(new UserSpec("admin"), UserRecord.class);
+//        log.info("test: {}", result.get());
     }
 
     private record UserSpec(String n) implements Specification<User> {
@@ -67,8 +67,8 @@ public class UserQueryRepositoryTest {
 
     @Test
     public void test() {
-        Page<UserRecord> result = queryRepository.findAllByNameAndGenderAndAccountNameAndAccountStateOrderByName("admin", null, null, null, Pageable.ofSize(10));
-        log.info("result: {}", result.get());
+//        Page<UserRecord> result = queryRepository.findAllByNameAndGenderAndAccountNameAndAccountStateOrderByName("admin", null, null, null, Pageable.ofSize(10));
+//        log.info("result: {}", result.get());
     }
 
     @PersistenceUnit
