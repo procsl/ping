@@ -26,6 +26,9 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.1.0</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
                 <executions>
                     <execution>
                         <id>exec-npm-run-build</id>
@@ -60,7 +63,8 @@
                         </goals>
                         <configuration>
                             <!--输出文件路径-->
-                            <outputDirectory>${project.build.outputDirectory}/META-INF/resources/editor</outputDirectory>
+                            <outputDirectory>${project.build.outputDirectory}/META-INF/resources/editor
+                            </outputDirectory>
                             <resources>
                                 <resource>
                                     <!--前端代码地址-->

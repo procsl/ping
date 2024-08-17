@@ -30,10 +30,8 @@ public class UserController {
 
     final JpaRepository<User, Long> jpaRepository;
 
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     final JpaSpecificationExecutor<Role> jpaSpecificationExecutor;
 
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     final JpaRepository<Subject, Long> subjectLongJpaRepository;
 
     final PasswordEncoderService passwordEncoderService;

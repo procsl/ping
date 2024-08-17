@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
 
 
-    @GetMapping("/echo")
+    @GetMapping("/v1/echo")
     public String echo(String input) {
         return input;
     }

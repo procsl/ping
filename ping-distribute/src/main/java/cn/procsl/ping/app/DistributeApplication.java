@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import static cn.procsl.ping.app.DistributeApplication.*;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "cn.procsl.ping.app.query")
 @OpenAPIDefinition(info = @Info(title = "接口文档", version = "1.0", license = @License(url = apache, name = name), description = desc))
 public class DistributeApplication {
 

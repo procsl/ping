@@ -74,14 +74,13 @@
             <scope>test</scope>
         </dependency>
 
-    </dependencies>
-    <repositories>
-        <repository>
-            <id>maven_central</id>
-            <name>Maven Central</name>
-            <url>https://repo.maven.apache.org/maven2/</url>
-        </repository>
-    </repositories>
+        <dependency>
+            <groupId>com.squareup</groupId>
+            <artifactId>javapoet</artifactId>
+            <version>1.13.0</version>
+            <scope>provided</scope>
+        </dependency>
 
+    </dependencies>
 
 </project>

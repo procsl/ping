@@ -38,11 +38,11 @@ public class SystemAutoConfiguration implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new AuthenticateInterceptor(systemConfigureProperties.getAuthenticatesPrefix()))
-                .excludePathPatterns(PUBLIC_STATIC_RESOURCES).addPathPatterns("/**");
+            .excludePathPatterns(PUBLIC_STATIC_RESOURCES).addPathPatterns("/**");
     }
 
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @EnableDomainRepositories(basePackages = "cn.procsl.ping.boot.system.query")
     public static class DomainRepositoryConfigurer {
 

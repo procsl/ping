@@ -7,7 +7,8 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
-        <version>3.2.8</version>
+        <version>3.3.2</version>
+        <relativePath/>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -17,7 +18,7 @@
 
     <properties>
         <liquibase.version>4.15.0</liquibase.version>
-        <version>1.0.0</version>
+        <ping.version>1.0.0</ping.version>
         <java.version>21</java.version>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven.compiler.source>${java.version}</maven.compiler.source>
@@ -37,13 +38,13 @@
         <dependency>
             <groupId>cn.procsl</groupId>
             <artifactId>ping-product</artifactId>
-            <version>1.0.0</version>
+            <version>${ping.version}</version>
         </dependency>
 
         <dependency>
             <groupId>cn.procsl</groupId>
             <artifactId>ping-system</artifactId>
-            <version>1.0.0</version>
+            <version>${ping.version}</version>
         </dependency>
 
         <dependency>
@@ -55,6 +56,24 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-properties-migrator</artifactId>
             <scope>runtime</scope>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
@@ -98,9 +117,49 @@
         <plugins>
 
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <generatedSourcesDirectory>
+                        ${project.build.directory}/generated-sources/java
+                    </generatedSourcesDirectory>
+                    <compilerVersion>${compiler.version}</compilerVersion>
+
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+
+                        <path>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-configuration-processor</artifactId>
+                            <version>${project.version}</version>
+                        </path>
+
+                        <path>
+                            <groupId>org.springframework</groupId>
+                            <artifactId>spring-context-indexer</artifactId>
+                            <version>${spring-framework.version}</version>
+                        </path>
+
+                    </annotationProcessorPaths>
+
+                    <verbose>true</verbose>
+                    <showWarnings>true</showWarnings>
+                    <!--保留参数名称-->
+                    <maxmem>2048m</maxmem>
+                    <compilerArgs>
+                        <arg>-g</arg>
+                        <arg>-Xlint:unchecked</arg>
+                        <arg>-Xlint:deprecation</arg>
+                        <arg>-parameters</arg>
+                        <arg>-proc:full</arg>
+                    </compilerArgs>
+                </configuration>
             </plugin>
+
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -122,7 +181,25 @@
                     </nonFilteredFileExtensions>
                 </configuration>
             </plugin>
+
+
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>cn.procsl.ping.app.DistributeApplication</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
+
     </build>
 
     <profiles>
@@ -334,16 +411,28 @@
                 <plugins>
 
                     <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <configuration>
+                            <mainClass>cn.procsl.ping.app.DistributeApplication</mainClass>
+                        </configuration>
+                    </plugin>
+
+                    <plugin>
                         <groupId>org.graalvm.buildtools</groupId>
                         <artifactId>native-maven-plugin</artifactId>
                         <configuration>
-                            <verbose>true</verbose>
                             <mainClass>cn.procsl.ping.app.DistributeApplication</mainClass>
                             <buildArgs>
+                                --no-fallback
                                 --initialize-at-build-time=ch.qos.logback
+                                --trace-object-instantiation=ch.qos.logback.classic.Logger
                                 --report-unsupported-elements-at-runtime
                                 --allow-incomplete-classpath
                                 -H:+ReportExceptionStackTraces
+                                -H:EnableURLProtocols=http
+                                -H:EnableURLProtocols=https
+                                --enable-url-protocols=http
                             </buildArgs>
                         </configuration>
                         <executions>
