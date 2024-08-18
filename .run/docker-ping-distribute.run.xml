@@ -1,0 +1,21 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="docker-ping-distribute" type="docker-deploy" factoryName="dockerfile" server-name="docker">
+    <deployment type="dockerfile">
+      <settings>
+        <option name="imageTag" value="1.0.0" />
+        <option name="containerName" value="ping-distribute" />
+        <option name="portBindings">
+          <list>
+            <DockerPortBindingImpl>
+              <option name="containerPort" value="10000" />
+              <option name="hostPort" value="10000" />
+            </DockerPortBindingImpl>
+          </list>
+        </option>
+        <option name="commandLineOptions" value="--network bridge" />
+        <option name="sourceFilePath" value="Dockerfile" />
+      </settings>
+    </deployment>
+    <method v="2" />
+  </configuration>
+</component>
