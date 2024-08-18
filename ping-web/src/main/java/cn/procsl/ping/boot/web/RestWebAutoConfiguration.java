@@ -17,6 +17,7 @@ import org.springframework.beans.factory.BeanNotOfRequiredTypeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -27,6 +28,9 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigRegistry;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.format.FormatterRegistry;
@@ -34,6 +38,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 /**
@@ -45,21 +50,21 @@ import java.util.List;
 @AutoConfiguration(before = ErrorMvcAutoConfiguration.class)
 @ConditionalOnMissingBean(RestWebAutoConfiguration.class)
 @ComponentScan(basePackages = "cn.procsl.ping.boot.web")
-public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProcessor {
+public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProcessor, ApplicationContextInitializer<ConfigurableApplicationContext> {
 
     final ApplicationContext applicationContext;
 
     public final static String[] PUBLIC_STATIC_RESOURCES = new String[]{
-            "**.css",
-            "**.html",
-            "**.js",
-            "**.jpeg",
-            "**.jpg",
-            "**.png",
-            "**.gif",
-            "**.pdf",
-            "**.xlsx",
-            "**.xls",
+        "**.css",
+        "**.html",
+        "**.js",
+        "**.jpeg",
+        "**.jpg",
+        "**.png",
+        "**.gif",
+        "**.pdf",
+        "**.xlsx",
+        "**.xls",
     };
 
 
@@ -68,12 +73,12 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProce
     }
 
     @Bean("cipherFilter")
-    public FilterRegistrationBean<CipherFilter> accessLoggerFilterFilterRegistrationBean(@Autowired CipherLockupService lockupService){
+    public FilterRegistrationBean<CipherFilter> accessLoggerFilterFilterRegistrationBean(@Autowired CipherLockupService lockupService) {
         FilterRegistrationBean<CipherFilter> filter = new FilterRegistrationBean<>();
         filter.setFilter(new CipherFilter(lockupService));
         filter.setName("cipherFilter");
         filter.setOrder(Integer.MIN_VALUE + 1);
-        filter.setUrlPatterns(List.of("/*"));
+        filter.setUrlPatterns(List.of("/v1/*", "/s/*", "/a/*"));
         return filter;
     }
 
@@ -152,5 +157,20 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProce
         return bean;
     }
 
+
+    @Override
+    public void initialize(@Nonnull ConfigurableApplicationContext context) {
+        if (!(context instanceof AnnotationConfigRegistry reg)) {
+            log.warn("未注册Admin Server, Context类错误");
+            return;
+        }
+
+        try {
+            Class<?> clazz = Class.forName("de.codecentric.boot.admin.server.config.AdminServerMarkerConfiguration");
+            reg.register(clazz);
+        } catch (ClassNotFoundException e) {
+            log.debug("未注册Admin Server, 找不到配置类");
+        }
+    }
 
 }

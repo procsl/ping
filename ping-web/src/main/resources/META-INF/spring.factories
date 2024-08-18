@@ -1,1 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=cn.procsl.ping.boot.web.RestWebAutoConfiguration
+org.springframework.context.ApplicationContextInitializer=cn.procsl.ping.boot.web.RestWebAutoConfiguration
