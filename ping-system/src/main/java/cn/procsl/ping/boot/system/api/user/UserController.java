@@ -38,7 +38,7 @@ public class UserController {
 
     final RoleSettingService roleSettingService;
 
-    final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
+    final UserMapper userMapper;
 
     @Operation(summary = "创建用户")
     @PostMapping(path = "/v1/system/users")
@@ -47,7 +47,7 @@ public class UserController {
     public void create(@Validated @RequestBody RegisterDTO register) {
         String password = register.getPassword();
         User user = User.creator(register.getNickName(), register.getAccount(),
-                passwordEncoderService.encode(password));
+            passwordEncoderService.encode(password));
         this.jpaRepository.save(user);
 
         Collection<String> roleNames = this.roleSettingService.getDefaultRoles();
@@ -56,7 +56,7 @@ public class UserController {
             Subject subject = new Subject(user.getId());
 
             List<Role> roles = this.jpaSpecificationExecutor.findAll(
-                    (root, query, criteriaBuilder) -> root.get("name").in(roleNames));
+                (root, query, criteriaBuilder) -> root.get("name").in(roleNames));
             subject.grant(roles);
             subjectLongJpaRepository.save(subject);
         }

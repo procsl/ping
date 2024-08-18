@@ -1,14 +1,19 @@
 package cn.procsl.ping.app;
 
+import cn.procsl.ping.app.hint.HttpServletRequestRuntimeHint;
+import de.codecentric.boot.admin.server.config.EnableAdminServer;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.info.License;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ImportRuntimeHints;
 
 import static cn.procsl.ping.app.DistributeApplication.*;
 
-@SpringBootApplication(scanBasePackages = "cn.procsl.ping.app.query")
+@EnableAdminServer
+@ImportRuntimeHints(value = {HttpServletRequestRuntimeHint.class})
+@SpringBootApplication(scanBasePackages = "cn.procsl.ping.app.query", proxyBeanMethods = false)
 @OpenAPIDefinition(info = @Info(title = "接口文档", version = "1.0", license = @License(url = apache, name = name), description = desc))
 public class DistributeApplication {
 

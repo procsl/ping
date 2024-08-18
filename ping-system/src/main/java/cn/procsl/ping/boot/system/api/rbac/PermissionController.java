@@ -28,7 +28,7 @@ public class PermissionController {
 
     final JpaRepository<Permission, Long> permissionJpaRepository;
 
-    final MapStructMapper mapStructMapper = Mappers.getMapper(MapStructMapper.class);
+    final MapStructMapper mapStructMapper;
 
     @PostMapping(path = "/v1/system/permissions")
     @Operation(summary = "创建权限")

@@ -42,7 +42,7 @@ public class AuthenticateController {
 
     final JpaSpecificationExecutor<User> userJpaSpecificationExecutor;
 
-    final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
+    final UserMapper userMapper;
 
     final AuthenticateService handler = new AuthenticateService();
 

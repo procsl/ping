@@ -26,7 +26,7 @@ public class ComponentController implements InitializingBean {
 
     final ComponentProjectionRepository repository;
 
-    final ComponentMapper componentMapper = Mappers.getMapper(ComponentMapper.class);
+    final ComponentMapper componentMapper;
 
     private String ui;
 

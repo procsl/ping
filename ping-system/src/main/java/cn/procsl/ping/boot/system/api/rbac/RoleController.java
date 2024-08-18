@@ -34,7 +34,7 @@ public class RoleController {
 
     final JpaRepository<Permission, Long> permissionJpaRepository;
 
-    final MapStructMapper mapStructMapper = Mappers.getMapper(MapStructMapper.class);
+    final MapStructMapper mapStructMapper;
 
 
     @Operation(summary = "创建角色")

@@ -5,7 +5,7 @@ import cn.procsl.ping.boot.system.domain.rbac.Role;
 import org.mapstruct.Mapper;
 
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface MapStructMapper {
 
     RoleVO mapper(Role role);

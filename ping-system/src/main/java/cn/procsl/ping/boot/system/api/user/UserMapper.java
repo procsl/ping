@@ -5,7 +5,7 @@ import cn.procsl.ping.boot.system.domain.user.User;
 import org.mapstruct.Mapper;
 
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface UserMapper {
 
     AuthenticateVO mapper(Authenticate authenticate);
