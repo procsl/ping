@@ -168,11 +168,6 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <configuration>
                     <encoding>utf-8</encoding>
-                    <delimiters>
-                        <delimiter>@</delimiter>
-                    </delimiters>
-                    <!-- 解决Spring boot引起的profile失效问题 -->
-                    <useDefaultDelimiters>false</useDefaultDelimiters>
                     <!-- 过滤后缀为p12、pem、pfx的证书文件 -->
                     <nonFilteredFileExtensions>
                         <nonFilteredFileExtension>p12</nonFilteredFileExtension>
@@ -184,6 +179,23 @@
                 </configuration>
             </plugin>
 
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <name>project.activeProfiles</name>
+                            <propertiyName>spring.profiles.active</propertiyName>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -419,7 +431,7 @@
                             <buildArgs>
                                 --no-fallback
                                 -Ob
-<!--                                -H:+DashboardAll-->
+                                <!--                                -H:+DashboardAll-->
                                 -H:+BuildReport
                                 --initialize-at-build-time=ch.qos.logback
                                 --trace-object-instantiation=ch.qos.logback.classic.Logger
