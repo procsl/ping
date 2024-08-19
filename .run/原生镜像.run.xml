@@ -1,7 +1,26 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="原生镜像" type="MavenRunConfiguration" factoryName="Maven">
     <MavenSettings>
-      <option name="myGeneralSettings" />
+      <option name="myGeneralSettings">
+        <MavenGeneralSettings>
+          <option name="alwaysUpdateSnapshots" value="false" />
+          <option name="checksumPolicy" value="NOT_SET" />
+          <option name="customMavenHome" />
+          <option name="emulateTerminal" value="false" />
+          <option name="failureBehavior" value="NOT_SET" />
+          <option name="localRepository" value="" />
+          <option name="mavenHome" value="使用 Maven 包装器" />
+          <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
+          <option name="nonRecursive" value="false" />
+          <option name="outputLevel" value="DEBUG" />
+          <option name="printErrorStackTraces" value="false" />
+          <option name="showDialogWithAdvancedSettings" value="false" />
+          <option name="threads" />
+          <option name="useMavenConfig" value="true" />
+          <option name="userSettingsFile" value="$USER_HOME$/.m2/settings.xml" />
+          <option name="workOffline" value="false" />
+        </MavenGeneralSettings>
+      </option>
       <option name="myRunnerSettings">
         <MavenRunnerSettings>
           <option name="delegateBuildToMaven" value="false" />
@@ -17,7 +36,7 @@
           <option name="passParentEnv" value="true" />
           <option name="runMavenInBackground" value="true" />
           <option name="skipTests" value="true" />
-          <option name="vmOptions" value="-Dspring.profiles.active=native,openapi,h2,monitor" />
+          <option name="vmOptions" value="-Dfile.encoding=UTF-8 -Dspring.profiles.active=native,openapi,h2,monitor" />
         </MavenRunnerSettings>
       </option>
       <option name="myRunnerParameters">

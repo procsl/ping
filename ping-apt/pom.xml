@@ -78,6 +78,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
+                    <release>${java.version}</release>
                     <generatedSourcesDirectory>
                         ${project.build.directory}/generated-sources/java
                     </generatedSourcesDirectory>
