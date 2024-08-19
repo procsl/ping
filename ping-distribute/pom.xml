@@ -418,8 +418,7 @@
                             <mainClass>cn.procsl.ping.app.DistributeApplication</mainClass>
                             <buildArgs>
                                 --no-fallback
-                                --pgo=ping-distribute.iprof
-<!--                                -Ob-->
+                                -Ob
                                 -H:+DashboardAll
                                 -H:+BuildReport
                                 --initialize-at-build-time=ch.qos.logback

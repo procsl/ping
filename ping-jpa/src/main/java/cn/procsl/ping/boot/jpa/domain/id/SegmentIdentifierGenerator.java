@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 @Slf4j
@@ -22,6 +23,7 @@ public class SegmentIdentifierGenerator implements IdentifierGenerator<Long> {
 
 
     final ConcurrentHashMap<String, SegmentLock> map = new ConcurrentHashMap<>();
+
 
     final IdentifierSegmentRepository repository;
 
@@ -82,7 +84,7 @@ public class SegmentIdentifierGenerator implements IdentifierGenerator<Long> {
         };
 
         // 不存在时调用回调函数
-        this.map.computeIfPresent(this.name, (v, o) -> new SegmentLock(this.segmentSize, supplier));
+        this.map.computeIfAbsent(this.name, v -> new SegmentLock(this.segmentSize, supplier));
         return this.map.get(this.name).nextValue();
     }
 
@@ -108,6 +110,7 @@ public class SegmentIdentifierGenerator implements IdentifierGenerator<Long> {
     private static class SegmentLock {
         final int segmentSize;
         final Supplier<Long> supplier;
+        private final ReentrantLock lock = new ReentrantLock();
         final AtomicReference<Segment> reference = new AtomicReference<>();
 
         public SegmentLock(int segmentSize, Supplier<Long> supplier) {
@@ -123,7 +126,9 @@ public class SegmentIdentifierGenerator implements IdentifierGenerator<Long> {
                 return nextId;
             }
 
-            synchronized (this) {
+            // TODO
+            lock.lock();
+            try {
                 nextId = this.reference.get().nextId();
                 if (nextId != null) {
                     return nextId;
@@ -132,6 +137,8 @@ public class SegmentIdentifierGenerator implements IdentifierGenerator<Long> {
                 Long startValue = supplier.get();
                 Segment seg = new Segment(startValue, segmentSize + startValue);
                 this.reference.set(seg);
+            } finally {
+                lock.unlock();
             }
 
             nextId = this.reference.get().nextId();
