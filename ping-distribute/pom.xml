@@ -419,7 +419,10 @@
                             <buildArgs>
                                 --no-fallback
                                 -Ob
-<!--                                -H:+DashboardAll-->
+                                <!-- -H:+DashboardAll -->
+                                --enable-sbom
+                                <!--                                -march=native-->
+                                <!--                                -march=list-->
                                 -H:+BuildReport
                                 --initialize-at-build-time=ch.qos.logback
                                 --trace-object-instantiation=ch.qos.logback.classic.Logger
