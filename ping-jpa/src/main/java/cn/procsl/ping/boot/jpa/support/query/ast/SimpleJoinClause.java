@@ -18,7 +18,7 @@ final class SimpleJoinClause implements FromClause {
 
     private final String targetFieldName;
 
-    public SimpleJoinClause(SimpleFromClause fromClause,
+    public SimpleJoinClause(FromClause fromClause,
                             String currentJoinFieldName,
                             String targetAlias,
                             String targetFieldName,

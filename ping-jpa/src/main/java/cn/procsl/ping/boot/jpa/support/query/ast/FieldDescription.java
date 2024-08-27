@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * 解析一个pojo对象, 解析字段与get方法, 并返回子节点
@@ -32,4 +33,13 @@ public interface FieldDescription {
     List<FieldDescription> getChildren();
 
     List<Annotation> getAnnotations();
+
+    default <T extends Annotation> T findMargeAnnotationOrDefault(Class<T> clazz, Supplier<T> instance) {
+        return ClassUtils.createMargeAnnotationOrDefault(clazz, this.getAnnotations(), instance);
+    }
+
+    default <T extends Annotation> T findMargeAnnotation(Class<T> clazz) {
+        return ClassUtils.createMargeAnnotationOrDefault(clazz, this.getAnnotations(), () -> null);
+    }
+
 }
