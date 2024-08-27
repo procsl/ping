@@ -1,14 +1,8 @@
 package cn.procsl.ping.boot.jpa.domain.id;
 
-import cn.procsl.ping.boot.common.utils.IdentifierGenerator;
 import lombok.Builder;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -19,11 +13,9 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 @Slf4j
-public class SegmentIdentifierGenerator implements IdentifierGenerator<Long> {
-
+public class SegmentIdentifierGenerator {
 
     final ConcurrentHashMap<String, SegmentLock> map = new ConcurrentHashMap<>();
-
 
     final IdentifierSegmentRepository repository;
 
@@ -31,17 +23,14 @@ public class SegmentIdentifierGenerator implements IdentifierGenerator<Long> {
 
     final int retryTimes;
 
-    final String name;
-
     final long initValue;
-
 
     @Builder
     private SegmentIdentifierGenerator(@NonNull IdentifierSegmentRepository repository,
-                                       int segmentSize, int retryTimes, @NonNull String name, long initValue) {
+                                       int segmentSize, int retryTimes, long initValue) {
 
         if (segmentSize <= 0) {
-            throw new IllegalArgumentException("segmentSize must be greater than 0");
+            throw new IllegalArgumentException("segment size must be greater than 0");
         }
 
         if (initValue < 0) {
@@ -49,24 +38,18 @@ public class SegmentIdentifierGenerator implements IdentifierGenerator<Long> {
         }
 
         if (retryTimes <= 0) {
-            throw new IllegalArgumentException("retryTimes must be greater than 0");
+            throw new IllegalArgumentException("retry times must be greater than 0");
         }
 
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("name must not be empty");
-        }
-
-        this.name = name;
         this.repository = repository;
         this.segmentSize = segmentSize;
         this.initValue = initValue;
         this.retryTimes = retryTimes;
     }
 
-    @Override
-    public Long nextId() {
+    public Long nextId(String name) {
 
-        SegmentLock current = this.map.get(this.name);
+        SegmentLock current = this.map.get(name);
         if (current != null) {
             return current.nextValue();
         }
@@ -74,7 +57,7 @@ public class SegmentIdentifierGenerator implements IdentifierGenerator<Long> {
         // ID段回调
         Supplier<Long> supplier = () -> {
             for (int i = 0; i < this.retryTimes; i++) {
-                Long next = this.nextSegmentValue(this.name, this.segmentSize, this.initValue);
+                Long next = this.nextSegmentValue(name, this.segmentSize, this.initValue);
                 if (next == null) {
                     continue;
                 }
@@ -84,20 +67,21 @@ public class SegmentIdentifierGenerator implements IdentifierGenerator<Long> {
         };
 
         // 不存在时调用回调函数
-        this.map.computeIfAbsent(this.name, v -> new SegmentLock(this.segmentSize, supplier));
-        return this.map.get(this.name).nextValue();
+        this.map.computeIfAbsent(name, v -> new SegmentLock(this.segmentSize, supplier));
+        return this.map.get(name).nextValue();
     }
 
-    private static class Segment {
+    private final static class Segment {
         final private AtomicLong currentValue;
         final private long maxValue;
+
 
         public Segment(Long currentValue, long maxValue) {
             this.currentValue = new AtomicLong(currentValue);
             this.maxValue = maxValue;
         }
 
-        protected Long nextId() {
+        public Long nextId() {
             long current = currentValue.getAndIncrement();
             if (current < maxValue) {
                 return current;
@@ -108,15 +92,17 @@ public class SegmentIdentifierGenerator implements IdentifierGenerator<Long> {
     }
 
     private static class SegmentLock {
-        final int segmentSize;
-        final Supplier<Long> supplier;
+        private final int segmentSize;
+        private final Supplier<Long> supplier;
         private final ReentrantLock lock = new ReentrantLock();
-        final AtomicReference<Segment> reference = new AtomicReference<>();
+        private final AtomicReference<Segment> reference = new AtomicReference<>();
+
+        final static Segment empty = new Segment(0L, 0);
 
         public SegmentLock(int segmentSize, Supplier<Long> supplier) {
             this.segmentSize = segmentSize;
             this.supplier = supplier;
-            this.reference.set(new Segment(0L, 0));
+            this.reference.set(empty);
         }
 
         protected Long nextValue() {

@@ -7,7 +7,7 @@ import cn.procsl.ping.boot.captcha.domain.image.ImageCaptchaBuilderService;
 import cn.procsl.ping.boot.captcha.handler.EmailCaptchaHandler;
 import cn.procsl.ping.boot.captcha.handler.WebUtils;
 import cn.procsl.ping.boot.common.utils.IdentifierGenerator;
-import cn.procsl.ping.boot.jpa.domain.id.IdentifierSegmentRepository;
+import cn.procsl.ping.boot.jpa.domain.id.IdentifierGeneratorWrapper;
 import cn.procsl.ping.boot.jpa.domain.id.SegmentIdentifierGenerator;
 import cn.procsl.ping.boot.web.annotation.VersionController;
 import com.wf.captcha.SpecCaptcha;
@@ -15,7 +15,6 @@ import com.wf.captcha.base.Captcha;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.PermitAll;
-import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -40,15 +39,11 @@ public class CaptchaController {
 
     final EmailCaptchaHandler emailCaptchaHandler;
 
-    final EntityManager entityManager;
-
     final IdentifierGenerator<Long> idGenerator;
 
-    public CaptchaController(EmailCaptchaHandler emailCaptchaHandler, EntityManager entityManager,
-                             IdentifierSegmentRepository repo) {
+    public CaptchaController(EmailCaptchaHandler emailCaptchaHandler, SegmentIdentifierGenerator generator) {
         this.emailCaptchaHandler = emailCaptchaHandler;
-        this.entityManager = entityManager;
-        this.idGenerator = SegmentIdentifierGenerator.builder().segmentSize(200).retryTimes(5).initValue(1L).name("captcha_id_seg").repository(repo).build();
+        this.idGenerator = new IdentifierGeneratorWrapper(generator, "captcha_id_seg");
     }
 
     @PermitAll
@@ -59,17 +54,17 @@ public class CaptchaController {
     public void createImageCaptcha(HttpServletRequest request, HttpServletResponse response,
                                    @RequestBody @Validated ImageCaptchaParam parameter
     )
-            throws IOException {
+        throws IOException {
 
         Captcha captcha = new SpecCaptcha(parameter.getWidth(), parameter.getHeight());
 
         String sessionId = WebUtils.getClientSessionId(request);
         ImageCaptcha imageCaptcha =
-                ImageCaptcha.builder().id(idGenerator.nextId())
-                        .target(sessionId)
-                        .ticket(captcha.text())
-                        .functionId(parameter.getFunctionId())
-                        .expired(2).build();
+            ImageCaptcha.builder().id(idGenerator.nextId())
+                .target(sessionId)
+                .ticket(captcha.text())
+                .functionId(parameter.getFunctionId())
+                .expired(2).build();
         String token = this.imageCaptchaBuilderService.serializeSecureToken("123456", imageCaptcha);
 
         Cookie cookie = new Cookie(TOKEN_KEY, token);
