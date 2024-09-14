@@ -7,6 +7,6 @@ import java.util.List;
 @NoRepositoryBean
 public interface ProjectionSearchRepository {
 
-    <T> List<T> search(T query);
+    <Q, R> List<R> search(Q queryDetails, Class<R> resultMapping);
 
 }

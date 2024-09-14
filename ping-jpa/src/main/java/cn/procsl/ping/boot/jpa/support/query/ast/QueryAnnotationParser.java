@@ -34,21 +34,21 @@ record QueryAnnotationParser(FieldDescription root) {
     public Collection<FromClause> getFromClauses() {
         List<FieldDescription> children = this.root.getChildren();
 
-        Projection projection = this.root.findMargeAnnotation(Projection.class);
-        if (projection == null) {
+        Projection main = this.root.findMargeAnnotation(Projection.class);
+        if (main == null) {
             throw new IllegalArgumentException("No projection annotation found: " + this.root.getType());
         }
 
-        List<FromClause> fromClauseList = new ArrayList<>(children.size());
-        ProjectionFromClause from = new ProjectionFromClause(projection);
-
-        for (FieldDescription child : children) {
-            JoinField join = child.findMargeAnnotation(JoinField.class);
-            if (join == null) {
-                continue;
-            }
-            SimpleJoinClause simple = new SimpleJoinClause(from, join.leftJoinField(), join.fromAlias(), join.joinType());
+        List<JoinField> joinFields = this.root.findAnnotations(JoinField.class);
+        if (!joinFields.isEmpty()) {
+            ComposeJoinClause composeJoinClause = new ComposeJoinClause(new ProjectionFromClause(main));
+            joinFields.forEach(joinField -> {
+                joinField
+                composeJoinClause.addJoin(new SimpleJoinClause());
+            });
         }
+
+        return null;
     }
 
     public static SelectClause createFieldClause(FieldDescription child, int i) {

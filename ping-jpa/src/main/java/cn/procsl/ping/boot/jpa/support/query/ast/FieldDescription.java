@@ -34,6 +34,11 @@ public interface FieldDescription {
 
     List<Annotation> getAnnotations();
 
+    default <T extends Annotation> List<T> findAnnotations(Class<T> clazz) {
+        return ClassUtils.filter(this.getAnnotations(), clazz);
+    }
+
+
     default <T extends Annotation> T findMargeAnnotationOrDefault(Class<T> clazz, Supplier<T> instance) {
         return ClassUtils.createMargeAnnotationOrDefault(clazz, this.getAnnotations(), instance);
     }
