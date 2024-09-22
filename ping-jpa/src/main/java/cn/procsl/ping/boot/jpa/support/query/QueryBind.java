@@ -8,12 +8,14 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Documented
-@Target(TYPE)
 @Retention(value = RUNTIME)
-public @interface Projection {
+@Target(TYPE)
+public @interface QueryBind {
 
-    Class<?> entity() default Object.class;
-
-    String alias() default "";
+    /**
+     * 基本查询语句骨架: 无select, where, order by
+     * 不支持 group by
+     */
+    String base();
 
 }

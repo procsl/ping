@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.jpa.support.query;
 
+import jakarta.persistence.NamedQuery;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -35,14 +36,18 @@ import java.util.Collection;
 @Projection(entity = MainEntity.class, alias = "main")
 @JoinField(fromAlias = "main", to = @Projection(entity = SubEntity.class, alias = "sub"))
 @JoinField(fromAlias = "main", to = @Projection(entity = SubEntity.class, alias = "sub2"))
+@QueryBind(base = "from MainEntity as m inner join SubEntity as s on m.id = s.mainId")
 public class ProjectionDTO implements Serializable {
 
+    @SelectField
     @OrderByField
     Long id;
 
+    @SelectField
     @WhereField
     String name;
 
+    @SelectField
     String desc;
 
     @ReferenceBy(value = "sub")

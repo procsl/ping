@@ -41,7 +41,7 @@ public class TableIdentifierSegmentRepositoryImpl implements IdentifierSegmentRe
 
             final String nextValueKey = "next_value";
 
-            query = query.multiselect(qr.get(InnerIdentifier_.value).alias(nextValueKey))
+            query = query.multiselect(qr.get(InnerIdentifier_.VALUE).alias(nextValueKey))
                 .where(builder.equal(qr.get(InnerIdentifier_.ID), segmentName));
 
             List<Tuple> list = entityManager.createQuery(query).getResultList();
@@ -50,8 +50,8 @@ public class TableIdentifierSegmentRepositoryImpl implements IdentifierSegmentRe
             }
 
             CriteriaUpdate<InnerIdentifier> updater = builder.createCriteriaUpdate(InnerIdentifier.class);
-            Path<Long> valueField = updater.getRoot().get(InnerIdentifier_.value);
-            Path<String> segmentFiled = updater.getRoot().get(InnerIdentifier_.id);
+            Path<Long> valueField = updater.getRoot().get(InnerIdentifier_.VALUE);
+            Path<String> segmentFiled = updater.getRoot().get(InnerIdentifier_.ID);
 
             Tuple identifier = list.getFirst();
             Long nextValue = identifier.get(nextValueKey, Long.class);

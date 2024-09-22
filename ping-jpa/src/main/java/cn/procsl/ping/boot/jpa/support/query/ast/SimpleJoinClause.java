@@ -3,7 +3,7 @@ package cn.procsl.ping.boot.jpa.support.query.ast;
 import jakarta.persistence.criteria.JoinType;
 import lombok.Getter;
 
-final class SimpleJoinClause implements FromClause {
+public final class SimpleJoinClause implements FromClause {
 
     @Getter
     private final String joinFieldName;
@@ -18,7 +18,7 @@ final class SimpleJoinClause implements FromClause {
 
     private final String targetFieldName;
 
-    public SimpleJoinClause(SimpleFromClause fromClause,
+    public SimpleJoinClause(FromClause fromClause,
                             String currentJoinFieldName,
                             String targetAlias,
                             String targetFieldName,

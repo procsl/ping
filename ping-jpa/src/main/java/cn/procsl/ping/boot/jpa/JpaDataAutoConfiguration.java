@@ -1,6 +1,7 @@
 package cn.procsl.ping.boot.jpa;
 
 import cn.procsl.ping.boot.jpa.domain.id.IdentifierSegmentRepository;
+import cn.procsl.ping.boot.jpa.domain.id.SegmentIdentifierGenerator;
 import cn.procsl.ping.boot.jpa.domain.id.TableIdentifierSegmentRepositoryImpl;
 import cn.procsl.ping.boot.jpa.support.extension.EnableJpaExtensionRepositories;
 import cn.procsl.ping.boot.jpa.support.extension.JpaRepositoryFactoryCustomizer;
@@ -8,6 +9,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -38,10 +40,19 @@ public class JpaDataAutoConfiguration implements BeanPostProcessor {
         return JpaRepositoryFactoryCustomizer.instance;
     }
 
-    @Bean
     @ConditionalOnMissingBean
-    public IdentifierSegmentRepository identifierSegmentRepository(EntityManager entityManager, PlatformTransactionManager manager) {
+    @Bean(name = "defaultIdentifierSegmentRepository")
+    public IdentifierSegmentRepository identifierSegmentRepository(EntityManager entityManager,
+                                                                   PlatformTransactionManager manager) {
         return new TableIdentifierSegmentRepositoryImpl(entityManager, manager);
+    }
+
+    @ConditionalOnMissingBean
+    @Bean(name = "defaultSegmentIdentifierGenerator")
+    public SegmentIdentifierGenerator segmentIdentifierGenerator(@Qualifier("defaultIdentifierSegmentRepository")
+                                                                          IdentifierSegmentRepository repo) {
+        return SegmentIdentifierGenerator.builder().segmentSize(200)
+            .retryTimes(5).initValue(1L).repository(repo).build();
     }
 
 

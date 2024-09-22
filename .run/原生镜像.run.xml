@@ -36,7 +36,7 @@
           <option name="passParentEnv" value="true" />
           <option name="runMavenInBackground" value="true" />
           <option name="skipTests" value="true" />
-          <option name="vmOptions" value="-Dfile.encoding=UTF-8 -Dspring.profiles.active=native,openapi,h2,monitor" />
+          <option name="vmOptions" value="-Djava.awt.headless=true -Dfile.encoding=UTF-8 -Dspring.profiles.active=native,openapi,h2,monitor" />
         </MavenRunnerSettings>
       </option>
       <option name="myRunnerParameters">

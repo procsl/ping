@@ -168,6 +168,11 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <configuration>
                     <encoding>utf-8</encoding>
+                    <delimiters>
+                        <delimiter>@</delimiter>
+                    </delimiters>
+                    <!-- 解决Spring boot引起的profile失效问题 -->
+                    <useDefaultDelimiters>false</useDefaultDelimiters>
                     <!-- 过滤后缀为p12、pem、pfx的证书文件 -->
                     <nonFilteredFileExtensions>
                         <nonFilteredFileExtension>p12</nonFilteredFileExtension>
@@ -431,7 +436,10 @@
                             <buildArgs>
                                 --no-fallback
                                 -Ob
-                                <!--                                -H:+DashboardAll-->
+                                <!-- -H:+DashboardAll -->
+                                --enable-sbom
+                                <!--                                -march=native-->
+                                <!--                                -march=list-->
                                 -H:+BuildReport
                                 --initialize-at-build-time=ch.qos.logback
                                 --trace-object-instantiation=ch.qos.logback.classic.Logger
