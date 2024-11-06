@@ -1,6 +1,6 @@
-package cn.procsl.ping.batch;
+package cn.procsl.ping.boot.batch;
 
-import cn.procsl.ping.batch.item.Fetch;
+import cn.procsl.ping.boot.batch.item.Fetch;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

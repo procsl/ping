@@ -1,23 +1,35 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
+        <artifactId>ping-parent</artifactId>
         <groupId>cn.procsl</groupId>
-        <artifactId>ping</artifactId>
         <version>1.0.0</version>
+        <relativePath>../ping-parent</relativePath>
     </parent>
 
     <artifactId>ping-batch</artifactId>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
+    <name>ping-批处理</name>
 
-    <distributionManagement>
-        <site>
-            <id>website</id>
-            <url>scp://webhost.company.com/www/website</url>
-        </site>
-    </distributionManagement>
 
     <properties>
+        <java.version>21</java.version>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.compilerVersion>${java.version}</maven.compiler.compilerVersion>
+        <compiler.version>${java.version}</compiler.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+        </dependency>
+
+    </dependencies>
+
 </project>

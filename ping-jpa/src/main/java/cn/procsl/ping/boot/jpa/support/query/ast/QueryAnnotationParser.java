@@ -43,8 +43,7 @@ record QueryAnnotationParser(FieldDescription root) {
         if (!joinFields.isEmpty()) {
             ComposeJoinClause composeJoinClause = new ComposeJoinClause(new ProjectionFromClause(main));
             joinFields.forEach(joinField -> {
-                joinField
-                composeJoinClause.addJoin(new SimpleJoinClause());
+//                composeJoinClause.addJoin(new SimpleJoinClause());
             });
         }
 

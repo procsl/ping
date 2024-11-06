@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
-        <version>3.3.2</version>
+        <version>3.3.5</version>
     </parent>
 
     <groupId>cn.procsl</groupId>
@@ -22,7 +22,7 @@
         <maven.compiler.compilerVersion>${java.version}</maven.compiler.compilerVersion>
         <compiler.version>${java.version}</compiler.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <springboot.version>3.3.2</springboot.version>
+        <springboot.version>3.3.5</springboot.version>
         <springdoc.version>2.5.0</springdoc.version>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
         <google.auto.version>1.1.1</google.auto.version>

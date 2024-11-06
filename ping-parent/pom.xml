@@ -18,6 +18,7 @@
         <module>../ping-im</module>
         <module>../ping-editor</module>
         <module>../ping-ui</module>
+        <module>../ping-batch</module>
     </modules>
 
     <dependencies>

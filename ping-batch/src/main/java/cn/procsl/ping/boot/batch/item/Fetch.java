@@ -1,4 +1,4 @@
-package cn.procsl.ping.batch.item;
+package cn.procsl.ping.boot.batch.item;
 
 import com.jayway.jsonpath.*;
 import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
@@ -7,6 +7,8 @@ import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import com.jayway.jsonpath.spi.mapper.MappingProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 
 import java.io.FileInputStream;
@@ -26,10 +28,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Slf4j
+@Component
 public class Fetch {
 
 
-    @Scheduled
+    @Scheduled(fixedDelay = 60 * 60 * 1000, initialDelay = 0)
     public void run() throws IOException, InterruptedException {
 
 
@@ -109,7 +112,7 @@ public class Fetch {
             log.info("results: {}", results);
 
         } finally {
-            log.error("请求完成");
+            log.info("请求完成");
         }
     }
 
