@@ -12,6 +12,20 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(value = RUNTIME)
 public @interface ReferenceBy {
 
-    String value();
+    /**
+     * 引用的别名
+     */
+    String ref();
+
+
+    /**
+     * 引用的字段名, 如果为 空白字符串, 则取被标注的字段
+     */
+    String target() default "";
+
+    /**
+     * 设置当前字段别名, 如果为空, 则使用被标注的字段字段名
+     */
+    String alias() default "";
 
 }

@@ -8,7 +8,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ClassUtilsTest {
+public class ClassUtilsTest {
 
     // 示例类用于测试
     static class Example {
@@ -39,7 +39,7 @@ class ClassUtilsTest {
     }
 
     @Test
-    void testExtractGetAndIsMethods() {
+    public void testExtractGetAndIsMethods() {
         List<Method> methods = ClassUtils.extractGetAndIsMethods(Example.class);
 
         assertEquals(4, methods.size(), "Should find 4 get and is methods");
@@ -51,7 +51,7 @@ class ClassUtilsTest {
     }
 
     @Test
-    void testIsGetMethod() throws NoSuchMethodException {
+    public void testIsGetMethod() throws NoSuchMethodException {
         Method getNameMethod = Example.class.getMethod("getName");
         assertTrue(ClassUtils.isGetMethod(getNameMethod), "getName should be recognized as get method");
 
@@ -66,7 +66,7 @@ class ClassUtilsTest {
     }
 
     @Test
-    void testIsIsMethod() throws NoSuchMethodException {
+    public void testIsIsMethod() throws NoSuchMethodException {
         Method isActiveMethod = Example.class.getMethod("isActive");
         assertTrue(ClassUtils.isIsMethod(isActiveMethod), "isActive should be recognized as is method");
 
@@ -84,7 +84,7 @@ class ClassUtilsTest {
     }
 
     @Test
-    void testIsSetMethod() throws NoSuchMethodException {
+    public void testIsSetMethod() throws NoSuchMethodException {
         Method setNameMethod = Example.class.getMethod("setName", String.class);
         assertTrue(ClassUtils.isSetMethod(setNameMethod), "setName should be recognized as set method");
 
@@ -99,7 +99,7 @@ class ClassUtilsTest {
     }
 
     @Test
-    void testExtractMethodNames() {
+    public void testExtractMethodNames() {
         List<Method> methods = ClassUtils.extractGetAndIsMethods(Example.class);
         Set<String> fieldNames = ClassUtils.extractMethodNames(methods);
 
@@ -112,7 +112,7 @@ class ClassUtilsTest {
     }
 
     @Test
-    void testExtractMethodNamesWithEmptyMethods() {
+    public void testExtractMethodNamesWithEmptyMethods() {
         // 用于测试没有任何 get, set 和 is 方法的类
         class EmptyClass {
         }
@@ -124,7 +124,7 @@ class ClassUtilsTest {
     }
 
     @Test
-    void testIsSimpleTypeWithSimpleTypes() {
+    public void testIsSimpleTypeWithSimpleTypes() {
         assertTrue(ClassUtils.isSimpleType(String.class), "String should be recognized as simple type");
         assertTrue(ClassUtils.isSimpleType(Date.class), "Date should be recognized as simple type");
         assertTrue(ClassUtils.isSimpleType(Long.class), "Long should be recognized as simple type");
@@ -146,19 +146,19 @@ class ClassUtilsTest {
     }
 
     @Test
-    void testIsSimpleTypeWithNonSimpleTypes() {
+    public void testIsSimpleTypeWithNonSimpleTypes() {
         assertFalse(ClassUtils.isSimpleType(Object.class), "Object should not be recognized as simple type");
         assertFalse(ClassUtils.isSimpleType(Class.class), "Class should not be recognized as simple type");
         assertFalse(ClassUtils.isSimpleType(System.class), "System should not be recognized as simple type");
     }
 
     @Test
-    void testIsSimpleTypeWithNull() {
+    public void testIsSimpleTypeWithNull() {
         assertFalse(ClassUtils.isSimpleType(null), "null should not be recognized as simple type");
     }
 
     @Test
-    void testIsContainerTypeWithContainerTypes() {
+    public void testIsContainerTypeWithContainerTypes() {
         assertTrue(ClassUtils.isContainerType(Collection.class), "Collection should be recognized as container type");
         assertTrue(ClassUtils.isContainerType(List.class), "List should be recognized as container type");
         assertTrue(ClassUtils.isContainerType(Map.class), "Map should be recognized as container type");
@@ -167,14 +167,14 @@ class ClassUtilsTest {
     }
 
     @Test
-    void testIsContainerTypeWithNonContainerTypes() {
+    public void testIsContainerTypeWithNonContainerTypes() {
         assertFalse(ClassUtils.isContainerType(String.class), "String should not be recognized as container type");
         assertFalse(ClassUtils.isContainerType(Integer.class), "Integer should not be recognized as container type");
         assertFalse(ClassUtils.isContainerType(Object.class), "Object should not be recognized as container type");
     }
 
     @Test
-    void testIsContainerTypeWithNull() {
+    public void testIsContainerTypeWithNull() {
         assertFalse(ClassUtils.isContainerType(null), "null should not be recognized as container type");
     }
 

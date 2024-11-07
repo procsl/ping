@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 @EnableJpaExtensionRepositories(basePackages = {"cn.procsl.ping.boot.jpa.jpql",
     "cn.procsl.ping.boot.jpa.support.query"})
 //        , basePackageClasses = {ExtensionRepository.class, StandRepository.class})
-@EntityScan("cn.procsl.ping.boot.jpa.support.query")
+@EntityScan({"cn.procsl.ping.boot.jpa.support.query", "cn.procsl.ping.boot.jpa.support.query.ast.domain"})
 public class TestJpaApplication {
 
     public static void main(String[] args) {

@@ -7,9 +7,15 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+/**
+ * select 子句字段
+ */
 @Documented
 @Target({FIELD, METHOD})
 @Retention(value = RUNTIME)
 public @interface SelectField {
+    /**
+     * 如果被标注为true, 一定会出现在select语句中
+     */
     boolean required() default false;
 }

@@ -1,6 +1,5 @@
 package cn.procsl.ping.boot.jpa.support.query;
 
-import jakarta.persistence.NamedQuery;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -50,10 +49,10 @@ public class ProjectionDTO implements Serializable {
     @SelectField
     String desc;
 
-    @ReferenceBy(value = "sub")
+    @ReferenceBy(ref = "sub")
     SubProjection subProjection;
 
-    @ReferenceBy(value = "sub2")
+    @ReferenceBy(ref = "sub2")
     Collection<SubProjection> subProjections;
 
 
