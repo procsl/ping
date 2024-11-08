@@ -22,7 +22,6 @@ class ProjectionSearchRepositoryImpl implements ProjectionSearchRepository, Init
 
     @Override
     public <Q, R> List<R> search(Q query, Class<R> mapping) {
-
         QueryContext context = new InnerQueryContext(query, mapping);
         ArrayList<Clause> list = new ArrayList<>();
         for (QueryBuilder builder : builders) {
@@ -32,7 +31,8 @@ class ProjectionSearchRepositoryImpl implements ProjectionSearchRepository, Init
         SimpleQueryStringBuilder builder = new SimpleQueryStringBuilder();
         Map<ClauseType, List<Clause>> results = list.stream().collect(Collectors.groupingBy(Clause::getClauseType));
         results.forEach((k, v) -> extracted(k, v, builder));
-
+        String sql = builder.toClauseString();
+        log.info("sql语句: {}", sql);
         return List.of();
     }
 
