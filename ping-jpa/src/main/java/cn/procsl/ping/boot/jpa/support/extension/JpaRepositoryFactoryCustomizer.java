@@ -23,9 +23,9 @@ public enum JpaRepositoryFactoryCustomizer implements RepositoryFactoryCustomize
     public static Object postProcessBeforeInitialization(@Nonnull Object bean, @Nonnull String beanName) throws BeansException {
         if (bean instanceof RepositoryFactoryBeanSupport<?, ?, ?> repoSupport) {
             boolean bool = JpaExtensionRepository.class.isAssignableFrom(repoSupport.getObjectType());
-            log.debug("发现repository接口: {}", repoSupport.getObjectType());
+            log.trace("发现repository接口: {}", repoSupport.getObjectType());
             if (bool) {
-                log.info("增强repository接口: {}", repoSupport.getObjectType());
+                log.debug("增强repository接口: {}", repoSupport.getObjectType());
                 repoSupport.addRepositoryFactoryCustomizer(instance);
             }
         }
