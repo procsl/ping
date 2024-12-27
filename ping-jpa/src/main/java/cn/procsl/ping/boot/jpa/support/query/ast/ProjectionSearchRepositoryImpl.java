@@ -28,7 +28,7 @@ class ProjectionSearchRepositoryImpl implements ProjectionSearchRepository, Init
             Optional<List<? extends Clause>> result = builder.parse(context);
             result.ifPresent(list::addAll);
         }
-        SimpleQueryStringBuilder builder = new SimpleQueryStringBuilder();
+        JpaQueryStringBuilder builder = new JpaQueryStringBuilder();
         Map<ClauseType, List<Clause>> results = list.stream().collect(Collectors.groupingBy(Clause::getClauseType));
         results.forEach((k, v) -> extracted(k, v, builder));
         String sql = builder.toClauseString();
@@ -36,37 +36,37 @@ class ProjectionSearchRepositoryImpl implements ProjectionSearchRepository, Init
         return List.of();
     }
 
-    private void extracted(ClauseType k, List<Clause> v, SimpleQueryStringBuilder builder) {
+    private void extracted(ClauseType k, List<Clause> v, JpaQueryStringBuilder builder) {
         if (k == ClauseType.select) {
-            if (v instanceof SelectClause a) {
-                builder.addSelectClause(a);
-                return;
+            for (Clause clause : v) {
+                if (clause instanceof SelectClause a) {
+                    builder.addSelectClause(a);
+                }
             }
-            log.warn("类型错误: {}", v.getClass());
         }
 
         if (k == ClauseType.from) {
-            if (v instanceof FromClause a) {
-                builder.addFromClause(a);
-                return;
+            for (Clause clause : v) {
+                if (clause instanceof FromClause a) {
+                    builder.addFromClause(a);
+                }
             }
-            log.warn("类型错误: {}", v.getClass());
         }
 
         if (k == ClauseType.order_by) {
-            if (v instanceof OrderByClause a) {
-                builder.addOrderBy(a);
-                return;
+            for (Clause clause : v) {
+                if (clause instanceof OrderByClause a) {
+                    builder.addOrderBy(a);
+                }
             }
-            log.warn("类型错误: {}", v.getClass());
         }
 
         if (k == ClauseType.where) {
-            if (v instanceof WhereClause a) {
-                builder.addWhereClause(a);
-                return;
+            for (Clause clause : v) {
+                if (clause instanceof WhereClause a) {
+                    builder.addWhereClause(a);
+                }
             }
-            log.warn("类型错误: {}", v.getClass());
         }
     }
 
@@ -75,6 +75,8 @@ class ProjectionSearchRepositoryImpl implements ProjectionSearchRepository, Init
      */
     @Override
     public void afterPropertiesSet() throws Exception {
+        this.builders.add(new SelectClauseBuilder());
+        this.builders.add(new FromClauseBuilder());
     }
 
     @RequiredArgsConstructor

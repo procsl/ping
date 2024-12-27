@@ -28,7 +28,7 @@ public class Teacher {
     Set<Long> bookIds;
 
     @ManyToMany
-    Set<Student> teacher;
+    Set<Student> students;
 
     String desc;
 }

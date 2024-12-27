@@ -7,14 +7,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @Slf4j
-public class SimpleQueryStringBuilderTest {
+public class JpaQueryStringBuilderTest {
 
 
     @Test
     @DisplayName("Select语句顺序生成测试")
     public void toClauseStringOrder() {
 
-        SimpleQueryStringBuilder builder = new SimpleQueryStringBuilder();
+        JpaQueryStringBuilder builder = new JpaQueryStringBuilder();
 
         SimpleSelectClause simple = new SimpleSelectClause(new FragmentClause("tb.my_name"), "name", String.class, 1);
         log.info(simple.toString());
@@ -35,7 +35,7 @@ public class SimpleQueryStringBuilderTest {
     @DisplayName("Select语句生成测试")
     public void toClauseString() {
 
-        SimpleQueryStringBuilder builder = new SimpleQueryStringBuilder();
+        JpaQueryStringBuilder builder = new JpaQueryStringBuilder();
 
         SimpleSelectClause simple = new SimpleSelectClause(new FragmentClause("tb.my_name"), "name", String.class, 0);
         log.info(simple.toString());
@@ -55,7 +55,7 @@ public class SimpleQueryStringBuilderTest {
     @Test
     @DisplayName("简单From语句生成测试")
     public void toClauseString3() {
-        SimpleQueryStringBuilder builder = new SimpleQueryStringBuilder();
+        JpaQueryStringBuilder builder = new JpaQueryStringBuilder();
         SimpleSelectClause simple = new SimpleSelectClause(new FragmentClause("tb.my_name"), "name", String.class, 0);
         log.info(simple.toString());
         Assertions.assertEquals("tb.my_name as name", simple.toClauseString());
@@ -69,7 +69,7 @@ public class SimpleQueryStringBuilderTest {
     @Test
     @DisplayName("From join语句生成测试")
     public void toClauseString4() {
-        SimpleQueryStringBuilder builder = new SimpleQueryStringBuilder();
+        JpaQueryStringBuilder builder = new JpaQueryStringBuilder();
         {
             SimpleSelectClause simple = new SimpleSelectClause(new FragmentClause("my.my_name"), "name", String.class, 0);
             builder.addSelectClause(simple);

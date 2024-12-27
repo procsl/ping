@@ -15,4 +15,8 @@ public interface SelectClause extends Clause, Order {
      */
     Class<?> getFieldMappingType();
 
+    @Override
+    default ClauseType getClauseType() {
+        return ClauseType.select;
+    }
 }

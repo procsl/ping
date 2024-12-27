@@ -11,4 +11,9 @@ public interface FromClause extends Clause, Order {
     default int getOrder() {
         return 0;
     }
+
+    @Override
+    default ClauseType getClauseType() {
+        return ClauseType.from;
+    }
 }

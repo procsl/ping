@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.jpa.support.query.ast;
 
+import jakarta.persistence.criteria.JoinType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -42,7 +43,14 @@ final class ComposeJoinClause implements FromClause {
         return base + " " + String.join(" ", list);
     }
 
+    // table_a as a inner join table_b as b on a.a_id = b.b_id
+    public void joinTo(JoinType joinType, FromClause joinClause,
+                       String mainField, String targetField) {
+        SimpleJoinClause tmp = new SimpleJoinClause(this, mainField, joinClause.getTableAlias(), targetField, joinType);
+        this.joinClauses.add(tmp);
+    }
+
+
     public void addJoin(SimpleJoinClause joinClause) {
-        this.joinClauses.add(joinClause);
     }
 }

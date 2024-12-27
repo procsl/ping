@@ -11,6 +11,8 @@ import java.io.Serializable;
  */
 @Data
 @Projection(entity = Teacher.class, alias = "teacher")
+@JoinField(fromAlias = "main", to = @Projection(entity = SubEntity.class, alias = "sub"))
+@JoinField(fromAlias = "main", to = @Projection(entity = SubEntity.class, alias = "sub"))
 public class SingletonQueryDTO implements Serializable {
 
     @OrderByField
