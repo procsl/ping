@@ -55,13 +55,18 @@ final class SelectClauseBuilder implements QueryBuilder {
         @Override
         public String toClauseString() {
             String tmp;
-            if (ref != null) {
-                tmp = ref.ref() + "." + ref.alias();
-                log.trace("[{}.{}]使用[ref]生成select字段[{}]", this.field.getDeclaringClass(), this.field.getName(), tmp);
+            if (ref == null) {
+                tmp = this.projection.alias() + "." + this.field.getName();
+                log.trace("[{}.{}]直接生成select字段[{}]", this.field.getDeclaringClass(), this.field.getName(), tmp);
                 return tmp;
             }
-            tmp = this.projection.alias() + "." + this.field.getName();
-            log.trace("[{}.{}]直接生成select字段[{}]", this.field.getDeclaringClass(), this.field.getName(), tmp);
+
+            if (ref.alias() == null || ref.alias().isEmpty()) {
+                tmp = ref.ref() + "." + ref.target() + " as " + this.field.getName();
+            } else {
+                tmp = ref.ref() + "." + ref.alias();
+            }
+            log.trace("[{}.{}]使用[ref]生成select字段[{}]", this.field.getDeclaringClass(), this.field.getName(), tmp);
             return tmp;
         }
 
@@ -73,6 +78,11 @@ final class SelectClauseBuilder implements QueryBuilder {
         @Override
         public String getSelectFieldAlias() {
             return this.field.getName();
+        }
+
+        @Override
+        public String getQueryColumnClause() {
+            return null;
         }
 
         @Override

@@ -10,9 +10,9 @@ import java.io.Serializable;
  * select teacher.id, teacher.name as teacherName, teacher.desc  from Teacher as teacher where id=:id
  */
 @Data
-@Projection(entity = Teacher.class, alias = "teacher")
-@JoinField(fromAlias = "main", to = @Projection(entity = SubEntity.class, alias = "sub"))
-@JoinField(fromAlias = "main", to = @Projection(entity = SubEntity.class, alias = "sub"))
+@Projection(entity = Teacher.class, alias = "main")
+@JoinField(ref = "main", join = @Projection(entity = SubEntity.class, alias = "sub"))
+@JoinField(ref = "sub", join = @Projection(entity = SubEntity.class, alias = "sub1"))
 public class SingletonQueryDTO implements Serializable {
 
     @OrderByField
@@ -21,8 +21,12 @@ public class SingletonQueryDTO implements Serializable {
     Long id;
 
     @SelectField
-    @ReferenceBy(ref = "teacher", target = "name")
-    String teacherName;
+    @ReferenceBy(ref = "sub", target = "name")
+    String subName;
+
+    @SelectField
+    @ReferenceBy(ref = "sub1", target = "name")
+    String sub1Name;
 
     @SelectField
     String desc;

@@ -32,7 +32,7 @@ class ProjectionSearchRepositoryImpl implements ProjectionSearchRepository, Init
         Map<ClauseType, List<Clause>> results = list.stream().collect(Collectors.groupingBy(Clause::getClauseType));
         results.forEach((k, v) -> extracted(k, v, builder));
         String sql = builder.toClauseString();
-        log.info("sql语句: {}", sql);
+        log.info("sql语句: \n\n{}\n", sql);
         return List.of();
     }
 

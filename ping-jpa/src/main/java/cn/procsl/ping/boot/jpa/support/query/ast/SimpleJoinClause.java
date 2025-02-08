@@ -1,32 +1,33 @@
 package cn.procsl.ping.boot.jpa.support.query.ast;
 
 import jakarta.persistence.criteria.JoinType;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NonNull;
 
+@Getter
 public final class SimpleJoinClause implements FromClause {
 
-    @Getter
-    private final String joinFieldName;
+    private final FromClause leftFromClause;
 
-    @Getter
-    private final FromClause fromClause;
+    private final SimpleFromClause rightFromClause;
 
-    @Getter
+    private final String leftFieldNameAlias;
+
+    private final String rightFieldNameAlias;
+
     private final JoinType joinType;
 
-    private final String targetAlias;
-
-    private final String targetFieldName;
-
-    public SimpleJoinClause(FromClause fromClause,
-                            String currentJoinFieldName,
-                            String targetAlias,
-                            String targetFieldName,
-                            JoinType joinType) {
-        this.fromClause = fromClause;
-        this.joinFieldName = currentJoinFieldName;
-        this.targetAlias = targetAlias;
-        this.targetFieldName = targetFieldName;
+    @Builder
+    private SimpleJoinClause(@NonNull FromClause leftFromClause,
+                             @NonNull SimpleFromClause rightFromClause,
+                             @NonNull String leftFieldNameAlias,
+                             @NonNull String rightFieldNameAlias,
+                             JoinType joinType) {
+        this.leftFromClause = leftFromClause;
+        this.rightFromClause = rightFromClause;
+        this.leftFieldNameAlias = leftFieldNameAlias;
+        this.rightFieldNameAlias = rightFieldNameAlias;
         if (joinType == null) {
             this.joinType = JoinType.INNER;
         } else {
@@ -34,16 +35,20 @@ public final class SimpleJoinClause implements FromClause {
         }
     }
 
-
     // FROM table_a AS a
     //       INNER JOIN table_b as b on a.id = b.id
     //       INNER JOIN table_c as c on a.id = c.id
     //            INNER JOIN table_d as d on c.id = d.id
     @Override
     public String toClauseString() {
-        String main = this.fromClause.toClauseString();
-        return "%s on %s.%s=%s.%s".formatted(main, this.targetAlias, this.targetFieldName,
-            this.fromClause.getTableAlias(), this.joinFieldName);
+        String main = this.leftFromClause.toClauseString();
+        String right = this.rightFromClause.toClauseString();
+        return " %s \n %s join %s on %s.%s = %s.%s".formatted(main,
+            joinType.toString().toLowerCase(), right,
+            this.leftFromClause.getTableAlias(),
+            this.leftFieldNameAlias,
+            this.rightFromClause.getTableAlias(),
+            this.rightFieldNameAlias);
     }
 
     @Override
@@ -53,6 +58,6 @@ public final class SimpleJoinClause implements FromClause {
 
     @Override
     public String getTableAlias() {
-        return fromClause.getTableAlias();
+        return rightFromClause.getTableAlias();
     }
 }

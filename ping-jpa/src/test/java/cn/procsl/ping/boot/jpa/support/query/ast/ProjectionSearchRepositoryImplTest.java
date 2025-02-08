@@ -34,7 +34,7 @@ public class ProjectionSearchRepositoryImplTest {
     public void search() {
         SingletonQueryDTO query = new SingletonQueryDTO();
         query.setId(1L);
-        query.setTeacherName("test");
+        query.setSubName("test");
         List<ResultDTO> result = this.projectionSearchRepository.search(query, ResultDTO.class);
         log.debug("结果: {}", result);
     }

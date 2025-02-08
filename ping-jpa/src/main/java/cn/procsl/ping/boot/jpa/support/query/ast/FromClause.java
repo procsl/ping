@@ -7,6 +7,11 @@ public interface FromClause extends Clause, Order {
      */
     String getTableAlias();
 
+    /**
+     * from查询语句
+     */
+//    String getFromClause();
+
     @Override
     default int getOrder() {
         return 0;

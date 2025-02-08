@@ -24,9 +24,9 @@ public @interface JoinField {
 
     JoinType joinType() default JoinType.INNER;
 
-    String fromAlias() default "";
+    String ref() default "";
 
-    Projection to();
+    Projection join();
 
 
     @Documented

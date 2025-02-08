@@ -38,19 +38,13 @@ final class ComposeJoinClause implements FromClause {
         }
 
         joinClauses.sort(Comparator.comparingInt(FromClause::getOrder));
-        Function<SimpleJoinClause, String> conv = item -> String.format("\n\t\t%s join %s", item.getJoinType().toString().toLowerCase(), item.toClauseString());
-        List<String> list = joinClauses.stream().map(conv).toList();
-        return base + " " + String.join(" ", list);
+        return null;
     }
 
     // table_a as a inner join table_b as b on a.a_id = b.b_id
-    public void joinTo(JoinType joinType, FromClause joinClause,
-                       String mainField, String targetField) {
-        SimpleJoinClause tmp = new SimpleJoinClause(this, mainField, joinClause.getTableAlias(), targetField, joinType);
-        this.joinClauses.add(tmp);
-    }
-
-
-    public void addJoin(SimpleJoinClause joinClause) {
-    }
+//    public void joinTo(JoinType joinType, FromClause joinClause, String mainTableAlias,
+//                       String mainField, String targetField) {
+//        SimpleJoinClause tmp = new SimpleJoinClause(joinClause, mainField, mainTableAlias, targetField, joinType);
+//        this.joinClauses.add(tmp);
+//    }
 }

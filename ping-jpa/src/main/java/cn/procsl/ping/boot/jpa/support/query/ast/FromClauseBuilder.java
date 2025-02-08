@@ -6,6 +6,7 @@ import lombok.NonNull;
 import org.springframework.core.annotation.AnnotationUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 final class FromClauseBuilder implements QueryBuilder {
 
@@ -35,27 +36,32 @@ final class FromClauseBuilder implements QueryBuilder {
             return Optional.of(Collections.singletonList(rootClause));
         }
 
-        HashMap<String, ComposeJoinClause> map = new HashMap<>();
-        map.put(projection.alias(), new ComposeJoinClause(rootClause));
         // 创建所有的join对象
-        for (JoinField field : joinFields) {
-            Projection joinProjection = field.to();
-            SimpleFromClause joinClause = new SimpleFromClause(new FragmentClause(joinProjection.entity().getName()), joinProjection.alias());
-            map.put(joinProjection.alias(), new ComposeJoinClause(joinClause));
-        }
-        // 建立join关系
-        for (JoinField field : joinFields) {
-            String alias = field.fromAlias();
-            ComposeJoinClause compose = map.get(alias);
-            if (compose == null) {
-                throw new IllegalArgumentException(alias + "对应的join不存在");
-            }
-            Projection joinProjection = field.to();
-            SimpleFromClause joinClause = new SimpleFromClause(new FragmentClause(joinProjection.entity().getName()), joinProjection.alias());
-            compose.joinTo(field.joinType(), joinClause, field.leftJoinField(), field.rightJoinField());
-        }
+        Map<String, List<JoinField>> group = joinFields.stream().collect(Collectors.groupingBy(JoinField::ref));
+        FromClause newFrom = this.build(rootClause, group);
+        return Optional.of(Collections.singletonList(newFrom));
+    }
 
-        return Optional.empty();
+    private FromClause build(FromClause rootClause, Map<String, List<JoinField>> joinFields) {
+        String alias = rootClause.getTableAlias();
+        List<JoinField> fields = joinFields.get(alias);
+        if (fields == null) {
+            return rootClause;
+        }
+        FromClause from = rootClause;
+        for (JoinField field : fields) {
+            Projection joinProjection = field.join();
+            FragmentClause clause = new FragmentClause(joinProjection.entity().getName());
+            SimpleFromClause joinClause = new SimpleFromClause(clause, joinProjection.alias());
+            from = SimpleJoinClause.builder()
+                .joinType(field.joinType())
+                .leftFromClause(from)
+                .rightFromClause(joinClause)
+                .leftFieldNameAlias(field.leftJoinField())
+                .rightFieldNameAlias(field.rightJoinField())
+                .build();
+        }
+        return this.build(from, joinFields);
     }
 
 

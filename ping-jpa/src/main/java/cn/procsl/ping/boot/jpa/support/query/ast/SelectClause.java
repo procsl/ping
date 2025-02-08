@@ -11,6 +11,11 @@ public interface SelectClause extends Clause, Order {
     String getSelectFieldAlias();
 
     /**
+     * 列查询语句
+     */
+    String getQueryColumnClause();
+
+    /**
      * 查询字段映射类型
      */
     Class<?> getFieldMappingType();

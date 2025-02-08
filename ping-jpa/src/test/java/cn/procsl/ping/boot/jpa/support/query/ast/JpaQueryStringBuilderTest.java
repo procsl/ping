@@ -83,22 +83,19 @@ public class JpaQueryStringBuilderTest {
         SimpleFromClause mainClause = new SimpleFromClause(new FragmentClause("my_table"), "my");
 
         SimpleFromClause youClause = new SimpleFromClause(new FragmentClause("you_table"), "you");
-        SimpleJoinClause youJoined = youClause.createJoinFromTo(JoinType.INNER, mainClause, "id", "id");
 
         SimpleFromClause heClause = new SimpleFromClause(new FragmentClause("he_table"), "he");
-        SimpleJoinClause heJoined = heClause.createJoinFromTo(JoinType.LEFT, mainClause, "id", "id");
 
         SimpleFromClause sheClause = new SimpleFromClause(new FragmentClause("she_table"), "she");
-        SimpleJoinClause sheJoined = sheClause.createJoinFromTo(JoinType.LEFT, youClause, "id", "id");
 
         SimpleFromClause otherFrom = new SimpleFromClause(new FragmentClause("other_table"), "other");
 
         SimpleFromClause subFrom = new SimpleFromClause(new FragmentClause("(select sub_tab.id from sub_tab)"), "sub");
 
         ComposeJoinClause composeJoinClause = new ComposeJoinClause(mainClause);
-        composeJoinClause.addJoin(youJoined);
-        composeJoinClause.addJoin(heJoined);
-        composeJoinClause.addJoin(sheJoined);
+//        composeJoinClause.joinTo(JoinType.INNER, youClause, composeJoinClause.getTableAlias(), "id", "id");
+//        composeJoinClause.joinTo(JoinType.LEFT, heClause, composeJoinClause.getTableAlias(), "id", "id");
+//        composeJoinClause.joinTo(JoinType.LEFT, sheClause, composeJoinClause.getTableAlias(), "id", "id");
 
         builder.addFromClause(composeJoinClause);
         builder.addFromClause(otherFrom);

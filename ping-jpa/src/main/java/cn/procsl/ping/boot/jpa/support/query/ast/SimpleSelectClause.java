@@ -28,4 +28,8 @@ final class SimpleSelectClause implements SelectClause {
         return this.toClauseString();
     }
 
+    @Override
+    public String getQueryColumnClause() {
+        return null;
+    }
 }
