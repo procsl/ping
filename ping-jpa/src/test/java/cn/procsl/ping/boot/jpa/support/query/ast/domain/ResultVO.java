@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 @Data
 @Projection(entity = Teacher.class, alias = "teacher")
-public class ResultDTO implements Serializable {
+public class ResultVO implements Serializable {
 
     String id;
 

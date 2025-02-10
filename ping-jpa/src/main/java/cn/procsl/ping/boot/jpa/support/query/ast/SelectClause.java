@@ -19,9 +19,4 @@ public interface SelectClause extends Clause, Order {
      * 查询字段映射类型
      */
     Class<?> getFieldMappingType();
-
-    @Override
-    default ClauseType getClauseType() {
-        return ClauseType.select;
-    }
 }

@@ -7,8 +7,5 @@ public interface Clause {
      */
     String toClauseString();
 
-    default ClauseType getClauseType() {
-        return ClauseType.none;
-    }
 
 }

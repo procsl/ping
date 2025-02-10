@@ -1,9 +1,8 @@
 package cn.procsl.ping.boot.jpa.support.query.ast;
 
 import cn.procsl.ping.boot.jpa.TestJpaApplication;
-import cn.procsl.ping.boot.jpa.support.query.ProjectionDTO;
 import cn.procsl.ping.boot.jpa.support.query.ProjectionSearchRepository;
-import cn.procsl.ping.boot.jpa.support.query.ast.domain.ResultDTO;
+import cn.procsl.ping.boot.jpa.support.query.ast.domain.ResultVO;
 import cn.procsl.ping.boot.jpa.support.query.ast.domain.SingletonQueryDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -16,8 +15,6 @@ import org.springframework.validation.annotation.Validated;
 import javax.inject.Inject;
 
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 @Service
@@ -35,7 +32,7 @@ public class ProjectionSearchRepositoryImplTest {
         SingletonQueryDTO query = new SingletonQueryDTO();
         query.setId(1L);
         query.setSubName("test");
-        List<ResultDTO> result = this.projectionSearchRepository.search(query, ResultDTO.class);
+        List<ResultVO> result = this.projectionSearchRepository.search(query, ResultVO.class);
         log.debug("结果: {}", result);
     }
 }

@@ -11,14 +11,9 @@ public interface FromClause extends Clause, Order {
      * from查询语句
      */
 //    String getFromClause();
-
     @Override
     default int getOrder() {
         return 0;
     }
 
-    @Override
-    default ClauseType getClauseType() {
-        return ClauseType.from;
-    }
 }

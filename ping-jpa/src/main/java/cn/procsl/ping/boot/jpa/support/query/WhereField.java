@@ -33,7 +33,7 @@ public @interface WhereField {
     boolean required() default false;
 
     @Documented
-    @Target(TYPE)
+    @Target({TYPE, FIELD})
     @Retention(value = RUNTIME)
     @interface WhereFields {
 
