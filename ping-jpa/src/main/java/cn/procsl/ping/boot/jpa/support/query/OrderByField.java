@@ -13,4 +13,13 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(value = RUNTIME)
 public @interface OrderByField {
 
+    int order() default Integer.MAX_VALUE;
+
+    Sort sort() default Sort.aes;
+
+
+    enum Sort {
+        aes, desc
+    }
+
 }

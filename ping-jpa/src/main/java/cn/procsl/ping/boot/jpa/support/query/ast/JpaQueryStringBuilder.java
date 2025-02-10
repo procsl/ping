@@ -41,10 +41,9 @@ final class JpaQueryStringBuilder implements QueryClause {
         sb.append(selectString);
         sb.append("\nfrom \n\t");
         sb.append(fromString);
-        sb.append("\n");
 
         if (!this.wheres.isEmpty()) {
-            sb.append(" where ");
+            sb.append("\nwhere \n\t");
             this.wheres.sort(comparing);
             String whereString = this.wheres.stream()
                 .sorted(comparing)
@@ -58,11 +57,11 @@ final class JpaQueryStringBuilder implements QueryClause {
         }
 
         if (!this.orderBy.isEmpty()) {
-            sb.append(" order by ");
+            sb.append("\norder by \n\t");
             this.orderBy.sort(comparing);
             String orderString = this.orderBy.stream()
                 .sorted(comparing)
-                .map(Clause::toClauseString).collect(Collectors.joining(" "));
+                .map(Clause::toClauseString).collect(Collectors.joining(", "));
             sb.append(orderString);
         }
         if (len < sb.length()) {

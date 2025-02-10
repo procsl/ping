@@ -3,6 +3,7 @@ package cn.procsl.ping.boot.jpa.support.query.ast;
 import cn.procsl.ping.boot.jpa.support.query.Projection;
 import cn.procsl.ping.boot.jpa.support.query.ReferenceBy;
 import cn.procsl.ping.boot.jpa.support.query.SelectField;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +39,7 @@ final class SelectClauseBuilder implements QueryBuilder {
     private static class FieldSelectField implements SelectClause {
 
         final private Field field;
+        @Getter
         final private int order;
         private final ReferenceBy ref;
         private final Projection projection;
@@ -68,11 +70,6 @@ final class SelectClauseBuilder implements QueryBuilder {
             }
             log.trace("[{}.{}]使用[ref]生成select字段[{}]", this.field.getDeclaringClass(), this.field.getName(), tmp);
             return tmp;
-        }
-
-        @Override
-        public int getOrder() {
-            return order;
         }
 
         @Override

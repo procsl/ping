@@ -60,10 +60,11 @@ class ProjectionSearchRepositoryImpl implements ProjectionSearchRepository, Init
      * 初始化
      */
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
         this.builders.add(new SelectClauseBuilder());
         this.builders.add(new FromClauseBuilder());
         this.builders.add(new WhereClauseBuilder());
+        this.builders.add(new OrderClauseBuilder());
     }
 
     @RequiredArgsConstructor
