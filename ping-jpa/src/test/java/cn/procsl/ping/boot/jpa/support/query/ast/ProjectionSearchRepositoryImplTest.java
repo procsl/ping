@@ -32,7 +32,9 @@ public class ProjectionSearchRepositoryImplTest {
         SingletonQueryDTO query = new SingletonQueryDTO();
         query.setId(1L);
         query.setSubName("test");
+//        for (int i = 0; i < 100000; i++) {
         List<ResultVO> result = this.projectionSearchRepository.search(query, ResultVO.class);
+//        }
         log.debug("结果: {}", result);
     }
 }
