@@ -35,7 +35,6 @@ import java.util.Collection;
 @Projection(entity = MainEntity.class, alias = "main")
 @JoinField(ref = "main", join = @Projection(entity = SubEntity.class, alias = "sub"))
 @JoinField(ref = "main", join = @Projection(entity = SubEntity.class, alias = "sub2"))
-@QueryBind(base = "from MainEntity as m inner join SubEntity as s on m.id = s.mainId")
 public class ProjectionDTO implements Serializable {
 
     @SelectField

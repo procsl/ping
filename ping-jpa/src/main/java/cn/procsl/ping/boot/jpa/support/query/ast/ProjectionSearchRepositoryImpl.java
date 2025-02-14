@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Indexed
-@Component("defaultProjectionSearchRepository")
+//@Component("defaultProjectionSearchRepository")
 class ProjectionSearchRepositoryImpl implements ProjectionSearchRepository, InitializingBean {
 
     List<QueryBuilder> builders = new ArrayList<>();

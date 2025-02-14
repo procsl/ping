@@ -63,13 +63,14 @@ final class SelectClauseBuilder implements QueryBuilder {
                 return tmp;
             }
 
-            if (ref.alias() == null || ref.alias().isEmpty()) {
-                tmp = ref.ref() + "." + ref.target() + " as " + this.field.getName();
-            } else {
-                tmp = ref.ref() + "." + ref.alias();
-            }
-            log.trace("[{}.{}]使用[ref]生成select字段[{}]", this.field.getDeclaringClass(), this.field.getName(), tmp);
-            return tmp;
+//            if (ref.alias() == null || ref.alias().isEmpty()) {
+//                tmp = ref.ref() + "." + ref.target() + " as " + this.field.getName();
+//            } else {
+//                tmp = ref.ref() + "." + ref.alias();
+//            }
+//            log.trace("[{}.{}]使用[ref]生成select字段[{}]", this.field.getDeclaringClass(), this.field.getName(), tmp);
+//            return tmp;
+            return null;
         }
 
         @Override

@@ -25,4 +25,5 @@ public @interface Projection {
      */
     String alias() default "";
 
+
 }

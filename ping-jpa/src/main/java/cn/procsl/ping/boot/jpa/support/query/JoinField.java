@@ -11,6 +11,9 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+/**
+ * 不同的位置可能不等价
+ */
 @Documented
 @Target({TYPE, FIELD})
 @Retention(value = RUNTIME)

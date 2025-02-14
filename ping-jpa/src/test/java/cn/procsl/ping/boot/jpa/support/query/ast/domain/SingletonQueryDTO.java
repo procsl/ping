@@ -2,16 +2,24 @@ package cn.procsl.ping.boot.jpa.support.query.ast.domain;
 
 
 import cn.procsl.ping.boot.jpa.support.query.*;
+import jakarta.persistence.criteria.JoinType;
 import lombok.Data;
 
 import java.io.Serializable;
 
 /**
- * select teacher.id, teacher.name as teacherName, teacher.desc  from Teacher as teacher where id=:id
+ * 1.  Teacher as main
+ * 2.  Teacher as main
+ *     inner join SubEntity as sub on main.id = sub.id
+ * 3.  Teacher as main
+ *     inner join SubEntity as sub on main.id = sub.id
+ *     inner join SubEntity as sub2 on main.id = sub2.id
+ *
  */
 @Data
 @Projection(entity = Teacher.class, alias = "main")
 @JoinField(ref = "main", join = @Projection(entity = SubEntity.class, alias = "sub"))
+@JoinField(ref = "main", joinType = JoinType.LEFT, join = @Projection(entity = SubEntity.class, alias = "sub2"))
 @JoinField(ref = "sub", join = @Projection(entity = SubEntity.class, alias = "sub1"))
 public class SingletonQueryDTO implements Serializable {
 

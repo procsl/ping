@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public interface From extends Node {
+public interface FromExpression extends Expression {
 
     /**
      * 获取表达式
@@ -19,12 +19,13 @@ public interface From extends Node {
     /**
      * 获取join节点
      */
-    List<Join> getJoins();
+    List<JoinExpression> getJoins();
 
     /**
      * 创建from语句, 不包含join
      */
     default String createFromExpString() {
+
         String main = this.getExpression().toExpString();
         return "%s as %s".formatted(main, this.getTableAlias());
     }
@@ -38,13 +39,13 @@ public interface From extends Node {
     @Override
     default String toExpString() {
 
-        List<Join> joins = this.getJoins();
+        List<JoinExpression> joins = this.getJoins();
         String main = this.createFromExpString();
         if (joins == null || joins.isEmpty()) {
             return main;
         }
 
-        Function<Join, String> exp = item -> item.createJoinExpString(this);
+        Function<JoinExpression, String> exp = item -> item.createJoinExpString(this.getTableAlias(), this.createFromExpString());
         String tmp = joins.stream().map(exp).collect(Collectors.joining(" "));
 
         return main + " " + tmp;

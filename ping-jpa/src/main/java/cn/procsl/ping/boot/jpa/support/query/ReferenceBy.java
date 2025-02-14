@@ -14,6 +14,7 @@ public @interface ReferenceBy {
 
     /**
      * 引用的别名
+     * 需要在类上标注类型
      */
     String ref();
 
@@ -23,9 +24,5 @@ public @interface ReferenceBy {
      */
     String target() default "";
 
-    /**
-     * 设置当前字段别名, 如果为空, 则使用被标注的字段字段名
-     */
-    String alias() default "";
 
 }
