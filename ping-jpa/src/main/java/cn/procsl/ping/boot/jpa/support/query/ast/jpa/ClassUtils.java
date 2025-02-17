@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.jpa.support.query.ast2.jpa;
+package cn.procsl.ping.boot.jpa.support.query.ast.jpa;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;

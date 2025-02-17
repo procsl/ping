@@ -1,9 +1,9 @@
-package cn.procsl.ping.boot.jpa.support.query.ast2.jpa;
+package cn.procsl.ping.boot.jpa.support.query.ast.jpa;
 
 import cn.procsl.ping.boot.jpa.support.query.Projection;
 import cn.procsl.ping.boot.jpa.support.query.ReferenceBy;
-import cn.procsl.ping.boot.jpa.support.query.SelectField;
-import cn.procsl.ping.boot.jpa.support.query.ast2.*;
+import cn.procsl.ping.boot.jpa.support.query.Select;
+import cn.procsl.ping.boot.jpa.support.query.ast.*;
 import jakarta.annotation.Nonnull;
 import lombok.NonNull;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -13,12 +13,12 @@ import java.lang.reflect.Field;
 final class SelectFieldExpression implements SelectExpression {
 
     private final Field field;
-    private final SelectField annotation;
+    private final Select annotation;
     private final Projection projection;
 
     public SelectFieldExpression(@NonNull Field field, @NonNull Projection projection) {
         this.field = field;
-        this.annotation = AnnotationUtils.findAnnotation(field, SelectField.class);
+        this.annotation = AnnotationUtils.findAnnotation(field, Select.class);
         this.projection = projection;
     }
 

@@ -33,19 +33,19 @@ import java.util.Collection;
 @Data
 @NoArgsConstructor
 @Projection(entity = MainEntity.class, alias = "main")
-@JoinField(ref = "main", join = @Projection(entity = SubEntity.class, alias = "sub"))
-@JoinField(ref = "main", join = @Projection(entity = SubEntity.class, alias = "sub2"))
+@Join(ref = "main", join = @Projection(entity = SubEntity.class, alias = "sub"))
+@Join(ref = "main", join = @Projection(entity = SubEntity.class, alias = "sub2"))
 public class ProjectionDTO implements Serializable {
 
-    @SelectField
-    @OrderByField
+    @Select
+    @Order
     Long id;
 
-    @SelectField
-    @WhereField
+    @Select
+    @Where
     String name;
 
-    @SelectField
+    @Select
     String desc;
 
     @ReferenceBy(ref = "sub")

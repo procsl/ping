@@ -1,6 +1,6 @@
-package cn.procsl.ping.boot.jpa.support.query.ast2.jpa;
+package cn.procsl.ping.boot.jpa.support.query.ast.jpa;
 
-import cn.procsl.ping.boot.jpa.support.query.JoinField;
+import cn.procsl.ping.boot.jpa.support.query.Join;
 import cn.procsl.ping.boot.jpa.support.query.Projection;
 import cn.procsl.ping.boot.jpa.support.query.ProjectionSearchRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +28,7 @@ class JpaProjectionSearchRepository implements ProjectionSearchRepository {
             throw new IllegalStateException("未标注@Projection注解: " + clazz);
         }
 
-        List<JoinField> joins = this.getJoinFields(clazz);
+        List<Join> joins = this.getJoinFields(clazz);
         List<Field> fields = ClassUtils.extractFields(clazz);
 
         ProjectionQueryExpression pqe = new ProjectionQueryExpression(true);
@@ -42,14 +42,14 @@ class JpaProjectionSearchRepository implements ProjectionSearchRepository {
         return null;
     }
 
-    private List<JoinField> getJoinFields(Class<?> clazz) {
-        List<JoinField> list = new ArrayList<>();
+    private List<Join> getJoinFields(Class<?> clazz) {
+        List<Join> list = new ArrayList<>();
 
-        JoinField.Joins joins = AnnotationUtils.findAnnotation(clazz, JoinField.Joins.class);
+        Join.Joins joins = AnnotationUtils.findAnnotation(clazz, Join.Joins.class);
         if (joins != null) {
             list.addAll(Arrays.asList(joins.value()));
         } else {
-            JoinField join = AnnotationUtils.findAnnotation(clazz, JoinField.class);
+            Join join = AnnotationUtils.findAnnotation(clazz, Join.class);
             list.add(join);
         }
         return list;

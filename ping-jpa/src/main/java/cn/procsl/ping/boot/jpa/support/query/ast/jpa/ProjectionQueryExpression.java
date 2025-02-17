@@ -1,13 +1,12 @@
-package cn.procsl.ping.boot.jpa.support.query.ast2.jpa;
+package cn.procsl.ping.boot.jpa.support.query.ast.jpa;
 
-import cn.procsl.ping.boot.jpa.support.query.ast2.FromExpression;
-import cn.procsl.ping.boot.jpa.support.query.ast2.Expression;
-import cn.procsl.ping.boot.jpa.support.query.ast2.SelectExpression;
+import cn.procsl.ping.boot.jpa.support.query.ast.FromExpression;
+import cn.procsl.ping.boot.jpa.support.query.ast.Expression;
+import cn.procsl.ping.boot.jpa.support.query.ast.SelectExpression;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.Set;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor

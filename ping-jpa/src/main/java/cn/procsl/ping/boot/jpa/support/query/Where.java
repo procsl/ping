@@ -12,8 +12,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Target({TYPE, FIELD})
 @Retention(value = RUNTIME)
-@Repeatable(value = WhereField.WhereFields.class)
-public @interface WhereField {
+@Repeatable(value = Where.WhereFields.class)
+public @interface Where {
     /**
      * 查询条件组, 例如 (field1=XX or field2=YY) and (field3=XX or field4=YY)
      * 其中 (field1=XX or field2=YY) 为一组
@@ -37,7 +37,7 @@ public @interface WhereField {
     @Retention(value = RUNTIME)
     @interface WhereFields {
 
-        WhereField[] value();
+        Where[] value();
 
     }
 

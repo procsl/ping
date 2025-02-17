@@ -1,19 +1,22 @@
-package cn.procsl.ping.boot.jpa.support.query.ast2;
+package cn.procsl.ping.boot.jpa.support.query.ast;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public final class StringExpression implements Expression {
+public final class DotExpression implements Expression {
 
-    final String exp;
+    final String main;
+    final String name;
 
     @Override
     public String toExpString() {
-        return exp;
+        return main + "." + name;
     }
 
     @Override
     public String toString() {
         return this.toExpString();
     }
+
+
 }

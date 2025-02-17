@@ -13,7 +13,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Target({FIELD, METHOD})
 @Retention(value = RUNTIME)
-public @interface SelectField {
+public @interface Select {
     /**
      * 如果被标注为true, 一定会出现在select语句中
      */

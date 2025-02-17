@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.jpa.support.query.ast2;
+package cn.procsl.ping.boot.jpa.support.query.ast;
 
 /**
  * 表达式节点

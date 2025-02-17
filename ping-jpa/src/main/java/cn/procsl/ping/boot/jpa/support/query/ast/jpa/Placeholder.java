@@ -1,6 +1,6 @@
-package cn.procsl.ping.boot.jpa.support.query.ast2.jpa;
+package cn.procsl.ping.boot.jpa.support.query.ast.jpa;
 
-import cn.procsl.ping.boot.jpa.support.query.ast2.Expression;
+import cn.procsl.ping.boot.jpa.support.query.ast.Expression;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

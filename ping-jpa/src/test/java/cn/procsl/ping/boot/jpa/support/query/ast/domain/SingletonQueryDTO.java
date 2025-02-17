@@ -18,31 +18,31 @@ import java.io.Serializable;
  */
 @Data
 @Projection(entity = Teacher.class, alias = "main")
-@JoinField(ref = "main", join = @Projection(entity = SubEntity.class, alias = "sub"))
-@JoinField(ref = "main", joinType = JoinType.LEFT, join = @Projection(entity = SubEntity.class, alias = "sub2"))
-@JoinField(ref = "sub", join = @Projection(entity = SubEntity.class, alias = "sub1"))
+@Join(ref = "main", join = @Projection(entity = SubEntity.class, alias = "sub"))
+@Join(ref = "main", joinType = JoinType.LEFT, join = @Projection(entity = SubEntity.class, alias = "sub2"))
+@Join(ref = "sub", join = @Projection(entity = SubEntity.class, alias = "sub1"))
 public class SingletonQueryDTO implements Serializable {
 
-    @OrderByField
-    @SelectField
+    @Order
+    @Select
     Long id;
 
-    @OrderByField
-    @SelectField
+    @Order
+    @Select
     @ReferenceBy(ref = "sub", target = "name")
-    @WhereField(groupName = "a")
-    @WhereField(groupName = "b")
+    @Where(groupName = "a")
+    @Where(groupName = "b")
     String subName;
 
-    @OrderByField
-    @SelectField
+    @Order
+    @Select
     @ReferenceBy(ref = "sub1", target = "name")
-    @WhereField(condition = ">=", required = true)
+    @Where(condition = ">=", required = true)
     String sub1Name;
 
-    @OrderByField(sort = OrderByField.Sort.desc, order = 1)
-    @SelectField
-    @WhereField(required = true, groupName = "a", condition = "like")
+    @Order(sort = Order.Sort.desc, order = 1)
+    @Select
+    @Where(required = true, groupName = "a", condition = "like")
     String desc;
 
 }

@@ -1,8 +1,8 @@
-package cn.procsl.ping.boot.jpa.support.query.ast2.jpa;
+package cn.procsl.ping.boot.jpa.support.query.ast.jpa;
 
-import cn.procsl.ping.boot.jpa.support.query.JoinField;
+import cn.procsl.ping.boot.jpa.support.query.Join;
 import cn.procsl.ping.boot.jpa.support.query.Projection;
-import cn.procsl.ping.boot.jpa.support.query.ast2.*;
+import cn.procsl.ping.boot.jpa.support.query.ast.*;
 import jakarta.persistence.criteria.JoinType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.ObjectUtils;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 final class FromFieldExpression implements FromExpression {
 
     private final Projection projection;
-    private final List<JoinField> joinFields;
+    private final List<Join> joinFields;
     private final Class<?> projectionType;
 
     public Class<?> getEntityType() {
@@ -51,7 +51,7 @@ final class FromFieldExpression implements FromExpression {
     static class InnerJoinExpression implements JoinExpression {
 
         private final FromFieldExpression from;
-        private final JoinField joinField;
+        private final Join joinField;
 
         @Override
         public Expression getExpression() {

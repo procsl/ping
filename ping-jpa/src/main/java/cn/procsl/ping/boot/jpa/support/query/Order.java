@@ -11,7 +11,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Target({TYPE, FIELD})
 @Retention(value = RUNTIME)
-public @interface OrderByField {
+public @interface Order {
 
     int order() default Integer.MAX_VALUE;
 

@@ -1,21 +1,19 @@
-package cn.procsl.ping.boot.jpa.support.query.ast2;
+package cn.procsl.ping.boot.jpa.support.query.ast;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public final class WrapperExpression implements Expression {
+public final class StringExpression implements Expression {
 
-    private final Expression expression;
+    final String exp;
 
     @Override
     public String toExpString() {
-        return "(" + expression.toExpString() + ")";
+        return exp;
     }
-
 
     @Override
     public String toString() {
         return this.toExpString();
     }
-
 }

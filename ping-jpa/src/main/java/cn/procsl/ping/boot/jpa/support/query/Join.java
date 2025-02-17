@@ -17,8 +17,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Target({TYPE, FIELD})
 @Retention(value = RUNTIME)
-@Repeatable(JoinField.Joins.class)
-public @interface JoinField {
+@Repeatable(Join.Joins.class)
+public @interface Join {
 
 
     String leftJoinField() default "id";
@@ -37,7 +37,7 @@ public @interface JoinField {
     @Retention(value = RUNTIME)
     @interface Joins {
 
-        JoinField[] value();
+        Join[] value();
 
     }
 
