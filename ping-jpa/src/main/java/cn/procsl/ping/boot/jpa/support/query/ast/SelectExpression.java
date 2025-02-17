@@ -14,6 +14,16 @@ public interface SelectExpression extends Expression {
     String getAliasName();
 
     /**
+     * 是否时必须的
+     */
+    boolean isRequired();
+
+    /**
+     * 是否包含在查询中
+     */
+    boolean isInclude();
+
+    /**
      * 获取查询表达式
      */
     @Nonnull

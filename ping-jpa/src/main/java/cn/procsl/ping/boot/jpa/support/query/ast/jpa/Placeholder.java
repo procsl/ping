@@ -13,8 +13,6 @@ public final class Placeholder implements Expression {
 
     final private String name;
 
-    final private Class<?> type;
-
     @Override
     public String toExpString() {
         return ":" + name;

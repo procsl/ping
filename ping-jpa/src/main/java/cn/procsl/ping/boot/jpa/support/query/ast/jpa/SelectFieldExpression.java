@@ -29,11 +29,17 @@ final class SelectFieldExpression implements SelectExpression {
         return this.annotation != null;
     }
 
+    @Override
     public boolean isRequired() {
         if (isSelectNode()) {
             return this.annotation.required();
         }
         return false;
+    }
+
+    @Override
+    public boolean isInclude() {
+        return this.isSelectNode();
     }
 
     @Nonnull

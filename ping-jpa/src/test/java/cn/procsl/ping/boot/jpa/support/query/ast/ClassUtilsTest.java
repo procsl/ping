@@ -1,6 +1,7 @@
 
 package cn.procsl.ping.boot.jpa.support.query.ast;
 
+import cn.procsl.ping.boot.jpa.support.query.ast.jpa.ClassUtils;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;

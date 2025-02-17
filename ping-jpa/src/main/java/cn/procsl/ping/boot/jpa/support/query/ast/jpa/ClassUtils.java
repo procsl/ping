@@ -5,7 +5,7 @@ import java.lang.reflect.*;
 import java.util.*;
 import java.util.function.Supplier;
 
-final class ClassUtils {
+public final class ClassUtils {
 
     /**
      * 提取给定类中的所有 get 方法和 is 方法。

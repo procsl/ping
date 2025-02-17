@@ -1,6 +1,7 @@
 package cn.procsl.ping.boot.jpa.support.query.ast;
 
 import cn.procsl.ping.boot.jpa.TestJpaApplication;
+import cn.procsl.ping.boot.jpa.support.query.ProjectionDTO;
 import cn.procsl.ping.boot.jpa.support.query.ProjectionSearchRepository;
 import cn.procsl.ping.boot.jpa.support.query.ast.domain.ResultVO;
 import cn.procsl.ping.boot.jpa.support.query.ast.domain.SingletonQueryDTO;
@@ -32,9 +33,10 @@ public class ProjectionSearchRepositoryImplTest {
         SingletonQueryDTO query = new SingletonQueryDTO();
         query.setId(1L);
         query.setSubName("test");
-//        for (int i = 0; i < 100000; i++) {
-        List<ResultVO> result = this.projectionSearchRepository.search(query, ResultVO.class);
-//        }
-        log.debug("结果: {}", result);
+        this.projectionSearchRepository.search(query, ResultVO.class);
+
+        ProjectionDTO pp = new ProjectionDTO();
+        pp.setId(2L);
+        this.projectionSearchRepository.search(pp, ResultVO.class);
     }
 }
