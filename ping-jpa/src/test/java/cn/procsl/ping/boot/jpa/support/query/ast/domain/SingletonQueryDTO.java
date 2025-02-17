@@ -19,7 +19,7 @@ import java.io.Serializable;
 @Data
 @Projection(entity = Teacher.class, alias = "main")
 @Join(ref = "main", join = @Projection(entity = SubEntity.class, alias = "sub"))
-@Join(ref = "main", joinType = JoinType.LEFT, join = @Projection(entity = SubEntity.class, alias = "sub2"))
+@Join(ref = "main", type = JoinType.LEFT, join = @Projection(entity = SubEntity.class, alias = "sub2"))
 @Join(ref = "sub", join = @Projection(entity = SubEntity.class, alias = "sub1"))
 public class SingletonQueryDTO implements Serializable {
 

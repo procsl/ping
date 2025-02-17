@@ -70,7 +70,7 @@ final class FromFieldExpression implements FromExpression {
 
         @Override
         public JoinType getJoinType() {
-            return joinField.joinType();
+            return joinField.type();
         }
 
         @Override

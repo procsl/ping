@@ -25,7 +25,7 @@ public @interface Join {
 
     String rightJoinField() default "id";
 
-    JoinType joinType() default JoinType.INNER;
+    JoinType type() default JoinType.INNER;
 
     String ref() default "";
 
