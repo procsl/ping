@@ -15,11 +15,11 @@ public @interface Order {
 
     int order() default Integer.MAX_VALUE;
 
-    Sort sort() default Sort.aes;
+    Sort sort() default Sort.asc;
 
 
     enum Sort {
-        aes, desc
+        asc, desc
     }
 
 }

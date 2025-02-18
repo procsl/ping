@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @Entity
-@Table(name = "j_main_entity")
+@Table(name = "j_sub_entity")
 @NoArgsConstructor
 public class SubEntity {
 

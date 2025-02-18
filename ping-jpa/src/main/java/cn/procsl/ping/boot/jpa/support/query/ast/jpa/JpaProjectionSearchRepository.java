@@ -1,6 +1,11 @@
 package cn.procsl.ping.boot.jpa.support.query.ast.jpa;
 
 import cn.procsl.ping.boot.jpa.support.query.*;
+import cn.procsl.ping.boot.jpa.support.query.ast.Variable;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Component;
@@ -10,15 +15,35 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Indexed
+@RequiredArgsConstructor
 @Component("defaultJpaProjectionSearchRepository")
 class JpaProjectionSearchRepository implements ProjectionSearchRepository {
+
+    final EntityManager entityManager;
 
     @Override
     public <Q, R> List<R> search(Q query, Class<R> mapping) {
 
+        ProjectionQueryExpression pqe = this.createProjectionQuery(query);
+
+        String jpql = pqe.toExpString();
+
+        Set<Variable> params = pqe.getQueryVariables();
+
+        TypedQuery<R> eq = entityManager.createQuery(jpql, mapping);
+        for (Variable param : params) {
+            eq.setParameter(param.getName(), param.getValue());
+        }
+        log.info("sql语句: \n\n{}\n\n", jpql);
+
+        return eq.getResultList();
+    }
+
+    private <Q> ProjectionQueryExpression createProjectionQuery(Q query) {
         Class<?> clazz = query.getClass();
         Projection projection = AnnotationUtils.findAnnotation(clazz, Projection.class);
 
@@ -37,7 +62,7 @@ class JpaProjectionSearchRepository implements ProjectionSearchRepository {
 
             List<Where> wheres = this.getWheres(field);
             for (Where where : wheres) {
-                pqe.addWhere(new WhereFieldExpression(field, projection, ref, where));
+                pqe.addWhere(new WhereFieldExpression(query, field, projection, ref, where));
             }
 
             Order order = this.getOrder(field);
@@ -46,10 +71,7 @@ class JpaProjectionSearchRepository implements ProjectionSearchRepository {
             }
         }
         pqe.addFrom(new FromFieldExpression(projection, joins, clazz));
-
-        log.info("sql语句: \n\n{}\n\n", pqe.toExpString());
-
-        return null;
+        return pqe;
     }
 
     private Order getOrder(Field field) {

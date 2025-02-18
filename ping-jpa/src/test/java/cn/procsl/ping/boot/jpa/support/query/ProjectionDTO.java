@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.Collection;
 
 
 /**
@@ -34,7 +33,6 @@ import java.util.Collection;
 @NoArgsConstructor
 @Projection(entity = MainEntity.class, alias = "main")
 @Join(ref = "main", join = @Projection(entity = SubEntity.class, alias = "sub"))
-@Join(ref = "main", join = @Projection(entity = SubEntity.class, alias = "sub2"))
 public class ProjectionDTO implements Serializable {
 
     @Select
@@ -46,28 +44,7 @@ public class ProjectionDTO implements Serializable {
     String name;
 
     @Select
-    String desc;
-
     @ReferenceBy(ref = "sub")
-    SubProjection subProjection;
-
-    @ReferenceBy(ref = "sub2")
-    Collection<SubProjection> subProjections;
-
-
-    @Data
-    @Projection(entity = SubEntity.class)
-    public static class SubProjection implements Serializable {
-
-        Long id;
-
-        String name;
-
-        ProjectionDTO projectionDTO;
-
-        MainEntity mainEntity;
-
-        String desc;
-    }
+    String desc;
 
 }

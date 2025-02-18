@@ -86,11 +86,10 @@ final class ProjectionQueryExpression implements Expression {
     /**
      * 获取sql占位符变量
      */
-    public Set<Placeholder> getQueryVariables() {
+    public Set<Variable> getQueryVariables() {
         return this.wheres.stream()
             .filter(WhereExpression::isInclude)
-            .map(WhereExpression::getParamName)
-            .map(Placeholder::new)
+            .map(WhereExpression::getParamVariable)
             .collect(Collectors.toSet());
     }
 
