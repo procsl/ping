@@ -13,7 +13,7 @@ import org.springframework.core.annotation.AnnotationUtils;
 import java.lang.reflect.Field;
 
 @RequiredArgsConstructor
-class WhereFieldExpression implements WhereExpression {
+final class WhereFieldExpression implements WhereExpression {
 
     final Field field;
     final Projection main;

@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 import java.lang.reflect.Field;
 
 @RequiredArgsConstructor
-class OrderFieldExpression implements OrderExpression {
+final class OrderFieldExpression implements OrderExpression {
 
     final Field field;
     final Projection projection;
