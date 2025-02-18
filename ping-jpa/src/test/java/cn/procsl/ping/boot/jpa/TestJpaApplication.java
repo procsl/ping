@@ -6,8 +6,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 @SpringBootApplication
-@EnableJpaExtensionRepositories(basePackages = {"cn.procsl.ping.boot.jpa.jpql",
-    "cn.procsl.ping.boot.jpa.support.query"})
+@EnableJpaExtensionRepositories(basePackages = {
+    "cn.procsl.ping.boot.jpa.jpql",
+    "cn.procsl.ping.boot.jpa.support.query",
+    "cn.procsl.ping.boot.jpa.support.query.ast"
+})
 //        , basePackageClasses = {ExtensionRepository.class, StandRepository.class})
 @EntityScan({"cn.procsl.ping.boot.jpa.support.query", "cn.procsl.ping.boot.jpa.support.query.ast.domain"})
 public class TestJpaApplication {

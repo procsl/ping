@@ -1,13 +1,16 @@
 package cn.procsl.ping.boot.jpa.support.query.ast;
 
 import cn.procsl.ping.boot.jpa.TestJpaApplication;
+import cn.procsl.ping.boot.jpa.support.query.MainEntity;
 import cn.procsl.ping.boot.jpa.support.query.ProjectionDTO;
 import cn.procsl.ping.boot.jpa.support.query.ProjectionSearchRepository;
+import cn.procsl.ping.boot.jpa.support.query.SubEntity;
 import cn.procsl.ping.boot.jpa.support.query.ast.domain.ResultVO;
 import cn.procsl.ping.boot.jpa.support.query.ast.domain.SingletonQueryDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,21 +25,36 @@ import java.util.List;
 @Validated
 @Transactional
 @Rollback
-@SpringBootTest(classes = TestJpaApplication.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@SpringBootTest(classes = TestJpaApplication.class,
+    webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class ProjectionSearchRepositoryImplTest {
 
     @Inject
     ProjectionSearchRepository projectionSearchRepository;
 
+    @Inject
+    JpaRepository<MainEntity, Long> mainEntityLongJpaRepository;
+
+    @Inject
+    JpaRepository<SubEntity, Long> subEntityLongJpaRepository;
+
+
     @Test
     public void search() {
-        SingletonQueryDTO query = new SingletonQueryDTO();
-        query.setId(1L);
-        query.setSubName("test");
-        this.projectionSearchRepository.search(query, ResultVO.class);
-
         ProjectionDTO pp = new ProjectionDTO();
-        pp.setId(2L);
-        this.projectionSearchRepository.search(pp, ResultVO.class);
+        pp.setName("1");
+
+        MainEntity entity = new MainEntity();
+        entity.setName("1");
+        entity.setDesc("你好啊");
+        entity = this.mainEntityLongJpaRepository.save(entity);
+
+        SubEntity sub = new SubEntity();
+        sub.setMainId(entity.getId());
+        sub.setName("我是sub");
+        this.subEntityLongJpaRepository.save(sub);
+        this.subEntityLongJpaRepository.flush();
+        List<ResultVO> result = this.projectionSearchRepository.search(pp, ResultVO.class);
+        log.info("结果集: {}", result);
     }
 }
