@@ -1,9 +1,14 @@
 package cn.procsl.ping.boot.jpa.support.query.ast.jpa;
 
+import cn.procsl.ping.boot.jpa.support.query.Projection;
+import cn.procsl.ping.boot.jpa.support.query.ReferenceBy;
+import cn.procsl.ping.boot.jpa.support.query.Select;
 import cn.procsl.ping.boot.jpa.support.query.Where;
+import cn.procsl.ping.boot.jpa.support.query.ast.DotExpression;
 import cn.procsl.ping.boot.jpa.support.query.ast.Expression;
 import cn.procsl.ping.boot.jpa.support.query.ast.WhereExpression;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.annotation.AnnotationUtils;
 
 import java.lang.reflect.Field;
 
@@ -11,16 +16,21 @@ import java.lang.reflect.Field;
 class WhereFieldExpression implements WhereExpression {
 
     final Field field;
+    final Projection main;
+    final ReferenceBy ref;
     final Where where;
 
     @Override
     public boolean isRequired() {
-        return false;
+        return where != null && where.required();
     }
 
     @Override
     public String groupName() {
-        return null;
+        if (where == null) {
+            return null;
+        }
+        return where.groupName();
     }
 
     @Override
@@ -29,17 +39,28 @@ class WhereFieldExpression implements WhereExpression {
     }
 
     @Override
-    public String getParmaName() {
-        return this;
+    public String getParamName() {
+        Select select = AnnotationUtils.findAnnotation(this.field, Select.class);
+        if (select == null || select.alias() == null || select.alias().isEmpty()) {
+            return this.field.getName();
+        }
+        return select.alias();
     }
 
     @Override
     public Expression getExpression() {
-        return null;
+        String name = this.field.getName();
+        if (ref == null) {
+            return new DotExpression(main.alias(), name);
+        }
+        if (ref.target() == null || ref.target().isEmpty()) {
+            return new DotExpression(ref.ref(), name);
+        }
+        return new DotExpression(ref.ref(), ref.target());
     }
 
     @Override
     public String condition() {
-        return null;
+        return this.where.condition();
     }
 }

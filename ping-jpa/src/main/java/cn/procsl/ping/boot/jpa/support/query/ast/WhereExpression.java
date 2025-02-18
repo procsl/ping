@@ -20,7 +20,7 @@ public interface WhereExpression extends Expression {
     /**
      * 参数名称
      */
-    String getParmaName();
+    String getParamName();
 
     /**
      * 条件表达式
@@ -34,6 +34,6 @@ public interface WhereExpression extends Expression {
 
     @Override
     default String toExpString() {
-        return this.getExpression() + " " + this.condition() + " :" + this.getParmaName();
+        return this.getExpression() + " " + this.condition() + " :" + this.getParamName();
     }
 }

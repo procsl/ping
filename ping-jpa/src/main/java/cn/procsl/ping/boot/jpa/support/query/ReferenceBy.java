@@ -1,5 +1,8 @@
 package cn.procsl.ping.boot.jpa.support.query;
 
+import cn.procsl.ping.boot.jpa.support.query.ast.DotExpression;
+import cn.procsl.ping.boot.jpa.support.query.ast.Expression;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -23,6 +26,5 @@ public @interface ReferenceBy {
      * 引用的字段名, 如果为 空白字符串, 则取被标注的字段
      */
     String target() default "";
-
 
 }

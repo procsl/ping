@@ -16,10 +16,14 @@ final class SelectFieldExpression implements SelectExpression {
     private final Select annotation;
     private final Projection projection;
 
-    public SelectFieldExpression(@NonNull Field field, @NonNull Projection projection) {
+    private final ReferenceBy ref;
+
+
+    public SelectFieldExpression(@NonNull Field field, @NonNull Projection projection, ReferenceBy ref) {
         this.field = field;
         this.annotation = AnnotationUtils.findAnnotation(field, Select.class);
         this.projection = projection;
+        this.ref = ref;
     }
 
     /**

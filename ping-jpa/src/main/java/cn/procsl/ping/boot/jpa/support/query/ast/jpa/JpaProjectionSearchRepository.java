@@ -1,9 +1,6 @@
 package cn.procsl.ping.boot.jpa.support.query.ast.jpa;
 
-import cn.procsl.ping.boot.jpa.support.query.Join;
-import cn.procsl.ping.boot.jpa.support.query.Projection;
-import cn.procsl.ping.boot.jpa.support.query.ProjectionSearchRepository;
-import cn.procsl.ping.boot.jpa.support.query.Where;
+import cn.procsl.ping.boot.jpa.support.query.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Component;
@@ -33,20 +30,30 @@ class JpaProjectionSearchRepository implements ProjectionSearchRepository {
         List<Field> fields = ClassUtils.extractFields(clazz);
 
         ProjectionQueryExpression pqe = new ProjectionQueryExpression(true);
-        for (Field field : fields) {
-            pqe.addSelect(new SelectFieldExpression(field, projection));
+        for (int i = 0; i < fields.size(); i++) {
+            Field field = fields.get(i);
+            ReferenceBy ref = AnnotationUtils.findAnnotation(field, ReferenceBy.class);
+            pqe.addSelect(new SelectFieldExpression(field, projection, ref));
 
             List<Where> wheres = this.getWheres(field);
             for (Where where : wheres) {
-                pqe.addWhere(new WhereFieldExpression(field, where));
+                pqe.addWhere(new WhereFieldExpression(field, projection, ref, where));
             }
 
+            Order order = this.getOrder(field);
+            if (order != null) {
+                pqe.addOrder(new OrderFieldExpression(field, projection, ref, order, i));
+            }
         }
         pqe.addFrom(new FromFieldExpression(projection, joins, clazz));
 
         log.info("sql语句: \n\n{}\n\n", pqe.toExpString());
 
         return null;
+    }
+
+    private Order getOrder(Field field) {
+        return AnnotationUtils.findAnnotation(field, Order.class);
     }
 
     private List<Where> getWheres(Field field) {

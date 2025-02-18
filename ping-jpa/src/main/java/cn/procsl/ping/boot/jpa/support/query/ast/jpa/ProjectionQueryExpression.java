@@ -1,15 +1,9 @@
 package cn.procsl.ping.boot.jpa.support.query.ast.jpa;
 
-import cn.procsl.ping.boot.jpa.support.query.ast.FromExpression;
-import cn.procsl.ping.boot.jpa.support.query.ast.Expression;
-import cn.procsl.ping.boot.jpa.support.query.ast.SelectExpression;
-import cn.procsl.ping.boot.jpa.support.query.ast.WhereExpression;
+import cn.procsl.ping.boot.jpa.support.query.ast.*;
 import lombok.RequiredArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -19,6 +13,7 @@ final class ProjectionQueryExpression implements Expression {
     final private ArrayList<SelectExpression> selects = new ArrayList<>();
     final private ArrayList<FromExpression> froms = new ArrayList<>();
     final private ArrayList<WhereExpression> wheres = new ArrayList<>();
+    final private ArrayList<OrderFieldExpression> orders = new ArrayList<>();
 
     final private String delimiter;
 
@@ -61,10 +56,15 @@ final class ProjectionQueryExpression implements Expression {
             }
         });
 
-        String whereStr = "\nwhere\n\t" + String.join(" and ", list);
+
+        String whereStr = list.isEmpty() ? "" : "\nwhere\n\t" + String.join(" and ", list);
+        String ordersStr =
+            this.orders.isEmpty() ? "" : "\norder by\n\t" + orders.stream()
+                .sorted(Comparator.comparingInt(OrderFieldExpression::sort))
+                .map(Expression::toExpString).collect(Collectors.joining(","));
 
         String base = "select\n\t%s\nfrom\n\t%s";
-        return base.formatted(selectStr, fromStr) + whereStr;
+        return base.formatted(selectStr, fromStr) + whereStr + ordersStr;
     }
 
     public void addSelect(SelectExpression select) {
@@ -79,13 +79,17 @@ final class ProjectionQueryExpression implements Expression {
         this.wheres.add(where);
     }
 
+    public void addOrder(OrderFieldExpression order) {
+        this.orders.add(order);
+    }
+
     /**
      * 获取sql占位符变量
      */
     public Set<Placeholder> getQueryVariables() {
         return this.wheres.stream()
             .filter(WhereExpression::isInclude)
-            .map(WhereExpression::getParmaName)
+            .map(WhereExpression::getParamName)
             .map(Placeholder::new)
             .collect(Collectors.toSet());
     }
