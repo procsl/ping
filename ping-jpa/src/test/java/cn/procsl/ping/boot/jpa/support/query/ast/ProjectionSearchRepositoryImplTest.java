@@ -42,17 +42,20 @@ public class ProjectionSearchRepositoryImplTest {
     @Test
     public void search() {
         ProjectionDTO pp = new ProjectionDTO();
-        pp.setName("1");
+        pp.setName("2");
 
         MainEntity entity = new MainEntity();
         entity.setName("1");
         entity.setDesc("你好啊");
         entity = this.mainEntityLongJpaRepository.save(entity);
 
-        SubEntity sub = new SubEntity();
-        sub.setMainId(entity.getId());
-        sub.setName("我是sub");
-        this.subEntityLongJpaRepository.save(sub);
+        for (int i = 0; i < 10; i++) {
+            SubEntity sub = new SubEntity();
+            sub.setMainId(entity.getId());
+            sub.setName("我是sub" + i);
+            sub.setDesc("我是描述" + i);
+            this.subEntityLongJpaRepository.save(sub);
+        }
         this.subEntityLongJpaRepository.flush();
         List<ResultVO> result = this.projectionSearchRepository.search(pp, ResultVO.class);
         log.info("结果集: {}", result);

@@ -32,7 +32,7 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @Projection(entity = MainEntity.class, alias = "main")
-@Join(ref = "main", join = @Projection(entity = SubEntity.class, alias = "sub"))
+@Join(ref = "main", join = @Projection(entity = SubEntity.class, alias = "sub"), rightJoinField = "mainId")
 public class ProjectionDTO implements Serializable {
 
     @Select

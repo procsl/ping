@@ -1,74 +1,71 @@
 package cn.procsl.ping.boot.jpa.support.query.ast.jpa;
 
+import cn.procsl.ping.boot.jpa.support.query.*;
 import cn.procsl.ping.boot.jpa.support.query.ast.*;
-import lombok.RequiredArgsConstructor;
+import org.springframework.core.annotation.AnnotationUtils;
 
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
 final class ProjectionQueryExpression implements Expression {
 
-    final private ArrayList<SelectExpression> selects = new ArrayList<>();
-    final private ArrayList<FromExpression> froms = new ArrayList<>();
-    final private ArrayList<WhereExpression> wheres = new ArrayList<>();
-    final private ArrayList<OrderFieldExpression> orders = new ArrayList<>();
+    final private ConstructorExpression constructor = new ConstructorExpression();
+    final private List<FromExpression> froms = new ArrayList<>();
+    final private List<WhereExpression> wheres = new ArrayList<>();
+    final private List<OrderFieldExpression> orders = new ArrayList<>();
+
+    final private static Predicate<WhereExpression> ve = WhereExpression::isInclude;
+    final private static Function<Expression, String> ee = Expression::toExpString;
+    final private static Comparator<OrderFieldExpression> ss = Comparator.comparingInt(OrderFieldExpression::sort);
+    final private AtomicInteger i = new AtomicInteger(0);
 
     final private String delimiter;
+    private final Class<?> mapping;
 
-    public ProjectionQueryExpression(boolean formatter) {
-//        if (formatter) {
-//            delimiter = ",\n";
-////        } else {
-//            delimiter = ",";
-//        }
+    public <R> ProjectionQueryExpression(boolean formatter, Class<R> mapping) {
         delimiter = ",\n\t";
+        this.mapping = mapping;
     }
 
     @Override
     public String toExpString() {
+        String base = "select\n\t%s\nfrom\n\t%s";
+        String whereStr = this.createWhere();
+        String fromStr = froms.stream().map(ee).collect(Collectors.joining(delimiter));
+        String ord = orders.stream().sorted(ss).map(ee).collect(Collectors.joining(","));
+        String ordersStr = this.orders.isEmpty() ? "" : "\norder by\n\t" + ord;
+        this.constructor.setTargetType(this.mapping);
+        return base.formatted(this.constructor.toExpString(), fromStr) + whereStr + ordersStr;
+    }
 
-        String selectStr = selects.stream()
-            .filter(SelectExpression::isInclude)
-            .map(Expression::toExpString).collect(Collectors.joining(delimiter));
-
-        String fromStr = froms.stream()
-            .map(Expression::toExpString).collect(Collectors.joining(delimiter));
-
-        AtomicInteger i = new AtomicInteger(0);
-        Map<String, List<WhereExpression>> group = wheres.stream()
-            .filter(WhereExpression::isInclude)
-            .collect(Collectors.groupingBy(item -> {
-                if (item.groupName() == null || item.groupName().isEmpty()) {
-                    return i.incrementAndGet() + "";
-                }
-                return item.groupName();
-            }));
+    private String createWhere() {
+        Collector<WhereExpression, ?, Map<String, List<WhereExpression>>> aa = Collectors.groupingBy(item -> {
+            if (item.groupName() == null || item.groupName().isEmpty()) {
+                return i.incrementAndGet() + "";
+            }
+            return item.groupName();
+        });
+        Map<String, List<WhereExpression>> group = wheres.stream().filter(ve).collect(aa);
 
         ArrayList<String> list = new ArrayList<>();
         group.forEach((k, v) -> {
             if (v.size() == 1) {
                 list.add(v.getFirst().toExpString());
             } else {
-                String collect = v.stream().map(WhereExpression::toExpString).collect(Collectors.joining(" or "));
+                String collect = v.stream().map(ee).collect(Collectors.joining(" or "));
                 list.add("(" + collect + ")");
             }
         });
-
-
-        String whereStr = list.isEmpty() ? "" : "\nwhere\n\t" + String.join(" and ", list);
-        String ordersStr =
-            this.orders.isEmpty() ? "" : "\norder by\n\t" + orders.stream()
-                .sorted(Comparator.comparingInt(OrderFieldExpression::sort))
-                .map(Expression::toExpString).collect(Collectors.joining(","));
-
-        String base = "select\n\t%s\nfrom\n\t%s";
-        return base.formatted(selectStr, fromStr) + whereStr + ordersStr;
+        return list.isEmpty() ? "" : "\nwhere\n\t" + String.join(" and ", list);
     }
 
     public void addSelect(SelectExpression select) {
-        this.selects.add(select);
+        this.constructor.addSelect(select);
     }
 
     public void addFrom(FromExpression from) {
@@ -87,14 +84,76 @@ final class ProjectionQueryExpression implements Expression {
      * 获取sql占位符变量
      */
     public Set<Variable> getQueryVariables() {
-        return this.wheres.stream()
-            .filter(WhereExpression::isInclude)
-            .map(WhereExpression::getParamVariable)
-            .collect(Collectors.toSet());
+        return this.wheres.stream().filter(ve)
+            .map(WhereExpression::getParamVariable).collect(Collectors.toSet());
     }
 
     @Override
     public String toString() {
         return this.toExpString();
     }
+
+
+    public static <Q, R> ProjectionQueryExpression create(Q query, Class<R> mapping) {
+        Class<?> clazz = query.getClass();
+        Projection projection = AnnotationUtils.findAnnotation(clazz, Projection.class);
+
+        if (projection == null) {
+            throw new IllegalStateException("未标注@Projection注解: " + clazz);
+        }
+
+        List<Join> joins = getJoinFields(clazz);
+        List<Field> fields = ClassUtils.extractFields(clazz);
+
+        ProjectionQueryExpression pqe = new ProjectionQueryExpression(true, mapping);
+        for (int i = 0; i < fields.size(); i++) {
+            Field field = fields.get(i);
+            ReferenceBy ref = AnnotationUtils.findAnnotation(field, ReferenceBy.class);
+            pqe.addSelect(new SelectFieldExpression(field, projection, ref));
+
+            List<Where> wheres = getWheres(field);
+            for (Where where : wheres) {
+                pqe.addWhere(new WhereFieldExpression(query, field, projection, ref, where));
+            }
+
+            Order order = getOrder(field);
+            if (order != null) {
+                pqe.addOrder(new OrderFieldExpression(field, projection, ref, order, i));
+            }
+        }
+        pqe.addFrom(new FromFieldExpression(projection, joins, clazz));
+        return pqe;
+    }
+
+    private static Order getOrder(Field field) {
+        return AnnotationUtils.findAnnotation(field, Order.class);
+    }
+
+    private static List<Where> getWheres(Field field) {
+        List<Where> list = new ArrayList<>();
+
+        Where.Wheres wheres = AnnotationUtils.findAnnotation(field, Where.Wheres.class);
+        if (wheres != null) {
+            list.addAll(Arrays.asList(wheres.value()));
+        } else {
+            Where where = AnnotationUtils.findAnnotation(field, Where.class);
+            list.add(where);
+        }
+        return list;
+    }
+
+    private static List<Join> getJoinFields(Class<?> clazz) {
+        List<Join> list = new ArrayList<>();
+
+        Join.Joins joins = AnnotationUtils.findAnnotation(clazz, Join.Joins.class);
+        if (joins != null) {
+            list.addAll(Arrays.asList(joins.value()));
+        } else {
+            Join join = AnnotationUtils.findAnnotation(clazz, Join.class);
+            list.add(join);
+        }
+        return list;
+    }
+
+
 }

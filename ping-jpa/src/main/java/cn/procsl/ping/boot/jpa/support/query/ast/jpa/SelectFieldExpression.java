@@ -42,6 +42,11 @@ final class SelectFieldExpression implements SelectExpression {
     }
 
     @Override
+    public Select getSelectAnnotation() {
+        return this.annotation;
+    }
+
+    @Override
     public boolean isInclude() {
         return this.isSelectNode();
     }

@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.jpa.support.query.ast;
 
+import cn.procsl.ping.boot.jpa.support.query.Select;
 import jakarta.annotation.Nonnull;
 
 /**
@@ -17,6 +18,8 @@ public interface SelectExpression extends Expression {
      * 是否时必须的
      */
     boolean isRequired();
+
+    Select getSelectAnnotation();
 
     /**
      * 是否包含在查询中

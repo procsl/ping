@@ -1,20 +1,25 @@
 package cn.procsl.ping.boot.jpa.support.query.ast.domain;
 
-import cn.procsl.ping.boot.jpa.support.query.Projection;
-import lombok.AllArgsConstructor;
+import cn.procsl.ping.boot.jpa.support.query.ast.ViewConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import java.io.Serializable;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-@Projection(entity = Teacher.class, alias = "teacher")
 public class ResultVO implements Serializable {
 
-    String id;
+    @ViewConstructor()
+    public ResultVO(Long id, String name, String desc) {
+        this.id = id;
+        this.name = name;
+        this.desc = desc;
+    }
+
+    Long id;
 
     String name;
+
+    String desc;
 }
