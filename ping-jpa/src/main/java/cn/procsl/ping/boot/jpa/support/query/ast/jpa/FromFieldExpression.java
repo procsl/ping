@@ -9,6 +9,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -37,8 +38,12 @@ final class FromFieldExpression implements FromExpression {
         if (joinFields == null || joinFields.isEmpty()) {
             return Collections.emptyList();
         }
+        List<Join> njf = joinFields.stream().filter(Objects::nonNull).toList();
+        if (njf.isEmpty()) {
+            return Collections.emptyList();
+        }
 
-        return this.joinFields.stream()
+        return njf.stream()
             .filter(item -> ObjectUtils.nullSafeEquals(this.projection.alias(), item.ref()))
             .map(item -> {
                 Projection proj = item.join();
@@ -82,6 +87,7 @@ final class FromFieldExpression implements FromExpression {
         public String getRightColumnName() {
             return joinField.rightJoinField();
         }
+
     }
 
 

@@ -5,13 +5,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.data.web.ProjectedPayload;
 
 @ProjectedPayload
-public interface UserAccountRecord {
+public class UserAccountRecord {
 
     @Schema(description = "账户名称")
-    String getName();
+    String name;
 
 
     @Schema(description = "账户状态")
-    AccountState getState();
+    AccountState state;
 
 }

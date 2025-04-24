@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 @AutoService(Processor.class)
-public class AptProcessor extends AbstractProcessor {
+public class RepositoryAptProcessor extends AbstractProcessor {
 
     final ComposeProcessor processor = new ComposeProcessor();
 

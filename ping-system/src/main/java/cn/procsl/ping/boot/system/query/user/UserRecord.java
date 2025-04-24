@@ -1,27 +1,40 @@
 package cn.procsl.ping.boot.system.query.user;
 
+import cn.procsl.ping.boot.jpa.support.query.ast.ViewConstructor;
 import cn.procsl.ping.boot.system.domain.user.Gender;
 import cn.procsl.ping.boot.web.annotation.SecurityId;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.web.ProjectedPayload;
 
-@ProjectedPayload
-public interface UserRecord {
+@Getter
+@NoArgsConstructor
+public class UserRecord {
+
+
+    @ViewConstructor
+    public UserRecord(Long id, String name, Gender gender, String remark) {
+        this.id = id;
+        this.name = name;
+        this.gender = gender;
+        this.remark = remark;
+    }
 
     @SecurityId(scope = "user")
     @Schema(description = "用户ID")
-    Long getId();
+    Long id;
 
     @Schema(description = "用户昵称")
-    String getName();
+    String name;
 
     @Schema(description = "用户性别")
-    Gender getGender();
+    Gender gender;
 
     @Schema(description = "用户备注")
-    String getRemark();
+    String remark;
 
     @Schema(description = "用户账户信息")
-    UserAccountRecord getAccount();
+    UserAccountRecord account;
 
 }

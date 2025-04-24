@@ -31,6 +31,10 @@ public @interface Join {
 
     Projection join();
 
+    /**
+     * 是否使用对象关系自动join, 如果使用自动join,则无需填写 joinField
+     */
+    boolean autoJoin() default false;
 
     @Documented
     @Target(TYPE)

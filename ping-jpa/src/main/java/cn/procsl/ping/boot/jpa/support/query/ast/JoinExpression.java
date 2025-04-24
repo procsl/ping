@@ -22,32 +22,31 @@ public interface JoinExpression extends FromExpression {
 
     String getRightColumnName();
 
-
     /**
      * 创建join语句
      * table_a as a inner join table_b as b on a.id = b.id
      * table_c as c inner join  table_a as a on c.xx=a.xx inner join table_b as b on a.id = b.id
-     *
+     * <p>
      * 1. 	inner join cn.procsl.ping.boot.jpa.support.query.SubEntity as sub1 on sub.id=sub1.id
      * 2. 	cn.procsl.ping.boot.jpa.support.query.MainEntity as main
-     *
+     * <p>
      * 1. 	cn.procsl.ping.boot.jpa.support.query.MainEntity as main
-     *      inner join
+     * inner join
      * 2. 	cn.procsl.ping.boot.jpa.support.query.SubEntity as sub
-     *      on main.id = sub.id
+     * on main.id = sub.id
      * 3.   inner join
-     *  	cn.procsl.ping.boot.jpa.support.query.SubEntity as sub1
-     *      on sub.id = sub1.id
-     *
+     * cn.procsl.ping.boot.jpa.support.query.SubEntity as sub1
+     * on sub.id = sub1.id
      */
     default String createJoinExpString(String leftTableAlias, String parentString) {
 
 
         DotExpression leftStr = new DotExpression(leftTableAlias, this.getLeftColumnName());
         DotExpression rightStr = new DotExpression(this.getTableAlias(), this.getRightColumnName());
-        String equ = leftStr + "=" + rightStr;
+        String equ = " on " + leftStr + "=" + rightStr;
+
         String t = this.getJoinType().toString().toLowerCase();
-        String tmp = "\n\t%s join %s on %s".formatted(t, this.createFromExpString(), equ);
+        String tmp = "\n\t%s join %s".formatted(t, this.createFromExpString()) + equ;
 
         List<JoinExpression> joins = this.getJoins();
         if (joins == null || joins.isEmpty()) {

@@ -24,7 +24,7 @@ public final class FormatPage<T> implements Page<T> {
 
     final Page<T> page;
 
-    private List<T> content;
+//    private List<T> content;
 
     public static <T> FormatPage<T> copy(Page<T> page) {
         if (page instanceof FormatPage) {
@@ -33,13 +33,17 @@ public final class FormatPage<T> implements Page<T> {
         return new FormatPage<>(page);
     }
 
+    public static <T> FormatPage<T> build(Page<T> page) {
+        return new FormatPage<>(page);
+    }
+
 
     @Override
     @NonNull
     public List<T> getContent() {
-        if (this.content != null) {
-            return this.content;
-        }
+//        if (this.content != null) {
+//            return this.content;
+//        }
         return page.getContent();
     }
 

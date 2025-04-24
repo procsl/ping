@@ -43,6 +43,13 @@ final class ProjectionQueryExpression implements Expression {
         return base.formatted(this.constructor.toExpString(), fromStr) + whereStr + ordersStr;
     }
 
+    public String totalExpString() {
+        String base = "select\n\tcount(1)\nfrom\n\t";
+        String whereStr = this.createWhere();
+        String fromStr = froms.stream().map(ee).collect(Collectors.joining(delimiter));
+        return base + fromStr + whereStr;
+    }
+
     private String createWhere() {
         Collector<WhereExpression, ?, Map<String, List<WhereExpression>>> aa = Collectors.groupingBy(item -> {
             if (item.groupName() == null || item.groupName().isEmpty()) {
