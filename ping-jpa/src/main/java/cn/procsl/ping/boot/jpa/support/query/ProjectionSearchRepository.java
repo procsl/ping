@@ -1,6 +1,7 @@
 package cn.procsl.ping.boot.jpa.support.query;
 
 import cn.procsl.ping.boot.jpa.domain.page.FormatPage;
+import cn.procsl.ping.boot.jpa.support.query.ast.ResultExtractor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.NoRepositoryBean;
 
@@ -30,5 +31,7 @@ public interface ProjectionSearchRepository {
      * @return 返回的结果集
      */
     <Q, R> FormatPage<R> search(Q query, Class<R> mapping, Pageable pageable);
+
+    <Q, R> FormatPage<R> search(Q mapper, ResultExtractor<R> result);
 
 }

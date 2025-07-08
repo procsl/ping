@@ -1,10 +1,10 @@
 <project>
     <modelVersion>4.0.0</modelVersion>
     <groupId>cn.procsl</groupId>
-    <artifactId>ping-forwarder</artifactId>
+    <artifactId>ping-tool</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
-    <name>Ping-TCP转发</name>
+    <name>Ping-工具</name>
 
     <properties>
         <java.version>21</java.version>
@@ -47,6 +47,40 @@
             <groupId>io.vertx</groupId>
             <artifactId>vertx-core</artifactId>
             <version>4.5.9</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.19.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.meilisearch.sdk/meilisearch-java -->
+        <dependency>
+            <groupId>com.meilisearch.sdk</groupId>
+            <artifactId>meilisearch-java</artifactId>
+            <version>0.14.4</version>
         </dependency>
 
     </dependencies>

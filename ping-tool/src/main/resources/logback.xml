@@ -29,5 +29,4 @@
     <logger name="org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLoggingListener"
             level="INFO"/>
     <logger name="org.hibernate.hql.internal.ast" level="INFO"/>
-    <logger name="cn.procsl.ping" level="TRACE"/>
 </configuration>

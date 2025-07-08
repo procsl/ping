@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 final class ProjectionQueryExpression implements Expression {
 
-    final private ConstructorExpression constructor = new ConstructorExpression();
     final private List<FromExpression> froms = new ArrayList<>();
     final private List<WhereExpression> wheres = new ArrayList<>();
     final private List<OrderFieldExpression> orders = new ArrayList<>();
@@ -25,11 +24,10 @@ final class ProjectionQueryExpression implements Expression {
     final private AtomicInteger i = new AtomicInteger(0);
 
     final private String delimiter;
-    private final Class<?> mapping;
+//    final private ResultExtractor<T> result;
 
-    public <R> ProjectionQueryExpression(boolean formatter, Class<R> mapping) {
+    public <R> ProjectionQueryExpression(boolean formatter) {
         delimiter = ",\n\t";
-        this.mapping = mapping;
     }
 
     @Override
@@ -39,8 +37,9 @@ final class ProjectionQueryExpression implements Expression {
         String fromStr = froms.stream().map(ee).collect(Collectors.joining(delimiter));
         String ord = orders.stream().sorted(ss).map(ee).collect(Collectors.joining(","));
         String ordersStr = this.orders.isEmpty() ? "" : "\norder by\n\t" + ord;
-        this.constructor.setTargetType(this.mapping);
-        return base.formatted(this.constructor.toExpString(), fromStr) + whereStr + ordersStr;
+//        this.constructor.setTargetType(this.mapping);
+//        return base.formatted(this.constructor.toExpString(), fromStr) + whereStr + ordersStr;
+        return null;
     }
 
     public String totalExpString() {
@@ -71,10 +70,6 @@ final class ProjectionQueryExpression implements Expression {
         return list.isEmpty() ? "" : "\nwhere\n\t" + String.join(" and ", list);
     }
 
-    public void addSelect(SelectExpression select) {
-        this.constructor.addSelect(select);
-    }
-
     public void addFrom(FromExpression from) {
         this.froms.add(from);
     }
@@ -101,7 +96,7 @@ final class ProjectionQueryExpression implements Expression {
     }
 
 
-    public static <Q, R> ProjectionQueryExpression create(Q query, Class<R> mapping) {
+    public static <Q, R> ProjectionQueryExpression create(Q query, ResultExtractor<R> result) {
         Class<?> clazz = query.getClass();
         Projection projection = AnnotationUtils.findAnnotation(clazz, Projection.class);
 
@@ -112,11 +107,10 @@ final class ProjectionQueryExpression implements Expression {
         List<Join> joins = getJoinFields(clazz);
         List<Field> fields = ClassUtils.extractFields(clazz);
 
-        ProjectionQueryExpression pqe = new ProjectionQueryExpression(true, mapping);
+        ProjectionQueryExpression pqe = new ProjectionQueryExpression(true);
         for (int i = 0; i < fields.size(); i++) {
             Field field = fields.get(i);
             ReferenceBy ref = AnnotationUtils.findAnnotation(field, ReferenceBy.class);
-            pqe.addSelect(new SelectFieldExpression(field, projection, ref));
 
             List<Where> wheres = getWheres(field);
             for (Where where : wheres) {

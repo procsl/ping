@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Indexed;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RestController;
 
 @Indexed
@@ -26,8 +25,7 @@ public class UserQueryController {
     @MarkPageable
     @Operation(summary = "获取用户列表")
     @GetMapping("/v1/system/users")
-    public FormatPage<UserRecord> findUsers(Pageable pageable, @ModelAttribute UserQuery query) {
-//        entityManager.createQuery("select u,u.account.name, u.account.state from User as u");
+    public FormatPage<UserRecord> findUsers(Pageable pageable, UserQuery query) {
         return this.searchRepository.search(query, UserRecord.class, pageable);
     }
 

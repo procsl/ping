@@ -73,7 +73,9 @@ class ConstructorExpression implements Expression {
 
             HashMap<String, SelectExpression> consSelect = new HashMap<>();
             for (SelectExpression select : this.selects) {
-                consSelect.put(select.getAliasName(), select);
+                if (select.isInclude()) {
+                    consSelect.put(select.getAliasName(), select);
+                }
             }
 
             List<String> ags = parseViewArguments(item, i);

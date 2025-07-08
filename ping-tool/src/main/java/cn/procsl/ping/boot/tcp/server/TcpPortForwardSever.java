@@ -25,13 +25,14 @@ public class TcpPortForwardSever {
 
     public void start() {
         Vertx vertx = Vertx.vertx();
-        NetServerOptions serverOptions = new NetServerOptions().setPort(sourcePort).setLogActivity(false);
+        NetServerOptions serverOptions = new NetServerOptions().setHost("172.28.0.1").setPort(sourcePort).setLogActivity(false);
         NetClientOptions clientOptions = new NetClientOptions().setConnectTimeout(1000).setLogActivity(false);
 
         NetServer server = vertx.createNetServer(serverOptions);
 
         server.connectHandler((serverSocket) -> {
             log.info("new connected: {}", serverSocket.remoteAddress());
+            String host = serverSocket.remoteAddress().host();
             // 先暂停
             serverSocket.pause();
 
@@ -78,7 +79,7 @@ public class TcpPortForwardSever {
             if (res.succeeded()) {
                 log.info("Server is now listening on actual port: {}", server.actualPort());
             } else {
-                log.error("Failed to bind!");
+                log.error("Failed to bind: {}", server.actualPort(), res.cause());
             }
         });
     }

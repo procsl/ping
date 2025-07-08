@@ -11,8 +11,6 @@ import lombok.Data;
 @Projection(entity = User.class, alias = "u")
 public class UserQuery {
 
-    Long id;
-
     @Select
     String name;
 
