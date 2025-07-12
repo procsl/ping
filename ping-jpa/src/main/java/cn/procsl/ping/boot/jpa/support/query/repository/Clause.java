@@ -1,7 +1,7 @@
 package cn.procsl.ping.boot.jpa.support.query.repository;
 
-public interface Clause<C> {
+public interface Clause {
 
-    String toClauseString(C context);
+    String toClauseString(BuilderContext context);
 
 }

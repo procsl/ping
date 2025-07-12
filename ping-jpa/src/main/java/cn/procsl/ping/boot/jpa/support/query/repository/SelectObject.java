@@ -17,8 +17,7 @@ public interface SelectObject extends Clause {
     String aliasName();
 
 
-    @Override
-    default String toClauseString(Object context) {
-        return selectClause() + " as " + aliasName();
+    default String toClauseString(String context) {
+        return String.format("%s as %s", selectClause(), aliasName());
     }
 }
