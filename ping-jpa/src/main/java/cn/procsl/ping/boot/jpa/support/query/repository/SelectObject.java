@@ -16,8 +16,9 @@ public interface SelectObject extends Clause {
     @NonNull
     String aliasName();
 
-
-    default String toClauseString(String context) {
+    @Override
+    default String toClauseString(BuilderContext context){
         return String.format("%s as %s", selectClause(), aliasName());
     }
+
 }

@@ -11,18 +11,32 @@ public interface FromObject extends Clause {
 
     List<JoinObject> joins();
 
+    default String toBaseClauseString(BuilderContext context) {
+        return baseFormClause() + " as " + alias();
+    }
+
     default String toClauseString(BuilderContext context) {
-        String def = baseFormClause() + " as " + alias();
-        // 如果无join关系,则直接返回
-        if (this.joins().isEmpty()) {
-            return def;
+        String joins = this.toJoinClauseString(context);
+        if (joins == null || joins.isEmpty()) {
+            return this.toBaseClauseString(context);
         }
 
-        // 如果有join关系
-        StringBuilder builder = new StringBuilder(def);
+        return this.toBaseClauseString(context) + " " + joins;
+    }
+
+    default String toJoinClauseString(BuilderContext context) {
+        if (this.joins() == null || this.joins().isEmpty()) {
+            return null;
+        }
+
+        StringBuilder builder = new StringBuilder();
         for (JoinObject join : joins()) {
-            builder.append(context.getDelimiter());
-            builder.append(join.buildJoinClauseString(context, alias()));
+            if (context.isFormat()) {
+                builder.append("\n\t");
+            } else {
+                builder.append(" ");
+            }
+            builder.append(join.toClauseString(context));
         }
         return builder.toString();
     }

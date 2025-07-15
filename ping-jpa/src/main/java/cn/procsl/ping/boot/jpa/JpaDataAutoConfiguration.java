@@ -6,7 +6,6 @@ import cn.procsl.ping.boot.jpa.domain.id.TableIdentifierSegmentRepositoryImpl;
 import cn.procsl.ping.boot.jpa.support.extension.EnableJpaExtensionRepositories;
 import cn.procsl.ping.boot.jpa.support.extension.JpaRepositoryFactoryCustomizer;
 import cn.procsl.ping.boot.jpa.support.query.ProjectionSearchRepository;
-import cn.procsl.ping.boot.jpa.support.query.ast.jpa.JpaProjectionSearchRepository;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
@@ -42,11 +41,11 @@ public class JpaDataAutoConfiguration implements BeanPostProcessor {
         return JpaRepositoryFactoryCustomizer.instance;
     }
 
-    @Bean("defaultJpaProjectionSearchRepository")
-    @ConditionalOnMissingBean
-    public ProjectionSearchRepository jpaProjectionSearchRepository(EntityManager entityManager) {
-        return new JpaProjectionSearchRepository(entityManager);
-    }
+//    @Bean("defaultJpaProjectionSearchRepository")
+//    @ConditionalOnMissingBean
+//    public ProjectionSearchRepository jpaProjectionSearchRepository(EntityManager entityManager) {
+//        return new JpaProjectionSearchRepository(entityManager);
+//    }
 
     @ConditionalOnMissingBean
     @Bean(name = "defaultIdentifierSegmentRepository")

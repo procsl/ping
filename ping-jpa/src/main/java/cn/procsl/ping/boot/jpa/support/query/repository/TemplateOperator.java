@@ -1,9 +1,12 @@
 package cn.procsl.ping.boot.jpa.support.query.repository;
 
-record TemplateExpression(String template, Object... args) implements WhereExpression {
+record TemplateOperator(String template, Object... args) implements Operator {
     @Override
     public String toClauseString(BuilderContext context) {
-        return template.formatted(args);
+        if (args != null && args.length > 0) {
+            return template.formatted(args);
+        }
+        return template;
     }
 
     @Override

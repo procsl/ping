@@ -1,6 +1,9 @@
 package cn.procsl.ping.boot.jpa.support.query.repository;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 public interface SearchObject extends Clause {
     // 查询字段描述对象
@@ -24,4 +27,49 @@ public interface SearchObject extends Clause {
 
     // 排序描述对象
     //
+
+
+    // 排序描述对象
+    default List<SortObject> sort() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    default String toClauseString(BuilderContext context) {
+
+        Collector<CharSequence, ?, String> a;
+        String item;
+        String newLine;
+        if (context.isFormat()) {
+            item = "\n\t";
+            newLine = "\n";
+        } else {
+            item = " ";
+            newLine = " ";
+        }
+        a = Collectors.joining("," + item);
+        String select = this.select().stream().map(s -> s.toClauseString(context)).collect(a);
+        String from = this.from().stream().map(f -> f.toClauseString(context)).collect(a);
+        String main = "%sselect%s%s%sfrom%s%s".formatted(newLine, item, select, newLine, item, from);
+        String where = this.where().getOperator().toClauseString(context);
+
+        if (where == null) {
+            where = "";
+        }
+
+        String i = where.replaceAll("\\s+", "").trim();
+        if (i.isEmpty()) {
+            where = "";
+        }
+
+        if (!where.isEmpty()) {
+            main = "%s%swhere%s%s".formatted(main, newLine, item, where);
+        }
+
+        String sorts = this.sort().stream().map(s -> s.toClauseString(context)).collect(Collectors.joining(", "));
+        if (!sorts.isEmpty()) {
+            main = "%s%sorder by%s%s".formatted(main, newLine, item, sorts);
+        }
+        return main;
+    }
 }
