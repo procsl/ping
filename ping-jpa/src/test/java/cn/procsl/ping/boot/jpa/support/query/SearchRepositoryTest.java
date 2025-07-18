@@ -1,6 +1,5 @@
 package cn.procsl.ping.boot.jpa.support.query;
 
-import cn.procsl.ping.boot.jpa.TestJpaApplication;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.criteria.*;
@@ -8,11 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.stereotype.Service;
 import org.springframework.test.annotation.Rollback;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -21,7 +16,7 @@ import java.util.List;
 @Slf4j
 @Rollback
 @DataJpaTest
-public class ProjectionSearchRepositoryTest {
+public class SearchRepositoryTest {
 
 
     @Inject

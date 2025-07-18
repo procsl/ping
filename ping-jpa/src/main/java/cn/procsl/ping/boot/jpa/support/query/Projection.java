@@ -1,29 +1,50 @@
 package cn.procsl.ping.boot.jpa.support.query;
 
+import java.io.Serializable;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * 标注映射实体
+ * select 子句字段
  */
 @Documented
-@Target(TYPE)
+@Target({TYPE})
 @Retention(value = RUNTIME)
 public @interface Projection {
 
     /**
-     * 对应的目标的实体
+     * 查询项
      */
-    Class<?> entity() default Object.class;
+    Item[] value();
 
     /**
-     * 实体别名
+     * 返回类型
      */
-    String alias() default "";
+    Class<? extends Serializable> returnType() default Serializable.class;
 
+    /**
+     * 字段注入方式
+     */
+    InjectType injectType() default InjectType.setter;
+
+    enum InjectType {
+        constructor,
+        setter,
+        field
+    }
+
+    @Documented
+    @Target({ANNOTATION_TYPE})
+    @Retention(value = RUNTIME)
+    @interface Item {
+        String value();
+
+        String alias();
+    }
 
 }

@@ -9,14 +9,14 @@ import java.util.Set;
 
 public final class SimpleWhere implements WhereObject {
 
-    public SimpleWhere(Operator operator, Argument... argument) {
+    public SimpleWhere(Operator operator, Parameter... parameter) {
         this.operator = operator;
-        if (argument != null) {
-            this.hashSet.addAll(Arrays.asList(argument));
+        if (parameter != null) {
+            this.hashSet.addAll(Arrays.asList(parameter));
         }
     }
 
-    private final HashSet<Argument> hashSet = new HashSet<>();
+    private final HashSet<Parameter> hashSet = new HashSet<>();
 
     @Setter
     @Getter
@@ -24,7 +24,7 @@ public final class SimpleWhere implements WhereObject {
 
 
     @Override
-    public Set<Argument> getArguments() {
+    public Set<Parameter> getArguments() {
         return hashSet;
     }
 

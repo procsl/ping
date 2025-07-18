@@ -2,13 +2,9 @@ package cn.procsl.ping.boot.jpa.support.query.repository;
 
 import lombok.NonNull;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
-
 public interface JoinObject extends Clause {
 
-    enum JOIN_TYPE implements Clause {
+    enum JoinType implements Clause {
         inner, left;
 
         @Override
@@ -31,7 +27,7 @@ public interface JoinObject extends Clause {
 
     // join类型
     @NonNull
-    JOIN_TYPE getJoinType();
+    JoinObject.JoinType getJoinType();
 
     // 被join的from对象
     @NonNull

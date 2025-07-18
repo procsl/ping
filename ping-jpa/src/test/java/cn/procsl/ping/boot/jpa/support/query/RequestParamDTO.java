@@ -31,19 +31,22 @@ import java.io.Serializable;
  */
 @Data
 @NoArgsConstructor
-@Projection(entity = MainEntity.class, alias = "main")
-@Join(ref = "main", join = @Projection(entity = SubEntity.class, alias = "sub"), rightJoinField = "mainId")
-public class ProjectionDTO implements Serializable {
+@From(entity = MainEntity.class, alias = "main")
+@Join(ref = "main", join = @From(entity = SubEntity.class, alias = "sub"), rightJoinField = "mainId")
+@Join(ref = "sub", join = @From(entity = SubEntity.class, alias = "sub2"), rightJoinField = "id")
+@Projection(value = {
+    @Projection.Item(value = "sub2.id", alias = "id"),
+    @Projection.Item(value = "main.name", alias = "name"),
+    @Projection.Item(value = "sub.id", alias = "id2")
+}, returnType = RequestParamDTO.class)
+public class RequestParamDTO implements Serializable {
 
-    @Select
     @Order
     Long id;
 
-    @Select
-    @Where
+    @Predicate(operator = Predicate.OperatorType.eq)
     String name;
 
-    @Select
     @ReferenceBy(ref = "sub")
     String desc;
 

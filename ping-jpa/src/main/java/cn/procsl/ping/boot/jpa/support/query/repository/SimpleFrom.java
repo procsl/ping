@@ -36,18 +36,18 @@ public final class SimpleFrom implements FromObject {
         return joins;
     }
 
-    public void addJoinObject(JoinObject.JOIN_TYPE joinType, FromObject target, Operator operator) {
+    public void addJoinObject(JoinObject.JoinType joinType, FromObject target, Operator operator) {
         this.joins.add(new InnerJoinObject(joinType, target, operator));
     }
 
-    public void addJoinObject(JoinObject.JOIN_TYPE joinType, FromObject target, String leftFieldName, String rightFieldName) {
+    public void addJoinObject(JoinObject.JoinType joinType, FromObject target, String leftFieldName, String rightFieldName) {
         this.joins.add(new InnerJoinObject(joinType, target, Operator.eq(leftFieldName, rightFieldName)));
     }
 
-    record InnerJoinObject(JOIN_TYPE joinType, FromObject target, Operator operator) implements JoinObject {
+    record InnerJoinObject(JoinType joinType, FromObject target, Operator operator) implements JoinObject {
 
         @Override
-        public @NonNull JOIN_TYPE getJoinType() {
+        public @NonNull JoinObject.JoinType getJoinType() {
             return joinType;
         }
 

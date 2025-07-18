@@ -4,11 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
 @Slf4j
-public class SimpleQueryObjectBuilderTest {
+public class SimpleSearchObjectBuilderTest {
 
     @Test
     public void toBaseClauseString() {
-        SimpleQueryObjectBuilder builder = new SimpleQueryObjectBuilder();
+        SimpleSearchObjectBuilder builder = new SimpleSearchObjectBuilder();
         BuilderContext context = new BuilderContext() {
             @Override
             public boolean isFormat() {
@@ -29,7 +29,7 @@ public class SimpleQueryObjectBuilderTest {
 
     @Test
     public void toWhereClauseString() {
-        SimpleQueryObjectBuilder builder = new SimpleQueryObjectBuilder();
+        SimpleSearchObjectBuilder builder = new SimpleSearchObjectBuilder();
         BuilderContext context = new BuilderContext() {
             @Override
             public boolean isFormat() {
@@ -42,7 +42,7 @@ public class SimpleQueryObjectBuilderTest {
         builder.addSelect("a.id", "aid");
         builder.addSelect("b.id", "bid");
         Operator and = LogicalOperator.and(Operator.eq("a.id", "b.id"), Operator.like("b.name", ":name"));
-        Operator or = LogicalOperator.or(Operator.eq("c.nickNam", ":nickName"), Operator.notIn("c.nickName", ":notNicks"));
+        Operator or = LogicalOperator.or(Operator.eq("c.nickNam", ":nickName"), Operator.not_in("c.nickName", ":notNicks"));
         builder.setWhere(new SimpleWhere(LogicalOperator.and(and, Operator.group(or))));
         String string = builder.toClauseString(context);
         log.info("sql语句: {}", string);
@@ -50,7 +50,7 @@ public class SimpleQueryObjectBuilderTest {
 
     @Test
     public void toJoinClauseString() {
-        SimpleQueryObjectBuilder builder = new SimpleQueryObjectBuilder();
+        SimpleSearchObjectBuilder builder = new SimpleSearchObjectBuilder();
         BuilderContext context = new BuilderContext() {
             @Override
             public boolean isFormat() {
@@ -64,16 +64,16 @@ public class SimpleQueryObjectBuilderTest {
         SimpleFrom sfa = new SimpleFrom("TableA", "a");
 
         SimpleFrom sfb = new SimpleFrom("TableB", "b");
-        sfa.addJoinObject(JoinObject.JOIN_TYPE.inner, sfb, Operator.eq("a.id", "b.id"));
+        sfa.addJoinObject(JoinObject.JoinType.inner, sfb, Operator.eq("a.id", "b.id"));
 
         SimpleFrom sfc = new SimpleFrom("TableC", "c");
-        sfb.addJoinObject(JoinObject.JOIN_TYPE.left, sfc, Operator.eq("b.id", "c.id"));
+        sfb.addJoinObject(JoinObject.JoinType.left, sfc, Operator.eq("b.id", "c.id"));
 
         SimpleFrom sfd = new SimpleFrom("TableD", "d");
-        sfc.addJoinObject(JoinObject.JOIN_TYPE.left, sfd, Operator.eq("c.id", "d.id"));
+        sfc.addJoinObject(JoinObject.JoinType.left, sfd, Operator.eq("c.id", "d.id"));
 
         SimpleFrom sfe = new SimpleFrom("TableE", "e");
-        sfa.addJoinObject(JoinObject.JOIN_TYPE.left, sfe, Operator.like("a.id", "e.id"));
+        sfa.addJoinObject(JoinObject.JoinType.left, sfe, Operator.like("a.id", "e.id"));
 
         builder.addFrom(sfa);
         String string = builder.toClauseString(context);
@@ -82,7 +82,7 @@ public class SimpleQueryObjectBuilderTest {
 
     @Test
     public void toFullClauseString() {
-        SimpleQueryObjectBuilder builder = new SimpleQueryObjectBuilder();
+        SimpleSearchObjectBuilder builder = new SimpleSearchObjectBuilder();
         BuilderContext context = new BuilderContext() {
             @Override
             public boolean isFormat() {
@@ -96,19 +96,19 @@ public class SimpleQueryObjectBuilderTest {
         SimpleFrom sfa = new SimpleFrom("TableA", "a");
 
         SimpleFrom sfb = new SimpleFrom("TableB", "b");
-        sfa.addJoinObject(JoinObject.JOIN_TYPE.inner, sfb, Operator.eq("a.id", "b.id"));
+        sfa.addJoinObject(JoinObject.JoinType.inner, sfb, Operator.eq("a.id", "b.id"));
 
         SimpleFrom sfc = new SimpleFrom("TableC", "c");
-        sfb.addJoinObject(JoinObject.JOIN_TYPE.left, sfc, "b.id", "c.id");
+        sfb.addJoinObject(JoinObject.JoinType.left, sfc, "b.id", "c.id");
 
         SimpleFrom sfd = new SimpleFrom("TableD", "d");
-        sfc.addJoinObject(JoinObject.JOIN_TYPE.left, sfd, Operator.eq("c.id", "d.id"));
+        sfc.addJoinObject(JoinObject.JoinType.left, sfd, Operator.eq("c.id", "d.id"));
 
         SimpleFrom sfe = new SimpleFrom("TableE", "e");
-        sfa.addJoinObject(JoinObject.JOIN_TYPE.left, sfe, Operator.like("a.id", "e.id"));
+        sfa.addJoinObject(JoinObject.JoinType.left, sfe, Operator.like("a.id", "e.id"));
 
         SimpleFrom sff = new SimpleFrom("TableF", "f");
-        sfc.addJoinObject(JoinObject.JOIN_TYPE.inner, sff, Operator.ne("c.id", "f.id"));
+        sfc.addJoinObject(JoinObject.JoinType.inner, sff, Operator.ne("c.id", "f.id"));
 
         builder.addFrom(sfa);
 

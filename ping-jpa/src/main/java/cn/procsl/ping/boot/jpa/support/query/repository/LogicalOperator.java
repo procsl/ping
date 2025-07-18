@@ -1,6 +1,8 @@
 package cn.procsl.ping.boot.jpa.support.query.repository;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 
 public interface LogicalOperator extends Operator {
@@ -9,6 +11,12 @@ public interface LogicalOperator extends Operator {
         return getOperator(" and ", operators);
     }
 
+    static Operator and(Collection<Operator> operators) {
+        if (operators == null || operators.isEmpty()) {
+            return null;
+        }
+        return getOperator(" and ", operators.toArray(value -> new Operator[0]));
+    }
 
     private static Operator getOperator(String dec, Operator... operators) {
         if (operators == null || operators.length == 0) {
@@ -25,6 +33,13 @@ public interface LogicalOperator extends Operator {
 
     static Operator or(Operator... operators) {
         return getOperator(" or ", operators);
+    }
+
+    static Operator or(Collection<Operator> operators) {
+        if (operators == null || operators.isEmpty()) {
+            return null;
+        }
+        return getOperator(" or ", operators.toArray(value -> new Operator[0]));
     }
 
 

@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.jpa.support.query;
 
-import jakarta.persistence.criteria.JoinType;
+import cn.procsl.ping.boot.jpa.support.query.repository.JoinObject;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Repeatable;
@@ -25,11 +25,11 @@ public @interface Join {
 
     String rightJoinField() default "id";
 
-    JoinType type() default JoinType.INNER;
+    JoinObject.JoinType type() default JoinObject.JoinType.inner;
 
     String ref() default "";
 
-    Projection join();
+    From join();
 
     /**
      * 是否使用对象关系自动join, 如果使用自动join,则无需填写 joinField

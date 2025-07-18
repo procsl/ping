@@ -1,9 +1,7 @@
 package cn.procsl.ping.boot.jpa.support.query.repository;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 public interface Operator extends Clause {
+
 
     Operator NONE = new TemplateOperator("");
 
@@ -48,7 +46,7 @@ public interface Operator extends Clause {
         return (new TemplateOperator("%s in ( %s )", field, args));
     }
 
-    static Operator notIn(String field, String args) {
+    static Operator not_in(String field, String args) {
         return (new TemplateOperator("%s not in ( %s )", field, args));
     }
 
@@ -56,5 +54,15 @@ public interface Operator extends Clause {
         return (new TemplateOperator("%s between %s and %s", field, arg1, arg2));
     }
 
+    static Operator is_not_null(String field) {
+        return (new TemplateOperator("%s is not null", field));
+    }
 
+    static Operator is_null(String field) {
+        return (new TemplateOperator("%s is null", field));
+    }
+
+    static Operator custom(String named) {
+        return new SimpleOperator((bc) -> named);
+    }
 }

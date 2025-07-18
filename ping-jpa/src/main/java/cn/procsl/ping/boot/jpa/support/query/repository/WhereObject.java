@@ -4,7 +4,7 @@ import java.util.Set;
 
 public interface WhereObject extends Clause {
 
-    Set<Argument> getArguments();
+    Set<Parameter> getArguments();
 
     Operator getOperator();
 

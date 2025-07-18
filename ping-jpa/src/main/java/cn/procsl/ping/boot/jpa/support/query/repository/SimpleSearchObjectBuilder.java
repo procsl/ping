@@ -6,7 +6,7 @@ import lombok.Setter;
 import java.util.*;
 
 @Setter
-public final class SimpleQueryObjectBuilder implements SearchObject {
+public final class SimpleSearchObjectBuilder implements SearchObject {
 
     private final List<SelectObject> select = new ArrayList<>();
     private final List<FromObject> from = new ArrayList<>();
@@ -83,7 +83,7 @@ public final class SimpleQueryObjectBuilder implements SearchObject {
         }
 
         @Override
-        public Set<Argument> getArguments() {
+        public Set<Parameter> getArguments() {
             return Collections.emptySet();
         }
 

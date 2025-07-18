@@ -1,6 +1,6 @@
 package cn.procsl.ping.boot.jpa.support.query.repository;
 
-public interface Argument {
+public interface Parameter {
 
     String getName();
 
