@@ -31,15 +31,15 @@ class PredicateAnnotationExtractor {
             if (!s.equals("$")) {
                 value = resolve(dto, s);
             }
+            PredicateMeta m;
             if (value != null) {
-                PredicateMeta m = new PredicateMeta(value.method().getReturnType(),
-                    value.value(), s, predicate, PredicateMeta.Source.type, current, value.field(), value.method());
-                predicateMaps.get(s).add(m);
+                m = new PredicateMeta(value.method().getReturnType(),
+                        value.value(), s, predicate, PredicateMeta.Source.type, current, value.field(), value.method());
             } else {
-                PredicateMeta m = new PredicateMeta(null,
-                    null, s, predicate, PredicateMeta.Source.type, current, null, null);
-                predicateMaps.get(s).add(m);
+                m = new PredicateMeta(null,
+                        null, s, predicate, PredicateMeta.Source.type, current, null, null);
             }
+            predicateMaps.get(s).add(m);
         };
         flatToMap(clazz, bi);
 

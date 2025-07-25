@@ -3,6 +3,7 @@ package cn.procsl.ping.boot.jpa.support.query.repository;
 import cn.procsl.ping.boot.jpa.support.query.From;
 import cn.procsl.ping.boot.jpa.support.query.Predicate;
 import cn.procsl.ping.boot.jpa.support.query.ReferenceBy;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -37,10 +38,15 @@ public record PredicateMeta(Class<?> type, Object value,                // 实�
     /**
      * 创建操作符
      */
-    public Operator createOperator(From from, ReferenceBy reference) {
+    public Operator createOperator(From from) {
+
+        // 获取注解
+        ReferenceBy reference = this.findAnnotations();
+
         TypeCategory c = this.categorize();
         // 获取hql表达式名称
         String sn = this.createSqlFieldFragment(from, reference);
+
         // 首先检测是否为 is null
         String named = this.createNamedFragment(from, reference, c);
         Operator isNullOp = Operator.is_null(sn);
@@ -61,6 +67,23 @@ public record PredicateMeta(Class<?> type, Object value,                // 实�
             case is_not_null -> (value instanceof Boolean && (Boolean) value) ? isNotNullOp : isNullOp;
             case custom -> Operator.group(Operator.custom(named));
         };
+    }
+
+    private ReferenceBy findAnnotations() {
+        ReferenceBy reference = null;
+        if (this.field != null) {
+            reference = AnnotatedElementUtils.findMergedAnnotation(this.field, ReferenceBy.class);
+        }
+        if (reference != null) {
+            return reference;
+        }
+        if (this.getter != null) {
+            reference = AnnotatedElementUtils.findMergedAnnotation(this.getter, ReferenceBy.class);
+        }
+        if (reference != null) {
+            return reference;
+        }
+        return null;
     }
 
     private static Operator getOperator(String named, Operator operator, Operator sn) {
