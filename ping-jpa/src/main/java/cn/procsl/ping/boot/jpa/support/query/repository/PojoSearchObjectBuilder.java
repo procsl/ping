@@ -9,7 +9,6 @@ import org.springframework.core.annotation.AnnotationUtils;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -55,7 +54,7 @@ public final class PojoSearchObjectBuilder implements SearchObject {
         // 解析Where语句
         var predicateProps = PredicateAnnotationExtractor.extract(this.targetQueryPojo);
         // 按照group分组
-        Map<String, List<PredicateMeta>> groups = predicateProps.stream().collect(Collectors.groupingBy(item -> item.predicate().group()));
+        Map<String, List<PredicateMeta>> groups = predicateProps.stream().collect(Collectors.groupingBy(item -> item.getPredicate().group()));
         ArrayList<Operator> ops = new ArrayList<>();
         HashSet<Parameter> p = new HashSet<>();
         groups.forEach((k, v) -> {
@@ -64,7 +63,7 @@ public final class PojoSearchObjectBuilder implements SearchObject {
                 if (prop.shouldIgnore()) {
                     continue;
                 }
-                Operator op = prop.createOperator(main, null);
+                Operator op = prop.createOperator(main);
                 p.addAll(prop.extractParameterPlaceholderAndValue());
                 group.add(op);
             }
