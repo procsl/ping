@@ -43,7 +43,9 @@ public class SimpleSearchObjectBuilderTest {
         builder.addSelect("b.id", "bid");
         Operator and = LogicalOperator.and(Operator.eq("a.id", "b.id"), Operator.like("b.name", ":name"));
         Operator or = LogicalOperator.or(Operator.eq("c.nickNam", ":nickName"), Operator.not_in("c.nickName", ":notNicks"));
-        builder.setWhere(new SimpleWhere(LogicalOperator.and(and, Operator.group(or))));
+        SimpleWhere sw = new SimpleWhere();
+        sw.addOperator(and, Operator.group(or));
+        builder.setWhere(sw);
         String string = builder.toClauseString(context);
         log.info("sql语句: {}", string);
     }
@@ -112,7 +114,9 @@ public class SimpleSearchObjectBuilderTest {
 
         builder.addFrom(sfa);
 
-        builder.setWhere(new SimpleWhere(LogicalOperator.and(Operator.in("a.id", ":ids"), Operator.like("b.name", ":name"))));
+        SimpleWhere sw = new SimpleWhere();
+        sw.addOperator(Operator.in("a.id", ":ids"), Operator.like("b.name", ":name"));
+        builder.setWhere(sw);
         builder.addSort(SortObject.forDesc("a.id"), SortObject.forAsc("b.id"), SortObject.forDesc("c.id"));
 
         String string = builder.toClauseString(context);

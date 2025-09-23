@@ -1,8 +1,6 @@
 package cn.procsl.ping.boot.jpa.support.query.repository;
 
-import cn.procsl.ping.boot.jpa.support.query.From;
 import cn.procsl.ping.boot.jpa.support.query.Predicate;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -10,108 +8,24 @@ import org.springframework.util.StringUtils;
 
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 
 @Slf4j
-class PredicateAnnotationExtractor {
+final class PredicateAnnotationExtractor {
 
-    public static List<PredicateMeta> extract(Object dto) {
-
-        HashMap<String, List<PredicateMetaRecord>> map = extractedPredicateMeta(dto);
-
-        // 合并
-        List<PredicateMeta> result = new ArrayList<>();
-        map.forEach((k, v) -> result.add(new PredicateMetaWrapper(v)));
-        return result;
-    }
-
-    private record PredicateMetaWrapper(List<PredicateMetaRecord> meta) implements PredicateMeta {
-
-        @Override
-        public boolean isRoot() {
-            return meta.getFirst().isRoot();
-        }
-
-        @Override
-        public Predicate getPredicate() {
-            List<Predicate> list = meta.stream().map(PredicateMetaRecord::getPredicate).collect(Collectors.toList());
-            return new PredicateWrapper(list);
-        }
-
-        @Override
-        public List<Parameter> extractParameterPlaceholderAndValue() {
-            return null;
-        }
-
-        @Override
-        public Operator createOperator(From from) {
-            return null;
-        }
-
-        @Override
-        public boolean shouldIgnore() {
-            return false;
-        }
-
-        @Override
-        public boolean ignoreIfBlank() {
-            return false;
-        }
-    }
-
-    @RequiredArgsConstructor
-    static class PredicateWrapper implements Predicate {
-
-        final List<Predicate> preedicates;
-
-        @Override
-        public String group() {
-            return null;
-        }
-
-        @Override
-        public boolean ignoreIfNull() {
-            return false;
-        }
-
-        @Override
-        public boolean ignoreIfBlank() {
-            return false;
-        }
-
-        @Override
-        public boolean ignoreIfEmptyCollection() {
-            return false;
-        }
-
-        @Override
-        public OperatorType operator() {
-            return null;
-        }
-
-        @Override
-        public String[] path() {
-            return new String[0];
-        }
-
-        @Override
-        public Class<? extends Annotation> annotationType() {
-            return null;
-        }
-    }
-
-    private static HashMap<String, List<PredicateMetaRecord>> extractedPredicateMeta(Object dto) {
+    public static List<PredicateMetaRecord> extract(Object dto) {
         Class<?> clazz = dto.getClass();
         PropertyDescriptor[] props = BeanUtils.getPropertyDescriptors(clazz);
-        HashMap<String, List<PredicateMetaRecord>> predicateMaps = new HashMap<>();
+        List<PredicateMetaRecord> records = new ArrayList<>();
         BiConsumer<String, Predicate> bi = (s, predicate) -> {
-            s = init(s, predicateMaps);
+            s = init(s);
             ValueType value = null;
             String current = "$";
             if (!s.equals("$")) {
@@ -119,14 +33,15 @@ class PredicateAnnotationExtractor {
             }
             PredicateMetaRecord m;
             if (value != null) {
-                m = new PredicateMetaRecord(value.method().getReturnType(),
-                    value.value(), s, predicate, PredicateMetaRecord.Source.type, current, value.field(), value.method());
+                m = new PredicateMetaRecord(value.method().getReturnType(), value.value(), s, predicate,
+                    PredicateMetaRecord.Source.type, current, value.field(), value.method());
             } else {
                 m = new PredicateMetaRecord(null,
                     null, s, predicate, PredicateMetaRecord.Source.type, current, null, null);
             }
-            predicateMaps.get(s).add(m);
+            records.add(m);
         };
+
         flatToMap(clazz, null, bi);
 
         for (PropertyDescriptor prop : props) {
@@ -142,22 +57,24 @@ class PredicateAnnotationExtractor {
             Object value = readValue(dto, getter);
             if (field != null) {
                 flatToMap(field, fieldName, (s, predicate) -> {
-                    s = init(s, predicateMaps);
-                    PredicateMetaRecord meta = new PredicateMetaRecord(returnType, value, s, predicate, PredicateMetaRecord.Source.field, fieldName, field, getter);
-                    predicateMaps.get(s).add(meta);
+                    s = init(s);
+                    PredicateMetaRecord meta = new PredicateMetaRecord(returnType, value, s, predicate,
+                        PredicateMetaRecord.Source.field, fieldName, field, getter);
+                    records.add(meta);
                 });
             }
 
             // 提取方法上的
             flatToMap(getter, fieldName, (s, predicate) -> {
-                s = init(s, predicateMaps);
-                predicateMaps.get(s).add(new PredicateMetaRecord(returnType, value, s, predicate, PredicateMetaRecord.Source.method, fieldName, field, getter));
+                s = init(s);
+                records.add(new PredicateMetaRecord(returnType, value, s, predicate,
+                    PredicateMetaRecord.Source.method, fieldName, field, getter));
             });
         }
-        return predicateMaps;
+        return records;
     }
 
-    private static String init(String s, HashMap<String, List<PredicateMetaRecord>> predicateMaps) {
+    private static String init(String s) {
         if (s == null) {
             s = "";
         }
@@ -165,7 +82,6 @@ class PredicateAnnotationExtractor {
         if (!StringUtils.hasText(s)) {
             s = "$";
         }
-        predicateMaps.computeIfAbsent(s, k -> new ArrayList<>());
         return s;
     }
 
@@ -206,24 +122,6 @@ class PredicateAnnotationExtractor {
         }
     }
 
-
-    /**
-     * 解析路径对应的字段类型类别
-     */
-    public static Class<?> resolveTypeCategory(Class<?> rootClass, String path) {
-        String[] segments = path.split("\\.");
-        Class<?> current = rootClass;
-
-        for (String segment : segments) {
-            PropertyDescriptor pd = getPropertyDescriptor(current, segment);
-            if (pd == null || pd.getReadMethod() == null) {
-                throw new IllegalArgumentException("字段不存在或无法访问: " + segment + " in " + current);
-            }
-            current = pd.getPropertyType();
-        }
-
-        return current;
-    }
 
     public record ValueType(Field field, Method method, Object value, String name) {
     }

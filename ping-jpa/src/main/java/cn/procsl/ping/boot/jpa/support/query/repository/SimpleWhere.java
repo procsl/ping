@@ -1,27 +1,40 @@
 package cn.procsl.ping.boot.jpa.support.query.repository;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Builder;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public final class SimpleWhere implements WhereObject {
 
-    public SimpleWhere(Operator operator, Parameter... parameter) {
-        this.operator = operator;
-        if (parameter != null) {
-            this.hashSet.addAll(Arrays.asList(parameter));
-        }
+    @Builder
+    SimpleWhere() {
     }
 
     private final HashSet<Parameter> hashSet = new HashSet<>();
 
-    @Setter
-    @Getter
-    private Operator operator;
 
+    private List<Operator> operator = new ArrayList<>();
+
+    public void addParameter(Parameter... parameters) {
+        hashSet.addAll(Arrays.asList(parameters));
+    }
+
+    public void addParameter(Collection<Parameter> parameters) {
+        hashSet.addAll(parameters);
+    }
+
+    public void addOperator(Operator... operators) {
+        this.operator.addAll(Arrays.asList(operators));
+    }
+
+    public void addOperator(Collection<Operator> operators) {
+        this.operator.addAll(operators);
+    }
+
+    @Override
+    public Operator getOperator() {
+        return LogicalOperator.and(operator);
+    }
 
     @Override
     public Set<Parameter> getArguments() {

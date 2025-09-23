@@ -3,6 +3,8 @@ package cn.procsl.ping.boot.jpa.support.query.repository;
 import cn.procsl.ping.boot.jpa.support.query.From;
 import cn.procsl.ping.boot.jpa.support.query.Predicate;
 import cn.procsl.ping.boot.jpa.support.query.ReferenceBy;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.reflect.Array;
@@ -12,19 +14,25 @@ import java.time.temporal.Temporal;
 import java.util.*;
 
 record PredicateMetaRecord(Class<?> type, Object value,                // 实际字段值
-                           String path, Predicate predicate, Source source, String fieldName, Field field, Method getter
+                           String path, Predicate predicate,
+                           Source source, String fieldName,
+                           Field field, Method getter
 
-) implements PredicateMeta {
+) {
 
-    @Override
+
+    enum Source {
+        type, method, field
+    }
+
+    enum TypeCategory {
+        collection, simple, string, map, complex
+    }
+
     public boolean isRoot() {
         return "$".equals(path);
     }
 
-    @Override
-    public Predicate getPredicate() {
-        return this.predicate;
-    }
 
     /**
      * 提取参数占位符,以及值
@@ -33,15 +41,17 @@ record PredicateMetaRecord(Class<?> type, Object value,                // 实际
      * <p>
      * 对于值, 如果为like,会附加 %
      */
-    @Override
-    public List<Parameter> extractParameterPlaceholderAndValue() {
+    public List<Parameter> extractParameter(Operator operator) {
+        if (operator instanceof ParameterOperator) {
+            List<Parameter> tmp = ((ParameterOperator) operator).getNamed();
+            return Objects.requireNonNullElse(tmp, Collections.emptyList());
+        }
         return Collections.emptyList();
     }
 
     /**
      * 创建操作符
      */
-    @Override
     public Operator createOperator(From from) {
 
         // 获取注解
@@ -52,24 +62,24 @@ record PredicateMetaRecord(Class<?> type, Object value,                // 实际
         String sn = this.createSqlFieldFragment(from, reference);
 
         // 首先检测是否为 is null
-        String named = this.createNamedFragment(from, reference, c);
+        Parameter named = this.createNamedFragment(from, reference, c, sn);
         Operator isNullOp = Operator.is_null(sn);
         Operator isNotNullOp = Operator.is_not_null(sn);
 
         return switch (this.predicate.operator()) {
             case ilike, between -> throw new UnsupportedOperationException("暂不支持");
-            case eq -> getOperator(named, isNullOp, Operator.eq(sn, named));
-            case ne -> getOperator(named, isNotNullOp, Operator.ne(sn, named));
-            case gt -> getOperator(named, isNullOp, Operator.gt(sn, named));
-            case gte -> getOperator(named, isNullOp, Operator.gte(sn, named));
-            case lt -> getOperator(named, isNullOp, Operator.lt(sn, named));
-            case lte -> getOperator(named, isNullOp, Operator.lte(sn, named));
-            case like, left_like, right_like -> getOperator(named, isNullOp, Operator.like(sn, named));
-            case in -> getOperator(named, isNullOp, Operator.in(sn, named));
-            case not_in -> getOperator(named, isNotNullOp, Operator.not_in(sn, named));
+            case eq -> createOperator(named, isNullOp, Operator.eq(sn, named.getName()));
+            case ne -> createOperator(named, isNotNullOp, Operator.ne(sn, named.getName()));
+            case gt -> createOperator(named, isNullOp, Operator.gt(sn, named.getName()));
+            case gte -> createOperator(named, isNullOp, Operator.gte(sn, named.getName()));
+            case lt -> createOperator(named, isNullOp, Operator.lt(sn, named.getName()));
+            case lte -> createOperator(named, isNullOp, Operator.lte(sn, named.getName()));
+            case like, left_like, right_like -> createOperator(named, isNullOp, Operator.like(sn, named.getName()));
+            case in -> createOperator(named, isNullOp, Operator.in(sn, named.getName()));
+            case not_in -> createOperator(named, isNotNullOp, Operator.not_in(sn, named.getName()));
             case is_null -> (value instanceof Boolean && (Boolean) value) ? isNullOp : isNotNullOp;
             case is_not_null -> (value instanceof Boolean && (Boolean) value) ? isNotNullOp : isNullOp;
-            case custom -> Operator.group(Operator.custom(named));
+            case custom -> Operator.group(Operator.custom(named.getName()));
         };
     }
 
@@ -90,17 +100,31 @@ record PredicateMetaRecord(Class<?> type, Object value,                // 实际
         return null;
     }
 
-    private static Operator getOperator(String named, Operator operator, Operator sn) {
+    private static Operator createOperator(Parameter named, Operator operator, Operator sn) {
         if (named == null) {
             return operator;
         } else {
-            return sn;
+            return new ParameterOperator(Collections.singletonList(named), sn);
         }
     }
 
+    @Getter
+    @RequiredArgsConstructor
+    final static class ParameterOperator implements Operator {
 
-    private String createNamedFragment(From from, ReferenceBy reference, TypeCategory c) {
-        return null;
+        final List<Parameter> named;
+        final Operator operator;
+
+        @Override
+        public String toClauseString(BuilderContext context) {
+            return operator.toClauseString(context);
+        }
+
+    }
+
+    private Parameter createNamedFragment(From from, ReferenceBy reference, TypeCategory c, String templ) {
+        String name = templ.replaceAll("\\.", "_");
+        return new SimpleParameter(name, type, value);
     }
 
 
@@ -117,7 +141,6 @@ record PredicateMetaRecord(Class<?> type, Object value,                // 实际
     }
 
 
-    @Override
     public boolean shouldIgnore() {
 
         if (predicate.operator() == Predicate.OperatorType.custom) {
@@ -132,11 +155,7 @@ record PredicateMetaRecord(Class<?> type, Object value,                // 实际
             return true;
         }
 
-        if (this.ignoreIfEmptyCollection()) {
-            return true;
-        }
-
-        return false;
+        return this.ignoreIfEmptyCollection();
     }
 
     private boolean ignoreIfEmptyCollection() {
@@ -193,7 +212,6 @@ record PredicateMetaRecord(Class<?> type, Object value,                // 实际
         return true;
     }
 
-    @Override
     public boolean ignoreIfBlank() {
         if (!this.predicate.ignoreIfBlank()) {
             return false;

@@ -7,9 +7,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 
-import java.io.Serializable;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @RequiredArgsConstructor
 public final class PojoSearchObjectBuilder implements SearchObject {
@@ -17,8 +18,6 @@ public final class PojoSearchObjectBuilder implements SearchObject {
     private final SimpleSearchObjectBuilder builder = new SimpleSearchObjectBuilder();
 
     private final Object targetQueryPojo;
-
-    private Class<? extends Serializable> returnType;
 
     private boolean init = false;
 
@@ -33,7 +32,7 @@ public final class PojoSearchObjectBuilder implements SearchObject {
         if (projection == null) {
             throw new IllegalArgumentException("参数 pojo 未标注 @Projection 注解");
         }
-        this.returnType = projection.returnType();
+//        this.returnType = projection.returnType();
         for (Projection.Item item : projection.value()) {
             builder.addSelect(item.value(), item.alias());
         }
@@ -53,24 +52,15 @@ public final class PojoSearchObjectBuilder implements SearchObject {
 
         // 解析Where语句
         var predicateProps = PredicateAnnotationExtractor.extract(this.targetQueryPojo);
-        // 按照group分组
-        Map<String, List<PredicateMeta>> groups = predicateProps.stream().collect(Collectors.groupingBy(item -> item.getPredicate().group()));
-        ArrayList<Operator> ops = new ArrayList<>();
-        HashSet<Parameter> p = new HashSet<>();
-        groups.forEach((k, v) -> {
-            ArrayList<Operator> group = new ArrayList<>();
-            for (PredicateMeta prop : predicateProps) {
-                if (prop.shouldIgnore()) {
-                    continue;
-                }
-                Operator op = prop.createOperator(main);
-                p.addAll(prop.extractParameterPlaceholderAndValue());
-                group.add(op);
-            }
-            ops.add(Operator.group(LogicalOperator.or(group)));
+        SimpleWhere sw = new SimpleWhere();
+        this.builder.setWhere(sw);
+        predicateProps.forEach((i) -> {
+            Operator ops = i.createOperator(main);
+            List<Parameter> value = i.extractParameter(ops);
+            LogicalOperator.and(ops);
+            sw.addParameter(value);
+            sw.addOperator(ops);
         });
-
-        this.builder.setWhere(new SimpleWhere(LogicalOperator.and(ops), p.toArray(value -> new Parameter[0])));
         this.init = true;
     }
 
@@ -80,15 +70,15 @@ public final class PojoSearchObjectBuilder implements SearchObject {
         }
 
         HashMap<String, Set<Join>> refs = new HashMap<>();
-        HashMap<String, From> froms = new HashMap<>();
+//        HashMap<String, From> froms = new HashMap<>();
         HashMap<String, SimpleFrom> fromBuilder = new HashMap<>();
         fromBuilder.put(main.alias(), mainBuilder);
-        froms.put(main.alias(), main);
+//        froms.put(main.alias(), main);
 
         // 解析join字段
         for (Join join : joins) {
             String alias = join.join().alias();
-            froms.put(alias, join.join());
+//            froms.put(alias, join.join());
             // 防止重复创建导致引用关系错误
             if (!fromBuilder.containsKey(alias)) {
                 fromBuilder.put(alias, new SimpleFrom(join.join().entity().getName(), alias));
@@ -103,7 +93,8 @@ public final class PojoSearchObjectBuilder implements SearchObject {
             for (Join join : v) {
                 // 从表对象
                 SimpleFrom slv = fromBuilder.get(join.join().alias());
-                Operator eq = Operator.eq("%s.%s".formatted(master.alias(), join.leftJoinField()), "%s.%s".formatted(slv.alias(), join.rightJoinField()));
+                Operator eq = Operator.eq("%s.%s".formatted(master.alias(),
+                    join.leftJoinField()), "%s.%s".formatted(slv.alias(), join.rightJoinField()));
                 master.addJoinObject(join.type(), slv, eq);
             }
 

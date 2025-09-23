@@ -26,7 +26,8 @@ public class UserQueryController {
     @Operation(summary = "获取用户列表")
     @GetMapping("/v1/system/users")
     public FormatPage<UserRecord> findUsers(Pageable pageable, UserQuery query) {
-        return this.searchRepository.search(query, UserRecord.class, pageable);
+//        return this.searchRepository.search(query, UserRecord.class, pageable);
+        return null;
     }
 
 }

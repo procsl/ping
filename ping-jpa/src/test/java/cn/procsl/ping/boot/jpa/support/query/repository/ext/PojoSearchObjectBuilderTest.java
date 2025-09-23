@@ -9,10 +9,13 @@ import org.junit.jupiter.api.Test;
 @Slf4j
 public class PojoSearchObjectBuilderTest {
 
-    private final PojoSearchObjectBuilder builder = new PojoSearchObjectBuilder(new RequestParamDTO());
+    private PojoSearchObjectBuilder builder;
 
     @Test
     public void select() {
+        RequestParamDTO dto = new RequestParamDTO();
+        dto.setName("你好");
+        builder = new PojoSearchObjectBuilder(dto);
         BuilderContext context = new BuilderContext() {
             @Override
             public boolean isFormat() {
