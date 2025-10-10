@@ -51,7 +51,7 @@ public interface SearchObject extends Clause {
         String select = this.select().stream().map(s -> s.toClauseString(context)).collect(a);
         String from = this.from().stream().map(f -> f.toClauseString(context)).collect(a);
         String main = "%sselect%s%s%sfrom%s%s".formatted(newLine, item, select, newLine, item, from);
-        String where = this.where().getOperator().toClauseString(context);
+        String where = this.where().toClauseString(context);
 
         if (where == null) {
             where = "";

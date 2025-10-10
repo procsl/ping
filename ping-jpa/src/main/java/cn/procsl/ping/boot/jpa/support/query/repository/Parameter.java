@@ -9,4 +9,8 @@ public interface Parameter {
     // 不在生成阶段注入值
     Object getValue();
 
+    default String createPlaceholder() {
+        return ":" + getName();
+    }
+
 }

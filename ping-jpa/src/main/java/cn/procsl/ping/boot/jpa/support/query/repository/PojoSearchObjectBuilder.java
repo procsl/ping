@@ -7,10 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @RequiredArgsConstructor
 public final class PojoSearchObjectBuilder implements SearchObject {
@@ -30,7 +27,7 @@ public final class PojoSearchObjectBuilder implements SearchObject {
         Class<?> clazz = this.targetQueryPojo.getClass();
         Projection projection = AnnotationUtils.findAnnotation(clazz, Projection.class);
         if (projection == null) {
-            throw new IllegalArgumentException("参数 pojo 未标注 @Projection 注解");
+            throw new IllegalArgumentException("参数 POJO 未标注 @Projection 注解");
         }
 //        this.returnType = projection.returnType();
         for (Projection.Item item : projection.value()) {
@@ -40,7 +37,7 @@ public final class PojoSearchObjectBuilder implements SearchObject {
         // 解析主表,暂时不支持多个From
         From main = AnnotatedElementUtils.findMergedAnnotation(clazz, From.class);
         if (main == null) {
-            throw new IllegalArgumentException("参数 pojo 未标注 @From 注解");
+            throw new IllegalArgumentException("参数 POJO 未标注 @From 注解");
         }
 
         // 解析所有的join
@@ -54,11 +51,10 @@ public final class PojoSearchObjectBuilder implements SearchObject {
         var predicateProps = PredicateAnnotationExtractor.extract(this.targetQueryPojo);
         SimpleWhere sw = new SimpleWhere();
         this.builder.setWhere(sw);
-        predicateProps.forEach((i) -> {
+        Comparator<PredicateMetaRecord> sort = Comparator.comparing(PredicateMetaRecord::sort);
+        predicateProps.stream().sorted(sort).forEach((i) -> {
             Operator ops = i.createOperator(main);
-            List<Parameter> value = i.extractParameter(ops);
-            LogicalOperator.and(ops);
-            sw.addParameter(value);
+            sw.addParameter(i.extractParameter(ops));
             sw.addOperator(ops);
         });
         this.init = true;

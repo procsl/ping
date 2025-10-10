@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.Date;
 
 
 /**
@@ -38,16 +39,18 @@ import java.io.Serializable;
     @Projection.Item(value = "sub2.id", alias = "id"),
     @Projection.Item(value = "main.name", alias = "name"),
     @Projection.Item(value = "sub.id", alias = "id2")
-}, returnType = RequestParamDTO.class)
+}, returnType = ResponseVO.class)
 public class RequestParamDTO implements Serializable {
 
-    @Order
-    Long id;
-
-    @Predicate(operator = Predicate.OperatorType.eq)
+    @Predicate(operator = Predicate.OperatorType.eq, group = "a")
     String name;
 
     @ReferenceBy(ref = "sub")
-    String desc;
+    @Predicate(operator = Predicate.OperatorType.gte, path = "createTime")
+    Date startDate;
+
+    @ReferenceBy(ref = "sub")
+    @Predicate(operator = Predicate.OperatorType.lte, path = "createTime")
+    Date endDate;
 
 }

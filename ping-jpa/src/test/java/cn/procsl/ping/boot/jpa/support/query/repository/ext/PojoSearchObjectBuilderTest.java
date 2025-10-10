@@ -6,6 +6,8 @@ import cn.procsl.ping.boot.jpa.support.query.repository.PojoSearchObjectBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
+import java.util.Date;
+
 @Slf4j
 public class PojoSearchObjectBuilderTest {
 
@@ -15,6 +17,7 @@ public class PojoSearchObjectBuilderTest {
     public void select() {
         RequestParamDTO dto = new RequestParamDTO();
         dto.setName("你好");
+        dto.setStartDate(new Date());
         builder = new PojoSearchObjectBuilder(dto);
         BuilderContext context = new BuilderContext() {
             @Override

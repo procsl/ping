@@ -24,25 +24,25 @@ final class PredicateAnnotationExtractor {
         Class<?> clazz = dto.getClass();
         PropertyDescriptor[] props = BeanUtils.getPropertyDescriptors(clazz);
         List<PredicateMetaRecord> records = new ArrayList<>();
-        BiConsumer<String, Predicate> bi = (s, predicate) -> {
-            s = init(s);
-            ValueType value = null;
-            String current = "$";
-            if (!s.equals("$")) {
-                value = resolve(dto, s);
-            }
-            PredicateMetaRecord m;
-            if (value != null) {
-                m = new PredicateMetaRecord(value.method().getReturnType(), value.value(), s, predicate,
-                    PredicateMetaRecord.Source.type, current, value.field(), value.method());
-            } else {
-                m = new PredicateMetaRecord(null,
-                    null, s, predicate, PredicateMetaRecord.Source.type, current, null, null);
-            }
-            records.add(m);
-        };
+//        BiConsumer<String, Predicate> bi = (s, predicate) -> {
+//            s = init(s);
+//            ValueType value = null;
+//            String current = "$";
+//            if (!s.equals("$")) {
+//                value = resolve(dto, s);
+//            }
+//            PredicateMetaRecord m;
+//            if (value != null) {
+//                m = new PredicateMetaRecord(value.method().getReturnType(), value.value(), s, predicate,
+//                    PredicateMetaRecord.Source.type, current, value.field(), value.method());
+//            } else {
+//                m = new PredicateMetaRecord(null,
+//                    null, s, predicate, PredicateMetaRecord.Source.type, current, null, null);
+//            }
+//            records.add(m);
+//        };
 
-        flatToMap(clazz, null, bi);
+//        flatToMap(clazz, null, bi);
 
         for (PropertyDescriptor prop : props) {
             String fieldName = prop.getName();

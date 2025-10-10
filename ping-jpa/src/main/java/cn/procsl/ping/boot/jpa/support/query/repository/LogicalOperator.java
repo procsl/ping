@@ -27,7 +27,7 @@ public interface LogicalOperator extends Operator {
             return operators[0];
         }
 
-        return new SimpleOperator((bc) -> Arrays.stream(operators).map(item -> item.toClauseString(bc)).collect(Collectors.joining(dec)));
+        return new SimpleOperator((bc) -> Arrays.stream(operators).map(item -> item.toClauseString(bc)).filter(item -> item != null && !item.isEmpty()).collect(Collectors.joining(dec)));
     }
 
 
