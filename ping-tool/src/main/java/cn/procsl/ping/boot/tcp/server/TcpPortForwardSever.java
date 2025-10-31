@@ -75,12 +75,10 @@ public class TcpPortForwardSever {
 
         });
 
-        server.listen(res -> {
-            if (res.succeeded()) {
-                log.info("Server is now listening on actual port: {}", server.actualPort());
-            } else {
-                log.error("Failed to bind: {}", server.actualPort(), res.cause());
-            }
+        server.listen().onSuccess((net) -> {
+            log.info("Server is now listening on actual port: {}", server.actualPort());
+        }).onFailure(err -> {
+            log.error("Failed to bind: {}", server.actualPort(), err);
         });
     }
 
