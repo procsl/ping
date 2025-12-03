@@ -10,11 +10,10 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 
 @Slf4j
 @RequiredArgsConstructor
-public class TunnelManagerService {
+public class TunnelClient {
 
     private final List<CommandHandler> handlers = new ArrayList<>();
     private final SimplePacketStream up = new SimplePacketStream();
@@ -103,24 +102,6 @@ public class TunnelManagerService {
         }
         latch.await();
         log.info("服务已关闭");
-    }
-
-    private static class SimplePacketStream implements PacketStreamWriter<Packet>, PacketStreamReader<Packet> {
-
-        private final LinkedBlockingQueue<Packet> queue = new LinkedBlockingQueue<>();
-
-        @Override
-        public Packet pull() throws InterruptedException {
-            Packet temp = queue.take();
-            log.info("取出队列元素: {}, {}", temp.getCommand(), temp.getChannelId());
-            return temp;
-        }
-
-        @Override
-        public void push(Packet temp) {
-            log.info("添加队列元素: {}, {}", temp.getCommand(), temp.getChannelId());
-            this.queue.add(temp);
-        }
     }
 
 }

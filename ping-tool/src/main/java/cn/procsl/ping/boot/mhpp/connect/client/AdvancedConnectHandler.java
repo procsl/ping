@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.mhpp.protocol.client;
+package cn.procsl.ping.boot.mhpp.connect.client;
 
 
 import io.netty.buffer.ByteBuf;
@@ -83,7 +83,7 @@ public class AdvancedConnectHandler extends ChannelInboundHandlerAdapter {
         ctx.pipeline().addLast(new TunnelDataHandler());
 
         // 通知外部连接已就绪
-        ctx.pipeline().fireUserEventTriggered(new TunnelEstablishedEvent());
+//        ctx.pipeline().fireUserEventTriggered(new TunnelEstablishedEvent());
 
         log.info("隧道模式已就绪，可以开始传输数据");
     }
@@ -119,6 +119,6 @@ public class AdvancedConnectHandler extends ChannelInboundHandlerAdapter {
 }
 
 // 隧道建立事件
-class TunnelEstablishedEvent {
-    // 事件标记
-}
+//public class TunnelEstablishedEvent {
+//    // 事件标记
+//}

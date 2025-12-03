@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.mhpp.protocol.client;
+package cn.procsl.ping.boot.mhpp.connect.client;
 
 
 import io.netty.bootstrap.Bootstrap;

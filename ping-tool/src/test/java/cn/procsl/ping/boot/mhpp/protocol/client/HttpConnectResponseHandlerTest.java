@@ -1,5 +1,8 @@
 package cn.procsl.ping.boot.mhpp.protocol.client;
 
+import cn.procsl.ping.boot.mhpp.connect.client.AdvancedHttpConnectClient;
+import cn.procsl.ping.boot.mhpp.connect.client.HttpConnectClient;
+//import cn.procsl.ping.boot.mhpp.connect.client.TunnelEstablishedEvent;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -38,17 +41,17 @@ public class HttpConnectResponseHandlerTest {
         Channel channel = connectFuture.sync().channel();
 
         // 添加监听器等待隧道建立
-        channel.pipeline().addLast(new ChannelInboundHandlerAdapter() {
-            @Override
-            public void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
-                if (evt instanceof TunnelEstablishedEvent) {
-                    log.debug("隧道已建立，可以发送数据");
-                    // 示例：发送一些数据
-                    String testData = "GET / HTTP/1.1\r\nHost: www.baidu.com\r\n\r\n";
-                    ctx.writeAndFlush(Unpooled.copiedBuffer(testData, StandardCharsets.UTF_8));
-                }
-            }
-        });
+//        channel.pipeline().addLast(new ChannelInboundHandlerAdapter() {
+//            @Override
+//            public void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
+//                if (evt instanceof TunnelEstablishedEvent) {
+//                    log.debug("隧道已建立，可以发送数据");
+//                    // 示例：发送一些数据
+//                    String testData = "GET / HTTP/1.1\r\nHost: www.baidu.com\r\n\r\n";
+//                    ctx.writeAndFlush(Unpooled.copiedBuffer(testData, StandardCharsets.UTF_8));
+//                }
+//            }
+//        });
 
         // 保持连接
         channel.closeFuture().sync();

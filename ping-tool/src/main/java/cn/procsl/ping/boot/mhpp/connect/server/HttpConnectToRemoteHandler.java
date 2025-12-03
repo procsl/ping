@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.mhpp.protocol.server;
+package cn.procsl.ping.boot.mhpp.connect.server;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;

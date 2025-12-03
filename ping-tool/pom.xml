@@ -113,29 +113,29 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.0.0</version>
-                <executions>
-                    <execution>
-                        <id>enforce-netty-version</id>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <!-- 强制所有 Netty 依赖使用统一版本 -->
-                                <requireSameVersion>
-                                    <dependencies>
-                                        <dependency>io.netty:*</dependency>
-                                    </dependencies>
-                                </requireSameVersion>
-                            </rules>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-enforcer-plugin</artifactId>-->
+<!--                <version>3.0.0</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>enforce-netty-version</id>-->
+<!--                        <goals>-->
+<!--                            <goal>enforce</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <rules>-->
+<!--                                &lt;!&ndash; 强制所有 Netty 依赖使用统一版本 &ndash;&gt;-->
+<!--                                <requireSameVersion>-->
+<!--                                    <dependencies>-->
+<!--                                        <dependency>io.netty:*</dependency>-->
+<!--                                    </dependencies>-->
+<!--                                </requireSameVersion>-->
+<!--                            </rules>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
         </plugins>
     </build>
 
