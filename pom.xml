@@ -4,19 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-dependencies</artifactId>
-        <version>4.0.6</version>
-    </parent>
-
     <groupId>cn.procsl</groupId>
     <artifactId>ping</artifactId>
     <packaging>pom</packaging>
     <version>1.0.1</version>
 
     <properties>
-         <java.version>25</java.version>
+        <java.version>25</java.version>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.compilerVersion>${java.version}</maven.compiler.compilerVersion>
@@ -31,6 +25,9 @@
         <spring-dev>false</spring-dev>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+        <maven.resources.plugin.version>3.5.0</maven.resources.plugin.version>
+        <maven.surefire.plugin.version>3.5.5</maven.surefire.plugin.version>
+        <maven.compiler.plugin.version>3.15.0</maven.compiler.plugin.version>
     </properties>
 
     <modules>
@@ -46,6 +43,14 @@
     <dependencyManagement>
 
         <dependencies>
+            <dependency>
+                <!-- 从 Spring Boot 导入依赖管理 -->
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>4.0.6</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
 
             <dependency>
                 <groupId>org.mapstruct</groupId>
@@ -196,189 +201,250 @@
 
     </dependencies>
 
+
     <build>
 
-        <plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>io.github.git-commit-id</groupId>
+                    <artifactId>git-commit-id-maven-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>get-the-git-infos</id>
+                            <!-- 默认绑定阶段initialize -->
+                            <phase>initialize</phase>
+                            <goals>
+                                <!-- 目标：revision -->
+                                <goal>revision</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <!-- 检查的仓库根目录，${project.basedir}：项目根目录，即包含pom.xml文件的目录 -->
+                        <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+                        <!-- false：扫描路径时不打印更多信息，默认值false，可以不配置 -->
+                        <verbose>false</verbose>
+                        <!-- 定义插件中所有时间格式，默认值：yyyy-MM-dd’T’HH:mm:ssZ -->
+                        <dateFormat>yyyy-MM-dd HH:mm:ss</dateFormat>
+                        <!-- git属性文件中各属性前缀，默认值git，可以不配置 -->
+                        <prefix>git</prefix>
+                        <!-- 生成git属性文件，默认false：不生成 -->
+                        <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                        <!-- 生成git属性文件路径及文件名，默认${project.build.outputDirectory}/git.properties -->
+                        <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties
+                        </generateGitPropertiesFilename>
+                        <!-- 生成git属性文件格式，默认值properties -->
+                        <format>json</format>
+                        <!-- 配置git-describe命令 -->
+                        <gitDescribe>
+                            <skip>false</skip>
+                            <always>false</always>
+                            <dirty>-dirty</dirty>
+                        </gitDescribe>
+                    </configuration>
+                </plugin>
 
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven.compiler.plugin.version}</version>
+                    <configuration>
+                        <release>${java.version}</release>
+                        <generatedSourcesDirectory>
+                            ${project.build.directory}/generated-sources/java
+                        </generatedSourcesDirectory>
+                        <compilerVersion>${compiler.version}</compilerVersion>
+
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <!--                                <version>${lombok.version}</version>-->
+                            </path>
+
+                            <!--                        <path>-->
+                            <!--                            <groupId>systems.manifold</groupId>-->
+                            <!--                            <artifactId>manifold</artifactId>-->
+                            <!--                            <version>${manifold.version}</version>-->
+                            <!--                        </path>-->
+
+                            <path>
+                                <groupId>org.mapstruct</groupId>
+                                <artifactId>mapstruct-processor</artifactId>
+                                <version>${mapstruct.version}</version>
+                            </path>
+
+                            <path>
+                                <groupId>cn.procsl</groupId>
+                                <artifactId>ping-apt</artifactId>
+                                <version>${project.version}</version>
+                            </path>
+
+                            <path>
+                                <groupId>com.google.auto.service</groupId>
+                                <artifactId>auto-service</artifactId>
+                                <version>${google.auto.version}</version>
+                            </path>
+
+                            <path>
+                                <groupId>org.hibernate.orm</groupId>
+                                <artifactId>hibernate-jpamodelgen</artifactId>
+                                <version>6.5.3.Final</version>
+                            </path>
+
+                            <path>
+                                <groupId>org.springframework.boot</groupId>
+                                <artifactId>spring-boot-configuration-processor</artifactId>
+                                <version>${springboot.version}</version>
+                            </path>
+
+                            <path>
+                                <groupId>org.springframework</groupId>
+                                <artifactId>spring-context-indexer</artifactId>
+                            </path>
+
+                        </annotationProcessorPaths>
+
+                        <verbose>true</verbose>
+                        <showWarnings>true</showWarnings>
+                        <!--                    <fork>true</fork>-->
+                        <!--保留参数名称-->
+                        <maxmem>2048m</maxmem>
+                        <compilerArgs>
+                            <arg>-g</arg>
+                            <arg>-Xlint:unchecked</arg>
+                            <arg>-Xlint:deprecation</arg>
+                            <arg>-parameters</arg>
+                            <arg>-proc:full</arg>
+                            <!--                        <arg>-Xplugin:Manifold</arg>-->
+                        </compilerArgs>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven.surefire.plugin.version}</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${maven.resources.plugin.version}</version>
+                    <configuration>
+                        <encoding>utf-8</encoding>
+                        <!-- 解决Spring boot引起的profile失效问题 -->
+                        <useDefaultDelimiters>true</useDefaultDelimiters>
+                        <!-- 过滤后缀为p12、pem、pfx的证书文件 -->
+                        <nonFilteredFileExtensions>
+                            <nonFilteredFileExtension>p12</nonFilteredFileExtension>
+                            <nonFilteredFileExtension>cer</nonFilteredFileExtension>
+                            <nonFilteredFileExtension>pem</nonFilteredFileExtension>
+                            <nonFilteredFileExtension>pfx</nonFilteredFileExtension>
+                            <nonFilteredFileExtension>jkx</nonFilteredFileExtension>
+                        </nonFilteredFileExtensions>
+                    </configuration>
+                </plugin>
+
+            </plugins>
+
+        </pluginManagement>
+
+        <plugins>
             <plugin>
-                <groupId>io.github.git-commit-id</groupId>
-                <artifactId>git-commit-id-maven-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.4.1</version>
                 <executions>
                     <execution>
-                        <id>get-the-git-infos</id>
-                        <!-- 默认绑定阶段initialize -->
-                        <phase>initialize</phase>
+                        <id>enforce-versions</id>
                         <goals>
-                            <!-- 目标：revision -->
-                            <goal>revision</goal>
+                            <goal>enforce</goal>
                         </goals>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <version>${java.version}</version>
+                                    <message>警告: 项目必须使用 JDK ${java.version} 或更高版本进行编译！</message>
+                                </requireJavaVersion>
+                                <requireMavenVersion>
+                                    <version>3.9.0</version>
+                                </requireMavenVersion>
+                            </rules>
+                        </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <!-- 检查的仓库根目录，${project.basedir}：项目根目录，即包含pom.xml文件的目录 -->
-                    <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
-                    <!-- false：扫描路径时不打印更多信息，默认值false，可以不配置 -->
-                    <verbose>false</verbose>
-                    <!-- 定义插件中所有时间格式，默认值：yyyy-MM-dd’T’HH:mm:ssZ -->
-                    <dateFormat>yyyy-MM-dd HH:mm:ss</dateFormat>
-                    <!-- git属性文件中各属性前缀，默认值git，可以不配置 -->
-                    <prefix>git</prefix>
-                    <!-- 生成git属性文件，默认false：不生成 -->
-                    <generateGitPropertiesFile>true</generateGitPropertiesFile>
-                    <!-- 生成git属性文件路径及文件名，默认${project.build.outputDirectory}/git.properties -->
-                    <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties
-                    </generateGitPropertiesFilename>
-                    <!-- 生成git属性文件格式，默认值properties -->
-                    <format>json</format>
-                    <!-- 配置git-describe命令 -->
-                    <gitDescribe>
-                        <skip>false</skip>
-                        <always>false</always>
-                        <dirty>-dirty</dirty>
-                    </gitDescribe>
-                </configuration>
             </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <release>${java.version}</release>
-                    <generatedSourcesDirectory>
-                        ${project.build.directory}/generated-sources/java
-                    </generatedSourcesDirectory>
-                    <compilerVersion>${compiler.version}</compilerVersion>
-
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>${lombok.version}</version>
-                        </path>
-
-                        <!--                        <path>-->
-                        <!--                            <groupId>systems.manifold</groupId>-->
-                        <!--                            <artifactId>manifold</artifactId>-->
-                        <!--                            <version>${manifold.version}</version>-->
-                        <!--                        </path>-->
-
-                        <path>
-                            <groupId>org.mapstruct</groupId>
-                            <artifactId>mapstruct-processor</artifactId>
-                            <version>${mapstruct.version}</version>
-                        </path>
-
-                        <path>
-                            <groupId>cn.procsl</groupId>
-                            <artifactId>ping-apt</artifactId>
-                            <version>${project.version}</version>
-                        </path>
-
-                        <path>
-                            <groupId>com.google.auto.service</groupId>
-                            <artifactId>auto-service</artifactId>
-                            <version>${google.auto.version}</version>
-                        </path>
-
-                        <path>
-                            <groupId>org.hibernate.orm</groupId>
-                            <artifactId>hibernate-jpamodelgen</artifactId>
-                            <!--                            <version>${hibernate.version}</version>-->
-                            <version>6.5.3.Final</version>
-                        </path>
-
-                        <path>
-                            <groupId>org.springframework.boot</groupId>
-                            <artifactId>spring-boot-configuration-processor</artifactId>
-                            <version>${springboot.version}</version>
-                        </path>
-
-                        <path>
-                            <groupId>org.springframework</groupId>
-                            <artifactId>spring-context-indexer</artifactId>
-                            <version>${spring-framework.version}</version>
-                        </path>
-
-                    </annotationProcessorPaths>
-
-                    <verbose>true</verbose>
-                    <showWarnings>true</showWarnings>
-                    <!--                    <fork>true</fork>-->
-                    <!--保留参数名称-->
-                    <maxmem>2048m</maxmem>
-                    <compilerArgs>
-                        <arg>-g</arg>
-                        <arg>-Xlint:unchecked</arg>
-                        <arg>-Xlint:deprecation</arg>
-                        <arg>-parameters</arg>
-                        <arg>-proc:full</arg>
-                        <!--                        <arg>-Xplugin:Manifold</arg>-->
-                    </compilerArgs>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-            </plugin>
-
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <configuration>
-                    <encoding>utf-8</encoding>
-                    <!-- 解决Spring boot引起的profile失效问题 -->
-                    <useDefaultDelimiters>true</useDefaultDelimiters>
-                    <!-- 过滤后缀为p12、pem、pfx的证书文件 -->
-                    <nonFilteredFileExtensions>
-                        <nonFilteredFileExtension>p12</nonFilteredFileExtension>
-                        <nonFilteredFileExtension>cer</nonFilteredFileExtension>
-                        <nonFilteredFileExtension>pem</nonFilteredFileExtension>
-                        <nonFilteredFileExtension>pfx</nonFilteredFileExtension>
-                        <nonFilteredFileExtension>jkx</nonFilteredFileExtension>
-                    </nonFilteredFileExtensions>
-                </configuration>
-            </plugin>
-
         </plugins>
 
         <finalName>${project.artifactId}-${project.version}</finalName>
-
-        <testResources>
-            <testResource>
-                <directory>${project.basedir}/src/test/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**</include>
-                </includes>
-                <excludes>
-                    <exclude>*.jks</exclude>
-                    <exclude>*.pfx</exclude>
-                    <exclude>*.txt</exclude>
-                </excludes>
-            </testResource>
-        </testResources>
 
         <resources>
             <resource>
                 <directory>${project.basedir}/src/main/resources</directory>
                 <filtering>true</filtering>
                 <includes>
-                    <include>**</include>
+                    <include>**/application*.yml</include>
+                    <include>**/application*.yaml</include>
+                    <include>**/application*.properties</include>
+                    <include>**/bootstrap*.yml</include>
+                    <include>**/bootstrap*.yaml</include>
+                    <include>**/bootstrap*.properties</include>
+                    <include>logback*.xml</include>
                 </includes>
-                <excludes>
-                    <exclude>*.jks</exclude>
-                    <exclude>*.pfx</exclude>
-                    <exclude>*.txt</exclude>
-                </excludes>
+            </resource>
 
+            <resource>
+                <directory>${project.basedir}/src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>**/application*.yml</exclude>
+                    <exclude>**/application*.yaml</exclude>
+                    <exclude>**/application*.properties</exclude>
+                    <exclude>**/bootstrap*.yml</exclude>
+                    <exclude>**/bootstrap*.yaml</exclude>
+                    <exclude>**/bootstrap*.properties</exclude>
+                    <exclude>logback*.xml</exclude>
+                </excludes>
             </resource>
         </resources>
+
+        <testResources>
+            <testResource>
+                <directory>${project.basedir}/src/test/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/application*.yml</include>
+                    <include>**/application*.yaml</include>
+                    <include>**/application*.properties</include>
+                    <include>**/bootstrap*.yml</include>
+                    <include>**/bootstrap*.yaml</include>
+                    <include>**/bootstrap*.properties</include>
+                    <include>logback*.xml</include>
+                </includes>
+            </testResource>
+
+            <testResource>
+                <directory>${project.basedir}/src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>**/application*.yml</exclude>
+                    <exclude>**/application*.yaml</exclude>
+                    <exclude>**/application*.properties</exclude>
+                    <exclude>**/bootstrap*.yml</exclude>
+                    <exclude>**/bootstrap*.yaml</exclude>
+                    <exclude>**/bootstrap*.properties</exclude>
+                    <exclude>logback*.xml</exclude>
+                </excludes>
+            </testResource>
+        </testResources>
+
 
     </build>
 
