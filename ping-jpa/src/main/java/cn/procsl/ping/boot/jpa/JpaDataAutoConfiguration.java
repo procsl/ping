@@ -5,7 +5,6 @@ import cn.procsl.ping.boot.jpa.domain.id.SegmentIdentifierGenerator;
 import cn.procsl.ping.boot.jpa.domain.id.TableIdentifierSegmentRepositoryImpl;
 import cn.procsl.ping.boot.jpa.support.extension.EnableJpaExtensionRepositories;
 import cn.procsl.ping.boot.jpa.support.extension.JpaRepositoryFactoryCustomizer;
-import cn.procsl.ping.boot.jpa.support.query.ProjectionSearchRepository;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
@@ -14,9 +13,21 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.persistence.autoconfigure.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.PlatformTransactionManager;
+
+//import jakarta.annotation.Nonnull;
+//import jakarta.persistence.EntityManager;
+//import lombok.extern.slf4j.Slf4j;
+//import org.springframework.beans.BeansException;
+//import org.springframework.beans.factory.annotation.Qualifier;
+//import org.springframework.beans.factory.config.BeanPostProcessor;
+//import org.springframework.boot.autoconfigure.AutoConfiguration;
+//import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+//import org.springframework.boot.autoconfigure.domain.EntityScan;
+//import org.springframework.context.annotation.Bean;
+//import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * 自动配置 用于注册加载时依赖注入和包扫描

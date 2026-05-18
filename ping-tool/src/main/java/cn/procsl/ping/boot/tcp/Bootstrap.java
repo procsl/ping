@@ -5,11 +5,11 @@ import cn.procsl.ping.boot.tcp.server.TcpPortForwardSever;
 public class Bootstrap {
 
     public static void main(String[] args) {
-        String targetHost = "127.0.0.1";
-        int sourcePort = 8082;
-        int targetPort = 8888;
-        TcpPortForwardSever server = new TcpPortForwardSever(sourcePort, targetPort, targetHost);
-        server.start();
+//        TcpPortForwardSever server = new TcpPortForwardSever(8089, 7777, "127.0.0.1");
+//        server.start();
+
+        TcpPortForwardSever server2 = new TcpPortForwardSever(8099, 7777, "127.0.0.1");
+        server2.start();
     }
 
 }

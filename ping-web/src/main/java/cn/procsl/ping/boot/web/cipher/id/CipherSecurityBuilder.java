@@ -1,10 +1,11 @@
 package cn.procsl.ping.boot.web.cipher.id;
 
 import cn.procsl.ping.boot.web.cipher.CipherLockupService;
-import com.fasterxml.jackson.databind.AnnotationIntrospector;
+//import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.web.format.WebConversionService;
 import org.springframework.core.convert.converter.GenericConverter;
+import tools.jackson.databind.AnnotationIntrospector;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;

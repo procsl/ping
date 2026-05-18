@@ -4,7 +4,7 @@
     <parent>
         <groupId>cn.procsl</groupId>
         <artifactId>ping</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
     </parent>
 
     <artifactId>ping-jpa</artifactId>
@@ -31,6 +31,7 @@
         <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-jpamodelgen</artifactId>
+            <version>6.5.3.Final</version>
         </dependency>
 
         <dependency>

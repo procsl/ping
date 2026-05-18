@@ -3,7 +3,7 @@ package cn.procsl.ping.boot.jpa;
 import cn.procsl.ping.boot.jpa.support.extension.EnableJpaExtensionRepositories;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.persistence.autoconfigure.EntityScan;
 
 @SpringBootApplication
 @EnableJpaExtensionRepositories(basePackages = {

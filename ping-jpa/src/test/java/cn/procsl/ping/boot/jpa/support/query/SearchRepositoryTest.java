@@ -6,7 +6,6 @@ import jakarta.persistence.criteria.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.annotation.Rollback;
 
 import javax.inject.Inject;
@@ -15,7 +14,7 @@ import java.util.List;
 
 @Slf4j
 @Rollback
-@DataJpaTest
+//@DataJpaTest
 public class SearchRepositoryTest {
 
 

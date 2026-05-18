@@ -11,7 +11,6 @@ import jakarta.servlet.http.Cookie;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.http.MediaType;
@@ -31,7 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
-@AutoConfigureMockMvc
+
 @SpringBootTest(classes = TestCaptchaApplication.class, webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 public class CaptchaControllerTest {
 

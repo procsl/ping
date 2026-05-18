@@ -1,6 +1,5 @@
 package cn.procsl.ping.boot.web.json;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
@@ -13,12 +12,10 @@ import org.junit.jupiter.api.Test;
 @Slf4j
 public class JsonFilterTest {
 
-    ObjectMapper jsonMapper = new ObjectMapper();
-
 
     @Test
     public void test() {
-        Configuration config = Configuration.builder().jsonProvider(new JacksonJsonProvider(jsonMapper)).mappingProvider(new JacksonMappingProvider()).build();
+        Configuration config = Configuration.builder().jsonProvider(new JacksonJsonProvider()).mappingProvider(new JacksonMappingProvider()).build();
         ParseContext context = JsonPath.using(config);
         DocumentContext document = context.parse("{\"id\": \"123456\"}");
     }

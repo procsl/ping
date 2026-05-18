@@ -8,7 +8,7 @@ import lombok.NonNull;
 import org.springframework.beans.BeansException;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.persistence.autoconfigure.EntityScan;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
@@ -22,9 +22,9 @@ import static cn.procsl.ping.boot.web.RestWebAutoConfiguration.PUBLIC_STATIC_RES
 
 @AutoConfiguration
 @ComponentScan(basePackages = {
-        "cn.procsl.ping.boot.captcha.web",
-        "cn.procsl.ping.boot.captcha.handler",
-        "cn.procsl.ping.boot.captcha.adapter"
+    "cn.procsl.ping.boot.captcha.web",
+    "cn.procsl.ping.boot.captcha.handler",
+    "cn.procsl.ping.boot.captcha.adapter"
 })
 @EntityScan(basePackages = "cn.procsl.ping.boot.captcha.domain")
 @EnableJpaRepositories(basePackages = "cn.procsl.ping.boot.captcha.domain", bootstrapMode = BootstrapMode.LAZY)
