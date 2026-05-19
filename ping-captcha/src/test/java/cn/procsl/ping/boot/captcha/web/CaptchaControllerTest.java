@@ -6,7 +6,6 @@ import cn.procsl.ping.boot.captcha.domain.email.EmailCaptcha;
 import cn.procsl.ping.boot.captcha.domain.image.ImageCaptcha;
 import cn.procsl.ping.boot.captcha.domain.image.ImageCaptchaBuilderService;
 import cn.procsl.ping.boot.captcha.domain.image.ImageCaptchaRepository;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import jakarta.servlet.http.Cookie;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -17,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import tools.jackson.databind.json.JsonMapper;
 
 import javax.inject.Inject;
 import java.nio.charset.StandardCharsets;
@@ -59,24 +59,24 @@ public class CaptchaControllerTest {
         AtomicReference<ImageCaptcha> imageReference = new AtomicReference<>();
 
         mockMvc.perform(post("/v1/captcha/image").session(session))
-               .andExpect(status().is2xxSuccessful())
-               .andDo(result -> {
-                   byte[] str = result.getResponse().getContentAsByteArray();
-                   String res = Base64.getEncoder().encodeToString(str);
-                   log.info("响应体为:{}", res);
-                   Assertions.assertNotNull(res);
-                   Cookie cookie = result.getResponse().getCookie(TOKEN_KEY);
-                   Assertions.assertNotNull(cookie);
-                   String value = cookie.getValue();
-                   imageReference.set(imageCaptchaBuilderService.buildForToken("123456", value));
-                   cookiesReference.set(result.getResponse().getCookies());
-               });
+            .andExpect(status().is2xxSuccessful())
+            .andDo(result -> {
+                byte[] str = result.getResponse().getContentAsByteArray();
+                String res = Base64.getEncoder().encodeToString(str);
+                log.info("响应体为:{}", res);
+                Assertions.assertNotNull(res);
+                Cookie cookie = result.getResponse().getCookie(TOKEN_KEY);
+                Assertions.assertNotNull(cookie);
+                String value = cookie.getValue();
+                imageReference.set(imageCaptchaBuilderService.buildForToken("123456", value));
+                cookiesReference.set(result.getResponse().getCookies());
+            });
 
         byte[] ticket = imageReference.get().getTicket().getBytes(StandardCharsets.UTF_8);
         String code = Base64.getEncoder().encodeToString(ticket);
         MockHttpServletRequestBuilder getMap = get("/v1/test")
-                .header(VerifyCaptcha.header, code)
-                .session(session).cookie(cookiesReference.get());
+            .header(VerifyCaptcha.header, code)
+            .session(session).cookie(cookiesReference.get());
 
         mockMvc.perform(getMap).andExpect(status().is2xxSuccessful());
         mockMvc.perform(getMap).andExpect(status().is2xxSuccessful());
@@ -85,7 +85,7 @@ public class CaptchaControllerTest {
         mockMvc.perform(getMap).andExpect(status().is2xxSuccessful());
 
         List<ImageCaptcha> res = this.specificationExecutor.findAll(
-                (root, query, cb) -> cb.equal(root.get("target"), session.getId()));
+            (root, query, cb) -> cb.equal(root.get("target"), session.getId()));
 
         Assertions.assertNotEquals(res.size(), 0);
     }
@@ -93,33 +93,33 @@ public class CaptchaControllerTest {
     @Test
     public void sendEmailCaptcha() throws Exception {
         mockMvc.perform(post("/v1/captcha/email"))
-               .andExpect(status().is4xxClientError());
+            .andExpect(status().is4xxClientError());
 
         MockHttpSession session = new MockHttpSession();
         AtomicReference<Cookie[]> cookiesReference = new AtomicReference<>();
         AtomicReference<ImageCaptcha> imageReference = new AtomicReference<>();
         mockMvc.perform(post("/v1/captcha/image").session(session))
-               .andDo(result -> {
-                   Cookie cookie = result.getResponse().getCookie(TOKEN_KEY);
-                   Assertions.assertNotNull(cookie);
-                   String value = cookie.getValue();
-                   imageReference.set(imageCaptchaBuilderService.buildForToken("123456", value));
-                   cookiesReference.set(result.getResponse().getCookies());
-               })
-               .andExpect(status().is2xxSuccessful());
+            .andDo(result -> {
+                Cookie cookie = result.getResponse().getCookie(TOKEN_KEY);
+                Assertions.assertNotNull(cookie);
+                String value = cookie.getValue();
+                imageReference.set(imageCaptchaBuilderService.buildForToken("123456", value));
+                cookiesReference.set(result.getResponse().getCookies());
+            })
+            .andExpect(status().is2xxSuccessful());
 
 
         String json = jsonMapper.writeValueAsString(new EmailSenderDTO("test@email.com"));
         MockHttpServletRequestBuilder toPost = post("/v1/captcha/email")
-                .content(json)
-                .contentType(MediaType.APPLICATION_JSON)
-                .cookie(cookiesReference.get())
-                .header(VerifyCaptcha.header, Base64.getEncoder().encodeToString(
-                        imageReference.get().getTicket().getBytes(StandardCharsets.UTF_8)))
-                .session(session);
+            .content(json)
+            .contentType(MediaType.APPLICATION_JSON)
+            .cookie(cookiesReference.get())
+            .header(VerifyCaptcha.header, Base64.getEncoder().encodeToString(
+                imageReference.get().getTicket().getBytes(StandardCharsets.UTF_8)))
+            .session(session);
 
         mockMvc.perform(toPost)
-               .andExpect(status().is2xxSuccessful());
+            .andExpect(status().is2xxSuccessful());
     }
 
 

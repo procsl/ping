@@ -19,13 +19,12 @@
     <properties>
         <liquibase.version>4.15.0</liquibase.version>
         <ping.version>1.0.1</ping.version>
-         <java.version>25</java.version>
+        <java.version>25</java.version>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.compilerVersion>${java.version}</maven.compiler.compilerVersion>
         <compiler.version>${java.version}</compiler.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <springdoc.version>2.5.0</springdoc.version>
+        <springdoc.version>3.0.3</springdoc.version>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
         <google.auto.version>1.1.1</google.auto.version>
         <manifold.version>2024.1.16</manifold.version>
@@ -34,6 +33,11 @@
     </properties>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>cn.procsl</groupId>
@@ -125,7 +129,6 @@
                     <generatedSourcesDirectory>
                         ${project.build.directory}/generated-sources/java
                     </generatedSourcesDirectory>
-                    <compilerVersion>${compiler.version}</compilerVersion>
 
                     <annotationProcessorPaths>
                         <path>

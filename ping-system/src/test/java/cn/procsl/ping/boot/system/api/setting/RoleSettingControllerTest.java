@@ -2,7 +2,6 @@ package cn.procsl.ping.boot.system.api.setting;
 
 import cn.procsl.ping.boot.system.TestSystemApplication;
 import cn.procsl.ping.boot.system.api.LoginUtils;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.github.jsonzou.jmockdata.JMockData;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -15,6 +14,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.json.JsonMapper;
 
 import javax.inject.Inject;
 

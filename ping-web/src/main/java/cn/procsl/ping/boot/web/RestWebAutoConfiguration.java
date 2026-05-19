@@ -14,12 +14,14 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanNotOfRequiredTypeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.web.format.WebConversionService;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
+import org.springframework.boot.webmvc.autoconfigure.error.ErrorMvcAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -40,8 +42,7 @@ import java.util.List;
  * @author procsl
  */
 @Slf4j
-//@AutoConfiguration(before = ErrorMvcAutoConfiguration.class)
-@ConditionalOnMissingBean(RestWebAutoConfiguration.class)
+@AutoConfiguration(before = ErrorMvcAutoConfiguration.class)
 @ComponentScan(basePackages = "cn.procsl.ping.boot.web")
 public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProcessor, ApplicationContextInitializer<ConfigurableApplicationContext> {
 
@@ -112,15 +113,15 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProce
 
     final static String MODEL_RESOLVER = "io.swagger.v3.core.jackson.ModelResolver";
 
-    @Bean
-    @ConditionalOnClass(name = MODEL_RESOLVER)
-    @ConditionalOnMissingBean(type = MODEL_RESOLVER)
-    @SneakyThrows
-    public Object modelResolver(ObjectMapper objectMapper) {
-        Class<?> resolver = Class.forName(MODEL_RESOLVER);
-        Constructor<?> constructor = resolver.getConstructor(ObjectMapper.class);
-        return constructor.newInstance(objectMapper);
-    }
+//    @Bean
+//    @ConditionalOnClass(name = MODEL_RESOLVER)
+//    @ConditionalOnMissingBean(type = MODEL_RESOLVER)
+//    @SneakyThrows
+//    public Object modelResolver(ObjectMapper objectMapper) {
+//        Class<?> resolver = Class.forName(MODEL_RESOLVER);
+//        Constructor<?> constructor = resolver.getConstructor(ObjectMapper.class);
+//        return constructor.newInstance(objectMapper);
+//    }
 
     @Bean
     @ConditionalOnMissingBean(name = "globalExceptionHandler")

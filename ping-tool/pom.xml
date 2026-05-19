@@ -11,7 +11,6 @@
         <compiler.version>${java.version}</compiler.version>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.compilerVersion>${java.version}</maven.compiler.compilerVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <netty.version>4.2.7.Final</netty.version>
     </properties>

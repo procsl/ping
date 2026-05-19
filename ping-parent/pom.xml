@@ -18,7 +18,7 @@
         <module>../ping-im</module>
         <module>../ping-editor</module>
         <module>../ping-ui</module>
-        <module>../ping-batch</module>
+<!--        <module>../ping-batch</module>-->
     </modules>
 
     <dependencies>
@@ -230,13 +230,13 @@
                     <dependency>
                         <groupId>de.codecentric</groupId>
                         <artifactId>spring-boot-admin-starter-client</artifactId>
-                        <version>3.2.2</version>
+                        <version>4.0.4</version>
                     </dependency>
 
                     <dependency>
                         <groupId>de.codecentric</groupId>
                         <artifactId>spring-boot-admin-starter-server</artifactId>
-                        <version>3.3.2</version>
+                        <version>4.0.4</version>
                     </dependency>
                 </dependencies>
             </dependencyManagement>

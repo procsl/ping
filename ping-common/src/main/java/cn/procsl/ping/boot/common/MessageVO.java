@@ -3,7 +3,7 @@ package cn.procsl.ping.boot.common;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 
 import java.io.Serializable;
 

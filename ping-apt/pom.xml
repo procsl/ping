@@ -15,7 +15,6 @@
         <compiler.version>${java.version}</compiler.version>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.compilerVersion>${java.version}</maven.compiler.compilerVersion>
         <compiler.version>${java.version}</compiler.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -82,7 +81,6 @@
                     <generatedSourcesDirectory>
                         ${project.build.directory}/generated-sources/java
                     </generatedSourcesDirectory>
-                    <compilerVersion>${compiler.version}</compilerVersion>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>

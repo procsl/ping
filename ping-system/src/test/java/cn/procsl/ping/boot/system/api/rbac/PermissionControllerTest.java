@@ -2,7 +2,6 @@ package cn.procsl.ping.boot.system.api.rbac;
 
 import cn.procsl.ping.boot.system.TestSystemApplication;
 import cn.procsl.ping.boot.system.api.LoginUtils;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.github.jsonzou.jmockdata.JMockData;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -14,6 +13,7 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import tools.jackson.databind.json.JsonMapper;
 
 import javax.inject.Inject;
 import java.util.concurrent.atomic.AtomicLong;
@@ -31,6 +31,7 @@ public class PermissionControllerTest {
 
     @Inject
     MockMvc mockMvc;
+
     JsonMapper jsonMapper = new JsonMapper();
     AtomicLong gid = new AtomicLong();
 

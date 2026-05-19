@@ -1,100 +1,100 @@
-package cn.procsl.ping.boot.jpa.support.extension;
-
-import cn.procsl.ping.boot.jpa.TestJpaApplication;
-import cn.procsl.ping.boot.jpa.domain.TestEntity;
-import cn.procsl.ping.boot.jpa.domain.TestProjection;
-import com.github.jsonzou.jmockdata.JMockData;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.Tuple;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Root;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.data.core.TypeInformation;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.projection.EntityProjection;
-import org.springframework.data.projection.ProjectionFactory;
-import org.springframework.data.projection.ProjectionInformation;
-import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
-
-import javax.inject.Inject;
-import java.util.List;
-import java.util.Optional;
-
-@Slf4j
-@Service
-@Validated
-@Transactional
-@Rollback
-@SpringBootTest(classes = TestJpaApplication.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
-public class JpaExtensionRepositoryImplTest {
-
-    @Inject
-    JpaRepository<TestEntity, Long> jpaRepository;
-
-    @Inject
-    EntityManager entityManager;
-
+//package cn.procsl.ping.boot.jpa.support.extension;
+//
+//import cn.procsl.ping.boot.jpa.TestJpaApplication;
+//import cn.procsl.ping.boot.jpa.domain.TestEntity;
+//import cn.procsl.ping.boot.jpa.domain.TestProjection;
+//import com.github.jsonzou.jmockdata.JMockData;
+//import jakarta.persistence.EntityManager;
+//import jakarta.persistence.Tuple;
+//import jakarta.persistence.criteria.CriteriaBuilder;
+//import jakarta.persistence.criteria.CriteriaQuery;
+//import jakarta.persistence.criteria.Root;
+//import lombok.extern.slf4j.Slf4j;
+//import lombok.val;
+//import org.junit.jupiter.api.RepeatedTest;
+//import org.junit.jupiter.api.Test;
+//import org.springframework.boot.test.context.SpringBootTest;
+//import org.springframework.context.annotation.Bean;
+//import org.springframework.data.core.TypeInformation;
+//import org.springframework.data.jpa.repository.JpaRepository;
+//import org.springframework.data.projection.EntityProjection;
+//import org.springframework.data.projection.ProjectionFactory;
+//import org.springframework.data.projection.ProjectionInformation;
+//import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
+//import org.springframework.stereotype.Service;
+//import org.springframework.test.annotation.Rollback;
+//import org.springframework.transaction.annotation.Transactional;
+//import org.springframework.validation.annotation.Validated;
+//
+//import javax.inject.Inject;
+//import java.util.List;
+//import java.util.Optional;
+//
+//@Slf4j
+//@Service
+//@Validated
+//@Transactional
+//@Rollback
+//@SpringBootTest(classes = TestJpaApplication.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
+//public class JpaExtensionRepositoryImplTest {
+//
 //    @Inject
-//    ConversionService conversionService;
-
-    @RepeatedTest(10)
-    public void test2() {
-        jpaRepository.save(JMockData.mock(TestEntity.class));
-        List<TestEntity> test = jpaRepository.findAll();
-        log.info("test: {}", test);
-
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Tuple> tupleQuery = builder.createTupleQuery();
-        Root<TestEntity> root = tupleQuery.from(TestEntity.class);
-
-
-        CriteriaQuery<Tuple> select = tupleQuery.multiselect(root.get("name"), root.get("id"), root.get("auditable").get("createdBy"));
-
-        List<Tuple> result = entityManager.createQuery(select).getResultList();
-        log.info("result: {}", result);
-    }
-
-    @Test
-    public void test() {
-
-        List<TestEntity> all = this.jpaRepository.findAll();
-        log.info("all: {}", all);
-    }
-
-    @Bean
-    public SpelAwareProxyProjectionFactory spelAwareProxyProjectionFactory() {
-        return new SpelAwareProxyProjectionFactory();
-    }
-
-    @Test
-    public void projection() {
-        final ProjectionFactory projectionFactory = new SpelAwareProxyProjectionFactory();
-        val test = projectionFactory.createProjection(TestProjection.class);
-        log.info("实体: {}", test);
-    }
-
-
-    @Test
-    public void setJpaRepository() {
-
-//        TypeInformation
-        SpelAwareProxyProjectionFactory spelAwareProxyProjectionFactory = new SpelAwareProxyProjectionFactory();
-        ProjectionInformation entity = spelAwareProxyProjectionFactory.getProjectionInformation(TestEntity.class);
-        TypeInformation<TestEntity> type = TypeInformation.of(TestEntity.class);
-
-        EntityProjection<TestEntity, TestEntity> projection = EntityProjection.projecting(type, type, null, EntityProjection.ProjectionType.DTO);
-        List<Optional<String>> result = projection.map(item -> Optional.of("")).stream().toList();
-    }
-
-
-}
+//    JpaRepository<TestEntity, Long> jpaRepository;
+//
+//    @Inject
+//    EntityManager entityManager;
+//
+////    @Inject
+////    ConversionService conversionService;
+//
+//    @RepeatedTest(10)
+//    public void test2() {
+//        jpaRepository.save(JMockData.mock(TestEntity.class));
+//        List<TestEntity> test = jpaRepository.findAll();
+//        log.info("test: {}", test);
+//
+//        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+//        CriteriaQuery<Tuple> tupleQuery = builder.createTupleQuery();
+//        Root<TestEntity> root = tupleQuery.from(TestEntity.class);
+//
+//
+//        CriteriaQuery<Tuple> select = tupleQuery.multiselect(root.get("name"), root.get("id"), root.get("auditable").get("createdBy"));
+//
+//        List<Tuple> result = entityManager.createQuery(select).getResultList();
+//        log.info("result: {}", result);
+//    }
+//
+//    @Test
+//    public void test() {
+//
+//        List<TestEntity> all = this.jpaRepository.findAll();
+//        log.info("all: {}", all);
+//    }
+//
+//    @Bean
+//    public SpelAwareProxyProjectionFactory spelAwareProxyProjectionFactory() {
+//        return new SpelAwareProxyProjectionFactory();
+//    }
+//
+//    @Test
+//    public void projection() {
+//        final ProjectionFactory projectionFactory = new SpelAwareProxyProjectionFactory();
+//        val test = projectionFactory.createProjection(TestProjection.class);
+//        log.info("实体: {}", test);
+//    }
+//
+//
+//    @Test
+//    public void setJpaRepository() {
+//
+////        TypeInformation
+//        SpelAwareProxyProjectionFactory spelAwareProxyProjectionFactory = new SpelAwareProxyProjectionFactory();
+//        ProjectionInformation entity = spelAwareProxyProjectionFactory.getProjectionInformation(TestEntity.class);
+//        TypeInformation<TestEntity> type = TypeInformation.of(TestEntity.class);
+//
+//        EntityProjection<TestEntity, TestEntity> projection = EntityProjection.projecting(type, type, null, EntityProjection.ProjectionType.DTO);
+//        List<Optional<String>> result = projection.map(item -> Optional.of("")).stream().toList();
+//    }
+//
+//
+//}

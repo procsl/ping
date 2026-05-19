@@ -11,7 +11,6 @@ import org.springframework.data.repository.config.BootstrapMode;
 
 @Slf4j
 @AutoConfiguration(after = WebMvcAutoConfiguration.class)
-@ConditionalOnMissingBean({ProductAutoConfiguration.class})
 @EntityScan(basePackages = "cn.procsl.ping.boot.product.domain")
 @EnableJpaRepositories(basePackages = "cn.procsl.ping.boot.product.domain", bootstrapMode = BootstrapMode.LAZY)
 @ComponentScan(basePackages = "cn.procsl.ping.boot.product")

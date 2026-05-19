@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.common.aop;
 
+import jakarta.annotation.Nullable;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,7 +8,6 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.lang.Nullable;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;

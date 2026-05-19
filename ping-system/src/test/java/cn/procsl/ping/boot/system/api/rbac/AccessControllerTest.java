@@ -4,8 +4,6 @@ import cn.procsl.ping.boot.system.TestSystemApplication;
 import cn.procsl.ping.boot.system.api.LoginUtils;
 import cn.procsl.ping.boot.system.api.user.RegisterDTO;
 import cn.procsl.ping.boot.system.api.user.UserController;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.github.jsonzou.jmockdata.JMockData;
 import com.github.jsonzou.jmockdata.MockConfig;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +16,8 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -61,45 +61,45 @@ public class AccessControllerTest {
             String account = mock(String.class, config);
             RegisterDTO user = new RegisterDTO("随机账户", account, "password");
             mockMvc.perform(
-                            post("/v1/users")
-                                    .contentType(APPLICATION_JSON)
-                                    .content(jsonMapper.writeValueAsString(user))
-                                    .session(session)
-                    )
-                    .andDo(result -> {
-                        String str = result.getResponse().getContentAsString();
-                        uid.add(str);
-                    });
+                    post("/v1/users")
+                        .contentType(APPLICATION_JSON)
+                        .content(jsonMapper.writeValueAsString(user))
+                        .session(session)
+                )
+                .andDo(result -> {
+                    String str = result.getResponse().getContentAsString();
+                    uid.add(str);
+                });
 
             List<Long> pid = new ArrayList<>();
             {
                 val permission = JMockData.mock(PermissionCreateDTO.class);
                 permission.setType(PermissionType.page);
                 mockMvc.perform(
-                                post("/v1/permissions")
-                                        .contentType(APPLICATION_JSON)
-                                        .content(jsonMapper.writeValueAsString(permission))
-                                        .session(session)
-                        )
-                        .andExpect(status().is2xxSuccessful())
-                        .andDo(result -> {
-                            String str = result.getResponse().getContentAsString();
-                            PermissionVO permissionVO = this.jsonMapper.readValue(str, PermissionVO.class);
-                            log.info("PermissionVO:{}", permissionVO);
-                            pid.add(permissionVO.getId());
-                        });
+                        post("/v1/permissions")
+                            .contentType(APPLICATION_JSON)
+                            .content(jsonMapper.writeValueAsString(permission))
+                            .session(session)
+                    )
+                    .andExpect(status().is2xxSuccessful())
+                    .andDo(result -> {
+                        String str = result.getResponse().getContentAsString();
+                        PermissionVO permissionVO = this.jsonMapper.readValue(str, PermissionVO.class);
+                        log.info("PermissionVO:{}", permissionVO);
+                        pid.add(permissionVO.getId());
+                    });
             }
 
             RoleGrantDTO role = new RoleGrantDTO(mock(String.class, config), pid);
             mockMvc.perform(
-                            post("/v1/roles")
-                                    .contentType(APPLICATION_JSON)
-                                    .content(jsonMapper.writeValueAsString(role))
-                                    .session(session)
-                    )
-                    .andExpect(status().is2xxSuccessful())
-                    .andExpect(content().contentType(APPLICATION_JSON))
-                    .andDo(result -> rid.add(role.getName()));
+                    post("/v1/roles")
+                        .contentType(APPLICATION_JSON)
+                        .content(jsonMapper.writeValueAsString(role))
+                        .session(session)
+                )
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andDo(result -> rid.add(role.getName()));
         }
         log.info("BeforeEach is end! uid:{}, rid:{}", uid, rid);
     }
@@ -121,33 +121,33 @@ public class AccessControllerTest {
         gid.set(Long.parseLong(uid.get(JMockData.mock(Integer.class, intRange))));
         String json = jsonMapper.writeValueAsString(body);
         mockMvc.perform(
-                        post("/v1/users/{id}/roles", gid.get())
-                                .contentType(APPLICATION_JSON)
-                                .content(json)
-                                .session(session)
-                )
-                .andExpect(status().is2xxSuccessful());
+                post("/v1/users/{id}/roles", gid.get())
+                    .contentType(APPLICATION_JSON)
+                    .content(json)
+                    .session(session)
+            )
+            .andExpect(status().is2xxSuccessful());
     }
 
     @Test
     void findSubjects() throws Exception {
         this.grant();
         mockMvc.perform(get("/v1/users/{id}/roles", gid.get())
-                        .session(session)
-                        .accept(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$").isNotEmpty())
-                .andDo(print())
-                .andExpect(result -> {
-                    String json = result.getResponse().getContentAsString();
-                    JsonNode tree = this.jsonMapper.readTree(json);
-                    for (JsonNode node : tree) {
-                        String name = node.get("name").asText();
-                        Assertions.assertTrue(rid.contains(name));
-                    }
-                });
+                .session(session)
+                .accept(APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(APPLICATION_JSON))
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$").isNotEmpty())
+            .andDo(print())
+            .andExpect(result -> {
+                String json = result.getResponse().getContentAsString();
+                JsonNode tree = this.jsonMapper.readTree(json);
+                for (JsonNode node : tree) {
+                    String name = node.get("name").asString();
+                    Assertions.assertTrue(rid.contains(name));
+                }
+            });
     }
 
 

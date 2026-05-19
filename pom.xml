@@ -13,12 +13,11 @@
         <java.version>25</java.version>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.compilerVersion>${java.version}</maven.compiler.compilerVersion>
         <compiler.version>${java.version}</compiler.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <springboot.version>4.0.6</springboot.version>
-        <springdoc.version>2.5.0</springdoc.version>
-        <mapstruct.version>1.5.3.Final</mapstruct.version>
+        <springdoc.version>3.0.3</springdoc.version>
+        <mapstruct.version>1.6.3</mapstruct.version>
         <google.auto.version>1.1.1</google.auto.version>
         <manifold.version>2024.1.16</manifold.version>
         <web.server.port>10000</web.server.port>
@@ -28,6 +27,7 @@
         <maven.resources.plugin.version>3.5.0</maven.resources.plugin.version>
         <maven.surefire.plugin.version>3.5.5</maven.surefire.plugin.version>
         <maven.compiler.plugin.version>3.15.0</maven.compiler.plugin.version>
+        <blaze-persistence.version>1.6.18</blaze-persistence.version>
     </properties>
 
     <modules>
@@ -48,6 +48,14 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
                 <version>4.0.6</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.blazebit</groupId>
+                <artifactId>blaze-persistence-bom</artifactId>
+                <version>${blaze-persistence.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -193,11 +201,11 @@
             <optional>true</optional>
         </dependency>
 
-        <!--        <dependency>-->
-        <!--            <groupId>systems.manifold</groupId>-->
-        <!--            <artifactId>manifold-rt</artifactId>-->
-        <!--            <version>${manifold.version}</version>-->
-        <!--        </dependency>-->
+        <dependency>
+            <groupId>systems.manifold</groupId>
+            <artifactId>manifold-rt</artifactId>
+            <version>${manifold.version}</version>
+        </dependency>
 
     </dependencies>
 
@@ -254,7 +262,6 @@
                         <generatedSourcesDirectory>
                             ${project.build.directory}/generated-sources/java
                         </generatedSourcesDirectory>
-                        <compilerVersion>${compiler.version}</compilerVersion>
 
                         <annotationProcessorPaths>
                             <path>

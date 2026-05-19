@@ -25,7 +25,6 @@ import static cn.procsl.ping.boot.web.RestWebAutoConfiguration.PUBLIC_STATIC_RES
 @Order
 @AutoConfiguration(after = WebMvcAutoConfiguration.class)
 @EnableTransactionManagement
-@ConditionalOnMissingBean({SystemAutoConfiguration.class})
 @EntityScan(basePackages = "cn.procsl.ping.boot.system.domain")
 @EnableJpaRepositories(basePackages = {"cn.procsl.ping.boot.system.domain"}, bootstrapMode = BootstrapMode.LAZY)
 @ComponentScan(basePackages = {"cn.procsl.ping.boot.system.api", "cn.procsl.ping.boot.system.query", "cn.procsl.ping.boot.system.service", "cn.procsl.ping.boot.system.listener", "cn.procsl.ping.boot.system.adapter"}, basePackageClasses = {ConfigFacade.class, RoleSettingService.class,})

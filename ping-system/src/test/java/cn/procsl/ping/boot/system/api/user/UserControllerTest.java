@@ -4,7 +4,6 @@ package cn.procsl.ping.boot.system.api.user;
 import cn.procsl.ping.boot.system.TestSystemApplication;
 import cn.procsl.ping.boot.system.api.LoginUtils;
 import cn.procsl.ping.boot.system.domain.user.Gender;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.github.javafaker.Faker;
 import com.github.jsonzou.jmockdata.MockConfig;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +17,7 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.json.JsonMapper;
 
 import javax.inject.Inject;
 import java.util.concurrent.atomic.AtomicLong;
@@ -56,18 +56,18 @@ public class UserControllerTest {
         String account = mock(String.class, config);
         RegisterDTO user = new RegisterDTO("超级管理员", account, "password");
         mockMvc.perform(
-                        post("/v1/users")
-                                .contentType(APPLICATION_JSON)
-                                .content(jsonMapper.writeValueAsString(user))
-                                .session(this.session)
-                )
-                .andExpect(status().is2xxSuccessful())
-                .andDo(result -> {
-                    String str = result.getResponse().getContentAsString();
-                    log.debug("响应体为:{}", str);
-                    gid.set(Long.parseLong(str));
-                })
-                .andExpect(status().is2xxSuccessful());
+                post("/v1/users")
+                    .contentType(APPLICATION_JSON)
+                    .content(jsonMapper.writeValueAsString(user))
+                    .session(this.session)
+            )
+            .andExpect(status().is2xxSuccessful())
+            .andDo(result -> {
+                String str = result.getResponse().getContentAsString();
+                log.debug("响应体为:{}", str);
+                gid.set(Long.parseLong(str));
+            })
+            .andExpect(status().is2xxSuccessful());
         log.info("BeforeEach is end!");
     }
 
@@ -75,17 +75,17 @@ public class UserControllerTest {
     public void register() throws Exception {
         RegisterDTO user = new RegisterDTO("普通账户", "program_chen@foxmail.com", "password");
         mockMvc.perform(
-                        post("/v1/users")
-                                .contentType(APPLICATION_JSON)
-                                .content(jsonMapper.writeValueAsString(user))
-                                .session(this.session)
-                )
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andDo(result -> {
-                    String str = result.getResponse().getContentAsString();
-                    Assertions.assertNotNull(str);
-                });
+                post("/v1/users")
+                    .contentType(APPLICATION_JSON)
+                    .content(jsonMapper.writeValueAsString(user))
+                    .session(this.session)
+            )
+            .andExpect(status().is2xxSuccessful())
+            .andExpect(content().contentType(APPLICATION_JSON))
+            .andDo(result -> {
+                String str = result.getResponse().getContentAsString();
+                Assertions.assertNotNull(str);
+            });
 
     }
 
@@ -93,38 +93,38 @@ public class UserControllerTest {
     public void update() throws Exception {
         UserPropDTO prop = new UserPropDTO(Faker.instance().name().username(), Gender.man, "这是备注");
         val builder =
-                patch("/v1/users/{id}", gid.get())
-                        .content(jsonMapper.writeValueAsString(prop))
-                        .contentType(APPLICATION_JSON)
-                        .session(this.session)
-                        .accept(APPLICATION_JSON);
+            patch("/v1/users/{id}", gid.get())
+                .content(jsonMapper.writeValueAsString(prop))
+                .contentType(APPLICATION_JSON)
+                .session(this.session)
+                .accept(APPLICATION_JSON);
 
         mockMvc.perform(builder)
-                .andExpect(status().is2xxSuccessful());
+            .andExpect(status().is2xxSuccessful());
     }
 
     @Test
     public void findUsers() throws Exception {
         val builder =
-                get("/v1/users")
-                        .param("limit", "1")
-                        .param("sort", "id", "desc")
-                        .session(this.session)
-                        .accept(APPLICATION_JSON);
+            get("/v1/users")
+                .param("limit", "1")
+                .param("sort", "id", "desc")
+                .session(this.session)
+                .accept(APPLICATION_JSON);
 
         mockMvc.perform(builder).andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(jsonPath("$.content").isNotEmpty())
-                .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.content[*].id").isNotEmpty())
-                .andExpect(jsonPath("$.content[*].name").isNotEmpty())
-                .andExpect(jsonPath("$.content[*].gender").isNotEmpty())
-                .andExpect(jsonPath("$.content[*].remark").isNotEmpty())
-                .andExpect(jsonPath("$.content[*].account").isNotEmpty())
-                .andExpect(jsonPath("$.content[*].account.name").isNotEmpty())
-                .andExpect(jsonPath("$.content[*].account.state").isNotEmpty())
-                .andExpect(jsonPath("$.limit").value("1"))
-                .andExpect(jsonPath("$.empty").value("false"))
-                .andDo(print());
+            .andExpect(content().contentType(APPLICATION_JSON))
+            .andExpect(jsonPath("$.content").isNotEmpty())
+            .andExpect(jsonPath("$.content").isArray())
+            .andExpect(jsonPath("$.content[*].id").isNotEmpty())
+            .andExpect(jsonPath("$.content[*].name").isNotEmpty())
+            .andExpect(jsonPath("$.content[*].gender").isNotEmpty())
+            .andExpect(jsonPath("$.content[*].remark").isNotEmpty())
+            .andExpect(jsonPath("$.content[*].account").isNotEmpty())
+            .andExpect(jsonPath("$.content[*].account.name").isNotEmpty())
+            .andExpect(jsonPath("$.content[*].account.state").isNotEmpty())
+            .andExpect(jsonPath("$.limit").value("1"))
+            .andExpect(jsonPath("$.empty").value("false"))
+            .andDo(print());
     }
 }

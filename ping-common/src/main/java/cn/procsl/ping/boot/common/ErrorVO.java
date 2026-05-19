@@ -1,14 +1,14 @@
 package cn.procsl.ping.boot.common;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.annotation.Nonnull;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 
-import javax.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.regex.Matcher;

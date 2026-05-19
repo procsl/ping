@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "User", description = "用户管理模块接口")
 public class UserQueryController {
 
-    final ProjectionSearchRepository searchRepository;
+//    final ProjectionSearchRepository searchRepository;
 
     final EntityManager entityManager;
 

@@ -4,7 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.criteria.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.DefaultTransactionDefinition;

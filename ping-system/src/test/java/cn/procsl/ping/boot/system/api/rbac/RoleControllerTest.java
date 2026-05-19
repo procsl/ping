@@ -2,18 +2,17 @@ package cn.procsl.ping.boot.system.api.rbac;
 
 import cn.procsl.ping.boot.system.TestSystemApplication;
 import cn.procsl.ping.boot.system.api.LoginUtils;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.github.javafaker.Faker;
 import com.github.jsonzou.jmockdata.JMockData;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import tools.jackson.databind.json.JsonMapper;
 
 import javax.inject.Inject;
 import java.util.Collection;
@@ -48,33 +47,33 @@ public class RoleControllerTest {
         permission.setType(PermissionType.page);
 
         mockMvc.perform(
-                       post("/v1/permissions")
-                               .contentType(APPLICATION_JSON)
-                               .content(jsonMapper.writeValueAsString(permission))
-                               .session(session)
-               )
-               .andExpect(status().is2xxSuccessful())
-               .andDo(result -> {
-                   String str = result.getResponse().getContentAsString();
-                   PermissionVO permissionVO = this.jsonMapper.readValue(str, PermissionVO.class);
-                   log.info("PermissionVO:{}", permissionVO);
-                   pid.set(permissionVO.getId());
-               });
+                post("/v1/permissions")
+                    .contentType(APPLICATION_JSON)
+                    .content(jsonMapper.writeValueAsString(permission))
+                    .session(session)
+            )
+            .andExpect(status().is2xxSuccessful())
+            .andDo(result -> {
+                String str = result.getResponse().getContentAsString();
+                PermissionVO permissionVO = this.jsonMapper.readValue(str, PermissionVO.class);
+                log.info("PermissionVO:{}", permissionVO);
+                pid.set(permissionVO.getId());
+            });
 
 
         RoleGrantDTO role = new RoleGrantDTO(Faker.instance().name().fullName(), List.of(pid.get()));
         mockMvc.perform(post("/v1/roles")
-                       .contentType(APPLICATION_JSON)
-                       .content(jsonMapper.writeValueAsString(role))
-                       .session(session)
-               )
-               .andExpect(status().is2xxSuccessful())
-               .andExpect(content().contentType(APPLICATION_JSON))
-               .andDo(result -> {
-                   String str = result.getResponse().getContentAsString();
-                   RoleVO roleVo = this.jsonMapper.readValue(str, RoleVO.class);
-                   gid.set(roleVo.getId());
-               });
+                .contentType(APPLICATION_JSON)
+                .content(jsonMapper.writeValueAsString(role))
+                .session(session)
+            )
+            .andExpect(status().is2xxSuccessful())
+            .andExpect(content().contentType(APPLICATION_JSON))
+            .andDo(result -> {
+                String str = result.getResponse().getContentAsString();
+                RoleVO roleVo = this.jsonMapper.readValue(str, RoleVO.class);
+                gid.set(roleVo.getId());
+            });
         log.info("BeforeEach is end!");
     }
 
@@ -84,58 +83,58 @@ public class RoleControllerTest {
         Collection<Long> permission = List.of(pid.get());
         RoleGrantDTO role = new RoleGrantDTO(Faker.instance().name().fullName(), permission);
         mockMvc.perform(post("/v1/roles")
-                       .contentType(APPLICATION_JSON)
-                       .content(jsonMapper.writeValueAsString(role))
-                       .session(session)
-               )
-               .andExpect(status().is2xxSuccessful())
-               .andExpect(content().contentType(APPLICATION_JSON))
-               .andDo(result -> {
-                   String str = result.getResponse().getContentAsString();
-                   log.info("roleVo:{}", str);
-               });
+                .contentType(APPLICATION_JSON)
+                .content(jsonMapper.writeValueAsString(role))
+                .session(session)
+            )
+            .andExpect(status().is2xxSuccessful())
+            .andExpect(content().contentType(APPLICATION_JSON))
+            .andDo(result -> {
+                String str = result.getResponse().getContentAsString();
+                log.info("roleVo:{}", str);
+            });
     }
 
     @Test
     public void delete() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete("/v1/roles/{id}", gid.get())
-                                              .session(session)
-               )
-               .andExpect(status().is2xxSuccessful());
+                .session(session)
+            )
+            .andExpect(status().is2xxSuccessful());
     }
 
     @Test
     public void change() throws Exception {
         RoleGrantDTO role = new RoleGrantDTO(Faker.instance().name().fullName(), List.of(pid.get()));
         mockMvc.perform(patch("/v1/roles/{id}", gid.get())
-                       .contentType(APPLICATION_JSON)
-                       .content(jsonMapper.writeValueAsString(role))
-                       .session(session)
-               )
-               .andExpect(status().is2xxSuccessful());
+                .contentType(APPLICATION_JSON)
+                .content(jsonMapper.writeValueAsString(role))
+                .session(session)
+            )
+            .andExpect(status().is2xxSuccessful());
 
 
         role.setPermissions(List.of(pid.get()));
         role.setName("test");
         mockMvc.perform(patch("/v1/roles/{id}",
-                       gid.get())
-                       .contentType(APPLICATION_JSON)
-                       .content(jsonMapper.writeValueAsString(role))
-                       .session(session)
-               )
-               .andExpect(status().is2xxSuccessful());
+                gid.get())
+                .contentType(APPLICATION_JSON)
+                .content(jsonMapper.writeValueAsString(role))
+                .session(session)
+            )
+            .andExpect(status().is2xxSuccessful());
 
     }
 
     @Test
     public void getById() throws Exception {
         mockMvc.perform(get("/v1/roles/{id}", gid.get())
-                       .accept(APPLICATION_JSON)
-                       .session(session)
-               )
-               .andExpect(status().isOk()).andExpect(content().contentType(APPLICATION_JSON))
-               .andExpect(jsonPath("$.name").isNotEmpty())
-               .andExpect(jsonPath("$.permissions").isArray());
+                .accept(APPLICATION_JSON)
+                .session(session)
+            )
+            .andExpect(status().isOk()).andExpect(content().contentType(APPLICATION_JSON))
+            .andExpect(jsonPath("$.name").isNotEmpty())
+            .andExpect(jsonPath("$.permissions").isArray());
 
     }
 
@@ -143,18 +142,18 @@ public class RoleControllerTest {
     @Test
     public void findRoles() throws Exception {
         val builder = get("/v1/roles")
-                .param("limit", "1")
-                .param("sort", "id", "desc")
-                .session(session)
-                .accept(APPLICATION_JSON);
+            .param("limit", "1")
+            .param("sort", "id", "desc")
+            .session(session)
+            .accept(APPLICATION_JSON);
 
         mockMvc.perform(builder)
-               .andExpect(status().isOk())
-               .andExpect(content().contentType(APPLICATION_JSON))
-               .andExpect(jsonPath("$.content").isNotEmpty())
-               .andExpect(jsonPath("$.content").isArray())
-               .andExpect(jsonPath("$.limit").value("1"))
-               .andExpect(jsonPath("$.empty").value("false"))
-               .andDo(print());
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(APPLICATION_JSON))
+            .andExpect(jsonPath("$.content").isNotEmpty())
+            .andExpect(jsonPath("$.content").isArray())
+            .andExpect(jsonPath("$.limit").value("1"))
+            .andExpect(jsonPath("$.empty").value("false"))
+            .andDo(print());
     }
 }
