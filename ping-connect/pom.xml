@@ -31,12 +31,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
             <groupId>cn.procsl</groupId>
             <artifactId>ping-common</artifactId>
             <optional>true</optional>

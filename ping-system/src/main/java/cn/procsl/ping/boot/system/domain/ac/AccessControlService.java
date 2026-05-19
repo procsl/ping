@@ -1,6 +1,7 @@
 package cn.procsl.ping.boot.system.domain.ac;
 
-import org.springframework.lang.NonNull;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * 访问控制服务

@@ -2,9 +2,9 @@ package cn.procsl.ping.boot.system.domain.ac.abac;
 
 import cn.procsl.ping.boot.system.domain.ac.*;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.lang.NonNull;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -296,8 +296,8 @@
 
                             <path>
                                 <groupId>org.hibernate.orm</groupId>
-                                <artifactId>hibernate-jpamodelgen</artifactId>
-                                <version>6.5.3.Final</version>
+                                <artifactId>hibernate-processor</artifactId>
+                                <version>7.2.12.Final</version>
                             </path>
 
                             <path>
@@ -391,67 +391,6 @@
         </plugins>
 
         <finalName>${project.artifactId}-${project.version}</finalName>
-
-        <resources>
-            <resource>
-                <directory>${project.basedir}/src/main/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**/application*.yml</include>
-                    <include>**/application*.yaml</include>
-                    <include>**/application*.properties</include>
-                    <include>**/bootstrap*.yml</include>
-                    <include>**/bootstrap*.yaml</include>
-                    <include>**/bootstrap*.properties</include>
-                    <include>logback*.xml</include>
-                </includes>
-            </resource>
-
-            <resource>
-                <directory>${project.basedir}/src/main/resources</directory>
-                <filtering>false</filtering>
-                <excludes>
-                    <exclude>**/application*.yml</exclude>
-                    <exclude>**/application*.yaml</exclude>
-                    <exclude>**/application*.properties</exclude>
-                    <exclude>**/bootstrap*.yml</exclude>
-                    <exclude>**/bootstrap*.yaml</exclude>
-                    <exclude>**/bootstrap*.properties</exclude>
-                    <exclude>logback*.xml</exclude>
-                </excludes>
-            </resource>
-        </resources>
-
-        <testResources>
-            <testResource>
-                <directory>${project.basedir}/src/test/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**/application*.yml</include>
-                    <include>**/application*.yaml</include>
-                    <include>**/application*.properties</include>
-                    <include>**/bootstrap*.yml</include>
-                    <include>**/bootstrap*.yaml</include>
-                    <include>**/bootstrap*.properties</include>
-                    <include>logback*.xml</include>
-                </includes>
-            </testResource>
-
-            <testResource>
-                <directory>${project.basedir}/src/main/resources</directory>
-                <filtering>false</filtering>
-                <excludes>
-                    <exclude>**/application*.yml</exclude>
-                    <exclude>**/application*.yaml</exclude>
-                    <exclude>**/application*.properties</exclude>
-                    <exclude>**/bootstrap*.yml</exclude>
-                    <exclude>**/bootstrap*.yaml</exclude>
-                    <exclude>**/bootstrap*.properties</exclude>
-                    <exclude>logback*.xml</exclude>
-                </excludes>
-            </testResource>
-        </testResources>
-
 
     </build>
 

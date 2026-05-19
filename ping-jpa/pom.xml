@@ -23,10 +23,12 @@
             <artifactId>ping-common</artifactId>
         </dependency>
 
+        <!-- Source: https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-processor -->
         <dependency>
             <groupId>org.hibernate.orm</groupId>
-            <artifactId>hibernate-jpamodelgen</artifactId>
-            <version>6.5.3.Final</version>
+            <artifactId>hibernate-processor</artifactId>
+            <version>7.3.4.Final</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
