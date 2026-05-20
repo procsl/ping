@@ -18,6 +18,7 @@ import lombok.Setter;
 public class SmsCaptcha extends Captcha {
 
     @Id
+    @TableGenerator(name = "ping_sequence")
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ping_sequence")
     Long id;
 

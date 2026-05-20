@@ -21,6 +21,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public class EmailCaptcha extends Captcha {
 
     @Id
+    @TableGenerator(name = "ping_sequence")
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ping_sequence")
     Long id;
 

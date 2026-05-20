@@ -23,6 +23,7 @@ import java.util.function.Function;
 public abstract class Permission implements Serializable, DiscriminatorValueFinder {
 
     @Id
+    @TableGenerator(name = "ping_sequence")
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ping_sequence")
     Long id;
 

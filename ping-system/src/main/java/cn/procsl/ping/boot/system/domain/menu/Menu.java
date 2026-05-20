@@ -22,6 +22,7 @@ public class Menu implements AdjacencyNode<Long, MenuNode> {
 
     @Id
     @Access(AccessType.PROPERTY)
+    @TableGenerator(name = "ping_sequence")
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ping_sequence")
     Long id;
 

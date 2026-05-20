@@ -18,6 +18,7 @@ import java.util.*;
 public class Subject implements Serializable {
 
     @Id
+    @TableGenerator(name = "ping_sequence")
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ping_sequence")
     Long id;
 

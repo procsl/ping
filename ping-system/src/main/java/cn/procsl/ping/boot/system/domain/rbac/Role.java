@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 public class Role implements Serializable {
 
     @Id
+    @TableGenerator(name = "ping_sequence")
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ping_sequence")
     Long id;
 

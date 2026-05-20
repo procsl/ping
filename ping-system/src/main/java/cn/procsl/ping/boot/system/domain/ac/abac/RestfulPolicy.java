@@ -24,6 +24,7 @@ import java.util.Map;
 public class RestfulPolicy implements Serializable, DiscriminatorValueFinder, Policy {
 
     @Id
+    @TableGenerator(name = "ping_sequence")
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ping_sequence")
     Long id;
 
