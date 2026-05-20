@@ -18,7 +18,7 @@
 
     <properties>
         <liquibase.version>4.15.0</liquibase.version>
-        <ping.version>1.0.1</ping.version>
+        <ping.version>1.0.2-SNAPSHOT</ping.version>
         <java.version>25</java.version>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven.compiler.source>${java.version}</maven.compiler.source>
@@ -126,9 +126,6 @@
                 <configuration>
                     <release>${java.version}</release>
                     <encoding>${project.build.sourceEncoding}</encoding>
-                    <generatedSourcesDirectory>
-                        ${project.build.directory}/generated-sources/java
-                    </generatedSourcesDirectory>
 
                     <annotationProcessorPaths>
                         <path>
@@ -366,13 +363,13 @@
                     <dependency>
                         <groupId>de.codecentric</groupId>
                         <artifactId>spring-boot-admin-starter-client</artifactId>
-                        <version>3.3.2</version>
+                        <version>4.0.4</version>
                     </dependency>
 
                     <dependency>
                         <groupId>de.codecentric</groupId>
                         <artifactId>spring-boot-admin-starter-server</artifactId>
-                        <version>3.3.2</version>
+                        <version>4.0.4</version>
                     </dependency>
                 </dependencies>
             </dependencyManagement>

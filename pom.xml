@@ -7,7 +7,7 @@
     <groupId>cn.procsl</groupId>
     <artifactId>ping</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.1</version>
+    <version>1.0.2-SNAPSHOT</version>
 
     <properties>
         <java.version>25</java.version>
@@ -201,11 +201,11 @@
             <optional>true</optional>
         </dependency>
 
-        <dependency>
-            <groupId>systems.manifold</groupId>
-            <artifactId>manifold-rt</artifactId>
-            <version>${manifold.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>systems.manifold</groupId>-->
+<!--            <artifactId>manifold-rt</artifactId>-->
+<!--            <version>${manifold.version}</version>-->
+<!--        </dependency>-->
 
     </dependencies>
 
@@ -259,9 +259,9 @@
                     <version>${maven.compiler.plugin.version}</version>
                     <configuration>
                         <release>${java.version}</release>
-                        <generatedSourcesDirectory>
-                            ${project.build.directory}/generated-sources/java
-                        </generatedSourcesDirectory>
+<!--                        <generatedSourcesDirectory>-->
+<!--                            ${project.build.directory}/generated-sources/java-->
+<!--                        </generatedSourcesDirectory>-->
 
                         <annotationProcessorPaths>
                             <path>
@@ -391,38 +391,6 @@
         </plugins>
 
         <finalName>${project.artifactId}-${project.version}</finalName>
-
-        <testResources>
-            <testResource>
-                <directory>${project.basedir}/src/test/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**</include>
-                </includes>
-                <excludes>
-                    <exclude>*.jks</exclude>
-                    <exclude>*.pfx</exclude>
-                    <exclude>*.txt</exclude>
-                </excludes>
-            </testResource>
-        </testResources>
-
-        <resources>
-            <resource>
-                <directory>${project.basedir}/src/main/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**</include>
-                </includes>
-                <excludes>
-                    <exclude>*.jks</exclude>
-                    <exclude>*.pfx</exclude>
-                    <exclude>*.txt</exclude>
-                </excludes>
-
-            </resource>
-        </resources>
-
     </build>
 
     <url>https://www.procsl.cn</url>

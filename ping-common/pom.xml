@@ -8,7 +8,7 @@
     <parent>
         <artifactId>ping</artifactId>
         <groupId>cn.procsl</groupId>
-        <version>1.0.1</version>
+        <version>1.0.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>ping-common</artifactId>
@@ -65,8 +65,16 @@
         <dependency>
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-annotations</artifactId>
-            <version>2.2.22</version>
+            <version>2.2.47</version>
         </dependency>
+
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations-jakarta</artifactId>
+            <version>2.2.47</version>
+            <scope>compile</scope>
+        </dependency>
+
 
         <dependency>
             <groupId>com.github.jsonzou</groupId>

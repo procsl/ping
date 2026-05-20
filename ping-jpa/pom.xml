@@ -4,7 +4,7 @@
     <parent>
         <groupId>cn.procsl</groupId>
         <artifactId>ping</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>ping-jpa</artifactId>
@@ -27,7 +27,6 @@
         <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-processor</artifactId>
-            <version>7.3.4.Final</version>
             <scope>provided</scope>
         </dependency>
 
@@ -68,59 +67,5 @@
 
 
     </dependencies>
-
-
-    <!--    <build>-->
-    <!--        <plugins>-->
-    <!--            <plugin>-->
-    <!--                <groupId>org.apache.maven.plugins</groupId>-->
-    <!--                <artifactId>maven-compiler-plugin</artifactId>-->
-    <!--                <configuration>-->
-    <!--                    <annotationProcessorPaths>-->
-
-    <!--                        <path>-->
-    <!--                            <groupId>org.projectlombok</groupId>-->
-    <!--                            <artifactId>lombok</artifactId>-->
-    <!--                        </path>-->
-
-    <!--                        <path>-->
-    <!--                            <groupId>com.google.auto.service</groupId>-->
-    <!--                            <artifactId>auto-service</artifactId>-->
-    <!--                        </path>-->
-
-    <!--                        <path>-->
-    <!--                            <groupId>org.hibernate.orm</groupId>-->
-    <!--                            <artifactId>hibernate-processor</artifactId>-->
-    <!--                            <version>7.0.0.Alpha2</version>-->
-    <!--                        </path>-->
-    <!--                    </annotationProcessorPaths>-->
-    <!--                </configuration>-->
-    <!--            </plugin>-->
-
-    <!--            <plugin>-->
-    <!--                <groupId>org.hibernate.orm.tooling</groupId>-->
-    <!--                <artifactId>hibernate-enhance-maven-plugin</artifactId>-->
-    <!--                <version>6.3.1.Final</version>-->
-    <!--                <executions>-->
-    <!--                    <execution>-->
-    <!--                        <configuration>-->
-    <!--                            <failOnError>true</failOnError>-->
-    <!--                            <enableLazyInitialization>true</enableLazyInitialization>-->
-    <!--                            <enableDirtyTracking>true</enableDirtyTracking>-->
-    <!--                            <enableAssociationManagement>true</enableAssociationManagement>-->
-    <!--                            <enableExtendedEnhancement>false</enableExtendedEnhancement>-->
-    <!--                        </configuration>-->
-    <!--                        <goals>-->
-    <!--                            <goal>enhance</goal>-->
-    <!--                        </goals>-->
-    <!--                    </execution>-->
-    <!--                </executions>-->
-    <!--            </plugin>-->
-
-
-    <!--        </plugins>-->
-
-    <!--    </build>-->
-
 
 </project>
