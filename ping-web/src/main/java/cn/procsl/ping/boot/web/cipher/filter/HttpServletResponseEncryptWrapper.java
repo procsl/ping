@@ -108,7 +108,6 @@ final class HttpServletResponseEncryptWrapper extends HttpServletResponseWrapper
             this.outputStream.flush();
         } catch (IOException ignored) {
         }
-        this.cipherLockupService.release(CipherLockupService.CipherScope.request, this.cipher);
     }
 
 

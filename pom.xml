@@ -35,7 +35,7 @@
         <module>ping-common</module>
         <module>ping-web</module>
         <module>ping-jpa</module>
-<!--        <module>ping-connect</module>-->
+        <!--        <module>ping-connect</module>-->
     </modules>
 
     <name>Ping 父模块</name>
@@ -201,11 +201,11 @@
             <optional>true</optional>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>systems.manifold</groupId>-->
-<!--            <artifactId>manifold-rt</artifactId>-->
-<!--            <version>${manifold.version}</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>systems.manifold</groupId>-->
+        <!--            <artifactId>manifold-rt</artifactId>-->
+        <!--            <version>${manifold.version}</version>-->
+        <!--        </dependency>-->
 
     </dependencies>
 
@@ -213,10 +213,12 @@
     <build>
 
         <pluginManagement>
+
             <plugins>
                 <plugin>
                     <groupId>io.github.git-commit-id</groupId>
                     <artifactId>git-commit-id-maven-plugin</artifactId>
+                    <version>10.0.0</version>
                     <executions>
                         <execution>
                             <id>get-the-git-infos</id>
@@ -240,7 +242,8 @@
                         <!-- 生成git属性文件，默认false：不生成 -->
                         <generateGitPropertiesFile>true</generateGitPropertiesFile>
                         <!-- 生成git属性文件路径及文件名，默认${project.build.outputDirectory}/git.properties -->
-                        <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties
+                        <generateGitPropertiesFilename>
+                            ${project.build.outputDirectory}/${project.artifactId}.git.properties
                         </generateGitPropertiesFilename>
                         <!-- 生成git属性文件格式，默认值properties -->
                         <format>json</format>
@@ -259,9 +262,6 @@
                     <version>${maven.compiler.plugin.version}</version>
                     <configuration>
                         <release>${java.version}</release>
-<!--                        <generatedSourcesDirectory>-->
-<!--                            ${project.build.directory}/generated-sources/java-->
-<!--                        </generatedSourcesDirectory>-->
 
                         <annotationProcessorPaths>
                             <path>
@@ -270,11 +270,11 @@
                                 <!--                                <version>${lombok.version}</version>-->
                             </path>
 
-                            <!--                        <path>-->
-                            <!--                            <groupId>systems.manifold</groupId>-->
-                            <!--                            <artifactId>manifold</artifactId>-->
-                            <!--                            <version>${manifold.version}</version>-->
-                            <!--                        </path>-->
+                            <path>
+                                <groupId>systems.manifold</groupId>
+                                <artifactId>manifold</artifactId>
+                                <version>${manifold.version}</version>
+                            </path>
 
                             <path>
                                 <groupId>org.mapstruct</groupId>
@@ -338,13 +338,18 @@
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${springboot.version}</version>
                 </plugin>
+
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
                     <version>${maven.resources.plugin.version}</version>
                     <configuration>
+                        <delimiters>
+                            <delimiter>@</delimiter>
+                        </delimiters>
                         <encoding>utf-8</encoding>
                         <!-- 解决Spring boot引起的profile失效问题 -->
                         <useDefaultDelimiters>true</useDefaultDelimiters>
@@ -388,6 +393,19 @@
                     </execution>
                 </executions>
             </plugin>
+
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+
+
+            <plugin>
+                <groupId>io.github.git-commit-id</groupId>
+                <artifactId>git-commit-id-maven-plugin</artifactId>
+            </plugin>
+
         </plugins>
 
         <finalName>${project.artifactId}-${project.version}</finalName>

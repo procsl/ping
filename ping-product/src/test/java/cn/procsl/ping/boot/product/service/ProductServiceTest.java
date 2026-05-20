@@ -13,7 +13,6 @@ import org.springframework.validation.annotation.Validated;
 import javax.inject.Inject;
 
 
-@Service
 @Validated
 @Transactional
 @Rollback(value = false)

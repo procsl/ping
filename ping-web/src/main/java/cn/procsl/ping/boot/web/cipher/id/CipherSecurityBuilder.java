@@ -18,7 +18,7 @@ public final class CipherSecurityBuilder {
         return new CipherGenericConverter(new SecurityIdCipherService(server));
     }
 
-    public static AnnotationIntrospector buildJacsonIntrospector(CipherLockupService service) {
+    public static AnnotationIntrospector buildJacksonIntrospector(CipherLockupService service) {
         return new JacksonSecurityIdAnnotationIntrospector(new SecurityIdCipherService(service));
     }
 

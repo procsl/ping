@@ -4,6 +4,7 @@ import cn.procsl.ping.boot.web.cipher.CipherLockupService;
 import cn.procsl.ping.boot.web.cipher.SimpleCipherLockupService;
 import cn.procsl.ping.boot.web.cipher.filter.CipherFilter;
 import cn.procsl.ping.boot.web.cipher.id.CipherSecurityBuilder;
+import cn.procsl.ping.boot.web.component.CommonErrorAttributes;
 import cn.procsl.ping.boot.web.component.GlobalExceptionHandler;
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.Filter;
@@ -16,12 +17,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.SearchStrategy;
 import org.springframework.boot.autoconfigure.web.format.WebConversionService;
+import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.boot.webmvc.autoconfigure.error.ErrorMvcAutoConfiguration;
+import org.springframework.boot.webmvc.error.ErrorAttributes;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -31,9 +34,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import tools.jackson.databind.ObjectMapper;
 
-import java.lang.reflect.Constructor;
 import java.util.List;
 
 /**
@@ -129,20 +130,20 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProce
         return new GlobalExceptionHandler();
     }
 
-//    @Bean
-//    @ConditionalOnMissingBean(value = ErrorAttributes.class, search = SearchStrategy.CURRENT)
-//    public CommonErrorAttributes errorAttributes() {
-//        return new CommonErrorAttributes();
-//    }
+    @Bean
+    @ConditionalOnMissingBean(value = ErrorAttributes.class, search = SearchStrategy.CURRENT)
+    public CommonErrorAttributes errorAttributes() {
+        return new CommonErrorAttributes();
+    }
 
+    @Bean
+    public JsonMapperBuilderCustomizer customAnnotationIntrospectorCustomizer(CipherLockupService cipherLockupService) {
+        return builder -> builder.annotationIntrospector(CipherSecurityBuilder.buildJacksonIntrospector(cipherLockupService));
+    }
 
     @Override
     @SneakyThrows
     public Object postProcessBeforeInitialization(@Nonnull Object bean, @Nonnull String beanName) throws BeansException {
-        if (bean instanceof ObjectMapper mapper) {
-            CipherLockupService server = this.applicationContext.getBean(CipherLockupService.class);
-//            mapper.setAnnotationIntrospector(CipherSecurityBuilder.buildJacsonIntrospector(server));
-        }
 
         if (beanName.equals("mvcConversionService") && bean instanceof WebConversionService conversionService) {
             return CipherSecurityBuilder.hookMvcConversionService(conversionService);

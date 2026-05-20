@@ -36,7 +36,6 @@ final class SecurityIdCipherService {
 
         Cipher cipher = cipherLockupService.lockupEncryptCipher(scope);
         byte[] enc = cipher.doFinal(buffer.array());
-        cipherLockupService.release(scope, cipher);
 
         return base62.encodeToString(enc);
     }
@@ -48,7 +47,6 @@ final class SecurityIdCipherService {
 
         Cipher cipher = cipherLockupService.lockupDecryptCipher(scope);
         byte[] res = cipher.doFinal(bytes);
-        cipherLockupService.release(CipherLockupService.CipherScope.session, cipher);
 
         byte[] ss = Arrays.copyOfRange(res, 8, res.length);
         String scopeOrg = new String(ss);

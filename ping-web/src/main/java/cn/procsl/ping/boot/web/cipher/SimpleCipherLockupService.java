@@ -8,18 +8,18 @@ import java.nio.charset.StandardCharsets;
 public class SimpleCipherLockupService implements CipherLockupService {
 
     final CipherFactory.CipherFactoryBuilder encryptBuilder = CipherFactory.init()
-            .algorithm("AES")
-            .cipherMode(CipherFactory.CipherMode.ENCRYPT)
-            .mode("ECB")
-            .padding("PKCS5Padding")
-            .privateKey("1234567890abcdef".getBytes(StandardCharsets.UTF_8));
+        .algorithm("AES")
+        .cipherMode(CipherFactory.CipherMode.ENCRYPT)
+        .mode("ECB")
+        .padding("PKCS5Padding")
+        .privateKey("1234567890abcdef".getBytes(StandardCharsets.UTF_8));
 
     final CipherFactory.CipherFactoryBuilder decryptBuilder = CipherFactory.init()
-            .algorithm("AES")
-            .cipherMode(CipherFactory.CipherMode.DECRYPT)
-            .mode("ECB")
-            .padding("PKCS5Padding")
-            .privateKey("1234567890abcdef".getBytes(StandardCharsets.UTF_8));
+        .algorithm("AES")
+        .cipherMode(CipherFactory.CipherMode.DECRYPT)
+        .mode("ECB")
+        .padding("PKCS5Padding")
+        .privateKey("1234567890abcdef".getBytes(StandardCharsets.UTF_8));
 
     @Override
     public Cipher lockupEncryptCipher(CipherScope scope) {
@@ -31,8 +31,5 @@ public class SimpleCipherLockupService implements CipherLockupService {
         return decryptBuilder.build().getCipher();
     }
 
-    @Override
-    public void release(CipherScope scope, Cipher cipher) {
 
-    }
 }

@@ -86,10 +86,10 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
         InputStream decoder = this.builderDecodeInputStream(is);
 
         this.inputStream = HttpServletInputStreamAdapter.builder()
-                .inputStream(decoder)
-                .setReadListener(is::setReadListener)
-                .isReady(is::isReady)
-                .isFinished(() -> finished(decoder, is)).build();
+            .inputStream(decoder)
+            .setReadListener(is::setReadListener)
+            .isReady(is::isReady)
+            .isFinished(() -> finished(decoder, is)).build();
         return this.inputStream;
     }
 
@@ -187,9 +187,6 @@ final class HttpServletRequestDecryptWrapper extends HttpServletRequestWrapper {
      * 当请求完成时
      */
     void onRequestFinished() {
-        if (this.cipher != null) {
-            this.cipherLockupService.release(CipherLockupService.CipherScope.session, this.cipher);
-        }
     }
 
 

@@ -15,6 +15,5 @@ public interface CipherLockupService {
 
     Cipher lockupDecryptCipher(CipherScope scope);
 
-    void release(CipherScope scope, Cipher cipher);
 
 }
