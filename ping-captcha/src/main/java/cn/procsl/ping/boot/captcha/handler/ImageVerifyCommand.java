@@ -5,7 +5,7 @@ import cn.procsl.ping.boot.captcha.domain.VerifyCaptchaCommand;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.util.ObjectUtils;
 
 import static cn.procsl.ping.boot.captcha.domain.image.ImageCaptcha.TOKEN_KEY;

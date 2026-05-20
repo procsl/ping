@@ -15,9 +15,9 @@
         <module>../ping-product</module>
         <module>../ping-system</module>
         <module>../ping-captcha</module>
-        <module>../ping-im</module>
-        <module>../ping-editor</module>
-        <module>../ping-ui</module>
+<!--        <module>../ping-im</module>-->
+<!--        <module>../ping-editor</module>-->
+<!--        <module>../ping-ui</module>-->
 <!--        <module>../ping-batch</module>-->
     </modules>
 
