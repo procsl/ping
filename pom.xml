@@ -339,6 +339,16 @@
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
                     <version>${springboot.version}</version>
+                    <executions>
+                        <execution>
+                            <id>process-aot</id>
+                            <!-- 绑定到打包前的准备阶段 -->
+                            <phase>prepare-package</phase>
+                            <goals>
+                                <goal>process-aot</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
 
 

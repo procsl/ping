@@ -1,7 +1,5 @@
 package cn.procsl.ping.boot.system.api.user;
 
-import cn.procsl.ping.boot.captcha.domain.CaptchaType;
-import cn.procsl.ping.boot.captcha.domain.VerifyCaptcha;
 import cn.procsl.ping.boot.common.MessageVO;
 import cn.procsl.ping.boot.common.Publisher;
 import cn.procsl.ping.boot.system.domain.user.*;
@@ -13,7 +11,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.mapstruct.factory.Mappers;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.http.HttpStatus;
@@ -68,7 +65,7 @@ public class AuthenticateController {
     }
 
     @PermitAll
-    @VerifyCaptcha(type = CaptchaType.image)
+//    @VerifyCaptcha(type = CaptchaType.image)
     @Publisher(eventName = USER_LOGIN, parameter = "#details.account")
     @Transactional(rollbackFor = Exception.class)
     @PostMapping(path = "/v1/system/authentications")
@@ -93,7 +90,7 @@ public class AuthenticateController {
         return dto;
     }
 
-    //    @Publisher(name = USER_LOGOUT, parameter = "#root[currentAccount].get()?.id")
+//        @Publisher(name = USER_LOGOUT, parameter = "#root[currentAccount].get()?.id")
     @Operation(summary = "用户注销")
     @DeleteMapping(path = "/v1/system/authentications/current")
     @ResponseStatus(HttpStatus.OK)

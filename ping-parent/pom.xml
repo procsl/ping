@@ -15,10 +15,10 @@
         <module>../ping-product</module>
         <module>../ping-system</module>
         <module>../ping-captcha</module>
-<!--        <module>../ping-im</module>-->
-<!--        <module>../ping-editor</module>-->
-<!--        <module>../ping-ui</module>-->
-<!--        <module>../ping-batch</module>-->
+        <!--        <module>../ping-im</module>-->
+        <!--        <module>../ping-editor</module>-->
+        <!--        <module>../ping-ui</module>-->
+        <!--        <module>../ping-batch</module>-->
     </modules>
 
     <dependencies>
@@ -99,6 +99,15 @@
         </dependency>
 
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 
     <profiles>
         <profile>

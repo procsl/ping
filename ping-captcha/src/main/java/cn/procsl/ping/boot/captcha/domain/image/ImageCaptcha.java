@@ -12,7 +12,6 @@ import jakarta.persistence.Table;
 import lombok.*;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-import javax.annotation.Nonnull;
 import java.util.Base64;
 
 @Getter
@@ -28,30 +27,20 @@ public class ImageCaptcha extends Captcha {
     public final static String TOKEN_KEY = "image-captcha-token";
 
     @Id
-    @Nonnull
     Long id;
+
 
     @Builder
     public ImageCaptcha(Long id, @NonNull String target, @NonNull String ticket, @NonNull String functionId, int expired) {
         super(target, ticket, functionId, expired);
         this.id = id;
-        this.verifyFunctionId(functionId);
     }
 
-    /**
-     * 校验验证码functionId的格式
-     */
-    private void verifyFunctionId(String functionId) {
-        if (functionId == null) {
-            // TODO
-//            @Pattern(regexp = "(GET|POST|DELETE|PATCH|PUT)", message = "仅支持[{regexp}]方法") String operate;
-        }
-    }
 
     @Override
     public boolean check(@NonNull VerifyCaptchaCommand param) throws VerifyFailureException {
-        String str = this.parseBase64Ticket(param.getClientTicket());
-        return this.ticket.equalsIgnoreCase(str);
+//        String str = this.parseBase64Ticket(param.getClientTicket());
+        return this.ticket.equalsIgnoreCase(param.getClientTicket());
     }
 
     @Override

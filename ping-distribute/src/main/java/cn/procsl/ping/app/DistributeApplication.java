@@ -1,17 +1,14 @@
 package cn.procsl.ping.app;
 
-import cn.procsl.ping.app.hint.HttpServletRequestRuntimeHint;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.info.License;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ImportRuntimeHints;
 
 import static cn.procsl.ping.app.DistributeApplication.*;
 
-@ImportRuntimeHints(value = {HttpServletRequestRuntimeHint.class})
-@SpringBootApplication(scanBasePackages = "cn.procsl.ping.app.query", proxyBeanMethods = false)
+@SpringBootApplication(scanBasePackages = "cn.procsl.ping.app", proxyBeanMethods = false)
 @OpenAPIDefinition(info = @Info(title = "接口文档", version = "1.0",
     license = @License(url = apache, name = name), description = desc))
 public class DistributeApplication {
@@ -22,7 +19,7 @@ public class DistributeApplication {
 
     final static String apache = "https://www.apache.org/licenses/LICENSE-2.0";
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
 
         SpringApplication.run(DistributeApplication.class, args);
     }
