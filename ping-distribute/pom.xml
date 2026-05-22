@@ -7,6 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
+        <!--        <artifactId>spring-boot-starter-parent</artifactId>-->
         <version>4.0.6</version>
         <relativePath/>
     </parent>
@@ -199,11 +200,11 @@
                             <goal>process-aot</goal>
                         </goals>
                     </execution>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
+<!--                    <execution>-->
+<!--                        <goals>-->
+<!--                            <goal>repackage</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
                 </executions>
             </plugin>
 
@@ -426,29 +427,12 @@
             <id>native</id>
             <build>
                 <plugins>
+
                     <plugin>
                         <groupId>org.graalvm.buildtools</groupId>
                         <artifactId>native-maven-plugin</artifactId>
                         <configuration>
                             <mainClass>cn.procsl.ping.app.DistributeApplication</mainClass>
-                            <buildArgs>
-                                --no-fallback
-                                -Ob
-                                <!-- -H:+DashboardAll -->
-                                --enable-sbom
-                                <!--                                -march=native-->
-                                <!--                                -march=list-->
-                                -H:+BuildReport
-                                --initialize-at-build-time=ch.qos.logback
-                                --trace-object-instantiation=ch.qos.logback.classic.Logger
-                                --initialize-at-run-time=sun.net.dns.ResolverConfigurationImpl
-                                --report-unsupported-elements-at-runtime
-                                --allow-incomplete-classpath
-                                -H:+ReportExceptionStackTraces
-                                -H:EnableURLProtocols=http
-                                -H:EnableURLProtocols=https
-                                --enable-url-protocols=http
-                            </buildArgs>
                         </configuration>
                         <executions>
                             <execution>

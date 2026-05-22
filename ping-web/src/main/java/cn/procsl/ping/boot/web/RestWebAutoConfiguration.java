@@ -16,9 +16,7 @@ import org.springframework.beans.factory.BeanNotOfRequiredTypeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.SearchStrategy;
+import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.boot.autoconfigure.web.format.WebConversionService;
 import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -34,7 +32,10 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.PropertyNamingStrategies;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 /**
@@ -67,6 +68,37 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProce
         this.applicationContext = applicationContext;
     }
 
+    @Bean
+    @ConditionalOnProperty(name = "spring.jackson.property-naming-strategy", havingValue = "SNAKE_CASE", matchIfMissing = true)
+    @ConditionalOnClass(name = {"io.swagger.v3.core.jackson.ModelResolver",
+        "com.fasterxml.jackson.databind.ObjectMapper",
+        "org.springdoc.core.properties.SpringDocConfigProperties"})
+    public Object modelResolver(ApplicationContext context) throws Exception {
+        log.debug("加载解析: spring.jackson.property-naming-strategy Springdoc配置项");
+        // 2. 动态加载 SpringDocConfigProperties 实例
+        Class<?> propertiesClass = Class.forName("org.springdoc.core.properties.SpringDocConfigProperties");
+        Object properties = context.getBean(propertiesClass);
+        boolean isOpenapi31 = (boolean) propertiesClass.getMethod("isOpenapi31").invoke(properties);
+
+        // 3. 动态创建 Jackson 2 的 ObjectMapper （完全由字符串驱动，躲过任何编译器的眼睛）
+        Class<?> objectMapperClass = Class.forName("com.fasterxml.jackson.databind.ObjectMapper");
+        Object mapper = objectMapperClass.getConstructor().newInstance();
+
+        // 4. 动态获取 Jackson 2 的 SNAKE_CASE 策略
+        Class<?> namingStrategiesClass = Class.forName("com.fasterxml.jackson.databind.PropertyNamingStrategies");
+        Object snakeCaseStrategy = namingStrategiesClass.getField("SNAKE_CASE").get(null);
+
+        // 5. 将策略注入到 Jackson 2 的 ObjectMapper 中
+        Class<?> strategyClass = Class.forName("com.fasterxml.jackson.databind.PropertyNamingStrategy");
+        objectMapperClass.getMethod("setPropertyNamingStrategy", strategyClass).invoke(mapper, snakeCaseStrategy);
+
+        // 6. 组装并返回 ModelResolver
+        Class<?> resolverClass = Class.forName("io.swagger.v3.core.jackson.ModelResolver");
+        Object resolver = resolverClass.getConstructor(objectMapperClass).newInstance(mapper);
+
+        return resolverClass.getMethod("openapi31", boolean.class).invoke(resolver, isOpenapi31);
+    }
+
     @Bean("cipherFilter")
     public FilterRegistrationBean<CipherFilter> accessLoggerFilterFilterRegistrationBean(@Autowired CipherLockupService lockupService) {
         FilterRegistrationBean<CipherFilter> filter = new FilterRegistrationBean<>();
@@ -81,6 +113,7 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProce
     @ConditionalOnBean(name = "cipherFilter", value = FilterRegistrationBean.class)
     public ServletListenerRegistrationBean<ServletRequestListener> cipherCleanRequestListener(@Autowired FilterRegistrationBean<CipherFilter> cipherFilter) {
         ServletListenerRegistrationBean<ServletRequestListener> listener = new ServletListenerRegistrationBean<>();
+        assert cipherFilter.getFilter() != null;
         listener.setListener(cipherFilter.getFilter());
         return listener;
     }
