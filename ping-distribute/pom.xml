@@ -5,11 +5,9 @@
 
 
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-dependencies</artifactId>
-        <!--        <artifactId>spring-boot-starter-parent</artifactId>-->
-        <version>4.0.6</version>
-        <relativePath/>
+        <groupId>cn.procsl</groupId>
+        <artifactId>ping</artifactId>
+        <version>1.0.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -31,6 +29,8 @@
         <manifold.version>2024.1.16</manifold.version>
         <web.server.port>10000</web.server.port>
         <spring-dev>false</spring-dev>
+        <dynamic.spring.profiles>unset</dynamic.spring.profiles>
+        <windows.native.args/>
     </properties>
 
     <dependencies>
@@ -87,107 +87,77 @@
 
         <finalName>${project.artifactId}-${database.type}-${ping.version}</finalName>
 
-        <testResources>
-            <testResource>
-                <directory>${project.basedir}/src/test/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**</include>
-                </includes>
-                <excludes>
-                    <exclude>*.jks</exclude>
-                    <exclude>*.pfx</exclude>
-                    <exclude>*.txt</exclude>
-                </excludes>
-            </testResource>
-        </testResources>
-
-        <resources>
-            <resource>
-                <directory>${project.basedir}/src/main/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**</include>
-                </includes>
-                <excludes>
-                    <exclude>*.jks</exclude>
-                    <exclude>*.pfx</exclude>
-                    <exclude>*.txt</exclude>
-                </excludes>
-
-            </resource>
-        </resources>
-
-
         <plugins>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <release>${java.version}</release>
-                    <encoding>${project.build.sourceEncoding}</encoding>
 
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>${lombok.version}</version>
-                        </path>
+            <!--            <plugin>-->
+            <!--                <groupId>org.apache.maven.plugins</groupId>-->
+            <!--                <artifactId>maven-compiler-plugin</artifactId>-->
+            <!--                <configuration>-->
+            <!--                    <release>${java.version}</release>-->
+            <!--                    <encoding>${project.build.sourceEncoding}</encoding>-->
 
-                        <path>
-                            <groupId>org.springframework.boot</groupId>
-                            <artifactId>spring-boot-configuration-processor</artifactId>
-                            <version>${project.version}</version>
-                        </path>
+            <!--                    <annotationProcessorPaths>-->
+            <!--                        <path>-->
+            <!--                            <groupId>org.projectlombok</groupId>-->
+            <!--                            <artifactId>lombok</artifactId>-->
+            <!--                        </path>-->
 
-                        <path>
-                            <groupId>org.springframework</groupId>
-                            <artifactId>spring-context-indexer</artifactId>
-                            <version>${spring-framework.version}</version>
-                        </path>
+            <!--                        <path>-->
+            <!--                            <groupId>org.springframework.boot</groupId>-->
+            <!--                            <artifactId>spring-boot-configuration-processor</artifactId>-->
+            <!--                            <version>${springboot.version}</version>-->
+            <!--                        </path>-->
 
-                    </annotationProcessorPaths>
+            <!--                        <path>-->
+            <!--                            <groupId>org.springframework</groupId>-->
+            <!--                            <artifactId>spring-context-indexer</artifactId>-->
+            <!--                            <version>${springboot.version}</version>-->
+            <!--                            &lt;!&ndash;                            <version>${spring-framework.version}</version>&ndash;&gt;-->
+            <!--                        </path>-->
 
-                    <verbose>true</verbose>
-                    <showWarnings>true</showWarnings>
-                    <!--保留参数名称-->
-                    <maxmem>2048m</maxmem>
-                    <compilerArgs>
-                        <arg>-g</arg>
-                        <arg>-Xlint:unchecked</arg>
-                        <arg>-Xlint:deprecation</arg>
-                        <arg>-parameters</arg>
-                        <arg>-proc:full</arg>
-                    </compilerArgs>
-                </configuration>
-            </plugin>
+            <!--                    </annotationProcessorPaths>-->
+
+            <!--                    <verbose>true</verbose>-->
+            <!--                    <showWarnings>true</showWarnings>-->
+            <!--                    &lt;!&ndash;保留参数名称&ndash;&gt;-->
+            <!--                    <maxmem>2048m</maxmem>-->
+            <!--                    <compilerArgs>-->
+            <!--                        <arg>-g</arg>-->
+            <!--                        <arg>-Xlint:unchecked</arg>-->
+            <!--                        <arg>-Xlint:deprecation</arg>-->
+            <!--                        <arg>-parameters</arg>-->
+            <!--                        <arg>-proc:full</arg>-->
+            <!--                    </compilerArgs>-->
+            <!--                </configuration>-->
+            <!--            </plugin>-->
 
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <configuration>
-                    <encoding>utf-8</encoding>
-                    <delimiters>
-                        <delimiter>@</delimiter>
-                    </delimiters>
-                    <!-- 解决Spring boot引起的profile失效问题 -->
-                    <useDefaultDelimiters>false</useDefaultDelimiters>
-                    <!-- 过滤后缀为p12、pem、pfx的证书文件 -->
-                    <nonFilteredFileExtensions>
-                        <nonFilteredFileExtension>p12</nonFilteredFileExtension>
-                        <nonFilteredFileExtension>cer</nonFilteredFileExtension>
-                        <nonFilteredFileExtension>pem</nonFilteredFileExtension>
-                        <nonFilteredFileExtension>pfx</nonFilteredFileExtension>
-                        <nonFilteredFileExtension>jkx</nonFilteredFileExtension>
-                    </nonFilteredFileExtensions>
-                </configuration>
-            </plugin>
+            <!--            <plugin>-->
+            <!--                <groupId>org.apache.maven.plugins</groupId>-->
+            <!--                <artifactId>maven-resources-plugin</artifactId>-->
+            <!--                <configuration>-->
+            <!--                    <encoding>utf-8</encoding>-->
+            <!--                    <delimiters>-->
+            <!--                        <delimiter>@</delimiter>-->
+            <!--                    </delimiters>-->
+            <!--                    &lt;!&ndash; 解决Spring boot引起的profile失效问题 &ndash;&gt;-->
+            <!--                    <useDefaultDelimiters>false</useDefaultDelimiters>-->
+            <!--                    &lt;!&ndash; 过滤后缀为p12、pem、pfx的证书文件 &ndash;&gt;-->
+            <!--                    <nonFilteredFileExtensions>-->
+            <!--                        <nonFilteredFileExtension>p12</nonFilteredFileExtension>-->
+            <!--                        <nonFilteredFileExtension>cer</nonFilteredFileExtension>-->
+            <!--                        <nonFilteredFileExtension>pem</nonFilteredFileExtension>-->
+            <!--                        <nonFilteredFileExtension>pfx</nonFilteredFileExtension>-->
+            <!--                        <nonFilteredFileExtension>jkx</nonFilteredFileExtension>-->
+            <!--                    </nonFilteredFileExtensions>-->
+            <!--                </configuration>-->
+            <!--            </plugin>-->
 
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${springboot.version}</version>
                 <configuration>
                     <mainClass>cn.procsl.ping.app.DistributeApplication</mainClass>
                 </configuration>
@@ -200,11 +170,6 @@
                             <goal>process-aot</goal>
                         </goals>
                     </execution>
-<!--                    <execution>-->
-<!--                        <goals>-->
-<!--                            <goal>repackage</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
                 </executions>
             </plugin>
 
@@ -424,6 +389,19 @@
         </profile>
 
         <profile>
+            <id>patch-windows-native</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <properties>
+                <!-- 只有 Windows 才会激活这行赋值 -->
+                <windows.native.args>-H:+UseWindowsVirtualMemory</windows.native.args>
+            </properties>
+        </profile>
+
+        <profile>
             <id>native</id>
             <build>
                 <plugins>
@@ -431,8 +409,15 @@
                     <plugin>
                         <groupId>org.graalvm.buildtools</groupId>
                         <artifactId>native-maven-plugin</artifactId>
+                        <version>1.0.0</version>
                         <configuration>
                             <mainClass>cn.procsl.ping.app.DistributeApplication</mainClass>
+                            <buildArgs>
+                                <!-- 添加这一行：允许生成分析报告 -->
+                                <buildArg>--emit build-report</buildArg>
+                                <!-- 关键点：把上面定义的变量引用进来（实现动态追加） -->
+                                <buildArg>${windows.native.args}</buildArg>
+                            </buildArgs>
                         </configuration>
                         <executions>
                             <execution>
@@ -447,6 +432,7 @@
                 </plugins>
             </build>
         </profile>
+
 
     </profiles>
 

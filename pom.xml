@@ -4,6 +4,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+
+        <parent>
+            <groupId>org.springframework.boot</groupId>
+<!--            <artifactId>spring-boot-dependencies</artifactId>-->
+            <artifactId>spring-boot-starter-parent</artifactId>
+            <version>4.0.6</version>
+            <relativePath/>
+        </parent>
+
     <groupId>cn.procsl</groupId>
     <artifactId>ping</artifactId>
     <packaging>pom</packaging>
@@ -19,7 +28,8 @@
         <springdoc.version>3.0.3</springdoc.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <google.auto.version>1.1.1</google.auto.version>
-        <manifold.version>2024.1.16</manifold.version>
+        <lombok.version>1.18.46</lombok.version>
+        <manifold.version>2026.1.6</manifold.version>
         <web.server.port>10000</web.server.port>
         <spring-dev>false</spring-dev>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -35,6 +45,7 @@
         <module>ping-common</module>
         <module>ping-web</module>
         <module>ping-jpa</module>
+        <module>ping-distribute</module>
         <!--        <module>ping-connect</module>-->
     </modules>
 
@@ -43,14 +54,14 @@
     <dependencyManagement>
 
         <dependencies>
-            <dependency>
-                <!-- 从 Spring Boot 导入依赖管理 -->
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>4.0.6</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
+<!--            <dependency>-->
+<!--                &lt;!&ndash; 从 Spring Boot 导入依赖管理 &ndash;&gt;-->
+<!--                <groupId>org.springframework.boot</groupId>-->
+<!--                <artifactId>spring-boot-dependencies</artifactId>-->
+<!--                <version>${springboot.version}</version>-->
+<!--                <type>pom</type>-->
+<!--                <scope>import</scope>-->
+<!--            </dependency>-->
 
             <dependency>
                 <groupId>com.blazebit</groupId>
@@ -199,22 +210,114 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
+            <version>${lombok.version}</version>
         </dependency>
 
-        <!--        <dependency>-->
-        <!--            <groupId>systems.manifold</groupId>-->
-        <!--            <artifactId>manifold-rt</artifactId>-->
-        <!--            <version>${manifold.version}</version>-->
-        <!--        </dependency>-->
+        <dependency>
+            <groupId>systems.manifold</groupId>
+            <artifactId>manifold-rt</artifactId>
+            <version>${manifold.version}</version>
+        </dependency>
 
     </dependencies>
 
 
     <build>
 
+
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**</include>
+                </includes>
+                <excludes>
+                    <exclude>*.jks</exclude>
+                    <exclude>*.pfx</exclude>
+                    <exclude>*.txt</exclude>
+                </excludes>
+            </testResource>
+        </testResources>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**</include>
+                </includes>
+                <excludes>
+                    <exclude>*.jks</exclude>
+                    <exclude>*.pfx</exclude>
+                    <exclude>*.txt</exclude>
+                </excludes>
+
+            </resource>
+        </resources>
+
+
         <pluginManagement>
 
             <plugins>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>3.4.1</version>
+                    <executions>
+                        <execution>
+                            <id>enforce-versions</id>
+                            <goals>
+                                <goal>enforce</goal>
+                            </goals>
+                            <configuration>
+                                <rules>
+                                    <requireJavaVersion>
+                                        <version>${java.version}</version>
+                                        <message>警告: 项目必须使用 JDK ${java.version} 或更高版本进行编译！</message>
+                                    </requireJavaVersion>
+                                    <requireMavenVersion>
+                                        <version>3.9.0</version>
+                                    </requireMavenVersion>
+                                </rules>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+
+                <plugin>
+                    <groupId>org.codehaus.gmavenplus</groupId>
+                    <artifactId>gmavenplus-plugin</artifactId>
+                    <version>3.0.0</version>
+                    <executions>
+                        <execution>
+                            <phase>initialize</phase>
+                            <goals>
+                                <goal>execute</goal>
+                            </goals>
+                            <configuration>
+                                <scripts>
+                                    <!-- 关键点：使用 scriptFile 替代原来的内部 script -->
+                                    <scriptFile>${maven.multiModuleProjectDirectory}/build-profile-filter.groovy
+                                    </scriptFile>
+                                </scripts>
+                            </configuration>
+                        </execution>
+                    </executions>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.groovy</groupId>
+                            <artifactId>groovy-all</artifactId>
+                            <version>5.0.6</version>
+                            <type>pom</type>
+                            <scope>runtime</scope>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+
+
                 <plugin>
                     <groupId>io.github.git-commit-id</groupId>
                     <artifactId>git-commit-id-maven-plugin</artifactId>
@@ -259,7 +362,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>${maven.compiler.plugin.version}</version>
+<!--                    <version>${maven.compiler.plugin.version}</version>-->
                     <configuration>
                         <release>${java.version}</release>
 
@@ -267,7 +370,7 @@
                             <path>
                                 <groupId>org.projectlombok</groupId>
                                 <artifactId>lombok</artifactId>
-                                <!--                                <version>${lombok.version}</version>-->
+                                                                <version>${lombok.version}</version>
                             </path>
 
                             <path>
@@ -313,7 +416,7 @@
 
                         </annotationProcessorPaths>
 
-                        <verbose>true</verbose>
+                        <!--                        <verbose>true</verbose>-->
                         <showWarnings>true</showWarnings>
                         <!--                    <fork>true</fork>-->
                         <!--保留参数名称-->
@@ -335,21 +438,10 @@
                     <version>${maven.surefire.plugin.version}</version>
                 </plugin>
 
-                <plugin>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-maven-plugin</artifactId>
-                    <version>${springboot.version}</version>
-                    <executions>
-                        <execution>
-                            <id>process-aot</id>
-                            <!-- 绑定到打包前的准备阶段 -->
-                            <phase>prepare-package</phase>
-                            <goals>
-                                <goal>process-aot</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
+<!--                <plugin>-->
+<!--                    <groupId>org.graalvm.buildtools</groupId>-->
+<!--                    <artifactId>native-maven-plugin</artifactId>-->
+<!--                </plugin>-->
 
 
                 <plugin>
@@ -379,41 +471,36 @@
         </pluginManagement>
 
         <plugins>
+
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.4.1</version>
-                <executions>
-                    <execution>
-                        <id>enforce-versions</id>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <requireJavaVersion>
-                                    <version>${java.version}</version>
-                                    <message>警告: 项目必须使用 JDK ${java.version} 或更高版本进行编译！</message>
-                                </requireJavaVersion>
-                                <requireMavenVersion>
-                                    <version>3.9.0</version>
-                                </requireMavenVersion>
-                            </rules>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
-
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
 
             <plugin>
                 <groupId>io.github.git-commit-id</groupId>
                 <artifactId>git-commit-id-maven-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
             </plugin>
 
         </plugins>
