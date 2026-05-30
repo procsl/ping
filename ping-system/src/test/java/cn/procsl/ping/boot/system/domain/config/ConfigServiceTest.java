@@ -1,7 +1,7 @@
 package cn.procsl.ping.boot.system.domain.config;
 
 import cn.procsl.ping.boot.system.TestSystemApplication;
-import cn.procsl.ping.boot.system.service.ConfigFacade;
+import cn.procsl.ping.boot.system.service.ConfigService;
 import com.github.javafaker.Faker;
 import com.github.jsonzou.jmockdata.JMockData;
 import lombok.extern.slf4j.Slf4j;
@@ -24,10 +24,10 @@ import java.util.Locale;
 @Transactional
 @DisplayName("配置项服务测试")
 @SpringBootTest(classes = TestSystemApplication.class, webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-public class ConfigFacadeTest {
+public class ConfigServiceTest {
 
     @Inject
-    ConfigFacade configFacade;
+    ConfigService configService;
 
     @Inject
     JpaRepository<Config, Long> jpaRepository;
@@ -53,7 +53,7 @@ public class ConfigFacadeTest {
         String key = JMockData.mock(String.class);
         String content = JMockData.mock(String.class);
         String desc = JMockData.mock(String.class);
-        Long id = configFacade.put(key, content, desc);
+        Long id = configService.put(key, content, desc);
 
         Config configure = jpaRepository.getReferenceById(id);
         Assertions.assertNotNull(configure);
@@ -61,11 +61,11 @@ public class ConfigFacadeTest {
         Assertions.assertEquals(content, configure.getContent());
         Assertions.assertEquals(desc, configure.getDescription());
 
-        this.configFacade.put(JMockData.mock(String.class), null, desc);
-        this.configFacade.put(JMockData.mock(String.class), "", desc);
-        this.configFacade.put(JMockData.mock(String.class), null, null);
-        this.configFacade.put(JMockData.mock(String.class), JMockData.mock(String.class), null);
-        this.configFacade.put(JMockData.mock(String.class), JMockData.mock(String.class), "");
+        this.configService.put(JMockData.mock(String.class), null, desc);
+        this.configService.put(JMockData.mock(String.class), "", desc);
+        this.configService.put(JMockData.mock(String.class), null, null);
+        this.configService.put(JMockData.mock(String.class), JMockData.mock(String.class), null);
+        this.configService.put(JMockData.mock(String.class), JMockData.mock(String.class), "");
         this.jpaRepository.flush();
     }
 
@@ -113,10 +113,10 @@ public class ConfigFacadeTest {
 
         Config entity = this.jpaRepository.getReferenceById(gid);
 
-        String config = this.configFacade.get(entity.getName());
+        String config = this.configService.get(entity.getName());
         Assertions.assertEquals(config, entity.getContent());
 
-        String config1 = this.configFacade.get(faker.animal().name());
+        String config1 = this.configService.get(faker.animal().name());
         Assertions.assertNull(config1);
     }
 

@@ -20,7 +20,7 @@ import java.util.Optional;
 @Validated
 @Transactional
 @RequiredArgsConstructor
-public class ConfigFacade {
+public class ConfigService {
 
     final JpaRepository<Config, Long> jpaRepository;
     final JpaSpecificationExecutor<Config> jpaSpecificationExecutor;

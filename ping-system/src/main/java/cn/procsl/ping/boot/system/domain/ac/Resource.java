@@ -1,23 +1,25 @@
 package cn.procsl.ping.boot.system.domain.ac;
 
-import jakarta.validation.constraints.NotBlank;
+import cn.procsl.ping.boot.system.domain.ac.abac.AttributeContainer;
+import lombok.Data;
 
-import java.util.Optional;
+import java.util.Map;
 
 /**
  * 访问资源描述
  */
-public interface Resource {
 
-    /**
-     * 资源主体目标
-     */
-    @NotBlank
-    String getObject();
+/**
+ * 遭受动作的目标（资源）
+ */
+@Data
+public final class Resource implements AttributeContainer {
+    private final String type;                     // 资产来源大类 (如: "api", "button", "order")
+    private final String identity;                 // 资产的业务逻辑标识 (如: "/api/orders/*", "export_btn", "ORD_99")
 
-    /**
-     * 资源描述
-     */
-    Optional<String> getDescription();
-
+    public Resource(String type, String identity, Map<String, Object> attributes) {
+        this.type = type != null ? type.toLowerCase() : "";
+        this.identity = identity;
+        this.attributes = attributes != null ? Map.copyOf(attributes) : Map.of();
+    }
 }

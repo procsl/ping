@@ -46,11 +46,11 @@ public class CaptchaController {
         this.idGenerator = new IdentifierGeneratorWrapper(generator, "captcha_id_seg");
     }
 
-    @PermitAll
-    @VersionController
-    @Operation(summary = "创建图形验证码")
-    @PostMapping(path = "/v1/captcha/images", produces = MediaType.IMAGE_GIF_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
+//    @PermitAll
+//    @VersionController
+//    @Operation(summary = "创建图形验证码")
+//    @PostMapping(path = "/v1/captcha/images", produces = MediaType.IMAGE_GIF_VALUE)
+//    @ResponseStatus(HttpStatus.CREATED)
     public void createImageCaptcha(HttpServletRequest request, HttpServletResponse response,
                                    @RequestBody @Validated ImageCaptchaParam parameter
     )
@@ -83,12 +83,12 @@ public class CaptchaController {
         captcha.out(response.getOutputStream());
     }
 
-    @PermitAll
-    @VerifyCaptcha(type = CaptchaType.image)
-    @Operation(summary = "发送邮件验证码")
-    @PostMapping(path = "/v1/captcha/emails")
-    @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    @Transactional(rollbackFor = Exception.class)
+//    @PermitAll
+//    @VerifyCaptcha(type = CaptchaType.image)
+//    @Operation(summary = "发送邮件验证码")
+//    @PostMapping(path = "/v1/captcha/emails")
+//    @ResponseStatus(code = HttpStatus.NO_CONTENT)
+//    @Transactional(rollbackFor = Exception.class)
     public void sendEmailCaptcha(HttpServletRequest request, @RequestBody @Validated EmailSenderDTO sender) {
         this.emailCaptchaHandler.createEmailCaptcha(WebUtils.getClientSessionId(request), sender.getEmail());
     }

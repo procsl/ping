@@ -2,7 +2,7 @@ package cn.procsl.ping.boot.system.api.config;
 
 import cn.procsl.ping.boot.common.BusinessException;
 import cn.procsl.ping.boot.system.domain.config.Config;
-import cn.procsl.ping.boot.system.service.ConfigFacade;
+import cn.procsl.ping.boot.system.service.ConfigService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Config", description = "系统配置接口")
 public class ConfigController {
 
-    final ConfigFacade configFacade;
+    final ConfigService configService;
 
     final JpaRepository<Config, Long> jpaRepository;
 
@@ -38,7 +38,7 @@ public class ConfigController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional(rollbackFor = Exception.class)
     public void put(@RequestBody @Validated ConfigDTO config) throws BusinessException {
-        configFacade.put(config.getName(), config.getContent(), config.getDescription());
+        configService.put(config.getName(), config.getContent(), config.getDescription());
     }
 
 
@@ -54,7 +54,7 @@ public class ConfigController {
     @GetMapping(path = "/v1/system/configs/{name}")
     @Transactional(rollbackFor = Exception.class, readOnly = true)
     public ConfigNameValueDTO getConfig(@PathVariable String name) {
-        return new ConfigNameValueDTO(name, this.configFacade.get(name));
+        return new ConfigNameValueDTO(name, this.configService.get(name));
     }
 
 //    @MarkPageable

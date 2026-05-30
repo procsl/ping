@@ -407,34 +407,33 @@
                 <plugins>
 
                     <plugin>
-                        <groupId>org.graalvm.buildtools</groupId>
-                        <artifactId>native-maven-plugin</artifactId>
-                        <version>1.0.0</version>
-                        <configuration>
-                            <mainClass>cn.procsl.ping.app.DistributeApplication</mainClass>
-                            <buildArgs>
-                                <!-- 添加这一行：允许生成分析报告 -->
-                                <buildArg>--emit build-report</buildArg>
-                                <!-- 关键点：把上面定义的变量引用进来（实现动态追加） -->
-                                <buildArg>${windows.native.args}</buildArg>
-                            </buildArgs>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>build-native</id>
-                                <goals>
-                                    <goal>compile-no-fork</goal>
-                                </goals>
-                                <phase>package</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
+<groupId>org.graalvm.buildtools</groupId>
+<artifactId>native-maven-plugin</artifactId>
+        <!--                        <version>1.0.0</version>-->
+<configuration>
+<mainClass>cn.procsl.ping.app.DistributeApplication</mainClass>
+<buildArgs>
+    <!-- 添加这一行：允许生成分析报告 -->
+    <buildArg>--emit build-report</buildArg>
+    <!-- 关键点：把上面定义的变量引用进来（实现动态追加） -->
+</buildArgs>
+</configuration>
+<executions>
+<execution>
+    <id>build-native</id>
+    <goals>
+        <goal>compile-no-fork</goal>
+    </goals>
+    <phase>package</phase>
+</execution>
+</executions>
+        </plugin>
+        </plugins>
+        </build>
         </profile>
 
 
-    </profiles>
+        </profiles>
 
 
-</project>
+        </project>
