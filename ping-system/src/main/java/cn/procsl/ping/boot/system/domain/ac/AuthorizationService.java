@@ -4,7 +4,7 @@ package cn.procsl.ping.boot.system.domain.ac;
 /**
  * 访问控制服务
  */
-public interface AuthorizationEngine {
+public interface AuthorizationService {
 
     /**
      * 核心无状态纯函数：f(S, A, R, E) -> Effect
