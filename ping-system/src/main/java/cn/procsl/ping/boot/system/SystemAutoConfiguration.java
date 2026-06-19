@@ -3,7 +3,6 @@ package cn.procsl.ping.boot.system;
 import cn.procsl.ping.boot.jpa.support.EnableDomainRepositories;
 import cn.procsl.ping.boot.system.api.user.AuthenticateInterceptor;
 import cn.procsl.ping.boot.system.constant.SystemConfigureProperties;
-import cn.procsl.ping.boot.system.domain.user.RoleSettingService;
 import cn.procsl.ping.boot.system.service.ConfigService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -26,7 +25,7 @@ import static cn.procsl.ping.boot.web.RestWebAutoConfiguration.PUBLIC_STATIC_RES
 @EnableTransactionManagement
 @EntityScan(basePackages = "cn.procsl.ping.boot.system.domain")
 @EnableJpaRepositories(basePackages = {"cn.procsl.ping.boot.system.domain"}, bootstrapMode = BootstrapMode.LAZY)
-@ComponentScan(basePackages = {"cn.procsl.ping.boot.system.api", "cn.procsl.ping.boot.system.query", "cn.procsl.ping.boot.system.service", "cn.procsl.ping.boot.system.listener", "cn.procsl.ping.boot.system.adapter"}, basePackageClasses = {ConfigService.class, RoleSettingService.class,})
+@ComponentScan(basePackages = {"cn.procsl.ping.boot.system.api", "cn.procsl.ping.boot.system.query", "cn.procsl.ping.boot.system.service", "cn.procsl.ping.boot.system.adapter"}, basePackageClasses = {ConfigService.class})
 @EnableConfigurationProperties(SystemConfigureProperties.class)
 @RequiredArgsConstructor
 public class SystemAutoConfiguration implements WebMvcConfigurer {

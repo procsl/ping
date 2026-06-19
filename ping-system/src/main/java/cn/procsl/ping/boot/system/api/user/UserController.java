@@ -1,7 +1,6 @@
 package cn.procsl.ping.boot.system.api.user;
 
 import cn.procsl.ping.boot.common.service.PasswordEncoderService;
-import cn.procsl.ping.boot.system.domain.user.RoleSettingService;
 import cn.procsl.ping.boot.system.domain.user.User;
 import cn.procsl.ping.boot.web.annotation.SecurityId;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,8 +22,6 @@ public class UserController {
     final JpaRepository<User, Long> jpaRepository;
 
     final PasswordEncoderService passwordEncoderService;
-
-    final RoleSettingService roleSettingService;
 
     final UserMapper userMapper;
 
