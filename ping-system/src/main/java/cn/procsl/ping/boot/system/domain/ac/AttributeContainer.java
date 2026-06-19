@@ -1,4 +1,4 @@
-package cn.procsl.ping.boot.system.domain.ac.abac;
+package cn.procsl.ping.boot.system.domain.ac;
 
 import java.util.Map;
 import java.util.Optional;

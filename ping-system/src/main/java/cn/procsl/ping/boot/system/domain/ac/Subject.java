@@ -1,6 +1,5 @@
 package cn.procsl.ping.boot.system.domain.ac;
 
-import cn.procsl.ping.boot.system.domain.ac.abac.AttributeContainer;
 import lombok.Data;
 
 import java.util.Map;

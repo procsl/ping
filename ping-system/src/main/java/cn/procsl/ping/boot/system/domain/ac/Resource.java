@@ -1,6 +1,5 @@
 package cn.procsl.ping.boot.system.domain.ac;
 
-import cn.procsl.ping.boot.system.domain.ac.abac.AttributeContainer;
 import lombok.Data;
 
 import java.util.Map;
@@ -16,6 +15,7 @@ import java.util.Map;
 public final class Resource implements AttributeContainer {
     private final String type;                     // 资产来源大类 (如: "api", "button", "order")
     private final String identity;                 // 资产的业务逻辑标识 (如: "/api/orders/*", "export_btn", "ORD_99")
+    Map<String, Object> attributes;
 
     public Resource(String type, String identity, Map<String, Object> attributes) {
         this.type = type != null ? type.toLowerCase() : "";
