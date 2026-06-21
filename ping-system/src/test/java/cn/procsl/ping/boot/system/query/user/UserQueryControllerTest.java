@@ -4,6 +4,7 @@ import cn.procsl.ping.boot.system.TestSystemApplication;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +19,7 @@ import javax.inject.Inject;
 public class UserQueryControllerTest {
 
 
-    @Inject
+    @Autowired
     UserQueryController userQueryController;
 
     @Test

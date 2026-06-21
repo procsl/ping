@@ -16,6 +16,7 @@ import org.springframework.beans.factory.BeanNotOfRequiredTypeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.boot.autoconfigure.web.format.WebConversionService;
 import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer;
@@ -26,15 +27,14 @@ import org.springframework.boot.webmvc.error.ErrorAttributes;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigRegistry;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.*;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.PropertyNamingStrategies;
 
+import javax.inject.Named;
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -44,7 +44,7 @@ import java.util.List;
  * @author procsl
  */
 @Slf4j
-@AutoConfiguration(before = ErrorMvcAutoConfiguration.class)
+@AutoConfiguration(before = {ErrorMvcAutoConfiguration.class}, beforeName = "org.springdoc.core.configuration.SpringDocConfiguration")
 @ComponentScan(basePackages = "cn.procsl.ping.boot.web")
 public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProcessor, ApplicationContextInitializer<ConfigurableApplicationContext> {
 
@@ -73,8 +73,9 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProce
     @ConditionalOnClass(name = {"io.swagger.v3.core.jackson.ModelResolver",
         "com.fasterxml.jackson.databind.ObjectMapper",
         "org.springdoc.core.properties.SpringDocConfigProperties"})
+    @ConditionalOnBean(type = "org.springdoc.core.properties.SpringDocConfigProperties")
     public Object modelResolver(ApplicationContext context) throws Exception {
-        log.debug("加载解析: spring.jackson.property-naming-strategy Springdoc配置项");
+        log.info("加载解析: spring.jackson.property-naming-strategy Springdoc配置项");
         // 2. 动态加载 SpringDocConfigProperties 实例
         Class<?> propertiesClass = Class.forName("org.springdoc.core.properties.SpringDocConfigProperties");
         Object properties = context.getBean(propertiesClass);

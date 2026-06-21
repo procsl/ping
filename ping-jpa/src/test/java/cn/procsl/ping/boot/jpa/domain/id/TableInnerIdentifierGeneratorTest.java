@@ -15,7 +15,7 @@
 //@SpringBootTest(classes = TestJpaApplication.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 //public class TableInnerIdentifierGeneratorTest {
 //
-//    @Inject
+//    @Autowired
 //    UniqueService uniqueService;
 //
 //

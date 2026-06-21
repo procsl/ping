@@ -87,8 +87,115 @@
 
         <finalName>${project.artifactId}-${database.type}-${ping.version}</finalName>
 
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springdoc</groupId>
+                    <artifactId>springdoc-openapi-maven-plugin</artifactId>
+                    <version>1.5</version>
+                    <executions>
+                        <execution>
+                            <id>pure-compile-generate</id>
+                            <phase>compile</phase>
+                            <goals>
+                                <goal>generate</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <apiDocsUrl>http://localhost:10000/v3/api-docs</apiDocsUrl>
+                        <outputFileName>openapi.json</outputFileName>
+                        <outputDir>${project.build.directory}/spring-doc</outputDir>
+                        <failOnError>true</failOnError>
+                        <skip>false</skip>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.springdoc</groupId>
+                            <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+                            <version>${springdoc.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
 
+
+<!--            <plugin>-->
+<!--                <groupId>org.codehaus.mojo</groupId>-->
+<!--                <artifactId>exec-maven-plugin</artifactId>-->
+<!--                <version>3.1.0</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>fetch-openapi-json</id>-->
+<!--                        <phase>prepare-package</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>java</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+
+<!--                            <mainClass>cn.procsl.ping.app.DistributeApplication</mainClass>-->
+
+<!--                            <includeProjectDependencies>true</includeProjectDependencies>-->
+<!--                            <includePluginDependencies>true</includePluginDependencies>-->
+<!--                            <classpathScope>test</classpathScope>-->
+
+<!--                            <systemProperties>-->
+<!--                                <systemProperty>-->
+<!--                                    <key>file.encoding</key>-->
+<!--                                    <value>UTF-8</value>-->
+<!--                                </systemProperty>-->
+<!--                                <systemProperty>-->
+<!--                                    <key>sun.stdout.encoding</key>-->
+<!--                                    <value>UTF-8</value>-->
+<!--                                </systemProperty>-->
+<!--                                <systemProperty>-->
+<!--                                    <key>sun.stderr.encoding</key>-->
+<!--                                    <value>UTF-8</value>-->
+<!--                                </systemProperty>-->
+<!--                            </systemProperties>-->
+
+<!--                            <arguments>-->
+<!--                                <argument>&#45;&#45;openapi.export=true</argument>-->
+<!--                                <argument>&#45;&#45;openapi.output.dir=${project.build.outputDirectory}/ping-api-doc/</argument>-->
+<!--                                <argument>&#45;&#45;spring.profiles.active=h2,openapi,openapi-export</argument>-->
+<!--                                <argument>&#45;&#45;server.port=0</argument>-->
+<!--                                <argument>&#45;&#45;logging.level.root=INFO</argument>-->
+<!--                                <argument>&#45;&#45;server.address=127.0.0.1</argument>-->
+<!--                                <argument>&#45;&#45;springdoc.api-docs.enabled=true</argument>-->
+<!--                            </arguments>-->
+
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+
+<!--                <dependencies>-->
+<!--                    <dependency>-->
+<!--                        <groupId>org.springdoc</groupId>-->
+<!--                        <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>-->
+<!--                        <version>${springdoc.version}</version>-->
+<!--                    </dependency>-->
+<!--                    <dependency>-->
+<!--                        <groupId>com.h2database</groupId>-->
+<!--                        <artifactId>h2</artifactId>-->
+<!--                        <version>${h2.version}</version>-->
+<!--                    </dependency>-->
+<!--                    <dependency>-->
+<!--                        <groupId>org.springdoc</groupId>-->
+<!--                        <artifactId>springdoc-openapi-starter-common</artifactId>-->
+<!--                        <version>${springdoc.version}</version>-->
+<!--                    </dependency>-->
+<!--                </dependencies>-->
+
+<!--            </plugin>-->
+
+            <!--            <plugin>-->
+            <!--                <groupId>org.springdoc</groupId>-->
+            <!--                <artifactId>springdoc-openapi-maven-plugin</artifactId>-->
+            <!--                <version>1.5</version>-->
+            <!--            </plugin>-->
 
             <!--            <plugin>-->
             <!--                <groupId>org.apache.maven.plugins</groupId>-->
@@ -282,33 +389,6 @@
 
             </dependencies>
 
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.springdoc</groupId>
-                            <artifactId>springdoc-openapi-maven-plugin</artifactId>
-                            <version>1.3</version>
-                            <executions>
-                                <execution>
-                                    <id>integration-test</id>
-                                    <goals>
-                                        <goal>generate</goal>
-                                    </goals>
-                                </execution>
-                            </executions>
-
-                            <configuration>
-                                <apiDocsUrl>http://localhost:${web.server.port}/v3/api-docs</apiDocsUrl>
-                                <outputFileName>openapi.json</outputFileName>
-                                <outputDir>${project.build.directory}/spring-doc</outputDir>
-                                <skip>false</skip>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-
         </profile>
 
         <profile>
@@ -407,33 +487,33 @@
                 <plugins>
 
                     <plugin>
-<groupId>org.graalvm.buildtools</groupId>
-<artifactId>native-maven-plugin</artifactId>
-        <!--                        <version>1.0.0</version>-->
-<configuration>
-<mainClass>cn.procsl.ping.app.DistributeApplication</mainClass>
-<buildArgs>
-    <!-- 添加这一行：允许生成分析报告 -->
-    <buildArg>--emit build-report</buildArg>
-    <!-- 关键点：把上面定义的变量引用进来（实现动态追加） -->
-</buildArgs>
-</configuration>
-<executions>
-<execution>
-    <id>build-native</id>
-    <goals>
-        <goal>compile-no-fork</goal>
-    </goals>
-    <phase>package</phase>
-</execution>
-</executions>
-        </plugin>
-        </plugins>
-        </build>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <!--                        <version>1.0.0</version>-->
+                        <configuration>
+                            <mainClass>cn.procsl.ping.app.DistributeApplication</mainClass>
+                            <buildArgs>
+                                <!-- 添加这一行：允许生成分析报告 -->
+                                <buildArg>--emit build-report</buildArg>
+                                <!-- 关键点：把上面定义的变量引用进来（实现动态追加） -->
+                            </buildArgs>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>build-native</id>
+                                <goals>
+                                    <goal>compile-no-fork</goal>
+                                </goals>
+                                <phase>package</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
 
 
-        </profiles>
+    </profiles>
 
 
-        </project>
+</project>

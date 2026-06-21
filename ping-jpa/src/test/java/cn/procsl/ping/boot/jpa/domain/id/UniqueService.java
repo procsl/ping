@@ -14,7 +14,7 @@
 //
 //    IdentifierGenerator<Long> idGenerator = new SimpleLongIdGenerator();
 //
-//    @Inject
+//    @Autowired
 //    EntityManager entityManager;
 //
 //    @Transactional

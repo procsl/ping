@@ -18,7 +18,7 @@
 //public class SearchRepositoryTest {
 //
 //
-//    @Inject
+//    @Autowired
 //    EntityManager em;
 //
 //    Long mainId;

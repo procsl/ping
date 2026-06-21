@@ -38,13 +38,13 @@
 //@SpringBootTest(classes = TestJpaApplication.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 //public class JpaExtensionRepositoryImplTest {
 //
-//    @Inject
+//    @Autowired
 //    JpaRepository<TestEntity, Long> jpaRepository;
 //
-//    @Inject
+//    @Autowired
 //    EntityManager entityManager;
 //
-////    @Inject
+////    @Autowired
 ////    ConversionService conversionService;
 //
 //    @RepeatedTest(10)

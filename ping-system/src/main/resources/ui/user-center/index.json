@@ -1,0 +1,17 @@
+{
+  "name": "user-center",
+  "functions": [
+    {
+      "type": "table",
+      "reference": "@API:用户信息列表查询"
+    },
+    {
+      "type": "action",
+      "reference": "@API:删除用户"
+    },
+    {
+      "type": "action",
+      "reference": "@API:添加用户"
+    }
+  ]
+}

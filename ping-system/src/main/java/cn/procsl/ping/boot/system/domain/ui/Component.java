@@ -1,14 +1,30 @@
 package cn.procsl.ping.boot.system.domain.ui;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 组件定义
  */
-public interface Component {
+@Getter
+@Setter(value = AccessLevel.PACKAGE)
+public class Component implements Serializable {
 
-    Long ROOT_ID = 0L;
+    String name;
+    String type;
 
-    Long getId();
+    Map<String, Object> attributes;
 
-    String getType();
+    public void addAttribute(String key, Object value) {
+        if (attributes == null) {
+            this.attributes = new HashMap<>();
+        }
+        this.attributes.put(key, value);
+    }
 
 }

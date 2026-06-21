@@ -1,5 +1,6 @@
 package cn.procsl.ping.boot.product.api;
 
+import cn.procsl.ping.boot.product.domain.Product;
 import cn.procsl.ping.boot.web.annotation.RequestBodySecurityIds;
 import cn.procsl.ping.boot.web.annotation.SecurityId;
 import jakarta.servlet.http.HttpServletRequest;
@@ -7,6 +8,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductController {
 
-    final HttpServletRequest request;
+    final JpaRepository<Product, Long> jpaRepository;
 
     @PostMapping("/v1/products/{id}")
     public void publishProduct(@PathVariable(name = "id") @SecurityId(scope = "product") Long product) {

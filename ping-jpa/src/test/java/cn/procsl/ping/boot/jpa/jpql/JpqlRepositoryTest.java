@@ -18,7 +18,7 @@
 //@SpringBootTest(classes = TestJpaApplication.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 //public class JpqlRepositoryTest {
 //
-//    @Inject
+//    @Autowired
 //    JpqlRepository jpqlRepository;
 //
 //    @Test

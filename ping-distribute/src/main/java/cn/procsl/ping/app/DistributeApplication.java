@@ -19,7 +19,7 @@ public class DistributeApplication {
 
     final static String apache = "https://www.apache.org/licenses/LICENSE-2.0";
 
-    static void main(String[] args) {
+    public static void main(String[] args) {
 
         SpringApplication.run(DistributeApplication.class, args);
     }

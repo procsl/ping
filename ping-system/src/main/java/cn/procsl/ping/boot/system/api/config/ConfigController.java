@@ -2,6 +2,7 @@ package cn.procsl.ping.boot.system.api.config;
 
 import cn.procsl.ping.boot.common.BusinessException;
 import cn.procsl.ping.boot.system.domain.config.Config;
+import cn.procsl.ping.boot.system.domain.ui.ResourceReference;
 import cn.procsl.ping.boot.system.service.ConfigService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,6 +26,7 @@ public class ConfigController {
     final JpaRepository<Config, Long> jpaRepository;
 
     @Operation(summary = "编辑配置项")
+    @ResourceReference(name = "编辑配置项")
     @PutMapping(path = "/v1/system/configs/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional(rollbackFor = Exception.class)
@@ -34,6 +36,7 @@ public class ConfigController {
     }
 
     @Operation(summary = "创建或更新配置项")
+    @ResourceReference(name = "创建配置项")
     @PostMapping(path = "/v1/system/configs")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional(rollbackFor = Exception.class)
@@ -43,6 +46,7 @@ public class ConfigController {
 
 
     @Operation(summary = "删除配置项")
+    @ResourceReference(name = "删除配置项")
     @DeleteMapping(path = "/v1/system/configs/{id}")
     @Transactional(rollbackFor = Exception.class)
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -51,6 +55,7 @@ public class ConfigController {
     }
 
     @Operation(summary = "获取配置内容")
+    @ResourceReference(name = "获取配置项")
     @GetMapping(path = "/v1/system/configs/{name}")
     @Transactional(rollbackFor = Exception.class, readOnly = true)
     public ConfigNameValueDTO getConfig(@PathVariable String name) {
