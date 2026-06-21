@@ -73,7 +73,7 @@ public class RestWebAutoConfiguration implements WebMvcConfigurer, BeanPostProce
     @ConditionalOnClass(name = {"io.swagger.v3.core.jackson.ModelResolver",
         "com.fasterxml.jackson.databind.ObjectMapper",
         "org.springdoc.core.properties.SpringDocConfigProperties"})
-    @ConditionalOnBean(type = "org.springdoc.core.properties.SpringDocConfigProperties")
+//    @ConditionalOnBean(type = "org.springdoc.core.properties.SpringDocConfigProperties")
     public Object modelResolver(ApplicationContext context) throws Exception {
         log.info("加载解析: spring.jackson.property-naming-strategy Springdoc配置项");
         // 2. 动态加载 SpringDocConfigProperties 实例
