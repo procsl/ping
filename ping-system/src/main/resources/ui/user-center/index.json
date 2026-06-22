@@ -8,7 +8,7 @@
       "functions": [
         {
           "type": "column",
-          "reference-api": "修改用户账户状态"
+          "api": "修改用户账户状态"
         }
       ]
     },
