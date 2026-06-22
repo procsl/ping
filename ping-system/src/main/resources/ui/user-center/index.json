@@ -1,17 +1,20 @@
 {
+  "type": "page",
   "name": "user-center",
   "functions": [
     {
       "type": "table",
-      "reference": "@API:用户信息列表查询"
+      "api": "获取用户列表",
+      "functions": [
+        {
+          "type": "column",
+          "reference-api": "修改用户账户状态"
+        }
+      ]
     },
     {
       "type": "action",
-      "reference": "@API:删除用户"
-    },
-    {
-      "type": "action",
-      "reference": "@API:添加用户"
+      "api": "重置用户密码"
     }
   ]
 }
