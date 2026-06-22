@@ -3,7 +3,6 @@ package cn.procsl.ping.boot.system.api.ui;
 import cn.procsl.ping.boot.common.BusinessException;
 import cn.procsl.ping.boot.system.domain.ui.Component;
 import cn.procsl.ping.boot.system.domain.ui.ResourceReference;
-import cn.procsl.ping.boot.system.domain.ui.ResourceRegistry;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -21,14 +20,13 @@ import java.util.List;
 @Tag(name = "UI", description = "系统UI接口")
 public class UIController {
 
-    final ResourceRegistry resourceRegistry;
 
     @Operation(summary = "用户菜单列表")
     @ResourceReference(name = "用户菜单列表")
     @PutMapping(path = "/v1/system/menus")
     @ResponseStatus(HttpStatus.OK)
     public List<Component> menus() throws BusinessException {
-        return this.resourceRegistry.getComponentById(null);
+        return null;
     }
 
 }

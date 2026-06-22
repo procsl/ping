@@ -3,11 +3,9 @@ package cn.procsl.ping.boot.system;
 import cn.procsl.ping.boot.jpa.support.EnableDomainRepositories;
 import cn.procsl.ping.boot.system.api.user.AuthenticateInterceptor;
 import cn.procsl.ping.boot.system.constant.SystemConfigureProperties;
-import cn.procsl.ping.boot.system.domain.ui.ResourceRegistry;
 import cn.procsl.ping.boot.system.service.ConfigService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -27,7 +25,6 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -50,11 +47,6 @@ public class SystemAutoConfiguration implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new AuthenticateInterceptor(systemConfigureProperties.getAuthenticatesPrefix()))
             .excludePathPatterns(PUBLIC_STATIC_RESOURCES).addPathPatterns("/**");
-    }
-
-    @Bean
-    public ResourceRegistry resourceRegistry(RequestMappingHandlerMapping handlerMapping) {
-        return new ResourceRegistry(handlerMapping);
     }
 
 
