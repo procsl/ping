@@ -1,195 +1,212 @@
+
 package cn.procsl.ping.boot.system.domain.ui;
 
-
-import lombok.AllArgsConstructor;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.stereotype.Service;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.ObjectNode;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@AllArgsConstructor
+@Service
 public class UiSchemaService {
 
-    private final JsonMapper jsonMapper = JsonMapper.shared();
-    private final PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+    private final UiSchemaRepository repository = new UiSchemaRepository(new JsonMapper());
 
-    /**
-     * 加载并拼装所有菜单
-     */
-    public JsonNode loadAndAssembleAllMenus() throws IOException {
-        // 1. 加载全局 OpenAPI 的 API 映射表，同时获取整个原始的 components/schemas 节点
-        JsonNode openApiRoot = loadOpenApiRoot();
-        Map<String, JsonNode> openApiMap = parseOpenApiMap(openApiRoot);
-        JsonNode globalSchemas = openApiRoot != null && openApiRoot.get("components") != null
-            ? openApiRoot.get("components").get("schemas") : null;
+    public List<UiComponent> loadAll() {
+        List<UiComponent> pages = repository.findAll();
+        JsonNode doc = repository.loadOpenapiDoc();
 
-        // 2. 检索并遍历所有菜单文件
-        Resource[] menuResources = resolver.getResources("classpath:ui/*/index.json");
-        ArrayNode allMenusResult = jsonMapper.createArrayNode();
+        Map<String, JsonNode> apiMap = compileApiMap(doc);
 
-        for (Resource resource : menuResources) {
-            if (!resource.exists()) continue;
-
-            try (InputStream is = resource.getInputStream()) {
-                JsonNode menuRoot = jsonMapper.readTree(is);
-                if (!(menuRoot instanceof ObjectNode menuObj)) continue;
-
-                // 3. 处理当前菜单引用，并收集当前菜单用到的所有 $ref
-                Set<String> referencedSchemaNames = new HashSet<>();
-                processMenuFunctions(menuObj, openApiMap, referencedSchemaNames);
-
-                // 4. 根据收集到的初始 ref，递归追溯所有深层嵌套的关联 ref
-                ObjectNode menuSchemasNode = jsonMapper.createObjectNode();
-                populateMenuSchemas(referencedSchemaNames, globalSchemas, menuSchemasNode);
-
-                // 5. 在菜单根层级注入 schemas 字段
-                menuObj.set("schemas", menuSchemasNode);
-                allMenusResult.add(menuObj);
-            }
+        for (UiComponent page : pages) {
+            resolveUiComponentApi(page, apiMap);
         }
-        return allMenusResult;
+
+        return pages;
     }
 
-    /**
-     * 遍历处理 functions，并收集第一层 API 结构里出现的所有 $ref
-     */
-    private void processMenuFunctions(ObjectNode menuObj, Map<String, JsonNode> openApiMap, Set<String> refContainer) {
-        JsonNode functions = menuObj.get("functions");
-        if (functions == null || !functions.isArray()) return;
-
-        for (JsonNode functionNode : functions) {
-            if (!(functionNode instanceof ObjectNode funcObj)) continue;
-
-            JsonNode refNode = funcObj.get("reference");
-            if (refNode == null || !refNode.isString()) continue;
-
-            String referenceText = refNode.asString();
-            if (!referenceText.startsWith("@API:")) continue;
-
-            String summaryKey = referenceText.substring(5).trim();
-            JsonNode matchedApi = openApiMap.get(summaryKey);
-            if (matchedApi == null) continue;
-
-            funcObj.set("reference", matchedApi);
-
-            // 扫描这个 API 内部所有的 $ref 节点
-            findRefKeys(matchedApi, refContainer);
-        }
-    }
-
-    /**
-     * 深度优先/递归提取 Json 节点树中所有包含 "$ref" 的值（提取出最后的类名）
-     */
-    private void findRefKeys(JsonNode node, Set<String> container) {
-        if (node == null) return;
-
-        if (node.has("$ref")) {
-            String refValue = node.get("$ref").asString();
-            // 例如从 "#/components/schemas/UserVO" 截取出 "UserVO"
-            String schemaName = refValue.substring(refValue.lastIndexOf("/") + 1);
-            container.add(schemaName);
-        }
-
-        // 无论是对象还是数组，直接利用 Jackson 3 的原生特性向下隐式迭代
-        for (JsonNode child : node) {
-            findRefKeys(child, container);
-        }
-    }
-
-    /**
-     * 递归追溯：有些 Schema 内部还引用了其他 Schema，必须连坐式全部连根拔起
-     */
-    private void populateMenuSchemas(Set<String> refNames, JsonNode globalSchemas, ObjectNode resultNode) {
-        if (globalSchemas == null || refNames.isEmpty()) return;
-
-        // 复制一份当前需要处理的 key，防止在循环中直接修改集合导致并发修改异常
-        Set<String> currentRound = new HashSet<>(refNames);
-        refNames.clear(); // 清空以备下一轮存储新发现的深层依赖
-
-        for (String schemaName : currentRound) {
-            if (resultNode.has(schemaName)) continue;
-
-            JsonNode schemaDefinition = globalSchemas.get(schemaName);
-            if (schemaDefinition == null) continue;
-
-            // 存入当前菜单的 schemas 结果集中
-            resultNode.set(schemaName, schemaDefinition);
-
-            // 检查这个 Schema 内部是否又潜伏了其他的 $ref 依赖
-            Set<String> deepRefs = new HashSet<>();
-            findRefKeys(schemaDefinition, deepRefs);
-
-            // 排除已经存在于结果集中的，剩下的放进下一轮备查
-            for (String deepRef : deepRefs) {
-                if (resultNode.has(deepRef)) continue;
-                refNames.add(deepRef);
-            }
-        }
-
-        // 递归进入下一层，直到没有新发现的 $ref 为止
-        populateMenuSchemas(refNames, globalSchemas, resultNode);
-    }
-
-    /**
-     * 获取 OpenAPI 的根节点
-     */
-    private JsonNode loadOpenApiRoot() throws IOException {
-        Resource openApiResource = resolver.getResource("classpath:ping-api-doc/openapi.json");
-        if (!openApiResource.exists()) return null;
-        try (InputStream is = openApiResource.getInputStream()) {
-            return jsonMapper.readTree(is);
-        }
-    }
-
-    /**
-     * 解析生成 summary -> API 定义的映射表
-     */
-    private Map<String, JsonNode> parseOpenApiMap(JsonNode openApiRoot) {
+    private Map<String, JsonNode> compileApiMap(JsonNode doc) {
         Map<String, JsonNode> apiMap = new HashMap<>();
-        if (openApiRoot == null) return apiMap;
+        JsonNode paths = doc.path("paths");
+        JsonNode globalSchemas = doc.path("components").path("schemas");
 
-        JsonNode paths = openApiRoot.get("paths");
-        if (paths == null) return apiMap;
+        if (paths.isMissingNode()) {
+            return apiMap;
+        }
 
-        for (String path : paths.propertyNames()) {
-            extractApiMethods(path, paths.get(path), apiMap);
+        for (var pathEntry : paths.properties()) {
+            String path = pathEntry.getKey();
+
+            for (var methodEntry : pathEntry.getValue().properties()) {
+                String method = methodEntry.getKey();
+                JsonNode operation = methodEntry.getValue();
+                String summary = operation.path("summary").asString();
+
+                if (summary.isBlank()) {
+                    continue;
+                }
+
+                if (operation.deepCopy() instanceof ObjectNode wrapper) {
+                    processSingleApiNode(wrapper, path, method, globalSchemas);
+                    apiMap.put(summary, wrapper);
+                }
+            }
         }
         return apiMap;
     }
 
+    private void processSingleApiNode(ObjectNode wrapper, String path, String method, JsonNode globalSchemas) {
+        wrapper.put("path", path);
+        wrapper.put("method", method.toUpperCase());
+        wrapper.remove("tags");
+        wrapper.remove("summary");
+
+        // 1. 处理并打平 requestBody
+        flattenRequestBody(wrapper);
+
+        // 2. 处理、打平并重命名 responses -> response
+        flattenAndRenameResponses(wrapper);
+
+        // 3. 递归解析 $ref 引用
+        resolveReferences(wrapper, globalSchemas, new HashSet<>());
+
+        // 4. 递归清除整个节点中的 example
+        stripExamples(wrapper);
+    }
+
     /**
-     * 抽取单个路径下的方法
+     * 打平 requestBody 结构
      */
-    private void extractApiMethods(String path, JsonNode methods, Map<String, JsonNode> apiMap) {
-        if (methods == null) return;
+    private void flattenRequestBody(ObjectNode wrapper) {
+        if (!(wrapper.path("requestBody") instanceof ObjectNode requestBody)) {
+            return;
+        }
 
-        for (String propertyName : methods.propertyNames()) {
-            JsonNode apiInfo = methods.get(propertyName);
-            if (apiInfo == null) continue;
+        JsonNode contentNode = requestBody.path("content");
+        if (contentNode instanceof ObjectNode contentObj) {
+            contentObj.properties().stream().findFirst().ifPresent(firstContent -> {
+                requestBody.put("contentType", firstContent.getKey());
+                JsonNode mediaTypeObj = firstContent.getValue();
+                if (!mediaTypeObj.path("schema").isMissingNode()) {
+                    requestBody.set("schema", mediaTypeObj.path("schema"));
+                }
+            });
+            requestBody.remove("content");
+        }
+    }
 
-            JsonNode summaryNode = apiInfo.get("summary");
-            if (summaryNode == null) continue;
+    /**
+     * 打平 2xx 响应结构，并将其重命名为单数 "response"
+     */
+    private void flattenAndRenameResponses(ObjectNode wrapper) {
+        if (!(wrapper.path("responses") instanceof ObjectNode responses)) {
+            return;
+        }
 
-            ObjectNode details = jsonMapper.createObjectNode();
-            details.put("path", path);
-            details.put("method", propertyName);
-            details.set("summary", summaryNode);
+        // 提取原有的 responses，找寻第一个 2xx 节点
+        var targetEntry = responses.properties().stream()
+            .filter(entry -> entry.getKey().startsWith("2"))
+            .findFirst();
 
-            if (apiInfo.get("operationId") != null) details.set("operationId", apiInfo.get("operationId"));
-            if (apiInfo.get("parameters") != null) details.set("parameters", apiInfo.get("parameters"));
-            if (apiInfo.get("requestBody") != null) details.set("requestBody", apiInfo.get("requestBody"));
-            if (apiInfo.get("responses") != null) details.set("responses", apiInfo.get("responses"));
+        // 移除旧的复数键名 "responses"
+        wrapper.remove("responses");
 
-            apiMap.put(summaryNode.asText().trim(), details);
+        if (targetEntry.isEmpty()) {
+            return;
+        }
+
+        String statusCode = targetEntry.get().getKey();
+        if (!(targetEntry.get().getValue() instanceof ObjectNode flatResponse)) {
+            return;
+        }
+
+        flatResponse.put("status", statusCode);
+
+        // 提取 content 内部结构
+        JsonNode contentNode = flatResponse.path("content");
+        if (contentNode instanceof ObjectNode contentObj) {
+            contentObj.properties().stream().findFirst().ifPresent(firstContent -> {
+                flatResponse.put("contentType", firstContent.getKey());
+                if (!firstContent.getValue().path("schema").isMissingNode()) {
+                    flatResponse.set("schema", firstContent.getValue().path("schema"));
+                }
+            });
+            flatResponse.remove("content");
+        }
+
+        // 重新绑定为单数的 "response"
+        wrapper.set("response", flatResponse);
+    }
+
+    private void resolveReferences(JsonNode node, JsonNode globalSchemas, Set<String> visited) {
+        if (node == null || node.isMissingNode()) {
+            return;
+        }
+
+        if (node instanceof ObjectNode objectNode) {
+            if (objectNode.has("$ref")) {
+                String refPath = objectNode.get("$ref").asString();
+                String schemaName = refPath.substring(refPath.lastIndexOf('/') + 1);
+
+                if (!visited.add(schemaName)) {
+                    objectNode.remove("$ref");
+                    objectNode.put("$circularRef", schemaName);
+                    return;
+                }
+
+                JsonNode targetSchema = globalSchemas.path(schemaName);
+                if (!targetSchema.isMissingNode()) {
+                    objectNode.remove("$ref");
+                    objectNode.setAll((ObjectNode) targetSchema.deepCopy());
+                    resolveReferences(objectNode, globalSchemas, new HashSet<>(visited));
+                }
+                return;
+            }
+
+            objectNode.properties().forEach(entry ->
+                resolveReferences(entry.getValue(), globalSchemas, new HashSet<>(visited))
+            );
+
+        } else if (node.isArray()) {
+            for (JsonNode element : node) {
+                resolveReferences(element, globalSchemas, new HashSet<>(visited));
+            }
+        }
+    }
+
+    private void stripExamples(JsonNode node) {
+        if (node == null || node.isMissingNode()) {
+            return;
+        }
+
+        if (node instanceof ObjectNode objectNode) {
+            objectNode.remove("example");
+            objectNode.properties().forEach(entry -> stripExamples(entry.getValue()));
+        } else if (node.isArray()) {
+            for (JsonNode element : node) {
+                stripExamples(element);
+            }
+        }
+    }
+
+    private void resolveUiComponentApi(UiComponent component, Map<String, JsonNode> apiMap) {
+        if (component == null) {
+            return;
+        }
+
+        if (component.getApi() != null) {
+            component.setApiDefinition(apiMap.get(component.getApi()));
+        }
+
+        if (component.getFunctions() != null) {
+            for (UiComponent child : component.getFunctions()) {
+                resolveUiComponentApi(child, apiMap);
+            }
         }
     }
 }
