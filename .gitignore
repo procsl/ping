@@ -36,3 +36,6 @@ logs
 **/node_modules/
 **/node_modules/**
 /ping-distribute/target2/
+
+### opencode ###
+.opencode/

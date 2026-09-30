@@ -14,9 +14,13 @@ import java.util.Set;
 public class ProjectionQueryAptProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        return false;
+        return true;
     }
 
+    @Override
+    public Set<String> getSupportedAnnotationTypes() {
+        return Set.of(Override.class.getCanonicalName());
+    }
 
     @Override
     public SourceVersion getSupportedSourceVersion() {

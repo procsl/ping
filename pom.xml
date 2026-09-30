@@ -5,13 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
 
 
-        <parent>
-            <groupId>org.springframework.boot</groupId>
-<!--            <artifactId>spring-boot-dependencies</artifactId>-->
-            <artifactId>spring-boot-starter-parent</artifactId>
-            <version>4.0.6</version>
-            <relativePath/>
-        </parent>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <!--            <artifactId>spring-boot-dependencies</artifactId>-->
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.0.6</version>
+        <relativePath/>
+    </parent>
 
     <groupId>cn.procsl</groupId>
     <artifactId>ping</artifactId>
@@ -54,14 +54,14 @@
     <dependencyManagement>
 
         <dependencies>
-<!--            <dependency>-->
-<!--                &lt;!&ndash; 从 Spring Boot 导入依赖管理 &ndash;&gt;-->
-<!--                <groupId>org.springframework.boot</groupId>-->
-<!--                <artifactId>spring-boot-dependencies</artifactId>-->
-<!--                <version>${springboot.version}</version>-->
-<!--                <type>pom</type>-->
-<!--                <scope>import</scope>-->
-<!--            </dependency>-->
+            <!--            <dependency>-->
+            <!--                &lt;!&ndash; 从 Spring Boot 导入依赖管理 &ndash;&gt;-->
+            <!--                <groupId>org.springframework.boot</groupId>-->
+            <!--                <artifactId>spring-boot-dependencies</artifactId>-->
+            <!--                <version>${springboot.version}</version>-->
+            <!--                <type>pom</type>-->
+            <!--                <scope>import</scope>-->
+            <!--            </dependency>-->
 
             <dependency>
                 <groupId>com.blazebit</groupId>
@@ -362,7 +362,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-<!--                    <version>${maven.compiler.plugin.version}</version>-->
+                    <!--                    <version>${maven.compiler.plugin.version}</version>-->
                     <configuration>
                         <release>${java.version}</release>
 
@@ -370,7 +370,7 @@
                             <path>
                                 <groupId>org.projectlombok</groupId>
                                 <artifactId>lombok</artifactId>
-                                                                <version>${lombok.version}</version>
+                                <version>${lombok.version}</version>
                             </path>
 
                             <path>
@@ -438,10 +438,10 @@
                     <version>${maven.surefire.plugin.version}</version>
                 </plugin>
 
-<!--                <plugin>-->
-<!--                    <groupId>org.graalvm.buildtools</groupId>-->
-<!--                    <artifactId>native-maven-plugin</artifactId>-->
-<!--                </plugin>-->
+                <!--                <plugin>-->
+                <!--                    <groupId>org.graalvm.buildtools</groupId>-->
+                <!--                    <artifactId>native-maven-plugin</artifactId>-->
+                <!--                </plugin>-->
 
 
                 <plugin>
