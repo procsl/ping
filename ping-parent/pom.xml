@@ -15,7 +15,7 @@
         <module>../ping-product</module>
         <module>../ping-system</module>
         <module>../ping-captcha</module>
-        <module>../ping-ai</module>
+        <module>../ping-ai</module>
         <!--        <module>../ping-im</module>-->
         <!--        <module>../ping-editor</module>-->
         <!--        <module>../ping-ui</module>-->
