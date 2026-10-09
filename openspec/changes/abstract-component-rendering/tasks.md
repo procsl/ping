@@ -36,15 +36,40 @@
 
 ## 4. 渲染器与前端工程
 
-- [ ] 4.1 在 `ping-ui` 建立前端工程（`package.json`、构建配置），复用 `ping-editor` 的 `exec-maven-plugin` + `maven-resources-plugin` 模式
-- [ ] 4.2 渲染器构建为 ESM 输出，`publicPath` 使用相对路径，产物落位 `META-INF/resources/assets/renderer/`
-- [ ] 4.3 实现主壳 `META-INF/resources/index.html`：加载渲染器并拉取 `/v1/ui/menus` 渲染
-- [ ] 4.4 实现组件树 → 前端路由表推导；按 `order` 排序同级节点
-- [ ] 4.5 实现内置组件注册表（`application`/`layout`/`menu`/`table`/`column`/`action` 等定稿 type）
-- [ ] 4.6 在 `ping-ui` 提供共享薄壳模板 `module-entry.html`
-- [ ] 4.7 打包期按 `${ping.module}` 复制模板为 `META-INF/resources/<module>/index.html`
+- [x] 4.1 在 `ping-ui` 建立前端工程（`package.json`、构建配置），复用 `ping-editor` 的 `exec-maven-plugin` + `maven-resources-plugin` 模式
+- [x] 4.2 渲染器构建为 ESM 输出，`publicPath` 使用相对路径，产物落位 `META-INF/resources/assets/renderer/`
+- [x] 4.3 实现主壳 `META-INF/resources/index.html`：加载渲染器并拉取 `/v1/ui/menus` 渲染
+      （实现为接口优先 + 静默降级本地声明，见 tasks 内「实现说明」；接口 `/v1/ui/menus` 由任务 2.3 提供）
+- [x] 4.4 实现组件树 → 前端路由表推导；按 `order` 排序同级节点
+      （`src/router/derive.ts`，路由统一两段式 `/xxx/xxx`，数据源可切换本地声明 / 后端接口）
+- [x] 4.5 实现内置组件注册表（`application`/`layout`/`menu`/`table`/`column`/`action` 等定稿 type）
+      （`src/components/renderer/registry.tsx`；`column`/`action` 由 `table` 渲染器 `data-table.tsx` 消费；
+      未知 type 降级占位并告警——定稿 type 取值域待任务 1.1 收敛）
+- [x] 4.6 在 `ping-ui` 提供共享薄壳模板 `module-entry.html`
+      （实现为 `src/main/resources/META-INF/ping/entry/index.html`——模板须预置为 `index.html` 文件名，
+      因 `maven-resources-plugin:copy-resources` 不支持复制时重命名；占位符 `@ping.module@` 以未过滤形态发布）
+- [x] 4.7 打包期按 `${ping.module}` 复制模板为 `META-INF/resources/<module>/index.html`
+      （ping-ui 自身实例化验证：`ping.module=ui` → `META-INF/resources/ui/index.html`，
+      由 `StaticAssetsTest` 断言占位符已替换）
 - [ ] 4.8 业务模块 `pom.xml` 声明模块标识属性（与处理器选项同源），不手写入口
-- [ ] 4.9 `./mvnw -Ph2 -DskipTests package` 后手工验证：聚形态根 `index.html` 可渲染全站
+      —— **阻塞**：前置变更 `standalone-module-packaging` 任务 1.1 未完成（`ping-ui` 仍在 `ping-parent` 业务层），
+      业务模块此刻依赖 `ping-ui` 会构成业务→业务依赖，违反同层禁止依赖约束；待移层后落地到 `ping-system`
+- [x] 4.9 `./mvnw -Ph2 -DskipTests package` 后手工验证：聚形态根 `index.html` 可渲染全站
+      （聚合 jar 经 `ping-distribute` 引入 `ping-ui`；起服验证 `/index.html`、`/ui/index.html`、
+      `/assets/renderer/renderer.js|css` 均 200，bundle 内含菜单声明数据；浏览器级渲染未覆盖）
+
+### 实现说明（本次落地）
+
+- 前端栈：React 19 + TypeScript + Vite 7 + Tailwind CSS v4 + shadcn/ui + react-router（用户决策）。
+- 开发态：`npm run dev`（vite，端口 5173，`/v1` 代理至 10000）；构建态：`npm run build`（`tsc --noEmit && vite build`），
+  产物固定文件名 `renderer.js`/`renderer.css`（薄壳模板才能写死 import 路径）。
+- 打包：`prepare-package` 执行 `exec-maven-plugin`（`npm run build`，可 `-Dping.npm.skip=true` 跳过）
+  → `maven-resources-plugin` 复制 `target/dist` → `META-INF/resources/assets/renderer/`；
+  薄壳生成在 `process-classes`（不依赖 node 产物，`mvn test` 即可验证）。
+- 菜单/路由首版使用本地声明（`src/data/default-tree.ts`），`loadManifest` 优先请求后端 `manifest` 接口，
+  失败降级本地声明 —— 对应用户决策「先本地声明，预留后端接口」。
+- 未覆盖（待后续任务）：SPA 深链刷新（`/system/user` 直接访问返回 404，需服务端 fallback）、
+  浏览器级渲染验证、`ping-distribute` 对 `ping-ui` 的依赖条目（为 4.9 聚合验证加入，与任务 1.2 同源）。
 
 ## 5. 组件动态加载与命名空间
 

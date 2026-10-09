@@ -52,6 +52,13 @@
             <version>${ping.version}</version>
         </dependency>
 
+        <!-- 渲染器与静态产物（主壳 index.html / assets/renderer）随聚合层发布 -->
+        <dependency>
+            <groupId>cn.procsl</groupId>
+            <artifactId>ping-ui</artifactId>
+            <version>${ping.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-xml</artifactId>

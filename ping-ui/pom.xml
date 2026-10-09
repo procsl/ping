@@ -14,8 +14,11 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- 模块标识：薄壳入口 META-INF/resources/<ping.module>/index.html，与 ping-apt 处理器选项同源 -->
+        <ping.module>ui</ping.module>
+        <!-- 无 node 环境时可 -Dping.npm.skip=true 跳过前端构建 -->
+        <ping.npm.skip>false</ping.npm.skip>
     </properties>
-
 
     <dependencies>
 
@@ -32,51 +35,89 @@
     </dependencies>
 
     <build>
-        <plugins>
-<!--            <plugin>-->
-<!--                <groupId>org.codehaus.mojo</groupId>-->
-<!--                <artifactId>exec-maven-plugin</artifactId>-->
-<!--                <version>3.1.0</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>exec-npm-run-build</id>-->
-<!--                        <phase>prepare-package</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>exec</goal>-->
-<!--                        </goals>-->
-<!--                        <configuration>-->
-<!--                            &lt;!&ndash;程序名称&ndash;&gt;-->
-<!--                            <executable>npm</executable>-->
-<!--                            <arguments>-->
-<!--                                &lt;!&ndash; 程序所执行的命令&ndash;&gt;-->
-<!--                                <argument>run</argument>-->
-<!--                                <argument>build</argument>-->
-<!--                            </arguments>-->
-<!--                            &lt;!&ndash;前端代码地址&ndash;&gt;-->
-<!--                            <workingDirectory>${basedir}</workingDirectory>-->
-<!--                        </configuration>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
+        <!-- 模板 META-INF/ping/entry/index.html 必须以未过滤形态发布（@ping.module@ 占位由使用方替换） -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <excludes>
+                    <exclude>*.jks</exclude>
+                    <exclude>*.pfx</exclude>
+                    <exclude>*.txt</exclude>
+                    <exclude>META-INF/ping/entry/index.html</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>META-INF/ping/entry/index.html</include>
+                </includes>
+            </resource>
+        </resources>
 
+        <plugins>
+            <!-- 前端构建：npm run build（vite） -->
             <plugin>
-                <!--maven-resources-plugin：maven复制文件插件-->
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>npm-run-build</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${ping.npm.skip}</skip>
+                            <executable>npm</executable>
+                            <arguments>
+                                <argument>run</argument>
+                                <argument>build</argument>
+                            </arguments>
+                            <workingDirectory>${basedir}</workingDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- 渲染器产物落位 META-INF/resources/assets/renderer/ -->
+            <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>copy-resource</id>
-                        <phase>package</phase>
+                        <id>copy-renderer-assets</id>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <!--输出文件路径-->
-                            <outputDirectory>${project.build.outputDirectory}/META-INF/resources/ui
-                            </outputDirectory>
+                            <outputDirectory>${project.build.outputDirectory}/META-INF/resources/assets/renderer</outputDirectory>
                             <resources>
                                 <resource>
-                                    <!--前端代码地址-->
                                     <directory>${project.build.directory}/dist</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+
+                    <!-- 本模块薄壳：META-INF/resources/<ping.module>/index.html（不依赖前端产物，测试期即可验证） -->
+                    <execution>
+                        <id>generate-module-entry</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}/META-INF/resources/${ping.module}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources/META-INF/ping/entry</directory>
+                                    <filtering>true</filtering>
+                                    <includes>
+                                        <include>index.html</include>
+                                    </includes>
                                 </resource>
                             </resources>
                         </configuration>
@@ -84,8 +125,6 @@
                 </executions>
             </plugin>
         </plugins>
-
     </build>
-
 
 </project>
