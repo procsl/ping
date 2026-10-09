@@ -1,4 +1,4 @@
-package cn.procsl.ping.ai.core;
+package cn.procsl.ping.boot.ai.core;
 
 public class ChatStreamService {
 
