@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { mockUserRows } from "@/mock"
 import type { RendererContext } from "@/components/renderer/registry"
 
 export interface DataTableProps {
@@ -29,10 +30,7 @@ export function DataTable({ node }: DataTableProps): React.ReactNode {
     )
   }
 
-  const rows = [
-    { id: "1", account: "admin", nickname: "管理员", status: "启用" },
-    { id: "2", account: "procsl", nickname: "开发者", status: "启用" },
-  ]
+  const rows = mockUserRows
 
   return (
     <div className="space-y-3">
@@ -80,7 +78,7 @@ export function DataTable({ node }: DataTableProps): React.ReactNode {
         </Table>
       </div>
       <p className="text-xs text-muted-foreground">
-        数据源：{node.apis?.[0]?.api ?? "未绑定 API"}（接口就绪后自动接入）
+        数据源：mock（声明 API：{node.apis?.[0]?.api ?? "未绑定"}，接入后端后自动切换）
       </p>
     </div>
   )

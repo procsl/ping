@@ -8,6 +8,12 @@ const backendPort = process.env.PING_BACKEND_PORT ?? "10000"
 
 export default defineConfig(({ mode }) => ({
   plugins: [react(), tailwindcss()],
+  // lib 模式不会自动替换 process.env.NODE_ENV，浏览器端会报 process is not defined
+  define: {
+    "process.env.NODE_ENV": JSON.stringify(
+      mode === "production" ? "production" : "development",
+    ),
+  },
   // 相对路径：薄壳位于 /<module>/index.html、主壳位于 /index.html，两级目录下均可解析
   base: "./",
   resolve: {

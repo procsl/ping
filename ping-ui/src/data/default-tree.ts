@@ -1,9 +1,9 @@
 import type { ComponentNode } from "@/schema/types"
 
 /**
- * 本地声明的默认组件树（开发/降级数据源）。
- * 待后端 GET /v1/ui/menus 就绪后，同一结构由接口返回，前端无需发版。
- * 路由统一为两段式：/xxx/xxx
+ * 本地组件树（当前唯一数据源，与后端接口解耦）。
+ * 路由统一两段式：/xxx/xxx；菜单只保留两项以验证框架效果。
+ * 后续接入 GET /v1/ui/menus 时由接口返回同构数据，前端无需发版。
  */
 export const defaultTree: ComponentNode = {
   type: "application",
@@ -47,51 +47,14 @@ export const defaultTree: ComponentNode = {
                   id: "table.system.user",
                   apis: [{ method: "GET", api: "/v1/system/users" }],
                   containers: [
-                    { type: "column", id: "col.username", name: "账号" },
+                    { type: "column", id: "col.account", name: "账号" },
                     { type: "column", id: "col.nickname", name: "昵称" },
                     { type: "column", id: "col.status", name: "状态" },
-                    {
-                      type: "action",
-                      id: "action.edit",
-                      name: "编辑",
-                    },
-                    {
-                      type: "action",
-                      id: "action.reset",
-                      name: "重置密码",
-                    },
+                    { type: "action", id: "action.edit", name: "编辑" },
+                    { type: "action", id: "action.reset", name: "重置密码" },
                   ],
                 },
               ],
-            },
-            {
-              type: "menu",
-              id: "menu.system.role",
-              name: "角色管理",
-              router: "system/role",
-              order: 2,
-            },
-            {
-              type: "menu",
-              id: "menu.system.menu",
-              name: "菜单管理",
-              router: "system/menu",
-              order: 3,
-            },
-          ],
-        },
-        {
-          type: "menu",
-          id: "menu.monitor",
-          name: "监控中心",
-          order: 3,
-          containers: [
-            {
-              type: "menu",
-              id: "menu.monitor.online",
-              name: "在线用户",
-              router: "monitor/online",
-              order: 1,
             },
           ],
         },
@@ -108,8 +71,7 @@ export const defaultTree: ComponentNode = {
             {
               type: "user_info_panel",
               id: "user_info_panel",
-              apis: [{ method: "GET", api: "/v1/system/authentications" }],
-              description: "用户信息面板",
+              description: "用户信息面板（mock）",
             },
           ],
         },

@@ -11,7 +11,6 @@ import {
 const TITLES: Record<string, string> = {
   home: "首页",
   system: "系统管理",
-  monitor: "监控中心",
 }
 
 /** 面包屑：按 /xxx/xxx 两段式路径逐级展开 */

@@ -5,15 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="ping-renderer" content="assets/renderer" />
     <title>Ping Admin</title>
-    <link rel="stylesheet" href="./assets/renderer/renderer.css" />
+    <link rel="stylesheet" href="./assets/renderer/renderer.css?v=@project.version@-@maven.build.timestamp@" />
   </head>
   <body>
     <div id="ping-root"></div>
     <script type="module">
-      import { mount } from "./assets/renderer/renderer.js"
+      import { mount } from "./assets/renderer/renderer.js?v=@project.version@-@maven.build.timestamp@"
       mount({
         namespace: "app",
-        manifest: "/v1/ui/menus",
         selector: "#ping-root",
       })
     </script>
