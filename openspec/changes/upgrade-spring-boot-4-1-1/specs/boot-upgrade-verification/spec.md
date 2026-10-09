@@ -39,7 +39,9 @@
 #### Scenario: 打包端到端成功
 
 - **WHEN** 执行 `./mvnw -Ph2 -DskipTests package`
-- **THEN** BUILD SUCCESS，`target/spring-doc/openapi.json`、`META-INF/ping/` 构建期产物与可执行 jar 均生成
+- **THEN** BUILD SUCCESS，OpenAPI 导出产物 `target/classes/ping-api-doc/openapi.json` 与可执行 jar（MANIFEST `Spring-Boot-Version: 4.1.1`、`Start-Class` 正确）均生成
+
+> 注（实现期修订）：`META-INF/ping/` 构建期产物与 `<Module>Launcher` 生成属变更 `standalone-module-packaging`，当前代码库尚无该生成器，不作为本变更门槛；`target/spring-doc/openapi.json` 是未绑定的 `springdoc-openapi-maven-plugin` 输出路径，实际导出走 `exec-maven-plugin`。
 
 #### Scenario: AOT 与测试跳过语义不受影响
 

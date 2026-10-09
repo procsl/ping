@@ -84,3 +84,8 @@
 
 - 生态版本是否收敛为根 pom 单一属性（消除 `springdoc.version` 双定义、SBA 四处硬编码）——建议留作后续重构变更，本变更只同步值。
 - native 冒烟是否纳入本次验收门槛（当前定位为可选，主门槛是 test + package）。
+
+### 实现期结论（2026-10-09）
+
+- **版本属性收敛**：维持现状。Maven `<parent>` 版本无法引用本 pom 属性，双写不可根除；`springdoc.version` 双定义与 SBA 四处硬编码本次仅同步值，收敛留待后续变更。一致性由 tasks 1.6 的 grep 断言保障（已通过）。
+- **native 冒烟**：执行时暴露环境约束——Boot 4.0.6→4.1.1 使 `native-maven-plugin` 从 0.11.5 跳到 1.1.8，其 reachability metadata 仓库 schema 要求比本机 GraalVM 25.0.0（`25+37.1`）更新的 25 patch。全部 JVM 模块构建成功，仅 native compile 步失败。是否升级门槛待用户决策（升级 GraalVM / pin 插件版本 / 维持可选并记录已知限制）。
