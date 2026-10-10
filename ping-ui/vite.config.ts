@@ -18,7 +18,7 @@ export default defineConfig(({ mode }) => ({
   base: "./",
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      "@": path.resolve(__dirname, "./src/main/js"),
     },
   },
   server: {
@@ -33,7 +33,7 @@ export default defineConfig(({ mode }) => ({
   build: {
     // 渲染器以 ESM 库形式产出，供主壳 / 薄壳 import
     lib: {
-      entry: path.resolve(__dirname, "src/main.tsx"),
+      entry: path.resolve(__dirname, "src/main/js/main.tsx"),
       formats: ["es"],
       fileName: () => "renderer.js",
     },
