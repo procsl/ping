@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { Outlet, useLocation } from "react-router"
 import type { ComponentNode } from "@/schema/types"
-import { deriveMenu, deriveRoutes } from "@/router/derive"
+import { deriveMenu, deriveRoutes, filterMenus } from "@/router/derive"
 import type { RendererContext } from "@/components/renderer/registry"
 import { Sidebar } from "@/layout/Sidebar"
 import { Header } from "@/layout/Header"
@@ -29,6 +29,7 @@ export function AdminLayout({
   const [collapsed, setCollapsed] = useState(
     () => localStorage.getItem("ping.collapsed") === "true",
   )
+  const [query, setQuery] = useState("")
 
   useEffect(() => {
     localStorage.setItem("ping.collapsed", String(collapsed))
@@ -36,20 +37,27 @@ export function AdminLayout({
 
   const menus = useMemo(() => deriveMenu(tree), [tree])
   const routes = useMemo(() => deriveRoutes(tree), [tree])
+  const visibleMenus = useMemo(
+    () => filterMenus(menus, query),
+    [menus, query],
+  )
 
   const ctx: RendererContext = {
     namespace,
     activePath: location.pathname,
     collapsed,
+    searching: query.trim().length > 0,
   }
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background">
       <Sidebar
         title={title}
-        menus={menus}
+        menus={visibleMenus}
         ctx={ctx}
         collapsed={collapsed}
+        query={query}
+        onQueryChange={setQuery}
       />
 
       <div className="flex min-w-0 flex-1 flex-col">

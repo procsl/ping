@@ -1,9 +1,12 @@
+import { useState } from "react"
 import type { ComponentNode } from "@/schema/types"
 import { Link } from "react-router"
+import { ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { UserPanel } from "@/layout/UserPanel"
 import { RouteOutlet } from "@/router/RouteOutlet"
 import { DataTable } from "@/components/renderer/data-table"
+import { Placeholder } from "@/pages/Placeholder"
 
 export interface RendererContext {
   /** 模块命名空间，动态组件按 /assets/<namespace>/components/<type>.js 寻址 */
@@ -12,6 +15,8 @@ export interface RendererContext {
   activePath: string
   /** 侧栏是否折叠（菜单按此收敛为图标态） */
   collapsed?: boolean
+  /** 侧栏搜索是否有关键字（搜索态下菜单分组强制展开） */
+  searching?: boolean
 }
 
 export interface NodeRendererProps {
@@ -33,23 +38,51 @@ function renderChildren(
 function Menu({ node, ctx }: NodeRendererProps): React.ReactNode {
   const children = node.containers ?? []
   const collapsed = ctx.collapsed ?? false
+  const searching = ctx.searching ?? false
+  const [open, setOpen] = useState(true)
+  const menuChildren = children.filter((child) => child.type === "menu")
 
-  if (children.length > 0) {
+  // 分组：子节点是菜单项 → 分组标题可点击展开/折叠（默认展开）
+  if (menuChildren.length > 0) {
     if (collapsed) {
       return (
         <div className="my-1 border-b border-sidebar-border/60 pb-1 pt-2" />
       )
     }
+    const expanded = open || searching
     return (
       <div className="px-2 pb-1 pt-3">
-        <div className="mb-1 px-2 text-xs font-medium text-muted-foreground">
-          {node.name ?? node.id}
-        </div>
-        <div className="space-y-0.5">{renderChildren(node, ctx)}</div>
+        <button
+          type="button"
+          aria-expanded={expanded}
+          onClick={() => {
+            if (!searching) {
+              setOpen(!expanded)
+            }
+          }}
+          className={cn(
+            "flex w-full items-center justify-between rounded-md px-2 py-1 text-xs font-medium transition-colors",
+            "text-muted-foreground hover:text-foreground",
+            searching && "cursor-default",
+          )}
+          title={node.name ?? node.id}
+        >
+          <span className="truncate">{node.name ?? node.id}</span>
+          <ChevronDown
+            className={cn(
+              "h-3.5 w-3.5 shrink-0 transition-transform duration-200",
+              expanded ? "rotate-180" : "rotate-0",
+            )}
+          />
+        </button>
+        {expanded && (
+          <div className="mt-1 space-y-0.5">{renderChildren(node, ctx)}</div>
+        )}
       </div>
     )
   }
 
+  // 叶子菜单项：其 containers 是页面内容（table / placeholder 等），由路由页渲染，侧栏只出链接
   if (!node.router) {
     return null
   }
@@ -103,6 +136,7 @@ export const registry: Record<string, NodeRenderer> = {
   user_info_panel: () => <UserPanel />,
   main_container: () => <RouteOutlet />,
   table: ({ node, ctx }) => <DataTable node={node} ctx={ctx} />,
+  placeholder: ({ node }) => <Placeholder name={node.name} id={node.id} />,
   application: ({ node, ctx }) => <>{renderChildren(node, ctx)}</>,
   layout: ({ node, ctx }) => <>{renderChildren(node, ctx)}</>,
 }

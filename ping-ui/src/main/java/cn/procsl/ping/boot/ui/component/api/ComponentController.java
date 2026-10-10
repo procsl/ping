@@ -1,10 +1,8 @@
 package cn.procsl.ping.boot.ui.component.api;
 
 import cn.procsl.ping.boot.ui.domain.Component;
-import cn.procsl.ping.boot.ui.domain.ComponentProjectionRepository;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,8 +21,6 @@ import java.io.InputStream;
 public class ComponentController implements InitializingBean {
 
     final JpaRepository<Component, Long> jpaRepository;
-
-    final ComponentProjectionRepository repository;
 
     final ComponentMapper componentMapper;
 

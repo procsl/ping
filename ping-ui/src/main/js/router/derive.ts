@@ -60,3 +60,43 @@ export function deriveMenu(tree: ComponentNode): ComponentNode[] {
   visit(tree)
   return roots.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
 }
+
+/**
+ * 侧栏菜单搜索：按关键字过滤菜单树。
+ * 关键字忽略首尾空白与大小写，按菜单项名称匹配；
+ * 只有命中菜单项的分组会连同其祖先链保留，未命中的分组整体移除；
+ * 关键字为空时原样返回整棵树。
+ */
+export function filterMenus(
+  menus: ComponentNode[],
+  query: string,
+): ComponentNode[] {
+  const keyword = query.trim().toLowerCase()
+  if (!keyword) {
+    return menus
+  }
+
+  const matches = (node: ComponentNode): boolean =>
+    (node.name ?? node.id ?? "").toLowerCase().includes(keyword)
+
+  const isGroup = (node: ComponentNode): boolean =>
+    (node.containers ?? []).some((child) => child.type === "menu")
+
+  const filterGroup = (group: ComponentNode): ComponentNode | null => {
+    const items = (group.containers ?? [])
+      .filter((child) => child.type === "menu")
+      .map((child) =>
+        isGroup(child)
+          ? filterGroup(child)
+          : matches(child)
+            ? child
+            : null,
+      )
+      .filter((child): child is ComponentNode => child !== null)
+    return items.length > 0 ? { ...group, containers: items } : null
+  }
+
+  return menus
+    .map((menu) => (isGroup(menu) ? filterGroup(menu) : null))
+    .filter((menu): menu is ComponentNode => menu !== null)
+}
