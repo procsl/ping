@@ -1,0 +1,15 @@
+{
+  "type": "breadcrumb",
+  "name": "面包屑",
+  "category": "navigation",
+  "description": "页面级位置指示，不承载内容；导航项由 items 属性声明",
+  "children": [],
+  "properties": [
+    {
+      "name": "items",
+      "type": "array",
+      "required": true,
+      "description": "导航项数组，每项含 name 与 router，末项无 router"
+    }
+  ]
+}

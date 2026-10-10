@@ -1,0 +1,29 @@
+{
+  "type": "query",
+  "name": "查询条件",
+  "category": "data",
+  "description": "数据表的输入参数容器，即该表的入参",
+  "children": [
+    "field"
+  ],
+  "properties": [
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "表单区标题"
+    },
+    {
+      "name": "collapse",
+      "type": "boolean",
+      "required": false,
+      "description": "是否可折叠"
+    },
+    {
+      "name": "collapsed",
+      "type": "boolean",
+      "required": false,
+      "description": "初始折叠"
+    }
+  ]
+}

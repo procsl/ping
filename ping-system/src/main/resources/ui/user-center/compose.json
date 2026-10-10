@@ -1,0 +1,60 @@
+{
+  "type": "dataset",
+  "id": "dataset.user-center",
+  "name": "用户管理",
+  "router": "system/user",
+  "order": 1,
+  "description": "系统用户管理",
+  "api": "@ResourceReference:获取用户列表",
+  "row_key": "id",
+  "selectable": true,
+  "containers": [
+    {
+      "type": "query",
+      "id": "query.user-center",
+      "name": "查询条件",
+      "collapse": true,
+      "collapsed": false,
+      "containers": [
+        {
+          "type": "field", "id": "f.account", "name": "account", "label": "账号",
+          "widget": "input", "placeholder": "请输入账号", "max_length": 64
+        },
+        {
+          "type": "field", "id": "f.status", "name": "status", "label": "状态",
+          "widget": "select",
+          "options": [
+            {"value": "1", "label": "启用"},
+            {"value": "0", "label": "停用"}
+          ]
+        }
+      ]
+    },
+    {"type": "column", "id": "col.account", "field": "account", "name": "账号", "sortable": true},
+    {"type": "column", "id": "col.nickname", "field": "nickname", "name": "昵称"},
+    {
+      "type": "column", "id": "col.status", "field": "status", "name": "状态",
+      "sortable": true, "format": "enum",
+      "enum": {"1": "启用", "0": "停用"}
+    },
+    {
+      "type": "column", "id": "col.create_time", "field": "create_time", "name": "创建时间",
+      "sortable": true, "format": "date", "width": 180
+    },
+    {
+      "type": "action", "id": "action.create", "name": "新建用户",
+      "variant": "primary", "placement": "toolbar"
+    },
+    {
+      "type": "row_action", "id": "ra.reset_password", "name": "重置密码",
+      "api": "@ResourceReference:重置用户密码",
+      "confirm": "确认重置该用户的登录密码？",
+      "danger": true
+    },
+    {
+      "type": "row_action", "id": "ra.toggle_status", "name": "切换状态",
+      "api": "@ResourceReference:修改用户账户状态",
+      "confirm": "确认切换该用户的状态？"
+    }
+  ]
+}

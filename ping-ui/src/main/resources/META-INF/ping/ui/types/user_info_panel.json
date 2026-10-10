@@ -1,0 +1,15 @@
+{
+  "type": "user_info_panel",
+  "name": "用户信息面板",
+  "category": "shell",
+  "description": "顶栏右侧的当前登录用户展示与操作",
+  "children": [],
+  "properties": [
+    {
+      "name": "api",
+      "type": "object",
+      "required": false,
+      "description": "获取用户信息的接口"
+    }
+  ]
+}

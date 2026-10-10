@@ -1,0 +1,15 @@
+{
+  "type": "placeholder",
+  "name": "页面占位",
+  "category": "state",
+  "description": "明确告知页面在建设中，保证菜单切换有可辨识的内容差异",
+  "children": [],
+  "properties": [
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "description": "页面名"
+    }
+  ]
+}

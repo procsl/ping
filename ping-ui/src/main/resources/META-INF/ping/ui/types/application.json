@@ -1,0 +1,23 @@
+{
+  "type": "application",
+  "name": "应用",
+  "category": "container",
+  "description": "整棵组件树的根，声明应用标识与标题",
+  "children": [
+    "layout",
+    "nav_group",
+    "menu",
+    "tabs",
+    "breadcrumb",
+    "user_info_panel",
+    "main_container"
+  ],
+  "properties": [
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "description": "应用名，显示在侧栏 logo 位"
+    }
+  ]
+}

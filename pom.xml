@@ -257,8 +257,19 @@
                     <exclude>*.jks</exclude>
                     <exclude>*.pfx</exclude>
                     <exclude>*.txt</exclude>
+                    <!-- 抽象组件描述与类型定义不参与 @...@ 过滤：内容含 @ResourceReference: 引用语法 -->
+                    <exclude>ui/**</exclude>
+                    <exclude>META-INF/ping/ui/**</exclude>
                 </excludes>
 
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>ui/**</include>
+                    <include>META-INF/ping/ui/**</include>
+                </includes>
             </resource>
         </resources>
 

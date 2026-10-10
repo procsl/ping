@@ -15,7 +15,7 @@
 ## 模块
 
 - reactor：`ping-parent`（→ `ping-product` `ping-system` `ping-captcha` `ping-ai`）、`ping-common`、`ping-web`、`ping-jpa`、`ping-distribute`
-- 已停用（pom 中注释，不参与构建）：`ping-connect` `ping-im` `ping-editor` `ping-ui` `ping-batch`
+- 已停用（pom 中注释，不参与构建）：`ping-connect` `ping-im` `ping-editor` `ping-batch`
 - 独立工程（只能 `-f` 构建）：`ping-apt`、`ping-tool`
 - 唯一入口：`cn.procsl.ping.app.DistributeApplication`，端口 10000
 - 自动配置类登记到 `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`（`spring.factories` 是遗留，不读）
@@ -51,7 +51,7 @@
 **配置与前端**
 
 - **配置只用 properties，禁 yaml**
-- 前端走**抽象组件**，**否决微前端**；`ping-ui` 是需要前端的模块的公共依赖，机制归 `ping-ui`，业务模块只交 `ui/<page>/index.json` 声明
+- 前端走**抽象组件**，**否决微前端**；`ping-ui` 是需要前端的模块的公共依赖，机制归 `ping-ui`，业务模块只交 `ui/<page>/compose.json` 声明（规范见 `ping-ui/doc/abstract-component-schema.md`）
 - schema 以 `ping-ui` 为准；API 关联用 `@ResourceReference` 稳定标识，不用 `@Operation(summary)` 中文文案
 - 静态资源进各自 jar `META-INF/resources/<module>/`，薄壳 `<module>/index.html`；散访 `/<module>/index.html`，聚访 `/index.html`，**共用同一渲染器**，node 构建仅在有自定义组件时需要
 - 动态加载粒度是**组件**，不是子应用；权限落菜单层 + API 层，**静态资源保持放行**（登录页要可达）

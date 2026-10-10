@@ -1,0 +1,57 @@
+{
+  "type": "column",
+  "name": "展示列",
+  "category": "data",
+  "description": "数据表的一列：描述取值字段、展示方式与列级能力",
+  "children": [],
+  "properties": [
+    {
+      "name": "field",
+      "type": "string",
+      "required": true,
+      "description": "对应出参 schema 中的字段名，列的取值来源"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": false,
+      "description": "列头，缺省回落 name"
+    },
+    {
+      "name": "sortable",
+      "type": "boolean",
+      "required": false,
+      "description": "该列可排序"
+    },
+    {
+      "name": "width",
+      "type": "string",
+      "required": false,
+      "description": "列宽"
+    },
+    {
+      "name": "align",
+      "type": "string",
+      "required": false,
+      "description": "对齐：left/center/right"
+    },
+    {
+      "name": "format",
+      "type": "string",
+      "required": false,
+      "description": "格式化提示：date/money/enum"
+    },
+    {
+      "name": "enum",
+      "type": "object",
+      "required": false,
+      "description": "字段值到展示文案的映射"
+    },
+    {
+      "name": "fixed",
+      "type": "string",
+      "required": false,
+      "description": "冻结列：left/right"
+    }
+  ]
+}

@@ -2,7 +2,7 @@ package cn.procsl.ping.boot.system.api.config;
 
 import cn.procsl.ping.boot.common.BusinessException;
 import cn.procsl.ping.boot.system.domain.config.Config;
-import cn.procsl.ping.boot.system.domain.ui.ResourceReference;
+import cn.procsl.ping.boot.ui.component.api.ResourceReference;
 import cn.procsl.ping.boot.system.service.ConfigService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

@@ -1,0 +1,29 @@
+{
+  "type": "nav_group",
+  "name": "菜单分组",
+  "category": "navigation",
+  "description": "可展开与折叠的菜单分组标题，默认展开",
+  "children": [
+    "menu"
+  ],
+  "properties": [
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "description": "分组标题"
+    },
+    {
+      "name": "order",
+      "type": "integer",
+      "required": false,
+      "description": "同级排序，缺省 0"
+    },
+    {
+      "name": "icon",
+      "type": "string",
+      "required": false,
+      "description": "图标标识"
+    }
+  ]
+}

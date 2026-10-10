@@ -1,0 +1,27 @@
+{
+  "type": "empty",
+  "name": "空态",
+  "category": "state",
+  "description": "数据为空时的提示与引导",
+  "children": [],
+  "properties": [
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "主文案，缺省用暂无数据"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "required": false,
+      "description": "次文案"
+    },
+    {
+      "name": "action",
+      "type": "string",
+      "required": false,
+      "description": "引导按钮文案"
+    }
+  ]
+}

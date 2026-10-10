@@ -1,0 +1,29 @@
+{
+  "type": "layout",
+  "name": "布局",
+  "category": "container",
+  "description": "把内容切分为方位区域，是应用外壳结构的骨架",
+  "children": [
+    "*"
+  ],
+  "properties": [
+    {
+      "name": "layout",
+      "type": "string",
+      "required": true,
+      "description": "方位：left/right/top/bottom/center，缺省按 center"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "区域标题"
+    },
+    {
+      "name": "order",
+      "type": "integer",
+      "required": false,
+      "description": "同级排序，缺省 0"
+    }
+  ]
+}

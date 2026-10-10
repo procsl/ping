@@ -23,6 +23,12 @@
             <artifactId>ping-captcha</artifactId>
         </dependency>
 
+        <!-- 基础层：抽象组件机制（@ResourceReference、组件描述接口）归口 ping-ui -->
+        <dependency>
+            <groupId>cn.procsl</groupId>
+            <artifactId>ping-ui</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

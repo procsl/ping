@@ -1,10 +1,11 @@
 import type { ComponentNode } from "@/schema/types"
 
 /**
- * 本地组件树（当前唯一数据源，与后端接口解耦）。
+ * 本地组件树：后端接口不可用时的降级声明，与接口返回的结构同构。
+ * 正常数据源是 GET /v1/ui/components（见 data/loader.ts）。
  * 路由统一两段式：/xxx/xxx；左侧菜单为 6 个分组、15 个菜单项，
  * 用于验证侧栏在多菜单规模下的布局、滚动与搜索表现。
- * 后续接入 GET /v1/ui/menus 时由接口返回同构数据，前端无需发版。
+ * 服务端同构声明见 ping-ui/src/main/resources/ui/app/compose.json。
  */
 export const defaultTree: ComponentNode = {
   type: "application",
@@ -44,15 +45,70 @@ export const defaultTree: ComponentNode = {
               order: 1,
               containers: [
                 {
-                  type: "table",
+                  type: "dataset",
                   id: "table.system.user",
-                  apis: [{ method: "GET", api: "/v1/system/users" }],
+                  name: "用户管理",
+                  api: { method: "GET", path: "/v1/system/users" },
+                  row_key: "id",
+                  selectable: true,
                   containers: [
-                    { type: "column", id: "col.account", name: "账号" },
-                    { type: "column", id: "col.nickname", name: "昵称" },
-                    { type: "column", id: "col.status", name: "状态" },
-                    { type: "action", id: "action.edit", name: "编辑" },
-                    { type: "action", id: "action.reset", name: "重置密码" },
+                    {
+                      type: "query",
+                      id: "query.system.user",
+                      name: "查询条件",
+                      containers: [
+                        {
+                          type: "field",
+                          id: "f.account",
+                          name: "account",
+                          label: "账号",
+                          widget: "input",
+                          placeholder: "请输入账号",
+                        },
+                        {
+                          type: "field",
+                          id: "f.status",
+                          name: "status",
+                          label: "状态",
+                          widget: "select",
+                          options: [
+                            { value: "1", label: "启用" },
+                            { value: "0", label: "停用" },
+                          ],
+                        },
+                      ],
+                    },
+                    {
+                      type: "column",
+                      id: "col.account",
+                      field: "account",
+                      name: "账号",
+                      sortable: true,
+                    },
+                    { type: "column", id: "col.nickname", field: "nickname", name: "昵称" },
+                    {
+                      type: "column",
+                      id: "col.status",
+                      field: "status",
+                      name: "状态",
+                      sortable: true,
+                      format: "enum",
+                      enum: { "1": "启用", "0": "停用" },
+                    },
+                    { type: "action", id: "action.edit", name: "编辑", placement: "toolbar" },
+                    {
+                      type: "row_action",
+                      id: "ra.reset",
+                      name: "重置密码",
+                      confirm: "确认重置该用户的登录密码？",
+                      danger: true,
+                    },
+                    {
+                      type: "row_action",
+                      id: "ra.toggle_status",
+                      name: "切换状态",
+                      confirm: "确认切换该用户的状态？",
+                    },
                   ],
                 },
               ],

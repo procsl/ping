@@ -3,6 +3,7 @@ package cn.procsl.ping.boot.system.query.user;
 import cn.procsl.ping.boot.jpa.domain.page.FormatPage;
 import cn.procsl.ping.boot.jpa.support.query.ProjectionSearchRepository;
 import cn.procsl.ping.boot.web.annotation.MarkPageable;
+import cn.procsl.ping.boot.ui.component.api.ResourceReference;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityManager;
@@ -24,6 +25,7 @@ public class UserQueryController {
 
     @MarkPageable
     @Operation(summary = "获取用户列表")
+    @ResourceReference(name = "获取用户列表")
     @GetMapping("/v1/system/users")
     public FormatPage<UserRecord> findUsers(Pageable pageable, UserQuery query) {
 //        return this.searchRepository.search(query, UserRecord.class, pageable);

@@ -1,0 +1,35 @@
+{
+  "type": "menu",
+  "name": "菜单项",
+  "category": "navigation",
+  "description": "可跳转的功能入口，同时是路由与页面内容的挂载点",
+  "children": [
+    "*"
+  ],
+  "properties": [
+    {
+      "name": "router",
+      "type": "string",
+      "required": true,
+      "description": "前端路由，两段式相对路径；https:// 开头视为外链"
+    },
+    {
+      "name": "icon",
+      "type": "string",
+      "required": false,
+      "description": "图标标识"
+    },
+    {
+      "name": "order",
+      "type": "integer",
+      "required": false,
+      "description": "同级排序，缺省 0"
+    },
+    {
+      "name": "external",
+      "type": "boolean",
+      "required": false,
+      "description": "强制外链，新开窗口"
+    }
+  ]
+}

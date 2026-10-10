@@ -45,6 +45,9 @@
                     <exclude>*.pfx</exclude>
                     <exclude>*.txt</exclude>
                     <exclude>META-INF/ping/entry/index.html</exclude>
+                    <!-- 抽象组件类型定义不参与 @...@ 过滤 -->
+                    <exclude>ui/**</exclude>
+                    <exclude>META-INF/ping/ui/**</exclude>
                 </excludes>
             </resource>
             <resource>
@@ -52,6 +55,8 @@
                 <filtering>false</filtering>
                 <includes>
                     <include>META-INF/ping/entry/index.html</include>
+                    <include>ui/**</include>
+                    <include>META-INF/ping/ui/**</include>
                 </includes>
             </resource>
         </resources>

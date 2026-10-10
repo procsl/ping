@@ -1,0 +1,39 @@
+{
+  "type": "row_action",
+  "name": "行内动作",
+  "category": "data",
+  "description": "数据表每一行上的操作，区别于容器级的 action",
+  "children": [],
+  "properties": [
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "description": "按钮文案"
+    },
+    {
+      "name": "api",
+      "type": "object",
+      "required": false,
+      "description": "动作接口，入参至少含行主键"
+    },
+    {
+      "name": "confirm",
+      "type": "string",
+      "required": false,
+      "description": "二次确认文案，非空时先确认再调接口"
+    },
+    {
+      "name": "danger",
+      "type": "boolean",
+      "required": false,
+      "description": "危险动作标红"
+    },
+    {
+      "name": "disabled_when",
+      "type": "string",
+      "required": false,
+      "description": "依行字段禁用的提示表达式"
+    }
+  ]
+}

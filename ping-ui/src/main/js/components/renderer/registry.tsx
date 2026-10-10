@@ -1,12 +1,18 @@
-import { useState } from "react"
 import type { ComponentNode } from "@/schema/types"
 import { Link } from "react-router"
-import { ChevronDown } from "lucide-react"
-import { cn } from "@/lib/utils"
 import { UserPanel } from "@/layout/UserPanel"
 import { RouteOutlet } from "@/router/RouteOutlet"
 import { DataTable } from "@/components/renderer/data-table"
+import { NavGroup } from "@/components/renderer/nav-group"
+import { Tabs } from "@/components/renderer/tabs"
+import { BreadcrumbBar } from "@/components/renderer/breadcrumb-bar"
+import { EmptyState } from "@/components/renderer/empty-state"
+import { ColumnCell } from "@/components/renderer/column"
+import { ActionButton } from "@/components/renderer/action"
+import { QueryForm } from "@/components/renderer/query-form"
+import { Field, Form, FormAction } from "@/components/renderer/form"
 import { Placeholder } from "@/pages/Placeholder"
+import { cn } from "@/lib/utils"
 
 export interface RendererContext {
   /** 模块命名空间，动态组件按 /assets/<namespace>/components/<type>.js 寻址 */
@@ -26,10 +32,14 @@ export interface NodeRendererProps {
 
 export type NodeRenderer = (props: NodeRendererProps) => React.ReactNode
 
-function renderChildren(
-  node: ComponentNode,
-  ctx: RendererContext,
-): React.ReactNode {
+/** 供子渲染器使用的递归渲染器，避免渲染器之间互相 import 造成循环依赖 */
+function childRenderer(ctx: RendererContext) {
+  return (node: ComponentNode): React.ReactNode => (
+    <ComponentRenderer node={node} ctx={ctx} />
+  )
+}
+
+function renderChildren(node: ComponentNode, ctx: RendererContext): React.ReactNode {
   return (node.containers ?? []).map((child, i) => (
     <ComponentRenderer key={child.id ?? i} node={child} ctx={ctx} />
   ))
@@ -38,51 +48,14 @@ function renderChildren(
 function Menu({ node, ctx }: NodeRendererProps): React.ReactNode {
   const children = node.containers ?? []
   const collapsed = ctx.collapsed ?? false
-  const searching = ctx.searching ?? false
-  const [open, setOpen] = useState(true)
   const menuChildren = children.filter((child) => child.type === "menu")
 
   // 分组：子节点是菜单项 → 分组标题可点击展开/折叠（默认展开）
   if (menuChildren.length > 0) {
-    if (collapsed) {
-      return (
-        <div className="my-1 border-b border-sidebar-border/60 pb-1 pt-2" />
-      )
-    }
-    const expanded = open || searching
-    return (
-      <div className="px-2 pb-1 pt-3">
-        <button
-          type="button"
-          aria-expanded={expanded}
-          onClick={() => {
-            if (!searching) {
-              setOpen(!expanded)
-            }
-          }}
-          className={cn(
-            "flex w-full items-center justify-between rounded-md px-2 py-1 text-xs font-medium transition-colors",
-            "text-muted-foreground hover:text-foreground",
-            searching && "cursor-default",
-          )}
-          title={node.name ?? node.id}
-        >
-          <span className="truncate">{node.name ?? node.id}</span>
-          <ChevronDown
-            className={cn(
-              "h-3.5 w-3.5 shrink-0 transition-transform duration-200",
-              expanded ? "rotate-180" : "rotate-0",
-            )}
-          />
-        </button>
-        {expanded && (
-          <div className="mt-1 space-y-0.5">{renderChildren(node, ctx)}</div>
-        )}
-      </div>
-    )
+    return <NavGroup node={node} ctx={ctx} render={childRenderer(ctx)} />
   }
 
-  // 叶子菜单项：其 containers 是页面内容（table / placeholder 等），由路由页渲染，侧栏只出链接
+  // 叶子菜单项：其 containers 是页面内容（dataset / placeholder 等），由路由页渲染，侧栏只出链接
   if (!node.router) {
     return null
   }
@@ -128,24 +101,42 @@ function Menu({ node, ctx }: NodeRendererProps): React.ReactNode {
 }
 
 /**
- * 内置组件注册表（spec 4.5）：渲染器按节点 type 查表，命中直接渲染；
- * 未命中由 renderNode 降级为占位节点并告警，不阻断整页（spec 5.2）。
+ * 内置组件注册表（spec：内置常用后台管理抽象组件类型）：
+ * 覆盖 16 个常用类型 + 2 个框架壳体类型；渲染器按节点 type 查表，
+ * 命中直接渲染，未命中降级为占位节点并告警，不阻断整页。
  */
 export const registry: Record<string, NodeRenderer> = {
-  menu: Menu,
-  user_info_panel: () => <UserPanel />,
-  main_container: () => <RouteOutlet />,
-  table: ({ node, ctx }) => <DataTable node={node} ctx={ctx} />,
-  placeholder: ({ node }) => <Placeholder name={node.name} id={node.id} />,
   application: ({ node, ctx }) => <>{renderChildren(node, ctx)}</>,
   layout: ({ node, ctx }) => <>{renderChildren(node, ctx)}</>,
+  menu: Menu,
+  nav_group: ({ node, ctx }) => (
+    <NavGroup node={node} ctx={ctx} render={childRenderer(ctx)} />
+  ),
+  tabs: ({ node, ctx }) => (
+    <Tabs node={node} ctx={ctx} render={childRenderer(ctx)} />
+  ),
+  breadcrumb: ({ node }) => <BreadcrumbBar node={node} />,
+  dataset: ({ node, ctx }) => (
+    <DataTable node={node} ctx={ctx} render={childRenderer(ctx)} />
+  ),
+  query: ({ node, ctx }) => <QueryForm node={node} render={childRenderer(ctx)} />,
+  column: ({ node }) => <ColumnCell node={node} />,
+  row_action: ({ node }) => <ActionButton node={node} />,
+  action: ({ node }) => <ActionButton node={node} />,
+  form: ({ node, ctx }) => <Form node={node} render={childRenderer(ctx)} />,
+  field: ({ node }) => <Field node={node} />,
+  form_action: ({ node }) => <FormAction node={node} />,
+  placeholder: ({ node }) => <Placeholder name={node.name} id={node.id} />,
+  empty: ({ node }) => <EmptyState node={node} />,
+  user_info_panel: () => <UserPanel />,
+  main_container: () => <RouteOutlet />,
 }
 
 export function isKnownType(type: string): boolean {
   return type in registry
 }
 
-/** 单节点渲染入口：查注册表 → 降级占位 */
+/** 单节点渲染入口：查注册表 → 降级占位（未知类型保留其子节点，不出现空白区） */
 export function ComponentRenderer({
   node,
   ctx,
@@ -158,6 +149,13 @@ export function ComponentRenderer({
   return (
     <div className="rounded-md border border-dashed px-3 py-2 text-xs text-muted-foreground">
       未知组件：{node.type}
+      {(node.containers ?? []).length > 0 && (
+        <div className="mt-1 space-y-1">
+          {(node.containers ?? []).map((child, i) => (
+            <ComponentRenderer key={child.id ?? i} node={child} ctx={ctx} />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

@@ -1,0 +1,8 @@
+{
+  "type": "main_container",
+  "name": "内容区路由出口",
+  "category": "shell",
+  "description": "内容区的路由出口，所有页面片段渲染到这里",
+  "children": [],
+  "properties": []
+}

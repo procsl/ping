@@ -1,0 +1,39 @@
+{
+  "type": "form_action",
+  "name": "表单动作",
+  "category": "form",
+  "description": "表单提交区的按钮",
+  "children": [],
+  "properties": [
+    {
+      "name": "kind",
+      "type": "string",
+      "required": true,
+      "description": "submit/reset/cancel"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "按钮文案"
+    },
+    {
+      "name": "api",
+      "type": "object",
+      "required": false,
+      "description": "覆盖表单的提交接口"
+    },
+    {
+      "name": "danger",
+      "type": "boolean",
+      "required": false,
+      "description": "危险动作标红"
+    },
+    {
+      "name": "loading",
+      "type": "string",
+      "required": false,
+      "description": "提交中态文案"
+    }
+  ]
+}

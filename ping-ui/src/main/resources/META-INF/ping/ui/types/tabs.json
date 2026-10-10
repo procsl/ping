@@ -1,0 +1,17 @@
+{
+  "type": "tabs",
+  "name": "页签容器",
+  "category": "navigation",
+  "description": "把多个平级内容放进同一页签区，页签标题取子节点的 name",
+  "children": [
+    "*"
+  ],
+  "properties": [
+    {
+      "name": "active",
+      "type": "string",
+      "required": false,
+      "description": "激活页签的 id，缺省取第一个子节点"
+    }
+  ]
+}

@@ -104,6 +104,28 @@
 
     <build>
 
+        <plugins>
+            <!-- 抽象组件构建期聚合：产出 META-INF/ping/ui/components.json，运行时只读该固定路径 -->
+            <plugin>
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>aggregate-ui-components</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <scripts>
+                                <scriptFile>${maven.multiModuleProjectDirectory}/ping-ui-components-aggregate.groovy</scriptFile>
+                            </scripts>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+
     </build>
 
     <profiles>

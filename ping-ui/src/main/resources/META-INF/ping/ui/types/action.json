@@ -1,0 +1,45 @@
+{
+  "type": "action",
+  "name": "通用动作",
+  "category": "action",
+  "description": "容器级别的动作，位于工具栏或页头；行内动作请用 row_action",
+  "children": [],
+  "properties": [
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "description": "按钮文案"
+    },
+    {
+      "name": "api",
+      "type": "object",
+      "required": false,
+      "description": "动作接口"
+    },
+    {
+      "name": "confirm",
+      "type": "string",
+      "required": false,
+      "description": "二次确认文案"
+    },
+    {
+      "name": "danger",
+      "type": "boolean",
+      "required": false,
+      "description": "危险动作标红"
+    },
+    {
+      "name": "variant",
+      "type": "string",
+      "required": false,
+      "description": "样式：primary/outline/ghost"
+    },
+    {
+      "name": "placement",
+      "type": "string",
+      "required": false,
+      "description": "位置：toolbar/header，默认 toolbar"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "type": "dataset",
+  "name": "数据表",
+  "category": "data",
+  "description": "逻辑数据表：描述取数接口、输入参数与展示列；只表达语义，不限定前端渲染形态",
+  "children": [
+    "query",
+    "column",
+    "action",
+    "row_action"
+  ],
+  "properties": [
+    {
+      "name": "api",
+      "type": "object",
+      "required": false,
+      "description": "查询接口；request.schema 为查询参数，response.schema 为行数据"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": false,
+      "description": "表标题，缺省回落 name"
+    },
+    {
+      "name": "row_key",
+      "type": "string",
+      "required": false,
+      "description": "行唯一键，默认 id"
+    },
+    {
+      "name": "selectable",
+      "type": "boolean",
+      "required": false,
+      "description": "是否允许多选行"
+    }
+  ]
+}
