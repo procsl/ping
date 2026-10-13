@@ -52,7 +52,7 @@
             <version>${ping.version}</version>
         </dependency>
 
-        <!-- 渲染器与静态产物（主壳 index.html / assets/renderer）随聚合层发布 -->
+        <!-- 渲染器与静态产物（薄壳入口 /ui/index.html / assets/renderer）随聚合层发布 -->
         <dependency>
             <groupId>cn.procsl</groupId>
             <artifactId>ping-ui</artifactId>

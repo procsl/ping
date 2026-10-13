@@ -5,7 +5,6 @@
   "type": "module",
   "description": "Ping 抽象组件渲染器与后台管理框架",
   "scripts": {
-    "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview"
   },

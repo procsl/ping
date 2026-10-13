@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * 静态产物落位验证：主壳、本模块薄壳与渲染器 bundle 打进 classpath 后可直接访问。
+ * 静态产物落位验证：本模块薄壳与渲染器 bundle 打进 classpath 后可直接访问。
  * 仅起 Web 层（不加载组件扫描），避免被存量未完成的机制代码阻断。
  */
 @SpringBootTest(classes = StaticAssetsTest.WebOnlyConfig.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -38,14 +38,6 @@ class StaticAssetsTest {
 
     private String body(String path) {
         return client().get().uri(path).retrieve().body(String.class);
-    }
-
-    @Test
-    void mainShellLoadsRenderer() {
-        assertEquals(200, get("/index.html").value());
-        String html = body("/index.html");
-        assertTrue(html.contains("assets/renderer/renderer.js"), "主壳应引用渲染器 bundle");
-        assertTrue(html.contains("mount("), "主壳应调用渲染器 mount 入口");
     }
 
     @Test

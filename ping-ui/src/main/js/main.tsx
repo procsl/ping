@@ -7,7 +7,7 @@ import "@/styles/globals.css"
 export type { MountOptions, ComponentNode } from "@/schema/types"
 
 /**
- * 渲染器挂载入口（ESM，主壳与薄壳共用）：
+ * 渲染器挂载入口（ESM，薄壳共用）：
  *   import { mount } from '../assets/renderer/renderer.js'
  *   mount({ namespace: 'system', manifest: '/v1/ui/menus?ns=system' })
  */

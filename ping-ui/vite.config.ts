@@ -3,9 +3,6 @@ import react from "@vitejs/plugin-react"
 import tailwindcss from "@tailwindcss/vite"
 import { defineConfig } from "vite"
 
-// 后端本地开发端口（与 ping-web 的 web.server.port 保持一致）
-const backendPort = process.env.PING_BACKEND_PORT ?? "10000"
-
 export default defineConfig(({ mode }) => ({
   plugins: [react(), tailwindcss()],
   // lib 模式不会自动替换 process.env.NODE_ENV，浏览器端会报 process is not defined
@@ -14,24 +11,15 @@ export default defineConfig(({ mode }) => ({
       mode === "production" ? "production" : "development",
     ),
   },
-  // 相对路径：薄壳位于 /<module>/index.html、主壳位于 /index.html，两级目录下均可解析
+  // 相对路径：薄壳位于 /<module>/index.html，两级目录下均可解析
   base: "./",
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src/main/js"),
     },
   },
-  server: {
-    port: 5173,
-    proxy: {
-      "/v1": {
-        target: `http://localhost:${backendPort}`,
-        changeOrigin: true,
-      },
-    },
-  },
   build: {
-    // 渲染器以 ESM 库形式产出，供主壳 / 薄壳 import
+    // 渲染器以 ESM 库形式产出，供薄壳 import
     lib: {
       entry: path.resolve(__dirname, "src/main/js/main.tsx"),
       formats: ["es"],
