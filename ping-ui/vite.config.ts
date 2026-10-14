@@ -19,9 +19,9 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    // 渲染器以 ESM 库形式产出，供薄壳 import
+    // 渲染器以 ESM 库形式产出，供薄壳 import；产物名保持 renderer.js（薄壳路径写死）
     lib: {
-      entry: path.resolve(__dirname, "src/main/js/main.tsx"),
+      entry: path.resolve(__dirname, "src/main/js/sdk/index.ts"),
       formats: ["es"],
       fileName: () => "renderer.js",
     },

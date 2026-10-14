@@ -774,13 +774,22 @@ Accept: application/json
 
 ## 11. 代码迁移对照
 
-节点模型变更后，以下代码位置需要同步迁移（当前仍是扁平模型）：
+> **已迁移**（`add-ping-ui-web-sdk`，2026-10）：旧 React 渲染器与扁平节点模型已删除，
+> SDK 按目标态模型（`children` + `properties`）从零重建起点。下表记录迁移结果与现状。
 
-| 文件 | 现状 | 目标 |
-|---|---|---|
-| `src/main/js/schema/types.ts` | `ComponentNode` 扁平声明所有属性 | 收敛为 5 个通用字段 + `properties: Record<string, unknown>` |
-| `src/main/js/components/renderer/registry.tsx` | 直接读 `node.router` / `node.order` | 改读 `node.properties?.router` 等 |
-| `src/main/js/router/derive.ts` | `node.containers`、`node.router` | 改为 `node.children`、`node.properties?.router` |
-| `src/main/js/data/default-tree.ts` | 扁平树 | 改写为 `children` + `properties` |
-| `src/main/resources/ui/app/compose.json` | 扁平树（已移除，待重建） | 按新模型重建 |
-| `ping-system/.../ui/user-center/compose.json` | 扁平树 | 改写为 `children` + `properties` |
+| 文件 | 现状 | 目标 | 状态 |
+|---|---|---|---|
+| `src/main/js/schema/types.ts` | `ComponentNode` 扁平声明所有属性 | 收敛为 5 个通用字段 + `properties: Record<string, unknown>` | ✅ 已删除，目标态 `ComponentNode` 落于 `src/main/js/sdk/types.ts` |
+| `src/main/js/components/renderer/registry.tsx` | 直接读 `node.router` / `node.order` | 改读 `node.properties?.router` 等 | ✅ 已删除，处理器注册表落于 `src/main/js/sdk/registry.ts` |
+| `src/main/js/router/derive.ts` | `node.containers`、`node.router` | 改为 `node.children`、`node.properties?.router` | ✅ 已删除，子节点派发由处理器经 `sdk.create(tree, messageBus)` 主动驱动 |
+| `src/main/js/data/default-tree.ts` | 扁平树 | 改写为 `children` + `properties` | ✅ 已删除，示例树落于 `src/main/js/sdk/demo/demo-tree.ts` |
+| `src/main/resources/ui/app/compose.json` | 扁平树（已移除，待重建） | 按新模型重建 | ⏳ 待重建（渲染器重建时一并恢复） |
+| `ping-system/.../ui/user-center/compose.json` | 扁平树 | 改写为 `children` + `properties` | ✅ 已改写为目标态 |
+
+**现状说明**：
+
+- SDK 核心（`createPingUi`、注册表、生命周期、`MessageBus`、`SdkError` 与默认
+  `error_handler`）已实现于 `ping-ui/src/main/js/sdk/`，测试 35 个用例全绿
+  （`npm test`，已纳入 `./mvnw -Ph2 test`）。
+- 用 SDK 重建渲染器与各类型 handler（18 个类型）**不在本次范围**，属后续变更；
+  重建时按本文 §2 节点模型与 `sdk-design.md` §2.2 处理器约定实现。

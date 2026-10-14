@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ping UI Web SDK Demo</title>
+    <link rel="stylesheet" href="./demo.css" />
+  </head>
+  <body>
+    <main class="demo-shell">
+      <header class="demo-header">
+        <h1>Ping UI Web SDK 演示</h1>
+        <p class="demo-subtitle">框架无关的抽象组件运行时 —— 原生 DOM 渲染，无任何 UI 框架依赖</p>
+      </header>
+
+      <section class="demo-section">
+        <h2>三条路径</h2>
+        <ul class="demo-paths">
+          <li><strong>正常命中</strong>：card / row / text 处理器被注册并渲染</li>
+          <li><strong>未注册降级</strong>：unknown_widget 无处理器 → error_handler 降级，子节点保留</li>
+          <li><strong>抛错隔离</strong>：broken 处理器抛错 → 同级后续节点照常执行</li>
+        </ul>
+      </section>
+
+      <section class="demo-section">
+        <h2>渲染输出</h2>
+        <div id="demo-output" class="demo-output" data-demo-output>加载中…</div>
+      </section>
+
+      <section class="demo-section">
+        <h2>错误记录</h2>
+        <div id="demo-errors" class="demo-errors" data-demo-errors>无</div>
+      </section>
+    </main>
+    <script type="module" src="./demo.ts"></script>
+  </body>
+</html>

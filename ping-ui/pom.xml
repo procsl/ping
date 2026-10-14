@@ -68,6 +68,22 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.1.0</version>
                 <executions>
+                    <!-- 前端测试：npm test（vitest），受 ping.npm.skip 控制，不自动 npm install -->
+                    <execution>
+                        <id>npm-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${ping.npm.skip}</skip>
+                            <executable>npm</executable>
+                            <arguments>
+                                <argument>test</argument>
+                            </arguments>
+                            <workingDirectory>${basedir}</workingDirectory>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>npm-run-build</id>
                         <phase>prepare-package</phase>

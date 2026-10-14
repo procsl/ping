@@ -1,6 +1,6 @@
 # Ping UI Web SDK 设计
 
-> 模块：`ping-ui`（基础层）｜ 状态：**设计稿（待评审）**
+> 模块：`ping-ui`（基础层）｜ 状态：**已实现**（`ping-ui/src/main/js/sdk/`，见 §10 里程碑）
 > 本文是 `ping-ui` 文档的**主文档**：定义 Web 端抽象组件 SDK 的架构。
 > SDK **不负责渲染 UI**（UI 由 shadcn 等具体框架承担），只提供：**组件 type 处理器注册**、
 > **JSON 描述 → 渲染**、**消息通知机制**。错误处理、调试等能力以 buildin 无 UI 组件注入。
@@ -149,14 +149,19 @@ handler({ type: "menu", id: "m1", name: "用户管理" })
 
 ## 4. 消息通知
 
-SDK 提供消息注册与通知机制，**消息组件暂未定义** —— 目前只保留一个空定义，
+SDK 提供消息注册与通知机制，**消息组件暂未定义** —— 目前只保留 `on/off/emit` 机制，
 具体消息语义由未来的消息组件定义。
 
 ```ts
 interface MessageBus {
-  // 待定义
+  on(event: string, callback: (payload: unknown) => void): void
+  off(event: string, callback?: (payload: unknown) => void): void
+  emit(event: string, payload?: unknown): void
+  clear(): void
 }
 ```
+
+> 已实现：`ping-ui/src/main/js/sdk/message-bus.ts`。`off` 不传回调时移除该事件的全部订阅。
 
 ---
 
@@ -276,11 +281,19 @@ handler({ type: "menu", id: "m1", name: "用户管理" })
 sdk.destroy()
 ```
 
+> 已实现：`ping-ui/src/main/js/sdk/index.ts`（`createPingUi`）。当前包形态为源码目录
+> `ping-ui/src/main/js/sdk/`（design F 的落定结论，见 §9），构建产物为 `renderer.js`
+> 并导出 `createPingUi`；`@ping-ui/sdk` 的独立包名留待后续发布时再定。
+> 可运行示例见 `ping-ui/src/main/js/sdk/demo/`（`npm run demo`）。
+
 ---
 
 ## 8. 与现有代码的关系
 
-现有 `registry.tsx` / `RouterOutlet.tsx` 是 React 绑定实现。重构方向：
+> **已实现**：本次变更（`add-ping-ui-web-sdk`）按本文从零重建起点，旧 React 渲染器与
+> 扁平节点模型已删除，SDK 已落地。本节保留原设计意图供追溯。
+
+原设计意图：现有 `registry.tsx` / `RouterOutlet.tsx` 是 React 绑定实现。重构方向：
 
 1. SDK 核心（注册表 + 渲染 + 消息 + 生命周期 + 错误机制）框架无关，独立成包。
 2. 现有 React 渲染器**暂不动**，SDK 先行落地，后续再决定是否迁移。
@@ -291,26 +304,41 @@ sdk.destroy()
 模型实现，代码侧的迁移清单见 `abstract-component-schema.md` §11。
 两份文档描述的都是**目标态**，与当前代码存在已知差异。
 
+**实际落地（2026-10）**：
+
+- 旧 React 渲染器（`components/renderer/*`、`RendererRoot.tsx`、`layout/*`、`router/*`、
+  `pages/*`、`data/*`、`schema/types.ts`、`mock/*`）已删除，SDK 按本文 §2.1 的
+  `children` + `properties` 模型实现于 `ping-ui/src/main/js/sdk/`。
+- 后台管理页面的侧栏、路由、菜单切换、分组折叠、搜索能力本次不再提供
+  （`admin-navigation` 能力随旧渲染器一并移除，后续用 SDK 处理器重建）。
+- 薄壳 `/ui/index.html` 与 `META-INF/resources` 落位机制保持不变，产物仍为 `renderer.js`。
+- 用 SDK 重建渲染器与各类型 handler、后端 `GET /v1/ui/components` 聚合链路恢复、
+  消息组件语义、`logger` buildin 组件均**不在本次范围**。
+
 ---
 
 ## 9. 待协商问题
 
-| # | 问题 | 倾向方案 |
+> **已落定**（`add-ping-ui-web-sdk` 实施时确认）：
+
+| # | 问题 | 落定结论 |
 |---|---|---|
 | A | Handler 参数个数 | 4 个：`(tree, node, messageBus, sdk)`，后两个自动注入 |
-| B | 命名空间粒度 | 按「命名空间 + type」两级 |
-| C | `run(tree, messageBus)` | 初始化所有处理器，执行 tree.type 对应的 handler |
+| B | 命名空间粒度 | 按「命名空间 + type」两级，查询按「当前命名空间 → default」回退 |
+| C | `run(tree, messageBus)` | 初始化所有处理器，执行 tree.type 对应的 handler；未初始化即运行自动补 `init()` 并告警 |
 | D | `create(tree, messageBus)` 返回的 Handler | 注入 tree 与消息对象，调用时只需传入当前节点 json |
-| E | `error_handler` 的降级形态 | 默认返回 null / 占位对象，可覆盖 |
-| F | 包形态 | 单包 `@ping-ui/sdk` |
-| G | 现有 React 渲染器去留 | 暂保留，SDK 先行，后续再定 |
+| E | `error_handler` 的降级形态 | 默认 `console.error` + 返回占位对象，可覆盖；`error_handler` 自身抛错不中断整棵树 |
+| F | 包形态 | 落定为源码目录 `ping-ui/src/main/js/sdk/`（不建独立包），构建产物 `renderer.js` 导出 `createPingUi` |
+| G | 现有 React 渲染器去留 | 已删除（BREAKING），SDK 按目标态模型从零重建起点 |
 
 ---
 
 ## 10. 里程碑
 
-| 阶段 | 内容 | 产出 |
-|---|---|---|
-| M1 | SDK 核心（注册表/run/create/消息/生命周期/错误机制） | `@ping-ui/sdk` |
-| M2 | 默认 `error_handler` 组件 | 无 UI 组件 |
-| M3 | 文档 + 测试 | 使用手册、单测 |
+| 阶段 | 内容 | 产出 | 状态 |
+|---|---|---|---|
+| M1 | SDK 核心（注册表/run/create/消息/生命周期/错误机制） | `ping-ui/src/main/js/sdk/` | ✅ 已实现 |
+| M2 | 默认 `error_handler` 组件 | `sdk/index.ts` 内建，可覆盖 | ✅ 已实现 |
+| M3 | 文档 + 测试 | 单测（vitest，`npm test`）+ 原生 demo（`npm run demo`） | ✅ 已实现 |
+
+> 测试已纳入 Maven 周期：`./mvnw -Ph2 test` 会连带执行 `npm test`（`-Dping.npm.skip=true` 跳过）。

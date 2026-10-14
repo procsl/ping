@@ -1,0 +1,145 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #f6f7f9;
+  color: #1f2328;
+}
+
+.demo-shell {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.demo-header h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.75rem;
+}
+
+.demo-subtitle {
+  margin: 0 0 1.5rem;
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.demo-section {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.demo-section h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.05rem;
+}
+
+.demo-paths {
+  margin: 0;
+  padding-left: 1.25rem;
+  line-height: 1.8;
+  font-size: 0.92rem;
+}
+
+.demo-output {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.demo-chip {
+  display: inline-block;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+
+.demo-chip-ok {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.demo-chip-broken {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.demo-card {
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+}
+
+.demo-card-title {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  color: #374151;
+}
+
+.demo-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.demo-log {
+  width: 100%;
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.demo-log-line {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8rem;
+  color: #374151;
+  line-height: 1.6;
+}
+
+.demo-errors {
+  font-size: 0.9rem;
+}
+
+.demo-error-line {
+  padding: 0.4rem 0.6rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  color: #b91c1c;
+  margin-bottom: 0.4rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.82rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #111827;
+    color: #e5e7eb;
+  }
+
+  .demo-section {
+    background: #1f2937;
+    border-color: #374151;
+  }
+
+  .demo-subtitle,
+  .demo-card-title,
+  .demo-log,
+  .demo-log-line {
+    color: #9ca3af;
+  }
+
+  .demo-card {
+    border-color: #374151;
+  }
+}
