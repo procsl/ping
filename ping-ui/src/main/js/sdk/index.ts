@@ -32,6 +32,19 @@ export * from "./types"
 export { MessageBus } from "./message-bus"
 export { Registry, ERROR_HANDLER_TYPE } from "./registry"
 export { toSdkError, type SdkError, type SdkPhase } from "./sdk-error"
+export {
+  APPLICATION_RENDER_EVENT,
+  applicationHandler,
+  DEFAULT_APPLICATION_NAME,
+  resolveApplicationName,
+  type ApplicationRenderPayload,
+} from "./handlers/application"
+export {
+  PLACEHOLDER_RENDER_EVENT,
+  placeholderHandler,
+  resolvePlaceholderName,
+  type PlaceholderRenderPayload,
+} from "./handlers/placeholder"
 
 const DEFAULT_NAMESPACE = "default"
 
