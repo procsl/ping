@@ -1,9 +1,12 @@
 # Ping UI Web SDK 设计
 
 > 模块：`ping-ui`（基础层）｜ 状态：**设计稿（待评审）**
-> 本文档定义 Web 端抽象组件 SDK 的设计。SDK **不负责渲染 UI**（UI 由 shadcn 等
-> 具体框架承担），只提供：**组件 type 处理器注册**、**JSON 描述 → 渲染**、
-> **消息通知机制**。错误处理、调试等能力以 buildin 无 UI 组件注入。
+> 本文是 `ping-ui` 文档的**主文档**：定义 Web 端抽象组件 SDK 的架构。
+> SDK **不负责渲染 UI**（UI 由 shadcn 等具体框架承担），只提供：**组件 type 处理器注册**、
+> **JSON 描述 → 渲染**、**消息通知机制**。错误处理、调试等能力以 buildin 无 UI 组件注入。
+>
+> 配套文档：`ping-ui/doc/abstract-component-schema.md` —— 节点模型、18 个组件类型定义、
+> `compose.json` 编写规范。SDK 只约定节点的 5 个通用字段，具体类型语义全部归该规范。
 
 ---
 
@@ -29,8 +32,8 @@
 
 ### 2.1 组件节点（ComponentNode）
 
-输入是抽象 UI 的 JSON 描述，与后端 `compose.json` 对齐。SDK 只约定 5 个通用字段，
-其余字段透传：
+输入是抽象 UI 的 JSON 描述，与 `compose.json` 对齐，节点模型见
+`abstract-component-schema.md` §2。SDK 只约定 5 个通用字段，其余字段透传：
 
 ```ts
 interface ComponentNode {
@@ -42,6 +45,10 @@ interface ComponentNode {
   [key: string]: unknown
 }
 ```
+
+节点上**不出现**这 5 个字段以外的字段 —— `router`、`order`、`api`、`widget` 等
+组件特有属性一律在 `properties` 里。SDK 对 `properties` 的内容**不做校验**，
+语义校验归各类型处理器与规范文档。
 
 ### 2.2 处理器（Handler）
 
@@ -273,11 +280,16 @@ sdk.destroy()
 
 ## 8. 与现有代码的关系
 
-现有 `registry.tsx` / `RendererRoot.tsx` 是 React 绑定实现。重构方向：
+现有 `registry.tsx` / `RouterOutlet.tsx` 是 React 绑定实现。重构方向：
 
 1. SDK 核心（注册表 + 渲染 + 消息 + 生命周期 + 错误机制）框架无关，独立成包。
 2. 现有 React 渲染器**暂不动**，SDK 先行落地，后续再决定是否迁移。
 3. 默认 `error_handler` 组件作为无 UI 处理器注入，可被覆盖。
+
+**迁移状态**：前端代码当前仍是**扁平节点模型**（类型专有字段平铺在节点上，
+子节点键为 `containers`）。SDK 落地时按本文 §2.1 的 `children` + `properties`
+模型实现，代码侧的迁移清单见 `abstract-component-schema.md` §11。
+两份文档描述的都是**目标态**，与当前代码存在已知差异。
 
 ---
 
