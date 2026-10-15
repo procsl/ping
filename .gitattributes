@@ -1,0 +1,9 @@
+# 所有文本文件强制 LF（WSL/Linux 开发环境，跨平台一致）
+* text=auto eol=lf
+
+# 二进制文件显式标记，不依赖 git 自动检测
+*.png binary
+*.ico binary
+*.p12 binary
+*.jar binary
+*.class binary
