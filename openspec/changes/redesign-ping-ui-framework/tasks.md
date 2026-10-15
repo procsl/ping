@@ -13,15 +13,15 @@
 
 ### 1.2 @ResourceReference 解析器
 
-- [ ] 1.2.1 实现按 operationId 匹配 openapi.json 中的 path + method，验证：单测覆盖匹配成功
-- [ ] 1.2.2 实现未找到 operationId 时的报错 `ReferenceNotFoundException`（包含可用 operationId 列表），验证：单测覆盖未找到报错
-- [ ] 1.2.3 实现重复 operationId 检测：多个方法有相同 operationId 时报错，验证：单测覆盖重复检测
-- [ ] 1.2.4 实现 `parameters` 数组解析：区分 `in: query`/`in: path`，分别放入 request.query/request.path，验证：单测覆盖两种参数位置
-- [ ] 1.2.5 实现 `requestBody` 解析：拉取 `content.application/json.schema` 作为 request.body，验证：单测覆盖有/无 requestBody
-- [ ] 1.2.6 实现 requestBody 非 application/json 时跳过（如 multipart/form-data），验证：单测覆盖非 JSON body
-- [ ] 1.2.7 实现 `responses` 解析：取 200/201 的 `content.application/json.schema` 作为 response，204 则为空对象，验证：单测覆盖 200/204 响应
-- [ ] 1.2.8 实现 response 无 200/201/204 时报错（只有 4xx/5xx），验证：单测覆盖无成功响应报错
-- [ ] 1.2.9 实现 parameter 级 `required` 标记：将 required=true 的 parameter 在 schema 中标记 `required: true`，验证：单测覆盖 required 标记
+- [x] 1.2.1 实现按 operationId 匹配 openapi.json 中的 path + method，验证：单测覆盖匹配成功
+- [x] 1.2.2 实现未找到 operationId 时的报错 `ReferenceNotFoundException`（包含可用 operationId 列表），验证：单测覆盖未找到报错
+- [x] 1.2.3 实现重复 operationId 检测：多个方法有相同 operationId 时报错，验证：单测覆盖重复检测
+- [x] 1.2.4 实现 `parameters` 数组解析：区分 `in: query`/`in: path`，分别放入 request.query/request.path，验证：单测覆盖两种参数位置
+- [x] 1.2.5 实现 `requestBody` 解析：拉取 `content.application/json.schema` 作为 request.body，验证：单测覆盖有/无 requestBody
+- [x] 1.2.6 实现 requestBody 非 application/json 时跳过（如 multipart/form-data），验证：单测覆盖非 JSON body
+- [x] 1.2.7 实现 `responses` 解析：取 200/201 的 `content.application/json.schema` 作为 response，204 则为空对象，验证：单测覆盖 200/204 响应
+- [x] 1.2.8 实现 response 无 200/201/204 时报错（只有 4xx/5xx），验证：单测覆盖无成功响应报错
+- [x] 1.2.9 实现 parameter 级 `required` 标记：将 required=true 的 parameter 在 schema 中标记 `required: true`，验证：单测覆盖 required 标记
 
 ### 1.3 $ref 展开
 
