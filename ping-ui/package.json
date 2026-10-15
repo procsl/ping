@@ -6,8 +6,6 @@
   "description": "Ping 抽象组件渲染器与后台管理框架",
   "scripts": {
     "build": "tsc --noEmit && vite build",
-    "test": "vitest run",
-    "demo": "vite --config vite.demo.config.ts",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -31,7 +29,6 @@
     "shadcn": "^4.21.4",
     "tailwindcss": "^4.1.13",
     "typescript": "^5.9.2",
-    "vite": "^7.1.7",
-    "vitest": "^3.2.7"
+    "vite": "^7.1.7"
   }
 }
