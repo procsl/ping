@@ -89,23 +89,23 @@
 
 ### 5.1 $ref 解析器重构
 
-- [ ] 5.1.1 移除 `@ResourceReference` 注解匹配逻辑，改为 `openapi://` 协议解析，验证：单测覆盖 openapi:// 前缀解析
-- [ ] 5.1.2 移除旧的 `@ResourceReference` 注解定义和处理代码，验证：代码中无 @ResourceReference 残留
-- [ ] 5.1.3 更新 operationId 匹配逻辑，支持 `openapi://<operationId>` 格式，验证：单测覆盖匹配成功/失败
+- [x] 5.1.1 移除 `@ResourceReference` 注解匹配逻辑，改为 `openapi://` 协议解析，验证：单测覆盖 openapi:// 前缀解析
+- [x] 5.1.2 移除旧的 `@ResourceReference` 注解定义和处理代码，验证：代码中无 @ResourceReference 残留
+- [x] 5.1.3 更新 operationId 匹配逻辑，支持 `openapi://<operationId>` 格式，验证：单测覆盖匹配成功/失败
 
 ### 5.2 $ref → UUID 解析重构
 
-- [ ] 5.2.1 移除旧的 `ref` 路径解析逻辑，改为 `openapi://` 协议路径解析，验证：单测覆盖 openapi:// 路径解析
-- [ ] 5.2.2 更新路径格式校验，支持 `openapi://<operationId>/<request|response>/<path>` 格式，验证：单测覆盖格式校验
-- [ ] 5.2.3 移除旧的 `ref` 路径相关代码，验证：代码中无旧 ref 路径解析残留
+- [x] 5.2.1 移除旧的 `ref` 路径解析逻辑，改为 `openapi://` 协议路径解析，验证：单测覆盖 openapi:// 路径解析
+- [x] 5.2.2 更新路径格式校验，支持 `openapi://<operationId>/<request|response>/<path>` 格式，验证：单测覆盖格式校验
+- [x] 5.2.3 移除旧的 `ref` 路径相关代码，验证：代码中无旧 ref 路径解析残留
 
 ### 5.3 编译校验重构
 
-- [ ] 5.3.1 更新引用完整性校验，支持 `openapi://` 协议，验证：单测覆盖断链报错
-- [ ] 5.3.2 更新 operation 的 api 字段校验，支持 `openapi://` 协议，验证：单测覆盖未标注/格式错误报错
+- [x] 5.3.1 更新引用完整性校验，支持 `openapi://` 协议，验证：单测覆盖断链报错
+- [x] 5.3.2 更新 operation 的 api 字段校验，支持 `openapi://` 协议，验证：单测覆盖未标注/格式错误报错
 
 ### 5.4 旧代码清理
 
-- [ ] 5.4.1 移除 `@ResourceReference` 注解定义，验证：代码中无 @ResourceReference 注解
-- [ ] 5.4.2 移除旧的 `ref` 路径解析相关代码，验证：代码中无旧 ref 解析逻辑
-- [ ] 5.4.3 移除旧的 JSON Pointer 解析相关代码，验证：代码中无 JSON Pointer 解析逻辑
+- [x] 5.4.1 移除 `@ResourceReference` 注解定义，验证：代码中无 @ResourceReference 注解
+- [x] 5.4.2 移除旧的 `ref` 路径解析相关代码，验证：代码中无旧 ref 解析逻辑
+- [x] 5.4.3 移除旧的 JSON Pointer 引用解析相关代码，验证：代码中无旧版 JSON Pointer 引用残留（OpenAPI 内部 `$ref` 展开所需的 JSON Pointer 解析除外）【原验证标准"代码中无 JSON Pointer 解析逻辑"与 design Step 2 冲突，已修订：`SchemaRefExpander` 展开 OpenAPI 内部 `#/...` `$ref` 必需 JSON Pointer，属设计保留项】

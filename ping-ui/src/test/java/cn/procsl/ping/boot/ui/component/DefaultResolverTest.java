@@ -140,7 +140,7 @@ class DefaultResolverTest {
                 { "request": { "notExists": "x" } }
                 """);
 
-        DefaultResolveException e = assertThrows(DefaultResolveException.class,
+        RefNotFoundException e = assertThrows(RefNotFoundException.class,
                 () -> resolver.applyOperationDefaults(operation));
         assertTrue(e.getMessage().contains("notExists"), "异常信息应包含目标字段名");
     }
@@ -153,7 +153,7 @@ class DefaultResolverTest {
                 """);
 
         // response 存在但字段不存在
-        assertThrows(DefaultResolveException.class, () -> resolver.applyOperationDefaults(operation));
+        assertThrows(ComposeCompileException.class, () -> resolver.applyOperationDefaults(operation));
     }
 
     // --- 1.5.5 overrides 类型校验 ---
@@ -165,7 +165,7 @@ class DefaultResolverTest {
                 { "properties": { "overrides": { "request": { "state": 123 } } } }
                 """);
 
-        DefaultResolveException e = assertThrows(DefaultResolveException.class,
+        ComposeCompileException e = assertThrows(ComposeCompileException.class,
                 () -> resolver.applyOverrides(function.get("properties"), operation));
         assertTrue(e.getMessage().contains("state"), "异常信息应包含字段名");
     }
@@ -177,7 +177,7 @@ class DefaultResolverTest {
                 { "properties": { "overrides": { "request": { "sort": "not-an-array" } } } }
                 """);
 
-        assertThrows(DefaultResolveException.class,
+        assertThrows(ComposeCompileException.class,
                 () -> resolver.applyOverrides(function.get("properties"), operation));
     }
 

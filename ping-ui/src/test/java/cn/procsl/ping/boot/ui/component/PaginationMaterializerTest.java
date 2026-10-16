@@ -57,9 +57,9 @@ class PaginationMaterializerTest {
                   "id": "user-list",
                   "properties": %s,
                   "children": [
-                    { "type": "input", "id": "f.name", "properties": { "ref": "findUsers.request.query.name" } },
-                    { "type": "output", "id": "c.name", "properties": { "ref": "findUsers.response.content[].name" } },
-                    { "type": "output", "id": "c.gender", "properties": { "ref": "findUsers.response.content[].gender" } }
+                    { "type": "input", "id": "f.name", "properties": { "$ref": "openapi://findUsers/request/query/name" } },
+                    { "type": "output", "id": "c.name", "properties": { "$ref": "openapi://findUsers/response/content/items/name" } },
+                    { "type": "output", "id": "c.gender", "properties": { "$ref": "openapi://findUsers/response/content/items/gender" } }
                   ]
                 }
                 """.formatted(properties));
@@ -97,7 +97,7 @@ class PaginationMaterializerTest {
         assertEquals("c.gender", pagination.get("children").get(1).get("id").asString());
     }
 
-    // --- 1.6.3 offset/size input 生成 ---
+    // --- 1.6.3 offset/size input 生成（openapi:// 协议 $ref） ---
 
     @Test
     void shouldGenerateOffsetAndSizeInputs() {
@@ -110,11 +110,11 @@ class PaginationMaterializerTest {
 
         assertEquals("input", offset.get("type").asString());
         assertEquals("page.offset", offset.get("id").asString());
-        assertEquals("findUsers.request.offset", offset.get("properties").get("ref").asString());
+        assertEquals("openapi://findUsers/request/offset", offset.get("properties").get("$ref").asString());
 
         assertEquals("input", size.get("type").asString());
         assertEquals("page.size", size.get("id").asString());
-        assertEquals("findUsers.request.size", size.get("properties").get("ref").asString());
+        assertEquals("openapi://findUsers/request/size", size.get("properties").get("$ref").asString());
     }
 
     // --- 1.6.4 mode 属性：默认 page，支持 scroll ---
@@ -164,6 +164,25 @@ class PaginationMaterializerTest {
         assertEquals(3, view.get("children").size(), "非分页 operation 不应改变 children");
     }
 
+    // --- pagination 容器的分页引用为 openapi:// 协议节点 ---
+
+    @Test
+    void shouldGeneratePaginationRefNodesWithOpenApiProtocol() {
+        JsonNode view = view("");
+        materializer.materialize(view, pagedOperation());
+
+        JsonNode paginationProperties = lastChild(view).get("properties");
+
+        assertEquals("openapi://findUsers/request/offset",
+                paginationProperties.get("offset").get("$ref").asString());
+        assertEquals("openapi://findUsers/request/size",
+                paginationProperties.get("size").get("$ref").asString());
+        assertEquals("openapi://findUsers/response/total",
+                paginationProperties.get("total").get("$ref").asString());
+        assertEquals("openapi://findUsers/response/content",
+                paginationProperties.get("content").get("$ref").asString());
+    }
+
     // --- 集成：pagination 的分页引用与 offset input 复用同一 UUID ---
 
     @Test
@@ -178,11 +197,11 @@ class PaginationMaterializerTest {
 
         JsonNode pagination = lastChild(view);
         String offsetId = operations.get("findUsers").get("request").get("offset").get("id").asString();
-        assertEquals(offsetId, pagination.get("properties").get("offset_ref").asString(),
-                "pagination.offset_ref 应解析为字段 UUID");
+        assertEquals(offsetId, pagination.get("properties").get("offset").get("$ref").asString(),
+                "pagination.offset 的 $ref 应解析为字段 UUID");
 
         JsonNode offsetInput = view.get("children").get(view.get("children").size() - 3);
-        assertEquals(offsetId, offsetInput.get("properties").get("ref").asString(),
-                "pagination.offset_ref 与 page.offset.ref 应复用同一 UUID");
+        assertEquals(offsetId, offsetInput.get("properties").get("$ref").asString(),
+                "pagination.offset 与 page.offset 的 $ref 应复用同一 UUID");
     }
 }

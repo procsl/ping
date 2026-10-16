@@ -2,7 +2,6 @@ package cn.procsl.ping.boot.system.api.user;
 
 import cn.procsl.ping.boot.common.service.PasswordEncoderService;
 import cn.procsl.ping.boot.system.domain.user.User;
-import cn.procsl.ping.boot.ui.component.api.ResourceReference;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
@@ -27,7 +26,6 @@ public class AccountController {
     final PasswordEncoderService passwordEncoderService;
 
     @Operation(summary = "修改用户账户状态")
-    @ResourceReference(name = "修改用户账户状态")
     @PatchMapping(path = "/v1/system/users/{id}/account")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional(rollbackOn = Exception.class)
@@ -39,7 +37,6 @@ public class AccountController {
     }
 
     @Operation(summary = "重置用户密码")
-    @ResourceReference(name = "重置用户密码")
     @PatchMapping(path = "/v1/system/users/{id}/password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional(rollbackOn = Exception.class)

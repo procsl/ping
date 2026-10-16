@@ -32,7 +32,7 @@ class ComposeRepositoryTest {
                     "type": "operation",
                     "id": "findUsers",
                     "properties": {
-                      "api": "@ResourceReference:findUsers"
+                      "api": { "$ref": "openapi://findUsers" }
                     }
                   },
                   {

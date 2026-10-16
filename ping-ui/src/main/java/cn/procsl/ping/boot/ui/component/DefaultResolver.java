@@ -29,6 +29,9 @@ import java.util.Map;
  *
  * <p>优先级链：<b>实际调用值（运行时） &gt; overrides（编译时） &gt; operation defaults（编译时）</b>。
  * 编译阶段先应用 operation defaults，再应用 overrides，后者覆盖前者。
+ *
+ * <p>合并失败统一抛出 {@link ComposeCompileException}（目标不存在时为
+ * {@link RefNotFoundException} 断链语义）。</p>
  */
 public class DefaultResolver {
 
@@ -38,15 +41,9 @@ public class DefaultResolver {
 
     private static final String DEFAULT_KEY = "default";
 
-    private static final String TYPE_KEY = "type";
-
-    private static final String PROPERTIES_KEY = "properties";
-
-    private static final String ITEMS_KEY = "items";
-
     private static final String ARRAY_ITEM_SUFFIX = "[]";
 
-    private static final List<String> SIDES = List.of("request", "response");
+    private static final List<String> SIDES = List.of(Schemas.REQUEST, Schemas.RESPONSE);
 
     /**
      * 应用 operation 级 {@code defaults} 到 operation properties 树。
@@ -78,7 +75,7 @@ public class DefaultResolver {
             }
             JsonNode sideSchema = operationProperties.get(side);
             if (sideSchema == null || !sideSchema.isObject()) {
-                throw new DefaultResolveException(
+                throw new ComposeCompileException(
                         "Default target side '" + side + "' not found in operation properties");
             }
 
@@ -119,7 +116,7 @@ public class DefaultResolver {
         if (byName != null) {
             return byName;
         }
-        throw new DefaultResolveException("Default target field '" + path + "' not found under '" + side + "'");
+        throw new RefNotFoundException(path, "default target field not found under '" + side + "'");
     }
 
     /** 按点分路径定位，支持 {@code []} 表示数组 items */
@@ -136,11 +133,11 @@ public class DefaultResolver {
             if (name.isEmpty()) {
                 return null;
             }
-            JsonNode field = propertiesOf(node).get(name);
+            JsonNode field = Schemas.propertiesOf(node).get(name);
             if (field == null) {
                 return null;
             }
-            node = arrayItem ? field.get(ITEMS_KEY) : field;
+            node = arrayItem ? field.get(Schemas.ITEMS) : field;
             if (node == null) {
                 return null;
             }
@@ -150,7 +147,7 @@ public class DefaultResolver {
 
     /** 按字段名递归查找唯一匹配，多个匹配视为歧义返回 {@code null} */
     private JsonNode locateByName(JsonNode node, String name) {
-        JsonNode properties = node.get(PROPERTIES_KEY);
+        JsonNode properties = node.get(Schemas.PROPERTIES);
         if (properties != null && properties.isObject() && properties.has(name)) {
             return properties.get(name);
         }
@@ -187,15 +184,9 @@ public class DefaultResolver {
         return found;
     }
 
-    /** 取 schema 的字段容器：object schema 取 {@code properties}，字段映射（request/response）取自身 */
-    private JsonNode propertiesOf(JsonNode node) {
-        JsonNode properties = node.get(PROPERTIES_KEY);
-        return properties != null && properties.isObject() ? properties : node;
-    }
-
     /** 覆盖值类型必须与字段 schema 声明的 {@code type} 一致（未声明类型则跳过） */
     private void validateType(JsonNode field, JsonNode value, String path) {
-        JsonNode typeNode = field.get(TYPE_KEY);
+        JsonNode typeNode = field.get(Schemas.TYPE);
         if (typeNode == null || !typeNode.isString()) {
             return;
         }
@@ -203,7 +194,7 @@ public class DefaultResolver {
         if (matchesType(type, value)) {
             return;
         }
-        throw new DefaultResolveException("Override value for field '" + path + "' is " + jsonType(value)
+        throw new ComposeCompileException("Override value for field '" + path + "' is " + jsonType(value)
                 + " but schema declares '" + type + "'");
     }
 

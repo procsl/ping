@@ -137,7 +137,7 @@ class SchemaRefExpanderTest {
                 { "$ref": "#/components/schemas/DoesNotExist" }
                 """);
 
-        assertThrows(ReferenceResolveException.class, () -> expander().expand(schema));
+        assertThrows(ComposeCompileException.class, () -> expander().expand(schema));
     }
 
     // --- 1.3.5 array items 中的 $ref 展开 ---

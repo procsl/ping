@@ -11,19 +11,23 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * {@code ref} → UUID 解析器。
+ * {@code openapi://} 字段路径 → UUID 解析器。
  *
- * <p>编译阶段把 input/output 组件的路径式 {@code ref}
- * （{@code <operationId>.<request|response>.<fieldPath>}）解析为 operation 树中的
- * 具体字段节点，生成 UUID 写入该字段的 {@code id} 属性，并把组件的 {@code ref}
- * 值替换为该 UUID（design D3）。
+ * <p>编译阶段把 input/output 组件的 {@code properties.$ref}
+ * （{@code openapi://<operationId>/<request|response>/<fields-glob> }，如
+ * {@code openapi://findUsers/request/query/name}）解析为 operation 树中的具体字段节点，
+ * 生成 UUID 写入该字段的 {@code id} 属性，并把组件的 {@code $ref} 值替换为该 UUID（design D3）。
  *
  * <p>规则：
  * <ul>
- *   <li>字段路径支持 {@code []} 表示数组 items（如 {@code content[].account}）</li>
- *   <li>同一 {@code ref} 复用相同 UUID（同一字段不重复生成）</li>
- *   <li>{@code ref} 仅限所属 operation，跨 operation 报错</li>
- *   <li>路径格式非法、operation/字段不存在时报错</li>
+ *   <li>路径格式固定为 {@code openapi://<operationId>/<request|response>/<fieldsPath>}，
+ *       字段段之间以 {@code /} 分隔</li>
+ *   <li>数组元素字段经 {@code items} 段访问（如 {@code response/content/items/account}，
+ *       对应 response.content 的 items.account）</li>
+ *   <li>同一 {@code $ref} 复用相同 UUID（同一字段不重复生成）</li>
+ *   <li>{@code $ref} 仅限所属 operation，跨 operation 报错</li>
+ *   <li>缺少 {@code openapi://} 前缀、路径段缺失或非法时报错</li>
+ *   <li>operation / 字段不存在时报错 {@link RefNotFoundException}（含完整 $ref 路径）</li>
  * </ul>
  *
  * <p>输入的 operation 树应已完成 {@code $ref} 展开（见 {@link SchemaRefExpander}），
@@ -31,29 +35,13 @@ import java.util.UUID;
  */
 public class RefResolver {
 
-    private static final String REQUEST = "request";
-
-    private static final String RESPONSE = "response";
-
-    private static final String ARRAY_ITEM_SUFFIX = "[]";
-
-    private static final String REF_KEY = "ref";
-
-    private static final String ID_KEY = "id";
-
-    private static final String OPERATION_KEY = "operation";
-
-    private static final String TYPE_KEY = "type";
-
-    private static final String PAGINATION_TYPE = "pagination";
-
-    private static final List<String> PAGINATION_REF_KEYS =
-            List.of("offset_ref", "size_ref", "total_ref", "content_ref");
+    /** pagination properties 中承载分页引用的键（值为 {@code {"$ref": <openapi://...>}}） */
+    private static final List<String> PAGINATION_REF_KEYS = List.of("offset", "size", "total", "content");
 
     /** operationId → operation properties（含 request/response，已 $ref 展开） */
     private final Map<String, JsonNode> operations;
 
-    /** ref 路径 → UUID 缓存，同一字段复用 */
+    /** $ref 路径 → UUID 缓存，同一字段复用 */
     private final Map<String, String> refCache = new HashMap<>();
 
     public RefResolver(Map<String, JsonNode> operations) {
@@ -61,12 +49,12 @@ public class RefResolver {
     }
 
     /**
-     * 解析 {@code ref} 路径并物化 UUID。
+     * 解析 {@code openapi://} 字段路径并物化 UUID。
      *
-     * @param ref             路径式 ref，如 {@code findUsers.request.query.name}
+     * @param ref             openapi:// 协议字段路径，如 {@code openapi://findUsers/request/query/name}
      * @param ownerOperationId 所属 operation（view/form 的 {@code properties.operation}），可为 {@code null}
      * @return 字段 UUID
-     * @throws RefResolveException  路径格式非法或跨 operation 时
+     * @throws ComposeCompileException  路径格式非法或跨 operation 时
      * @throws RefNotFoundException operation 或字段不存在时
      */
     public String resolve(String ref, String ownerOperationId) {
@@ -75,7 +63,7 @@ public class RefResolver {
         String side = parts.get(1);
 
         if (ownerOperationId != null && !ownerOperationId.equals(operationId)) {
-            throw new RefResolveException("Cross-operation ref '" + ref + "': component belongs to operation '"
+            throw new ComposeCompileException("Cross-operation ref '" + ref + "': component belongs to operation '"
                     + ownerOperationId + "', but ref targets '" + operationId + "'");
         }
 
@@ -86,34 +74,34 @@ public class RefResolver {
 
         JsonNode node = locate(operationId, side, parts.subList(2, parts.size()), ref);
         String uuid = UUID.randomUUID().toString();
-        ((ObjectNode) node).put(ID_KEY, uuid);
+        ((ObjectNode) node).put(Schemas.ID, uuid);
         refCache.put(ref, uuid);
         return uuid;
     }
 
-    /** 就地替换 input/output 组件的 {@code ref} 值为 UUID；pagination 组件处理其分页引用 */
+    /** 就地替换 input/output 组件的 {@code properties.$ref} 值为 UUID；pagination 组件处理其分页引用 */
     public void resolveComponent(JsonNode component, String ownerOperationId) {
-        if (PAGINATION_TYPE.equals(component.path(TYPE_KEY).asString())) {
+        if (Schemas.PAGINATION.equals(component.path(Schemas.TYPE).asString())) {
             resolvePagination(component, ownerOperationId);
             return;
         }
 
-        JsonNode properties = component.get("properties");
+        JsonNode properties = component.get(Schemas.PROPERTIES);
         if (properties == null || !properties.isObject()) {
             return;
         }
-        JsonNode refNode = properties.get(REF_KEY);
+        JsonNode refNode = properties.get(Schemas.REF);
         if (refNode == null || !refNode.isString()) {
             return;
         }
         String uuid = resolve(refNode.asString(), ownerOperationId);
-        ((ObjectNode) properties).put(REF_KEY, uuid);
+        ((ObjectNode) properties).put(Schemas.REF, uuid);
     }
 
     /** 解析 view/form 容器下所有 input/output 子节点（owner 取容器的 {@code properties.operation}） */
     public void resolveContainer(JsonNode container) {
-        JsonNode properties = container.get("properties");
-        JsonNode operationNode = properties == null ? null : properties.get(OPERATION_KEY);
+        JsonNode properties = container.get(Schemas.PROPERTIES);
+        JsonNode operationNode = properties == null ? null : properties.get(Schemas.OPERATION);
         String owner = operationNode != null && operationNode.isString() ? operationNode.asString() : null;
 
         JsonNode children = container.get("children");
@@ -126,22 +114,26 @@ public class RefResolver {
     }
 
     /**
-     * 解析 pagination 容器的分页引用（{@code offset_ref}/{@code size_ref}/{@code total_ref}/{@code content_ref}）
-     * 及其 children 中的 output ref。
+     * 解析 pagination 容器的分页引用（properties 中 {@code offset}/{@code size}/{@code total}/{@code content}
+     * 各节点内的 {@code $ref}）及其 children 中的 output $ref。
      *
-     * @param pagination         pagination 组件节点
-     * @param ownerOperationId   所属 operation
+     * @param pagination       pagination 组件节点
+     * @param ownerOperationId 所属 operation
      */
     public void resolvePagination(JsonNode pagination, String ownerOperationId) {
-        JsonNode properties = pagination.get("properties");
+        JsonNode properties = pagination.get(Schemas.PROPERTIES);
         if (properties != null && properties.isObject()) {
             for (String key : PAGINATION_REF_KEYS) {
-                JsonNode refNode = properties.get(key);
+                JsonNode refContainer = properties.get(key);
+                if (refContainer == null || !refContainer.isObject()) {
+                    continue;
+                }
+                JsonNode refNode = refContainer.get(Schemas.REF);
                 if (refNode == null || !refNode.isString()) {
                     continue;
                 }
                 String uuid = resolve(refNode.asString(), ownerOperationId);
-                ((ObjectNode) properties).put(key, uuid);
+                ((ObjectNode) refContainer).put(Schemas.REF, uuid);
             }
         }
 
@@ -156,22 +148,35 @@ public class RefResolver {
     /** 校验 ref 格式并拆分，返回 {@code [operationId, request|response, ...fieldSegments]} */
     private List<String> validate(String ref) {
         if (ref == null || ref.isBlank()) {
-            throw new RefResolveException("Ref path must not be blank");
+            throw new ComposeCompileException("Ref must not be blank");
         }
-        List<String> parts = Arrays.asList(ref.split("\\."));
+        if (!ref.startsWith(Schemas.REF_PROTOCOL)) {
+            throw new ComposeCompileException("Invalid ref '" + ref
+                    + "': must be 'openapi://<operationId>/<request|response>/<fieldPath>' ('openapi://' prefix required)");
+        }
+
+        String path = ref.substring(Schemas.REF_PROTOCOL.length());
+        if (path.isEmpty() || path.endsWith("/") || path.contains("//")) {
+            throw new ComposeCompileException("Invalid ref '" + ref + "': empty path segment");
+        }
+
+        List<String> parts = Arrays.asList(path.split("/"));
         if (parts.size() < 3) {
-            throw new RefResolveException("Invalid ref path '" + ref
-                    + "': expected <operationId>.<request|response>.<fieldPath>");
+            throw new ComposeCompileException("Invalid ref '" + ref
+                    + "': expected openapi://<operationId>/<request|response>/<fieldPath>");
         }
         String side = parts.get(1);
-        if (!REQUEST.equals(side) && !RESPONSE.equals(side)) {
-            throw new RefResolveException("Invalid ref path '" + ref
+        if (!Schemas.REQUEST.equals(side) && !Schemas.RESPONSE.equals(side)) {
+            throw new ComposeCompileException("Invalid ref '" + ref
                     + "': second segment must be 'request' or 'response', got '" + side + "'");
+        }
+        if (parts.stream().anyMatch(String::isBlank)) {
+            throw new ComposeCompileException("Invalid ref '" + ref + "': empty path segment");
         }
         return parts;
     }
 
-    /** 沿字段路径定位到具体 schema 节点 */
+    /** 沿字段路径定位到具体 schema 节点（{@code items} 段即数组 schema 的 items 子节点） */
     private JsonNode locate(String operationId, String side, List<String> fieldSegments, String ref) {
         JsonNode operation = operations.get(operationId);
         if (operation == null) {
@@ -182,35 +187,14 @@ public class RefResolver {
             throw new RefNotFoundException(ref, "'" + side + "' not found in operation '" + operationId + "'");
         }
 
-        for (String segment : fieldSegments) {
-            boolean arrayItem = segment.endsWith(ARRAY_ITEM_SUFFIX);
-            String name = arrayItem
-                    ? segment.substring(0, segment.length() - ARRAY_ITEM_SUFFIX.length())
-                    : segment;
-            if (name.isEmpty()) {
-                throw new RefNotFoundException(ref, "empty field segment '" + segment + "'");
-            }
-            JsonNode field = propertiesOf(node).get(name);
+        for (String name : fieldSegments) {
+            JsonNode field = Schemas.propertiesOf(node).get(name);
             if (field == null) {
                 throw new RefNotFoundException(ref, "field '" + name + "' not found under '" + side
                         + "' of operation '" + operationId + "'");
             }
-            node = arrayItem ? requireItems(field, ref, name) : field;
+            node = field;
         }
         return node;
-    }
-
-    /** 取 schema 的字段容器：object schema 取 {@code properties}，字段映射（request/response）取自身 */
-    private JsonNode propertiesOf(JsonNode node) {
-        JsonNode properties = node.get("properties");
-        return properties != null && properties.isObject() ? properties : node;
-    }
-
-    private JsonNode requireItems(JsonNode field, String ref, String name) {
-        JsonNode items = field.get("items");
-        if (items == null || !items.isObject()) {
-            throw new RefNotFoundException(ref, "field '" + name + "' has no items schema for '[]' access");
-        }
-        return items;
     }
 }

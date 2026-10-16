@@ -17,11 +17,11 @@ import tools.jackson.databind.node.ObjectNode;
  * <p>命中后为引用该 operation 的 view 物化：
  * <ol>
  *   <li>生成 {@code type: "input"} 组件（{@code page.offset} / {@code page.size}），
+ *       properties 为 {@code "$ref": "openapi://<operationId>/<request|response>/<name>"}
  *       插入 view children（与 query、sort 并列）</li>
  *   <li>生成 {@code type: "pagination"} 容器，children 为 view 的 output 子节点，
- *       插入 view children 末尾</li>
- *   <li>pagination 的 {@code offset_ref}/{@code size_ref}/{@code total_ref}/{@code content_ref}
- *       写入字段路径（由 {@link RefResolver} 在编译后段解析为 UUID）</li>
+ *       插入 view children 末尾；properties 中 {@code offset}/{@code size}/{@code total}/{@code content}
+ *       各为 {@code {"$ref": "openapi://..."}}，由 {@link RefResolver} 在编译后段解析为 UUID</li>
  * </ol>
  *
  * <p>{@code mode} 取 view 的 {@code properties.pagination.mode}，默认 {@code page}，
@@ -29,23 +29,9 @@ import tools.jackson.databind.node.ObjectNode;
  */
 public class PaginationMaterializer {
 
-    private static final String TYPE = "type";
-
-    private static final String ID = "id";
-
-    private static final String PROPERTIES = "properties";
-
-    private static final String CHILDREN = "children";
-
-    private static final String REF = "ref";
-
     private static final String INPUT = "input";
 
     private static final String OUTPUT = "output";
-
-    private static final String PAGINATION = "pagination";
-
-    private static final String OPERATION = "operation";
 
     private static final String MODE = "mode";
 
@@ -58,14 +44,6 @@ public class PaginationMaterializer {
     private static final String CONTENT = "content";
 
     private static final String TOTAL = "total";
-
-    private static final String OFFSET_REF = "offset_ref";
-
-    private static final String SIZE_REF = "size_ref";
-
-    private static final String CONTENT_REF = "content_ref";
-
-    private static final String TOTAL_REF = "total_ref";
 
     private static final String PAGE_PREFIX = "page.";
 
@@ -82,8 +60,8 @@ public class PaginationMaterializer {
      * @return 是否分页
      */
     public boolean isPaged(JsonNode operationProperties) {
-        JsonNode request = operationProperties.get("request");
-        JsonNode response = operationProperties.get("response");
+        JsonNode request = operationProperties.get(Schemas.REQUEST);
+        JsonNode response = operationProperties.get(Schemas.RESPONSE);
         if (request == null || !request.isObject() || response == null || !response.isObject()) {
             return false;
         }
@@ -102,20 +80,20 @@ public class PaginationMaterializer {
             return;
         }
 
-        JsonNode viewProperties = view.get(PROPERTIES);
-        String operationId = viewProperties == null ? null : viewProperties.path(OPERATION).asString();
+        JsonNode viewProperties = view.get(Schemas.PROPERTIES);
+        String operationId = viewProperties == null ? null : viewProperties.path(Schemas.OPERATION).asString();
         if (operationId == null || operationId.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "View '" + view.path(ID).asString() + "' has no 'properties.operation'");
+            throw new ComposeCompileException(
+                    "View '" + view.path(Schemas.ID).asString() + "' has no 'properties." + Schemas.OPERATION + "'");
         }
 
         // 1. 收集 output 子节点，其余保留
         ArrayNode outputs = objectMapper.createArrayNode();
         ArrayNode remaining = objectMapper.createArrayNode();
-        JsonNode children = view.get(CHILDREN);
+        JsonNode children = view.get(Schemas.CHILDREN);
         if (children != null && children.isArray()) {
             for (JsonNode child : (ArrayNode) children) {
-                if (OUTPUT.equals(child.path(TYPE).asString())) {
+                if (OUTPUT.equals(child.path(Schemas.TYPE).asString())) {
                     outputs.add(child);
                 } else {
                     remaining.add(child);
@@ -129,17 +107,17 @@ public class PaginationMaterializer {
 
         // 3. 生成 pagination 容器（children 为 output 子节点）
         ObjectNode pagination = objectMapper.createObjectNode();
-        pagination.put(TYPE, PAGINATION);
-        pagination.put(ID, PAGE_PREFIX + view.path(ID).asString());
+        pagination.put(Schemas.TYPE, Schemas.PAGINATION);
+        pagination.put(Schemas.ID, PAGE_PREFIX + view.path(Schemas.ID).asString());
 
         ObjectNode paginationProperties = objectMapper.createObjectNode();
         paginationProperties.put(MODE, resolveMode(viewProperties));
-        paginationProperties.put(OFFSET_REF, operationId + ".request." + OFFSET);
-        paginationProperties.put(SIZE_REF, operationId + ".request." + SIZE);
-        paginationProperties.put(TOTAL_REF, operationId + ".response." + TOTAL);
-        paginationProperties.put(CONTENT_REF, operationId + ".response." + CONTENT);
-        pagination.set(PROPERTIES, paginationProperties);
-        pagination.set(CHILDREN, outputs);
+        paginationProperties.set(OFFSET, refNode(operationId + "/" + Schemas.REQUEST + "/" + OFFSET));
+        paginationProperties.set(SIZE, refNode(operationId + "/" + Schemas.REQUEST + "/" + SIZE));
+        paginationProperties.set(TOTAL, refNode(operationId + "/" + Schemas.RESPONSE + "/" + TOTAL));
+        paginationProperties.set(CONTENT, refNode(operationId + "/" + Schemas.RESPONSE + "/" + CONTENT));
+        pagination.set(Schemas.PROPERTIES, paginationProperties);
+        pagination.set(Schemas.CHILDREN, outputs);
 
         // 4. 重写 view children：非 output + offset/size input + pagination（末尾）
         ArrayNode newChildren = objectMapper.createArrayNode();
@@ -147,15 +125,23 @@ public class PaginationMaterializer {
         newChildren.add(offsetInput);
         newChildren.add(sizeInput);
         newChildren.add(pagination);
-        ((ObjectNode) view).set(CHILDREN, newChildren);
+        ((ObjectNode) view).set(Schemas.CHILDREN, newChildren);
     }
 
+    /** 生成 {@code page.<name>} input，properties.$ref 为 openapi:// 字段路径 */
     private ObjectNode input(String operationId, String name) {
         ObjectNode input = objectMapper.createObjectNode();
-        input.put(TYPE, INPUT);
-        input.put(ID, PAGE_PREFIX + name);
-        input.set(PROPERTIES, objectMapper.createObjectNode().put(REF, operationId + ".request." + name));
+        input.put(Schemas.TYPE, INPUT);
+        input.put(Schemas.ID, PAGE_PREFIX + name);
+        input.set(Schemas.PROPERTIES, refNode(operationId + "/" + Schemas.REQUEST + "/" + name));
         return input;
+    }
+
+    /** 生成 {@code {"$ref": "openapi://<operationId>/(request|response)/<name>"}} 引用节点 */
+    private ObjectNode refNode(String fieldPath) {
+        ObjectNode node = objectMapper.createObjectNode();
+        node.put(Schemas.REF, Schemas.REF_PROTOCOL + fieldPath);
+        return node;
     }
 
     /** 取 view 的 {@code properties.pagination.mode}，默认 {@code page} */
@@ -163,7 +149,7 @@ public class PaginationMaterializer {
         if (viewProperties == null) {
             return DEFAULT_MODE;
         }
-        JsonNode pagination = viewProperties.get(PAGINATION);
+        JsonNode pagination = viewProperties.get(Schemas.PAGINATION);
         if (pagination != null && pagination.isObject()) {
             JsonNode mode = pagination.get(MODE);
             if (mode != null && mode.isString()) {

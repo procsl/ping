@@ -11,11 +11,12 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * {@code @ResourceReference} 解析器。
+ * {@code openapi://} 协议的 operation 级引用解析器。
  *
- * <p>以打包期导出的 OpenAPI 文档为输入，按 {@code operationId} 匹配 path + method，
- * 将 {@code parameters}、{@code requestBody}、{@code responses} 解析为 operation 契约结构
- * （method/path/request/response），写入 compose.json 的 operation 节点。
+ * <p>以打包期导出的 OpenAPI 文档为输入，将 {@code openapi://<operationId>} 形式的
+ * {@code $ref} 按 {@code operationId} 匹配到 path + method，把 {@code parameters}、
+ * {@code requestBody}、{@code responses} 解析为 operation 契约结构
+ * （method/path/request/response）。
  *
  * <p>解析规则（design D5/D6）：
  * <ul>
@@ -29,10 +30,13 @@ import java.util.Set;
  *   <li>parameter 级 {@code required=true} 标记移入对应 schema 节点</li>
  * </ul>
  *
- * <p>schema 节点均为深拷贝，后续编译阶段（$ref 展开、ref→UUID、默认值合并）
+ * <p>旧的 {@code @ResourceReference} 注解匹配已被移除：引用统一通过 {@code openapi://}
+ * 协议按 {@code operationId} 匹配（机器生成的唯一标识），不再依赖注解标注与 summary 文案。
+ *
+ * <p>schema 节点均为深拷贝，后续编译阶段（$ref 展开、$ref→UUID、默认值合并）
  * 对节点的修改不会污染 OpenAPI 原文档。
  */
-public class ResourceReferenceResolver {
+public class OperationRefResolver {
 
     private static final Set<String> HTTP_METHODS =
             Set.of("get", "put", "post", "delete", "options", "head", "patch", "trace");
@@ -49,27 +53,56 @@ public class ResourceReferenceResolver {
     private final Map<String, IndexedOperation> operations = new LinkedHashMap<>();
 
     /**
-     * @param objectMapper      JSON 工厂
-     * @param openApiDocument   打包期导出的 OpenAPI 文档根节点
-     * @throws ReferenceResolveException 文档缺少 paths 或存在重复 operationId 时
+     * @param objectMapper    JSON 工厂
+     * @param openApiDocument 打包期导出的 OpenAPI 文档根节点
+     * @throws ComposeCompileException 文档缺少 paths 或存在重复 operationId 时
      */
-    public ResourceReferenceResolver(ObjectMapper objectMapper, JsonNode openApiDocument) {
+    public OperationRefResolver(ObjectMapper objectMapper, JsonNode openApiDocument) {
         this.objectMapper = objectMapper;
         buildIndex(openApiDocument);
     }
 
     /**
-     * 按 operationId 解析为 operation 契约结构。
+     * 从 {@code openapi://<operationId>} 引用中提取 operationId 并校验格式。
      *
-     * @param operationId {@code @ResourceReference} 引用的 operationId
-     * @return 含 method/path/request/response 的 properties 节点
-     * @throws ReferenceNotFoundException operationId 不存在时（含可用 operationId 列表）
-     * @throws ReferenceResolveException  operation 无任何成功响应（200/201/204）时
+     * @param ref openapi:// 协议引用
+     * @return operationId
+     * @throws ComposeCompileException 引用为空、缺少 openapi:// 前缀或携带字段路径时
      */
-    public ObjectNode resolve(String operationId) {
+    public String extractOperationId(String ref) {
+        if (ref == null || ref.isBlank()) {
+            throw new ComposeCompileException("openapi:// ref must not be blank");
+        }
+        if (!ref.startsWith(Schemas.REF_PROTOCOL)) {
+            throw new ComposeCompileException(
+                    "Invalid ref '" + ref + "': must be 'openapi://<operationId>'");
+        }
+        String operationId = ref.substring(Schemas.REF_PROTOCOL.length());
+        if (operationId.isBlank()) {
+            throw new ComposeCompileException(
+                    "Invalid ref '" + ref + "': operationId after 'openapi://' must not be blank");
+        }
+        if (operationId.contains("/")) {
+            throw new ComposeCompileException(
+                    "Invalid ref '" + ref + "': operation-level ref must not contain a field path");
+        }
+        return operationId;
+    }
+
+    /**
+     * 解析 {@code openapi://<operationId>} 引用为 operation 契约结构。
+     *
+     * @param ref openapi:// 协议引用（如 {@code openapi://findUsers}）
+     * @return 含 method/path/request/response 的 properties 节点
+     * @throws ComposeCompileException 引用格式非法、operation 无任何成功响应（200/201/204）时
+     * @throws RefNotFoundException    operationId 不存在时（含可用 operationId 列表）
+     */
+    public ObjectNode resolve(String ref) {
+        String operationId = extractOperationId(ref);
+
         IndexedOperation indexed = operations.get(operationId);
         if (indexed == null) {
-            throw new ReferenceNotFoundException(operationId, List.copyOf(operations.keySet()));
+            throw new RefNotFoundException(operationId, List.copyOf(operations.keySet()));
         }
 
         ObjectNode properties = objectMapper.createObjectNode();
@@ -77,21 +110,49 @@ public class ResourceReferenceResolver {
         properties.put("path", indexed.path());
 
         ObjectNode request = objectMapper.createObjectNode();
-        parseParameters(operationId, indexed.operation(), request);
-        parseRequestBody(operationId, indexed.operation(), request);
+        parseParameters(indexed.operation(), request);
+        parseRequestBody(indexed.operation(), request);
 
         ObjectNode response = parseResponses(operationId, indexed.operation());
 
-        properties.set("request", request);
-        properties.set("response", response);
+        properties.set(Schemas.REQUEST, request);
+        properties.set(Schemas.RESPONSE, response);
         return properties;
+    }
+
+    /**
+     * 校验并解析 operation 组件的 api 标注（operation 必须携带
+     * {@code properties.api.$ref = openapi://<operationId>}）。
+     *
+     * @param operationComponent operation 组件节点（type/id/properties）
+     * @return 含 method/path/request/response 的契约 properties 节点
+     * @throws ComposeCompileException api 未标注、api 结构非法或引用格式非法时
+     * @throws RefNotFoundException    引用的 operationId 不存在时
+     */
+    public ObjectNode resolveApi(JsonNode operationComponent) {
+        String componentId = operationComponent.path(Schemas.ID).asString(null);
+
+        JsonNode properties = operationComponent.get(Schemas.PROPERTIES);
+        JsonNode api = properties == null ? null : properties.get("api");
+        if (api == null || !api.isObject()) {
+            throw new ComposeCompileException("operation '" + componentId
+                    + "' must declare an api openapi:// ref in properties.api");
+        }
+
+        JsonNode refNode = api.get(Schemas.REF);
+        if (refNode == null || !refNode.isString()) {
+            throw new ComposeCompileException("Invalid api ref of operation '" + componentId
+                    + "': api must be {\"$ref\": \"openapi://<operationId>\"}");
+        }
+
+        return resolve(refNode.asString());
     }
 
     /** 构建 operationId 索引，重复 operationId 立即报错（fail fast） */
     private void buildIndex(JsonNode openApiDocument) {
         JsonNode paths = openApiDocument == null ? null : openApiDocument.get("paths");
         if (paths == null || !paths.isObject()) {
-            throw new ReferenceResolveException("Invalid OpenAPI document: missing 'paths' object");
+            throw new ComposeCompileException("Invalid OpenAPI document: missing 'paths' object");
         }
 
         for (Map.Entry<String, JsonNode> pathEntry : paths.properties()) {
@@ -116,7 +177,7 @@ public class ResourceReferenceResolver {
                 String operationId = idNode.asString();
                 IndexedOperation previous = operations.put(operationId, new IndexedOperation(path, httpMethod, operation));
                 if (previous != null) {
-                    throw new ReferenceResolveException("Duplicate operationId '" + operationId + "' in OpenAPI document: "
+                    throw new ComposeCompileException("Duplicate operationId '" + operationId + "' in OpenAPI document: "
                             + previous.httpMethod().toUpperCase(Locale.ROOT) + " " + previous.path()
                             + " and " + httpMethod.toUpperCase(Locale.ROOT) + " " + path);
                 }
@@ -125,7 +186,7 @@ public class ResourceReferenceResolver {
     }
 
     /** 解析 parameters：按 in 分派到 request.path / request.query / request.<name> */
-    private void parseParameters(String operationId, JsonNode operation, ObjectNode request) {
+    private void parseParameters(JsonNode operation, ObjectNode request) {
         JsonNode parameters = operation.get("parameters");
         if (parameters == null || !parameters.isArray()) {
             return;
@@ -164,7 +225,7 @@ public class ResourceReferenceResolver {
     }
 
     /** 解析 requestBody：仅 application/json 的 schema → request.body，其余内容类型跳过 */
-    private void parseRequestBody(String operationId, JsonNode operation, ObjectNode request) {
+    private void parseRequestBody(JsonNode operation, ObjectNode request) {
         JsonNode requestBody = operation.get("requestBody");
         if (requestBody == null || !requestBody.isObject()) {
             return;
@@ -179,7 +240,7 @@ public class ResourceReferenceResolver {
     private ObjectNode parseResponses(String operationId, JsonNode operation) {
         JsonNode responses = operation.get("responses");
         if (responses == null || !responses.isObject()) {
-            throw new ReferenceResolveException("operation '" + operationId + "' has no responses definition");
+            throw new ComposeCompileException("operation '" + operationId + "' has no responses definition");
         }
 
         for (String status : SUCCESS_WITH_BODY_STATUSES) {
@@ -196,7 +257,7 @@ public class ResourceReferenceResolver {
             return objectMapper.createObjectNode();
         }
 
-        throw new ReferenceResolveException("operation '" + operationId + "' has no success response (200/201/204), found: "
+        throw new ComposeCompileException("operation '" + operationId + "' has no success response (200/201/204), found: "
                 + responses.properties().stream().map(Map.Entry::getKey).toList());
     }
 

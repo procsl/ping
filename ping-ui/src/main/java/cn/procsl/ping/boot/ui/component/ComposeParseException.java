@@ -1,12 +1,12 @@
 package cn.procsl.ping.boot.ui.component;
 
 /**
- * compose.json 解析异常。
+ * compose.json 文件级解析异常。
  *
  * <p>当 compose.json 文件内容非法（JSON 格式错误、顶层类型不合法等）时抛出。
  * 异常信息包含文件路径、行号（如可知）和具体错误原因，便于快速定位问题。
  */
-public class ComposeParseException extends RuntimeException {
+public class ComposeParseException extends ComposeCompileException {
 
     private final String filePath;
     private final Integer lineNumber;

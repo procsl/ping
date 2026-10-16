@@ -24,14 +24,12 @@ import java.util.Map;
  *       同级属性优先</li>
  *   <li>嵌套 {@code $ref}（object properties 与 array items）递归展开</li>
  *   <li>展开过程检测循环引用，命中即抛 {@link CircularReferenceException}</li>
- *   <li>目标不存在时抛 {@link ReferenceResolveException}</li>
+ *   <li>目标不存在时抛 {@link RefNotFoundException}</li>
  * </ul>
  *
  * <p>输入树不会被修改，返回值为展开后的新树。
  */
 public class SchemaRefExpander {
-
-    private static final String REF_KEY = "$ref";
 
     private static final String POINTER_PREFIX = "#/";
 
@@ -53,7 +51,7 @@ public class SchemaRefExpander {
      * @param schema 待展开的 schema 节点
      * @return 展开后的新节点（原节点不被修改）
      * @throws CircularReferenceException 检测到循环引用时
-     * @throws ReferenceResolveException  {@code $ref} 目标不存在时
+     * @throws RefNotFoundException        {@code $ref} 目标不存在时
      */
     public JsonNode expand(JsonNode schema) {
         return expand(schema, new ArrayDeque<>());
@@ -77,7 +75,7 @@ public class SchemaRefExpander {
     }
 
     private JsonNode expandObject(ObjectNode object, Deque<String> stack) {
-        JsonNode refNode = object.get(REF_KEY);
+        JsonNode refNode = object.get(Schemas.REF);
         if (refNode != null && refNode.isString()) {
             return expandRef(refNode.asString(), object, stack);
         }
@@ -96,8 +94,7 @@ public class SchemaRefExpander {
 
         JsonNode target = resolve(ref);
         if (target == null) {
-            throw new ReferenceResolveException(
-                    "Unresolvable $ref '" + ref + "': target not found in OpenAPI document");
+            throw new RefNotFoundException(ref, "unresolvable $ref target in OpenAPI document");
         }
 
         ObjectNode merged = merge(target.deepCopy(), origin);
@@ -118,7 +115,7 @@ public class SchemaRefExpander {
             }
         }
         for (Map.Entry<String, JsonNode> property : origin.properties()) {
-            if (REF_KEY.equals(property.getKey())) {
+            if (Schemas.REF.equals(property.getKey())) {
                 continue;
             }
             merged.set(property.getKey(), property.getValue().deepCopy());

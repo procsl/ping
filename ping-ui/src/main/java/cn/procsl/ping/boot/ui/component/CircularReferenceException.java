@@ -3,7 +3,7 @@ package cn.procsl.ping.boot.ui.component;
 import java.util.List;
 
 /**
- * {@code $ref} 循环引用异常。
+ * OpenAPI schema {@code $ref} 循环引用异常。
  *
  * <p>编译阶段展开 OpenAPI schema 的 {@code $ref} 时，若目标 schema 的展开路径中
  * 再次引用到正在解析的 schema，则判定为循环引用并抛出。
@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @see SchemaRefExpander
  */
-public class CircularReferenceException extends ReferenceResolveException {
+public class CircularReferenceException extends ComposeCompileException {
 
     private final String ref;
     private final List<String> resolutionPath;
