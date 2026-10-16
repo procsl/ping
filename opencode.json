@@ -9,11 +9,13 @@
           "chrome-devtools-mcp@latest",
           "--autoConnect",
           "--channel=beta"
-        ]
+        ],
+        "disabled": true
       },
       "context7": {
         "type": "remote",
-        "url": "https://mcp.context7.com/mcp"
+        "url": "https://mcp.context7.com/mcp",
+        "disabled": true
       }
     }
   }
