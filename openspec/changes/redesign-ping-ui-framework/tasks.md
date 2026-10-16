@@ -11,7 +11,7 @@
 - [x] 1.1.5 实现顶层类型检测：数组元素必须是 `operation` 或 `function` 类型，其他类型报错，验证：单测覆盖非法顶层类型
 - [x] 1.1.6 实现多文件合并：所有 compose.json 的数组合并为一个 app.children，验证：单测覆盖多模块合并
 
-### 1.2 @ResourceReference 解析器
+### 1.2 $ref 解析器（openapi:// 协议）
 
 - [x] 1.2.1 实现按 operationId 匹配 openapi.json 中的 path + method，验证：单测覆盖匹配成功
 - [x] 1.2.2 实现未找到 operationId 时的报错 `ReferenceNotFoundException`（包含可用 operationId 列表），验证：单测覆盖未找到报错
@@ -31,14 +31,14 @@
 - [x] 1.3.4 实现 `$ref` 目标不存在时报错，验证：单测覆盖断链 $ref
 - [x] 1.3.5 实现 array items 中的 `$ref` 展开（如 `items: { $ref: ... }`），验证：单测覆盖数组 items 展开
 
-### 1.4 ref → UUID 解析
+### 1.4 $ref → UUID 解析（openapi:// 协议）
 
-- [x] 1.4.1 实现路径解析：将 `findUsers.request.query.name` 解析为 operation 树中的具体字段节点，验证：单测覆盖正常解析
-- [x] 1.4.2 实现 UUID 生成 + 替换：为被引用字段生成 UUID，替换 ref 值，在字段上写入 `id` 属性，验证：单测覆盖替换正确
-- [x] 1.4.3 实现断链检测：ref 指向不存在的 operation 或字段时报错 `RefNotFoundException`（包含完整 ref 路径），验证：单测覆盖断链报错
-- [x] 1.4.4 实现重复 ref 检测：同一 compose.json 中多个组件引用同一字段时，复用相同 UUID（不重复生成），验证：单测覆盖复用
-- [x] 1.4.5 实现跨 operation ref 检测：ref 指向其他 operation 的字段时报错（ref 仅限同一 operation），验证：单测覆盖跨 operation 报错
-- [x] 1.4.6 实现 ref 路径格式校验：必须为 `<operationId>.<request|response>.<fieldPath>` 格式，验证：单测覆盖格式错误
+- [x] 1.4.1 实现路径解析：将 `openapi://<operationId>/<request|response>/<path>` 解析为 operation 树中的具体字段节点，验证：单测覆盖正常解析
+- [x] 1.4.2 实现 UUID 生成 + 替换：为被引用字段生成 UUID，替换 $ref 值，在字段上写入 `id` 属性，验证：单测覆盖替换正确
+- [x] 1.4.3 实现断链检测：$ref 指向不存在的 operation 或字段时报错 `RefNotFoundException`（包含完整 $ref 路径），验证：单测覆盖断链报错
+- [x] 1.4.4 实现重复 $ref 检测：同一 compose.json 中多个组件引用同一字段时，复用相同 UUID（不重复生成），验证：单测覆盖复用
+- [x] 1.4.5 实现跨 operation $ref 检测：$ref 指向其他 operation 的字段时报错（$ref 仅限同一 operation），验证：单测覆盖跨 operation 报错
+- [x] 1.4.6 实现 $ref 路径格式校验：必须为 `openapi://<operationId>/<request|response>/<path>` 格式，验证：单测覆盖格式错误
 
 ### 1.5 默认值合并
 
@@ -59,7 +59,7 @@
 
 ### 1.7 编译校验
 
-- [ ] 1.7.1 实现引用完整性校验：所有 ref 必须能解析到具体字段，验证：单测覆盖断链报错
+- [ ] 1.7.1 实现引用完整性校验：所有 $ref 必须能解析到具体字段，验证：单测覆盖断链报错
 - [ ] 1.7.2 实现空 schema 检测：被引用字段的 schema 为空对象 `{}` 时报错，验证：单测覆盖空 schema 报错
 - [ ] 1.7.3 实现非法 UI 属性检测：input/output 上出现 width/align/icon/order 等属性时报错，验证：单测覆盖非法属性报错
 - [ ] 1.7.4 实现编译结果缓存：编译后的 JSON 缓存为只读快照，验证：单测覆盖缓存一致性
@@ -82,5 +82,30 @@
 ## 4. 验证
 
 - [ ] 4.1 端到端验证：启动应用 → 请求 `/v1/ui/components` → 返回合法 JSON，验证完整链路畅通
-- [ ] 4.2 验证编译失败场景：故意写入断链 ref，验证启动失败且报错信息包含具体引用路径
+- [ ] 4.2 验证编译失败场景：故意写入断链 $ref，验证启动失败且报错信息包含具体引用路径
 - [ ] 4.3 验证分页场景：编译后 JSON 中包含 pagination 组件和 offset/size input
+
+## 5. 重构（基于 openapi:// 协议）
+
+### 5.1 $ref 解析器重构
+
+- [ ] 5.1.1 移除 `@ResourceReference` 注解匹配逻辑，改为 `openapi://` 协议解析，验证：单测覆盖 openapi:// 前缀解析
+- [ ] 5.1.2 移除旧的 `@ResourceReference` 注解定义和处理代码，验证：代码中无 @ResourceReference 残留
+- [ ] 5.1.3 更新 operationId 匹配逻辑，支持 `openapi://<operationId>` 格式，验证：单测覆盖匹配成功/失败
+
+### 5.2 $ref → UUID 解析重构
+
+- [ ] 5.2.1 移除旧的 `ref` 路径解析逻辑，改为 `openapi://` 协议路径解析，验证：单测覆盖 openapi:// 路径解析
+- [ ] 5.2.2 更新路径格式校验，支持 `openapi://<operationId>/<request|response>/<path>` 格式，验证：单测覆盖格式校验
+- [ ] 5.2.3 移除旧的 `ref` 路径相关代码，验证：代码中无旧 ref 路径解析残留
+
+### 5.3 编译校验重构
+
+- [ ] 5.3.1 更新引用完整性校验，支持 `openapi://` 协议，验证：单测覆盖断链报错
+- [ ] 5.3.2 更新 operation 的 api 字段校验，支持 `openapi://` 协议，验证：单测覆盖未标注/格式错误报错
+
+### 5.4 旧代码清理
+
+- [ ] 5.4.1 移除 `@ResourceReference` 注解定义，验证：代码中无 @ResourceReference 注解
+- [ ] 5.4.2 移除旧的 `ref` 路径解析相关代码，验证：代码中无旧 ref 解析逻辑
+- [ ] 5.4.3 移除旧的 JSON Pointer 解析相关代码，验证：代码中无 JSON Pointer 解析逻辑

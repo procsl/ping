@@ -86,7 +86,7 @@
 
 #### Scenario: 调用 operation
 - **WHEN** 前端需要获取用户列表
-- **THEN** 找到 id="获取用户列表" 的 operation，使用其 method/path/request 发起 GET /v1/system/users
+- **THEN** 找到 id="findUsers" 的 operation，使用其 method/path/request 发起 GET /v1/system/users
 
 ### Requirement: 平台过滤
 

@@ -8,7 +8,7 @@
 
 **Goals:**
 - 定义一套极致克制的 JSON 声明语言，只声明功能组件及其与 operation 的输入/输出映射
-- 编译阶段全量解析（@ResourceReference → OpenAPI、ref → UUID、默认值合并），失败则启动失败
+- 编译阶段全量解析（`openapi://` → OpenAPI 操作、OpenAPI `$ref` 展开、`openapi://` 字段路径 → UUID、默认值合并），失败则启动失败
 - 前端拿到完全内联的最终 JSON，零运行时解析
 - 恢复后端 `GET /v1/ui/components` 聚合接口
 - 移除 SDK 运行时（注册表、生命周期、消息总线、错误处理器）
@@ -31,7 +31,7 @@
 
 ### D2: operation 作为接口契约中心
 
-**决策**：`operation` 是接口契约的定义点，包含 `method`/`path`/`request`/`response`/`defaults`/`sortable_fields`。`input`/`output` 通过 `ref` 引用 operation 的字段。
+**决策**：`operation` 是接口契约的定义点，包含 `method`/`path`/`request`/`response`/`defaults`/`sortable_fields`。`input`/`output` 通过 `$ref`（`openapi://` 协议）引用 operation 的字段。
 
 **理由**：将接口描述集中管理，避免重复声明。前端可从 operation 生成可调用方法。编译时在被引用字段上插入 UUID 作为唯一标识。
 
@@ -39,9 +39,9 @@
 - 每个 input/output 内联完整 schema → 被拒绝，重复且难以维护
 - 保持引用不解析 → 被拒绝，前端需要运行时解析
 
-### D3: 编译时解析 ref → UUID，嵌入字段 id 属性
+### D3: 编译时解析 $ref → UUID，嵌入字段 id 属性
 
-**决策**：编译阶段将 `ref` 路径解析为 UUID，替换 `ref` 值，并在被引用字段的 `id` 属性上写入该 UUID。
+**决策**：编译阶段将 `openapi://` 字段路径解析为 UUID，替换 `$ref` 值，并在被引用字段的 `id` 属性上写入该 UUID。
 
 **理由**：
 - 编译时校验所有引用完整性，启动失败而非运行时降级
@@ -54,19 +54,25 @@
 
 ### D4: 排序作为 input 处理
 
-**决策**：排序是一种特殊的 `input`，通过 `ref` 引用 operation.request 中的排序字段。排序规则定义在 operation 的 `sortable_fields` 列表中。
+**决策**：排序是一种特殊的 `input`，通过 `$ref`（`openapi://` 协议）引用 operation.request 中的排序字段。排序规则定义在 operation 的 `sortable_fields` 列表中。
 
 **理由**：排序本质上是"传给接口的参数"，和查询条件、分页没有本质区别。统一为 `input` 保持模型一致性。
 
 **备选方案**：在 output 上声明 `sortable: true` → 被拒绝，output 不应该关心行为，且需要后端支持。
 
-### D5: @ResourceReference 匹配 operationId
+### D5: $ref 使用 openapi:// 协议引用 operation
 
-**决策**：`@ResourceReference(name)` 匹配 OpenAPI 的 `operationId`（非 summary）。冲突时追加类型+方法名。
+**决策**：`$ref` 使用自定义协议 `openapi://<operationId>` 引用 OpenAPI 操作（如 `openapi://findUsers`）。编译器按 `operationId` 在 OpenAPI 文档中查找对应 path + method。冲突时追加类型+方法名。
 
-**理由**：`operationId` 是机器生成的唯一标识，比 `summary`（人类可读文案）更稳定。冲突时追加类型+方法名保证唯一性。
+**理由**：
+- `openapi://` 协议简洁直观，避免 JSON Pointer 长路径（如 `#/paths/~1v1~1system~1users/get`）
+- 字段引用使用 `openapi://<operationId>/<request|response>/<path>` 语义路径，不依赖数组索引
+- `operationId` 是机器生成的唯一标识，比 `summary`（人类可读文案）更稳定
+- 冲突时追加类型+方法名保证唯一性
 
-**备选方案**：匹配 summary → 被拒绝，summary 可能重复且不稳定。
+**备选方案**：
+- 使用 JSON Pointer（`#/paths/~1v1~1system~1users/get`）→ 被拒绝，路径过长且数组索引不稳定
+- 匹配 summary → 被拒绝，summary 可能重复且不稳定
 
 ### D6: 编译阶段全量校验，失败则启动失败
 
@@ -108,7 +114,7 @@
 
 ### 真实 openapi.json 片段（编译输入）
 
-以下来自 `ping-distribute/target/classes/ping-api-doc/openapi.json`，是编译阶段解析 `@ResourceReference` 的输入：
+以下来自 `ping-distribute/target/classes/ping-api-doc/openapi.json`，是编译阶段解析 OpenAPI 内部 `$ref` 的输入：
 
 ```json
 {
@@ -244,7 +250,7 @@
     "type": "operation",
     "id": "findUsers",
     "properties": {
-      "api": "@ResourceReference:findUsers",
+      "api": { "$ref": "openapi://findUsers" },
       "defaults": {
         "request": { "state": "enable" }
       },
@@ -255,7 +261,7 @@
     "type": "operation",
     "id": "accountStatusSetting",
     "properties": {
-      "api": "@ResourceReference:accountStatusSetting"
+      "api": { "$ref": "openapi://accountStatusSetting" }
     }
   },
   {
@@ -269,12 +275,12 @@
           "operation": "findUsers"
         },
         "children": [
-          { "type": "input", "id": "f.name", "properties": { "ref": "findUsers.request.query.name" } },
-          { "type": "input", "id": "f.state", "properties": { "ref": "findUsers.request.query.state" } },
-          { "type": "output", "id": "c.account", "properties": { "ref": "findUsers.response.content[].account" } },
-          { "type": "output", "id": "c.name", "properties": { "ref": "findUsers.response.content[].name" } },
-          { "type": "output", "id": "c.gender", "properties": { "ref": "findUsers.response.content[].gender" } },
-          { "type": "input", "id": "sort.account", "properties": { "ref": "findUsers.request.sort", "value": "account,asc" } }
+          { "type": "input", "id": "f.name", "properties": { "$ref": "openapi://findUsers/request/query/name" } },
+          { "type": "input", "id": "f.state", "properties": { "$ref": "openapi://findUsers/request/query/state" } },
+          { "type": "output", "id": "c.account", "properties": { "$ref": "openapi://findUsers/response/content/items/account" } },
+          { "type": "output", "id": "c.name", "properties": { "$ref": "openapi://findUsers/response/content/items/name" } },
+          { "type": "output", "id": "c.gender", "properties": { "$ref": "openapi://findUsers/response/content/items/gender" } },
+          { "type": "input", "id": "sort.account", "properties": { "$ref": "openapi://findUsers/request/sort", "value": "account,asc" } }
         ]
       },
       {
@@ -284,7 +290,7 @@
           "operation": "accountStatusSetting"
         },
         "children": [
-          { "type": "input", "id": "f.state", "properties": { "ref": "accountStatusSetting.request.body.state" } }
+          { "type": "input", "id": "f.state", "properties": { "$ref": "openapi://accountStatusSetting/request/body/state" } }
         ]
       }
     ]
@@ -297,22 +303,24 @@
 ### 编译阶段处理过程
 
 ```
-Step 1: @ResourceReference → OpenAPI 描述
+Step 1: openapi:// → OpenAPI 操作描述
 
-"@ResourceReference:findUsers"
-     ↓ 按 operationId 匹配 openapi.json paths./v1/system/users.get.operationId
+"$ref": "openapi://findUsers"
+     ↓ 提取 operationId = findUsers
+     ↓ 在 OpenAPI 文档中按 operationId 查找
+     ↓ 找到 paths./v1/system/users.get
      ↓
 {
   "method": "GET",
   "path": "/v1/system/users",
   "request": {
-    "query": { "$ref": "#/components/schemas/UserQuery" },   ← 需展开
+    "query": { "$ref": "#/components/schemas/UserQuery" },   ← L3: 需展开
     "offset": { "type": "integer", "default": 1 },
     "size": { "type": "integer", "default": 10 },
     "sort": { "type": "array", "items": { "type": "string" } }
   },
   "response": {
-    "content": { "type": "array", "items": { "$ref": "#/components/schemas/UserRecord" } },
+    "content": { "type": "array", "items": { "$ref": "#/components/schemas/UserRecord" } },  ← L3: 需展开
     "offset": { "type": "integer" },
     "total": { "type": "integer" },
     "limit": { "type": "integer" }
@@ -345,8 +353,8 @@ request 有 offset + size，response 有 content + total
      ↓ 生成 type: "pagination" 容器组件，children 为 output 子节点
 
 自动生成 input 组件:
-{ "type": "input", "id": "page.offset", "properties": { "ref": "findUsers.request.offset" } }
-{ "type": "input", "id": "page.size", "properties": { "ref": "findUsers.request.size" } }
+{ "type": "input", "id": "page.offset", "properties": { "$ref": "openapi://findUsers/request/offset" } }
+{ "type": "input", "id": "page.size", "properties": { "$ref": "openapi://findUsers/request/size" } }
 
 生成的 pagination 容器:
 {
@@ -354,15 +362,15 @@ request 有 offset + size，response 有 content + total
   "id": "page.user-list",
   "properties": {
     "mode": "page",
-    "offset_ref": "findUsers.request.offset",
-    "size_ref": "findUsers.request.size",
-    "total_ref": "findUsers.response.total",
-    "content_ref": "findUsers.response.content"
+    "offset": { "$ref": "openapi://findUsers/request/offset" },
+    "size": { "$ref": "openapi://findUsers/request/size" },
+    "total": { "$ref": "openapi://findUsers/response/total" },
+    "content": { "$ref": "openapi://findUsers/response/content" }
   },
   "children": [
-    { "type": "output", "id": "c.account", "properties": { "ref": "findUsers.response.content[].account" } },
-    { "type": "output", "id": "c.name", "properties": { "ref": "findUsers.response.content[].name" } },
-    { "type": "output", "id": "c.gender", "properties": { "ref": "findUsers.response.content[].gender" } }
+    { "type": "output", "id": "c.account", "properties": { "$ref": "openapi://findUsers/response/content/items/account" } },
+    { "type": "output", "id": "c.name", "properties": { "$ref": "openapi://findUsers/response/content/items/name" } },
+    { "type": "output", "id": "c.gender", "properties": { "$ref": "openapi://findUsers/response/content/items/gender" } }
   ]
 }
      ↓ 在 view 的 children 中，output 被包裹进 pagination 容器
@@ -372,16 +380,20 @@ request 有 offset + size，response 有 content + total
 ```
 
 ```
-Step 4: ref → UUID，写入被引用字段的 id 属性
+Step 4: openapi:// 字段路径 → UUID，写入被引用字段的 id 属性
 
-"ref": "findUsers.request.query.name"
-     ↓ 解析路径，找到 UserQuery.name
+"$ref": "openapi://findUsers/request/query/name"
+     ↓ 提取 operationId = findUsers
+     ↓ 在已展开的 operation 中定位 request.query.name
+     ↓ 找到 UserQuery.name 字段
      ↓ 生成 UUID: a1b2c3d4
      ↓ 在 name 字段上写入 "id": "a1b2c3d4"
-     ↓ 替换 ref 值为 "a1b2c3d4"
+     ↓ 替换 $ref 值为 "a1b2c3d4"
 
-"ref": "findUsers.response.content[].account"
-     ↓ 解析路径，找到 UserRecord.account ($ref: UserAccountRecord)
+"$ref": "openapi://findUsers/response/content/items/account"
+     ↓ 提取 operationId = findUsers
+     ↓ 在已展开的 operation 中定位 response.content.items.account
+     ↓ 找到 UserRecord.account 字段
      ↓ 生成 UUID: f6g7h8i9
      ↓ 在 account 字段上写入 "id": "f6g7h8i9"
 ```
@@ -474,25 +486,25 @@ state: { "type": "string", "enum": ["disable","enable"], "default": "enable" }
           "type": "view",
           "id": "user-list",
           "children": [
-            { "type": "input", "id": "f.name", "properties": { "ref": "a1b2c3d4" } },
-            { "type": "input", "id": "f.state", "properties": { "ref": "b2c3d4e5" } },
-            { "type": "input", "id": "sort.account", "properties": { "ref": "c3d4e5f6", "value": "account,asc" } },
-            { "type": "input", "id": "page.offset", "properties": { "ref": "d4e5f6a1" } },
-            { "type": "input", "id": "page.size", "properties": { "ref": "e5f6g7b2" } },
+            { "type": "input", "id": "f.name", "properties": { "$ref": "a1b2c3d4" } },
+            { "type": "input", "id": "f.state", "properties": { "$ref": "b2c3d4e5" } },
+            { "type": "input", "id": "sort.account", "properties": { "$ref": "c3d4e5f6", "value": "account,asc" } },
+            { "type": "input", "id": "page.offset", "properties": { "$ref": "d4e5f6a1" } },
+            { "type": "input", "id": "page.size", "properties": { "$ref": "e5f6g7b2" } },
             {
               "type": "pagination",
               "id": "page.user-list",
               "properties": {
                 "mode": "page",
-                "offset_ref": "d4e5f6a1",
-                "size_ref": "e5f6g7b2",
-                "total_ref": "g7h8i9d4",
-                "content_ref": "f6g7h8c3"
+                "offset": { "$ref": "d4e5f6a1" },
+                "size": { "$ref": "e5f6g7b2" },
+                "total": { "$ref": "g7h8i9d4" },
+                "content": { "$ref": "f6g7h8c3" }
               },
               "children": [
-                { "type": "output", "id": "c.account", "properties": { "ref": "f6g7h8i9" } },
-                { "type": "output", "id": "c.name", "properties": { "ref": "d4e5f6g7" } },
-                { "type": "output", "id": "c.gender", "properties": { "ref": "e5f6g7h8" } }
+                { "type": "output", "id": "c.account", "properties": { "$ref": "f6g7h8i9" } },
+                { "type": "output", "id": "c.name", "properties": { "$ref": "d4e5f6g7" } },
+                { "type": "output", "id": "c.gender", "properties": { "$ref": "e5f6g7h8" } }
               ]
             }
           ]
@@ -501,7 +513,7 @@ state: { "type": "string", "enum": ["disable","enable"], "default": "enable" }
           "type": "form",
           "id": "edit-user",
           "children": [
-            { "type": "input", "id": "f.state", "properties": { "ref": "accountStatusSetting.request.body.state" } }
+            { "type": "input", "id": "f.state", "properties": { "$ref": "openapi://accountStatusSetting/request/body/state" } }
           ]
         }
       ]
@@ -542,7 +554,7 @@ path 参数（如 `accountStatusSetting` 的 `{id}`）由 SDK 根据配置在运
 ## Risks / Trade-offs
 
 - **[风险]** compose.json 格式破坏性变更，所有业务模块需迁移 → 提供迁移指南和自动化脚本
-- **[风险]** `@ResourceReference` name 从 summary 改为 operationId，现有标注需批量修改 → 提供 grep + sed 迁移脚本
+- **[风险]** `$ref` 引用语法从自定义路径改为 `openapi://` 协议
 - **[权衡]** 编译时校验导致启动失败，可能影响开发体验 → 报错信息包含具体引用路径，便于快速定位
 - **[权衡]** 不支持运行时动态加载组件描述 → 当前无此需求，如有需要可后续扩展
 - **[风险]** OpenAPI 中 `$ref` 嵌套可能导致编译时循环引用 → 编译阶段检测循环引用并报错
@@ -550,7 +562,7 @@ path 参数（如 `accountStatusSetting` 的 `{id}`）由 SDK 根据配置在运
 
 ## Migration Plan
 
-1. 修改 `@ResourceReference` name 为 operationId
+1. 将所有 `$ref` 引用统一到 `openapi://` 协议风格
 2. 重写 `ping-ui` SDK 核心为编译/组装器
 3. 实现后端 `GET /v1/ui/components` 聚合接口
 4. 迁移所有业务模块 compose.json 到新格式
