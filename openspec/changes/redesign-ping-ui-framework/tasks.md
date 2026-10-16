@@ -51,9 +51,33 @@
 
 ## 4. 旧代码清理
 
-- [ ] 4.1 移除 `ping-ui` 旧 SDK 代码（registry、lifecycle、message-bus、error_handler、sdk/ 目录），验证：`./mvnw -Ph2 test` 通过
-- [ ] 4.2 移除前端旧渲染器代码（registry.tsx、derive.ts、default-tree.ts 等），验证：`npm run build` 通过
-- [ ] 4.3 移除旧异常类（`RefNotFoundException`、`CircularReferenceException`），验证：代码中无残留引用
+### 4.1 移除旧 compiler 组件（已整合到 OperationCompiler/ComponentCompiler）
+
+- [ ] 4.1.1 移除 `OperationRefResolver.java`，验证：代码中无残留引用
+- [ ] 4.1.2 移除 `SchemaRefExpander.java`，验证：代码中无残留引用
+- [ ] 4.1.3 移除 `DefaultResolver.java`，验证：代码中无残留引用
+- [ ] 4.1.4 移除 `RefResolver.java`，验证：代码中无残留引用
+- [ ] 4.1.5 移除 `PaginationMaterializer.java`，验证：代码中无残留引用
+
+### 4.2 移除旧异常类（已合并到 ComposeException）
+
+- [ ] 4.2.1 移除 `RefNotFoundException.java`，验证：代码中无残留引用
+- [ ] 4.2.2 移除 `CircularReferenceException.java`，验证：代码中无残留引用
+- [ ] 4.2.3 移除 `ComposeCompileException.java`（重命名为 `ComposeException`），验证：代码中无残留引用
+
+### 4.3 移除旧 Compose 聚合根（已删除）
+
+- [ ] 4.3.1 移除 `Compose.java`，验证：代码中无残留引用
+
+### 4.4 移除旧前端 SDK 代码
+
+- [ ] 4.4.1 移除 `ping-ui/src/main/js/sdk/` 目录（registry、message-bus、error-handler 等），验证：`npm run build` 通过
+- [ ] 4.4.2 移除前端旧渲染器代码（registry.tsx、derive.ts、default-tree.ts 等），验证：`npm run build` 通过
+
+### 4.5 移除旧测试代码
+
+- [ ] 4.5.1 移除 `ComponentTest.java`（性能测试，与 UI 组件无关），验证：`./mvnw -Ph2 test` 通过
+- [ ] 4.5.2 移除旧 component 包下的测试（ComposeRepositoryTest、DefaultResolverTest、OperationRefResolverTest、PaginationMaterializerTest、RefResolverTest、SchemaRefExpanderTest），验证：`./mvnw -Ph2 test` 通过
 
 ## 5. 验证
 

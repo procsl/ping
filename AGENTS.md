@@ -52,9 +52,27 @@
 
 - **配置只用 properties，禁 yaml**
 - 前端走**抽象组件**，**否决微前端**；`ping-ui` 是需要前端的模块的公共依赖，机制归 `ping-ui`，业务模块只交 `ui/<page>/compose.json` 声明（规范见 `ping-ui/doc/abstract-component-schema.md`）
-- schema 以 `ping-ui` 为准；API 关联用 `@ResourceReference` 稳定标识，不用 `@Operation(summary)` 中文文案
+- schema 以 `ping-ui` 为准；API 关联用 `openapi://` 协议稳定标识，不用 `@Operation(summary)` 中文文案
 - 静态资源进各自 jar `META-INF/resources/<module>/`，薄壳 `<module>/index.html`；散访 `/<module>/index.html`，聚访 `/index.html`，**共用同一渲染器**，node 构建仅在有自定义组件时需要
 - 动态加载粒度是**组件**，不是子应用；权限落菜单层 + API 层，**静态资源保持放行**（登录页要可达）
+
+## 领域驱动设计（DDD）
+
+**核心原则**
+
+- **组合优于继承**：减少继承，多用组合
+- **职责清晰**：每个类只负责一个明确职责
+- **开闭原则**：对扩展开放，对修改关闭
+- **异常精炼**：不多不少，报错明确，通过错误消息区分不同错误场景
+- **无状态**：组件不依赖 Spring，直接 new 创建，用完即释放，无需一直持有
+- **命名规范**：命名清晰一致，避免混乱
+
+**OpenSpec 工作流约束**
+
+- 需求理清楚后，**必须协商架构如何定义、组件如何组织**
+- spec 中的设计与任务必须包含：**示例、要求、测试**等沟通中的约束
+- 必须有**代码设计约束**（协商而来）
+- 规划阶段只创建规划制品，不实现代码
 
 ## 编译期生成
 
