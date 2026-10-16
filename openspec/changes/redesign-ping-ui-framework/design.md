@@ -12,6 +12,8 @@
 - 前端拿到完全内联的最终 JSON，零运行时解析
 - 恢复后端 `GET /v1/ui/components` 聚合接口
 - 移除 SDK 运行时（注册表、生命周期、消息总线、错误处理器）
+- **DDD 代码架构**：引入 `Component` 组合类型、`App` 应用根、`ComposeService` 领域服务、`ComposeCompiler` 编译器、`ComposeRepository` 仓储
+- **开闭原则**：新增编译阶段只需实现 `CompilePhase` 接口，不修改已有代码
 
 **Non-Goals:**
 - 不实现前端渲染器（各端自行实现）
@@ -109,6 +111,140 @@
 **备选方案**：
 - 标记 `operation.paged = true`，前端自行推断 → 被拒绝，前端需要额外推断逻辑
 - 在 compose.json 中显式声明分页组件 → 被拒绝，违背克制原则
+
+### D10: DDD 代码架构——组合类型 + 领域服务 + 编译器
+
+**决策**：引入 DDD 代码架构，包结构如下：
+
+```
+cn.procsl.ping.boot.ui
+├── domain/
+│   ├── Component.java         # 组合类型（type + id + properties + children）
+│   └── App.java               # 应用根，包含编译后的 Component 树
+├── compiler/
+│   ├── ComposeCompiler.java   # 编译器（List<JsonNode> → List<Component>）
+│   ├── OperationCompiler.java # operation 契约构建（解析 + 展开 + 默认值）
+│   ├── ComponentCompiler.java # 组件树物化（UUID + 分页）
+│   ├── CompilePhase.java      # 编译阶段接口
+│   ├── CompileContext.java    # 编译上下文
+│   └── Schemas.java           # 常量
+├── service/
+│   └── ComposeService.java    # 领域服务，调用 Compiler，返回 App
+├── repository/
+│   └── ComposeRepository.java  # 返回 List<JsonNode>
+└── exception/
+    ├── ComposeException.java
+    └── ComposeParseException.java
+```
+
+**理由**：
+- `Component` 采用组合优于继承，不同类型只是 `type` 字段不同
+- `ComposeService` 作为领域服务，串联 Repository → Compiler → App
+- `ComposeCompiler` 负责编译流程编排，返回类型安全的 `List<Component>`
+- `ComposeRepository` 只负责数据访问，返回原始 `List<JsonNode>`
+- 开闭原则：新增编译阶段只需实现 `CompilePhase` 接口
+
+**备选方案**：
+- 保持现有扁平结构 → 被拒绝，职责混乱、命名不清晰
+- 引入 Component 继承层次 → 被拒绝，用户明确说"组合优于继承"
+
+### D11: compiler 包整合——按职责域整合
+
+**决策**：将现有 6 个类整合为 3 个：
+
+| 新类 | 整合来源 | 职责 |
+|---|---|---|
+| `ComposeCompiler` | 新增 | 主编排器，协调各编译阶段 |
+| `OperationCompiler` | `OperationRefResolver` + `SchemaRefExpander` + `DefaultResolver` | operation 契约完整构建：解析 → 展开 → 默认值 |
+| `ComponentCompiler` | `RefResolver` + `PaginationMaterializer` | 组件树物化：UUID + 分页 |
+
+**理由**：
+- 按职责域整合，而非按编译阶段拆分
+- operation 相关的操作（解析、展开、默认值）都是围绕 operation 契约的
+- 组件树相关的操作（UUID、分页）都是围绕组件树的
+- 命名统一为 `Compiler` 后缀，清晰一致
+
+**备选方案**：保持现有细粒度拆分 → 被拒绝，太乱太细
+
+### D12: exception 精简到 2 个
+
+**决策**：从 4 个异常类精简到 2 个：
+
+| 异常 | 用途 |
+|---|---|
+| `ComposeException` | 基类，所有编译错误（引用断链、循环引用、格式错误等） |
+| `ComposeParseException` | 文件级解析失败（JSON 格式错误、顶层类型不合法） |
+
+**理由**：
+- 文件级解析错误与编译错误是不同性质的错误，值得区分
+- 引用断链、循环引用等都是编译错误的一种，通过错误消息区分即可
+- 异常类不多不少，报错明确
+
+**备选方案**：
+- 保持 4 个异常 → 被拒绝，用户明确说"太多了"
+- 精简到 1 个 → 被拒绝，文件级错误与编译错误需要区分
+
+## 调用流程
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                  ComposeService.compile()                    │
+│                                                              │
+│  1. ComposeRepository.loadAll() → List<JsonNode>            │
+│  2. ComposeCompiler.compile(List<JsonNode>) → List<Component>│
+│  3. new App(List<Component>) → App                          │
+│                                                              │
+│  输出: App（包含编译后的 Component 树）                      │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│                    ComposeCompiler.compile()                 │
+│                                                              │
+│  输入: List<JsonNode>（ComposeRepository.loadAll() 返回）    │
+│                                                              │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │ Phase 1: OperationCompiler                             │  │
+│  │                                                        │  │
+│  │  遍历所有 operation 组件:                              │  │
+│  │  ┌──────────────────────────────────────────────────┐  │  │
+│  │  │ 1. 解析 openapi:// 引用                          │  │  │
+│  │  │ 2. 展开 OpenAPI $ref                             │  │  │
+│  │  │ 3. 合并默认值                                     │  │  │
+│  │  └──────────────────────────────────────────────────┘  │  │
+│  │                                                        │  │
+│  │  结果: context.operations (Map<String, JsonNode>)      │  │
+│  └────────────────────────────────────────────────────────┘  │
+│                                                              │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │ Phase 2: ComponentCompiler                             │  │
+│  │                                                        │  │
+│  │  遍历所有 function/view/form 组件:                     │  │
+│  │  ┌──────────────────────────────────────────────────┐  │  │
+│  │  │ 1. 字段路径 → UUID                               │  │  │
+│  │  │ 2. 分页物化                                       │  │  │
+│  │  └──────────────────────────────────────────────────┘  │  │
+│  │                                                        │  │
+│  │  结果: 编译后的 List<Component>（$ref 已替换为 UUID）  │  │
+│  └────────────────────────────────────────────────────────┘  │
+│                                                              │
+│  输出: List<Component>（编译后的组件树）                      │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## 注意事项
+
+1. **开闭原则**：新增编译阶段只需实现 `CompilePhase` 接口，注册到 `ComposeCompiler`，不修改已有代码
+2. **类型安全**：`Component` 采用组合类型，不同类型只是 `type` 字段不同，不引入继承层次
+3. **职责清晰**：Repository 只负责数据访问，Compiler 负责编译逻辑，Service 负责编排
+4. **异常精简**：只保留 2 个异常类，通过错误消息区分不同错误场景
+5. **命名规范**：统一使用 `Compiler` 后缀，避免 Resolver/Expander/Materializer 等混乱命名
+
+## 测试原则
+
+1. **单元测试**：每个 Compiler 阶段都有对应的单元测试
+2. **集成测试**：`ComposeCompiler` 的端到端测试，验证完整编译流程
+3. **异常测试**：验证各种错误场景（引用断链、循环引用、格式错误等）
+4. **边界测试**：验证空数组、空对象、缺失字段等边界情况
 
 ## 示例
 
@@ -306,21 +442,21 @@
 Step 1: openapi:// → OpenAPI 操作描述
 
 "$ref": "openapi://findUsers"
-     ↓ 提取 operationId = findUsers
-     ↓ 在 OpenAPI 文档中按 operationId 查找
-     ↓ 找到 paths./v1/system/users.get
-     ↓
+      ↓ 提取 operationId = findUsers
+      ↓ 在 OpenAPI 文档中按 operationId 查找
+      ↓ 找到 paths./v1/system/users.get
+      ↓
 {
   "method": "GET",
   "path": "/v1/system/users",
   "request": {
-    "query": { "$ref": "#/components/schemas/UserQuery" },   ← L3: 需展开
+    "query": { "$ref": "#/components/schemas/UserQuery" },   ← 需展开
     "offset": { "type": "integer", "default": 1 },
     "size": { "type": "integer", "default": 10 },
     "sort": { "type": "array", "items": { "type": "string" } }
   },
   "response": {
-    "content": { "type": "array", "items": { "$ref": "#/components/schemas/UserRecord" } },  ← L3: 需展开
+    "content": { "type": "array", "items": { "$ref": "#/components/schemas/UserRecord" } },  ← 需展开
     "offset": { "type": "integer" },
     "total": { "type": "integer" },
     "limit": { "type": "integer" }
@@ -332,7 +468,7 @@ Step 1: openapi:// → OpenAPI 操作描述
 Step 2: query $ref 展开
 
 query: { "$ref": "#/components/schemas/UserQuery" }
-     ↓ 展开为
+      ↓ 展开为
 query: {
   "type": "object",
   "properties": {
@@ -348,9 +484,9 @@ query: {
 Step 3: 分页自动检测 + 物化
 
 request 有 offset + size，response 有 content + total
-     ↓ 检测到分页模式
-     ↓ 生成 type: "input" 组件（offset/size），插入 view children
-     ↓ 生成 type: "pagination" 容器组件，children 为 output 子节点
+      ↓ 检测到分页模式
+      ↓ 生成 type: "input" 组件（offset/size），插入 view children
+      ↓ 生成 type: "pagination" 容器组件，children 为 output 子节点
 
 自动生成 input 组件:
 { "type": "input", "id": "page.offset", "properties": { "$ref": "openapi://findUsers/request/offset" } }
@@ -373,37 +509,37 @@ request 有 offset + size，response 有 content + total
     { "type": "output", "id": "c.gender", "properties": { "$ref": "openapi://findUsers/response/content/items/gender" } }
   ]
 }
-     ↓ 在 view 的 children 中，output 被包裹进 pagination 容器
-     ↓ offset/size 作为 input 与 query、sort 并列
-     ↓ 前端看到 pagination → 渲染分页器，children 即为行数据的 output 描述
-     ↓ mode: "page" → 按页分页器；mode: "scroll" → 滑动加载
+      ↓ 在 view 的 children 中，output 被包裹进 pagination 容器
+      ↓ offset/size 作为 input 与 query、sort 并列
+      ↓ 前端看到 pagination → 渲染分页器，children 即为行数据的 output 描述
+      ↓ mode: "page" → 按页分页器；mode: "scroll" → 滑动加载
 ```
 
 ```
 Step 4: openapi:// 字段路径 → UUID，写入被引用字段的 id 属性
 
 "$ref": "openapi://findUsers/request/query/name"
-     ↓ 提取 operationId = findUsers
-     ↓ 在已展开的 operation 中定位 request.query.name
-     ↓ 找到 UserQuery.name 字段
-     ↓ 生成 UUID: a1b2c3d4
-     ↓ 在 name 字段上写入 "id": "a1b2c3d4"
-     ↓ 替换 $ref 值为 "a1b2c3d4"
+      ↓ 提取 operationId = findUsers
+      ↓ 在已展开的 operation 中定位 request.query.name
+      ↓ 找到 UserQuery.name 字段
+      ↓ 生成 UUID: a1b2c3d4
+      ↓ 在 name 字段上写入 "id": "a1b2c3d4"
+      ↓ 替换 $ref 值为 "a1b2c3d4"
 
 "$ref": "openapi://findUsers/response/content/items/account"
-     ↓ 提取 operationId = findUsers
-     ↓ 在已展开的 operation 中定位 response.content.items.account
-     ↓ 找到 UserRecord.account 字段
-     ↓ 生成 UUID: f6g7h8i9
-     ↓ 在 account 字段上写入 "id": "f6g7h8i9"
+      ↓ 提取 operationId = findUsers
+      ↓ 在已展开的 operation 中定位 response.content.items.account
+      ↓ 找到 UserRecord.account 字段
+      ↓ 生成 UUID: f6g7h8i9
+      ↓ 在 account 字段上写入 "id": "f6g7h8i9"
 ```
 
 ```
 Step 5: 合并默认值
 
 defaults.request.state = "enable"
-     ↓ 写入 request.query.state.default = "enable"
-     ↓
+      ↓ 写入 request.query.state.default = "enable"
+      ↓
 state: { "type": "string", "enum": ["disable","enable"], "default": "enable" }
 ```
 
@@ -551,6 +687,16 @@ path 参数（如 `accountStatusSetting` 的 `{id}`）由 SDK 根据配置在运
 - 编译成功（204 = 成功但无可解析字段）
 - 如果有 `output` 引用 `accountStatusSetting.response` 的任何字段 → 编译失败（断链）
 
+详见 `design/phase-1-compiler-core.md`、`design/phase-2-backend-api.md`、`design/phase-3-cleanup.md`
+
+## 阶段设计文档索引
+
+| 阶段 | 文档 | 状态 |
+|---|---|---|
+| 1. 编译器核心 | design/phase-1-compiler-core.md | 已细化 |
+| 2. 后端聚合接口 | design/phase-2-backend-api.md | 已细化 |
+| 3. 旧代码清理 | design/phase-3-cleanup.md | 已细化 |
+
 ## Risks / Trade-offs
 
 - **[风险]** compose.json 格式破坏性变更，所有业务模块需迁移 → 提供迁移指南和自动化脚本
@@ -559,11 +705,12 @@ path 参数（如 `accountStatusSetting` 的 `{id}`）由 SDK 根据配置在运
 - **[权衡]** 不支持运行时动态加载组件描述 → 当前无此需求，如有需要可后续扩展
 - **[风险]** OpenAPI 中 `$ref` 嵌套可能导致编译时循环引用 → 编译阶段检测循环引用并报错
 - **[风险]** UserAccountRecord 为空 schema `{}`，output 引用它时前端无法推断控件类型 → 编译阶段检测空 schema 并报错，要求后端补全
+- **[风险]** DDD 重构可能影响现有测试 → 保留现有测试，逐步迁移到新架构
 
 ## Migration Plan
 
 1. 将所有 `$ref` 引用统一到 `openapi://` 协议风格
-2. 重写 `ping-ui` SDK 核心为编译/组装器
+2. 重写 `ping-ui` SDK 核心为编译/组装器，引入 DDD 架构
 3. 实现后端 `GET /v1/ui/components` 聚合接口
 4. 迁移所有业务模块 compose.json 到新格式
 5. 前端渲染器重写为静态 JSON 驱动
