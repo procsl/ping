@@ -25,37 +25,37 @@
 
 ### 1.3 $ref 展开
 
-- [ ] 1.3.1 实现 `$ref` 递归展开：将 `schema.$ref` 指向的 object 展开到 operation 中，验证：单测覆盖一层 $ref
-- [ ] 1.3.2 实现嵌套 $ref 展开：处理 schema 内部嵌套的 `$ref`（如 UserRecord.account → UserAccountRecord），验证：单测覆盖嵌套 $ref
-- [ ] 1.3.3 实现循环引用检测：展开时检测 $ref 循环并报错 `CircularReferenceException`，验证：单测覆盖循环引用报错
-- [ ] 1.3.4 实现 `$ref` 目标不存在时报错，验证：单测覆盖断链 $ref
-- [ ] 1.3.5 实现 array items 中的 `$ref` 展开（如 `items: { $ref: ... }`），验证：单测覆盖数组 items 展开
+- [x] 1.3.1 实现 `$ref` 递归展开：将 `schema.$ref` 指向的 object 展开到 operation 中，验证：单测覆盖一层 $ref
+- [x] 1.3.2 实现嵌套 $ref 展开：处理 schema 内部嵌套的 `$ref`（如 UserRecord.account → UserAccountRecord），验证：单测覆盖嵌套 $ref
+- [x] 1.3.3 实现循环引用检测：展开时检测 $ref 循环并报错 `CircularReferenceException`，验证：单测覆盖循环引用报错
+- [x] 1.3.4 实现 `$ref` 目标不存在时报错，验证：单测覆盖断链 $ref
+- [x] 1.3.5 实现 array items 中的 `$ref` 展开（如 `items: { $ref: ... }`），验证：单测覆盖数组 items 展开
 
 ### 1.4 ref → UUID 解析
 
-- [ ] 1.4.1 实现路径解析：将 `findUsers.request.query.name` 解析为 operation 树中的具体字段节点，验证：单测覆盖正常解析
-- [ ] 1.4.2 实现 UUID 生成 + 替换：为被引用字段生成 UUID，替换 ref 值，在字段上写入 `id` 属性，验证：单测覆盖替换正确
-- [ ] 1.4.3 实现断链检测：ref 指向不存在的 operation 或字段时报错 `RefNotFoundException`（包含完整 ref 路径），验证：单测覆盖断链报错
-- [ ] 1.4.4 实现重复 ref 检测：同一 compose.json 中多个组件引用同一字段时，复用相同 UUID（不重复生成），验证：单测覆盖复用
-- [ ] 1.4.5 实现跨 operation ref 检测：ref 指向其他 operation 的字段时报错（ref 仅限同一 operation），验证：单测覆盖跨 operation 报错
-- [ ] 1.4.6 实现 ref 路径格式校验：必须为 `<operationId>.<request|response>.<fieldPath>` 格式，验证：单测覆盖格式错误
+- [x] 1.4.1 实现路径解析：将 `findUsers.request.query.name` 解析为 operation 树中的具体字段节点，验证：单测覆盖正常解析
+- [x] 1.4.2 实现 UUID 生成 + 替换：为被引用字段生成 UUID，替换 ref 值，在字段上写入 `id` 属性，验证：单测覆盖替换正确
+- [x] 1.4.3 实现断链检测：ref 指向不存在的 operation 或字段时报错 `RefNotFoundException`（包含完整 ref 路径），验证：单测覆盖断链报错
+- [x] 1.4.4 实现重复 ref 检测：同一 compose.json 中多个组件引用同一字段时，复用相同 UUID（不重复生成），验证：单测覆盖复用
+- [x] 1.4.5 实现跨 operation ref 检测：ref 指向其他 operation 的字段时报错（ref 仅限同一 operation），验证：单测覆盖跨 operation 报错
+- [x] 1.4.6 实现 ref 路径格式校验：必须为 `<operationId>.<request|response>.<fieldPath>` 格式，验证：单测覆盖格式错误
 
 ### 1.5 默认值合并
 
-- [ ] 1.5.1 实现 operation defaults 写入：将 `defaults.request` 合并到 operation.request 对应字段的 `default` 属性，验证：单测覆盖合并成功
-- [ ] 1.5.2 实现 function overrides 覆盖：将 function 级别的 overrides 覆盖 operation defaults，验证：单测覆盖覆盖成功
-- [ ] 1.5.3 实现优先级链：实际调用值 > 覆盖默认值 > operation 默认值，验证：单测覆盖三级优先级
-- [ ] 1.5.4 实现 defaults 目标字段不存在时报错，验证：单测覆盖 defaults 断链
-- [ ] 1.5.5 实现 overrides 类型校验：overrides 值类型必须与 schema 声明类型一致，验证：单测覆盖类型不匹配报错
+- [x] 1.5.1 实现 operation defaults 写入：将 `defaults.request` 合并到 operation.request 对应字段的 `default` 属性，验证：单测覆盖合并成功
+- [x] 1.5.2 实现 function overrides 覆盖：将 function 级别的 overrides 覆盖 operation defaults，验证：单测覆盖覆盖成功
+- [x] 1.5.3 实现优先级链：实际调用值 > 覆盖默认值 > operation 默认值，验证：单测覆盖三级优先级
+- [x] 1.5.4 实现 defaults 目标字段不存在时报错，验证：单测覆盖 defaults 断链
+- [x] 1.5.5 实现 overrides 类型校验：overrides 值类型必须与 schema 声明类型一致，验证：单测覆盖类型不匹配报错
 
 ### 1.6 分页自动检测 + 物化
 
-- [ ] 1.6.1 实现分页检测：request 有 `offset` + `size` 且 response 有 `content` + `total`，验证：单测覆盖检测成功/失败
-- [ ] 1.6.2 实现 pagination 容器生成：创建 `type: "pagination"` 组件，children 为 output 子节点，验证：单测覆盖生成正确
-- [ ] 1.6.3 实现 offset/size input 生成：自动创建 `type: "input"` 组件，验证：单测覆盖生成正确
-- [ ] 1.6.4 实现 mode 属性：默认 `page`，支持 `scroll`，验证：单测覆盖默认值和自定义值
-- [ ] 1.6.5 实现 pagination 插入位置：pagination 组件插入到 view children 末尾（output 之后），验证：单测覆盖位置正确
-- [ ] 1.6.6 实现非分页 operation 不生成 pagination，验证：单测覆盖无分页场景
+- [x] 1.6.1 实现分页检测：request 有 `offset` + `size` 且 response 有 `content` + `total`，验证：单测覆盖检测成功/失败
+- [x] 1.6.2 实现 pagination 容器生成：创建 `type: "pagination"` 组件，children 为 output 子节点，验证：单测覆盖生成正确
+- [x] 1.6.3 实现 offset/size input 生成：自动创建 `type: "input"` 组件，验证：单测覆盖生成正确
+- [x] 1.6.4 实现 mode 属性：默认 `page`，支持 `scroll`，验证：单测覆盖默认值和自定义值
+- [x] 1.6.5 实现 pagination 插入位置：pagination 组件插入到 view children 末尾（output 之后），验证：单测覆盖位置正确
+- [x] 1.6.6 实现非分页 operation 不生成 pagination，验证：单测覆盖无分页场景
 
 ### 1.7 编译校验
 
