@@ -12,7 +12,7 @@
 - 前端拿到完全内联的最终 JSON，零运行时解析
 - 恢复后端 `GET /v1/ui/components` 聚合接口
 - 移除 SDK 运行时（注册表、生命周期、消息总线、错误处理器）
-- **DDD 代码架构**：引入 `Component` 组合类型、`App` 应用根、`ComposeService` 领域服务、`ComposeCompiler` 编译器、`ComposeRepository` 仓储
+- **DDD 代码架构**：引入 `Component` 组合类型、`App` 应用根、`ComposeEngine` 编译器、`ComposeRepository` 仓储
 - **开闭原则**：新增编译阶段只需实现 `CompilePhase` 接口，不修改已有代码
 
 **Non-Goals:**
@@ -25,15 +25,15 @@
 
 ### D1: 组件类型系统从 18 种精简到 8 种
 
-**决策**：只保留 `app`、`operation`、`function`、`view`、`form`、`input`、`output`、`placeholder`。
+**决策**：只保留 `app`、`operation`、`function`、`view`、`form`、`input`、`output`、`pagination`。
 
-**理由**：移除的 10 种类型（layout、nav_group、menu、breadcrumb、tabs、user_info_panel、main_container、row_action、form_action、empty）都是前端壳或 UI 细节，不属于"功能声明"。`row_action` 和 `form_action` 统一为 `input`（引用 operation.request 字段），`empty` 由前端自行处理。
+**理由**：移除的 10 种类型（layout、nav_group、menu、breadcrumb、tabs、user_info_panel、main_container、row_action、form_action、empty）都是前端壳或 UI 细节，不属于"功能声明"。`row_action` 和 `form_action` 统一为 `input`（引用 operation.request 字段），`empty` 由前端自行处理。`pagination` 作为正式组件类型，前端需要注册渲染器。`placeholder` 移除（AI 误加，无实际场景）。
 
 **备选方案**：保留更多类型以覆盖更多场景 → 被拒绝，违背克制原则。
 
 ### D2: operation 作为接口契约中心
 
-**决策**：`operation` 是接口契约的定义点，包含 `method`/`path`/`request`/`response`/`defaults`/`sortable_fields`。`input`/`output` 通过 `$ref`（`openapi://` 协议）引用 operation 的字段。
+**决策**：`operation` 是接口契约的定义点，包含 `method`/`path`/`request`/`response`/`defaults`/`sortable_fields`。`input`/`output` 通过 `$ref`（`openapi://` 协议）引用 operation 的字段。operation id **全局唯一**，重复即编译报错。
 
 **理由**：将接口描述集中管理，避免重复声明。前端可从 operation 生成可调用方法。编译时在被引用字段上插入 UUID 作为唯一标识。
 
@@ -43,12 +43,13 @@
 
 ### D3: 编译时解析 $ref → UUID，嵌入字段 id 属性
 
-**决策**：编译阶段将 `openapi://` 字段路径解析为 UUID，替换 `$ref` 值，并在被引用字段的 `id` 属性上写入该 UUID。
+**决策**：编译阶段将 `openapi://` 字段路径解析为 UUID，替换 `$ref` 值，并在被引用字段的 `id` 属性上写入该 UUID。UUID 使用**确定性哈希**（基于字段路径），同一字段被多次引用时**共享同一 UUID**。前端不应依赖 UUID 的确定性特性。
 
 **理由**：
 - 编译时校验所有引用完整性，启动失败而非运行时降级
 - 前端不需要理解路径引用，只需查 UUID
 - UUID 嵌入字段本身，零额外结构
+- 确定性哈希保证同一字段共享 UUID，但是否视为同一实例由前端决定
 
 **备选方案**：
 - 维护独立的 UUID 映射表 → 被拒绝，增加结构复杂度
@@ -64,7 +65,7 @@
 
 ### D5: $ref 使用 openapi:// 协议引用 operation
 
-**决策**：`$ref` 使用自定义协议 `openapi://<operationId>` 引用 OpenAPI 操作（如 `openapi://findUsers`）。编译器按 `operationId` 在 OpenAPI 文档中查找对应 path + method。冲突时追加类型+方法名。
+**决策**：`$ref` 使用自定义协议 `openapi://<operationId>` 引用 OpenAPI 操作（如 `openapi://findUsers`）。编译器按 `operationId` 在 OpenAPI 文档中查找对应 path + method。冲突时追加类型+方法名。**没有 operationId 的操作会导致编译报错**。
 
 **理由**：
 - `openapi://` 协议简洁直观，避免 JSON Pointer 长路径（如 `#/paths/~1v1~1system~1users/get`）
@@ -78,7 +79,7 @@
 
 ### D6: 编译阶段全量校验，失败则启动失败
 
-**决策**：任何引用断链、空 schema、非法属性都导致启动失败。
+**决策**：任何引用断链、空 schema、非法属性都导致启动失败。**全有或全无**——任何一个模块编译失败，整个应用启动失败。
 
 **理由**：断链意味着声明有错误，运行时降级会隐藏问题。启动失败强制开发者修复。
 
@@ -86,25 +87,22 @@
 
 ### D7: 后端聚合器扫描 classpath 收集 compose.json
 
-**决策**：启动时扫描 classpath 下所有 `META-INF/ping/ui/compose.json`，每个文件内容为 operation/function 数组（不需要 `type: "app"` 包装），合并编译为最终 app JSON，缓存为只读快照。
+**决策**：启动时扫描 classpath 下所有 `META-INF/ping/ui/compose.json`，每个文件内容为 operation/function 数组（不需要 `type: "app"` 包装），合并编译为最终 app JSON，缓存为只读快照。**启动时编译一次，运行期间不更新，直到重启**。function 按 id 字母序返回，但前端不可依赖此特性。
 
-**理由**：各业务模块独立提供 compose.json，后端聚合器统一编译并合并为 app.children。与现有"统一落 META-INF/ping/"的约定一致。
+**理由**：各业务模块独立提供 compose.json，后端聚合器统一编译并合并为 app.children。与现有"统一落 META-INF/ping/"的约定一致。顺序不应由后端决定，后续如需排序会增加新提案。
 
 **备选方案**：构建期聚合 → 被拒绝，当前构建期聚合链路已移除，且启动期聚合更灵活。
 
-### D8: platform 过滤在组装时注入
+### D8: platform 过滤（暂缓）
 
-**决策**：前端请求时携带平台标识（query param 或 header），后端在返回时过滤不支持的组件。
-
-**理由**：同一份 compose.json 在不同平台可能有不同可用性，过滤逻辑由后端控制。
-
-**备选方案**：在 compose.json 中声明 `platform` 属性 → 被拒绝，用户明确说"组装时声明即可"。
+**决策**：暂不实现。后续需要时再提新提案。
 
 ### D9: 分页自动检测 + 物化为 pagination 容器 + input 组件
 
 **决策**：编译阶段检测 operation 的 request 是否含 `offset` + `size`、response 是否含 `content` + `total`。检测到后：
 1. 生成 `type: "pagination"` 容器组件，children 为该分页接口的 output 子节点，`mode` 属性区分 `page`（按页分页）或 `scroll`（滑动分页），默认 `page`
 2. 自动生成 `type: "input"` 组件（`offset` 和 `size`），插入到 view 的 children 中，与 query、sort 并列
+3. **response 匹配但 request 无分页参数时**，pagination mode 设为 `scroll`
 
 **理由**：分页是后台系统的固定模式（offset/size 请求 + content/total 响应），应该由编译器自动物化。pagination 作为容器包裹 output 子节点，前端既知道数据来自分页接口，又能针对性渲染分页器。`mode` 让前端选择按页分页器还是滑动加载。分页参数自动生成为 input，前端无需额外推断。
 
@@ -112,35 +110,33 @@
 - 标记 `operation.paged = true`，前端自行推断 → 被拒绝，前端需要额外推断逻辑
 - 在 compose.json 中显式声明分页组件 → 被拒绝，违背克制原则
 
-### D10: DDD 代码架构——组合类型 + 领域服务 + 编译器
+### D10: DDD 代码架构——组合类型 + 编译器 + 仓储
 
-**决策**：引入 DDD 代码架构，包结构如下：
+**决策**：引入 DDD 代码架构，包结构如下（合并 compiler 和 service 包）：
 
 ```
 cn.procsl.ping.boot.ui
 ├── domain/
-│   ├── Component.java         # 组合类型（type + id + properties + children）
+│   ├── Component.java         # 组合类型（type + id + properties: Map<String, JsonNode> + children）
 │   └── App.java               # 应用根，包含编译后的 Component 树
 ├── compiler/
-│   ├── ComposeCompiler.java   # 编译器（List<JsonNode> → List<Component>）
+│   ├── ComposeEngine.java     # 主编排器（合并原 ComposeCompiler + ComposeService），协调各编译阶段，返回 App
 │   ├── OperationCompiler.java # operation 契约构建（解析 + 展开 + 默认值）
 │   ├── ComponentCompiler.java # 组件树物化（UUID + 分页）
 │   ├── CompilePhase.java      # 编译阶段接口
 │   ├── CompileContext.java    # 编译上下文
 │   └── Schemas.java           # 常量
-├── service/
-│   └── ComposeService.java    # 领域服务，调用 Compiler，返回 App
 ├── repository/
 │   └── ComposeRepository.java  # 返回 List<JsonNode>
 └── exception/
-    ├── ComposeException.java
-    └── ComposeParseException.java
+    ├── ComposeException.java       # 基类，所有编译错误（引用断链、循环引用、格式错误等）
+    └── ComposeParseException.java  # 文件级解析失败（JSON 格式错误、顶层类型不合法）
 ```
 
 **理由**：
 - `Component` 采用组合优于继承，不同类型只是 `type` 字段不同
-- `ComposeService` 作为领域服务，串联 Repository → Compiler → App
-- `ComposeCompiler` 负责编译流程编排，返回类型安全的 `List<Component>`
+- `properties` 类型为 `Map<String, JsonNode>`，直接依赖 Jackson 和 OpenAPI，实现简单
+- `ComposeEngine` 合并原 ComposeCompiler 和 ComposeService，负责编译流程编排，返回类型安全的 `App`
 - `ComposeRepository` 只负责数据访问，返回原始 `List<JsonNode>`
 - 开闭原则：新增编译阶段只需实现 `CompilePhase` 接口
 
@@ -154,7 +150,7 @@ cn.procsl.ping.boot.ui
 
 | 新类 | 整合来源 | 职责 |
 |---|---|---|
-| `ComposeCompiler` | 新增 | 主编排器，协调各编译阶段 |
+| `ComposeEngine` | 新增（合并原 ComposeCompiler + ComposeService） | 主编排器，协调各编译阶段，返回 App |
 | `OperationCompiler` | `OperationRefResolver` + `SchemaRefExpander` + `DefaultResolver` | operation 契约完整构建：解析 → 展开 → 默认值 |
 | `ComponentCompiler` | `RefResolver` + `PaginationMaterializer` | 组件树物化：UUID + 分页 |
 
@@ -162,7 +158,7 @@ cn.procsl.ping.boot.ui
 - 按职责域整合，而非按编译阶段拆分
 - operation 相关的操作（解析、展开、默认值）都是围绕 operation 契约的
 - 组件树相关的操作（UUID、分页）都是围绕组件树的
-- 命名统一为 `Compiler` 后缀，清晰一致
+- 命名统一为 `Compiler`/`Engine` 后缀，清晰一致
 
 **备选方案**：保持现有细粒度拆分 → 被拒绝，太乱太细
 
@@ -184,21 +180,50 @@ cn.procsl.ping.boot.ui
 - 保持 4 个异常 → 被拒绝，用户明确说"太多了"
 - 精简到 1 个 → 被拒绝，文件级错误与编译错误需要区分
 
+### D13: operation 和 function 保持平级，前端自行匹配
+
+**决策**：编译后的 JSON 中，operation 和 function 是平级关系（都在 app.children 下）。前端根据 `function.properties.operation` 查找对应 operation。
+
+**理由**：保持 JSON 结构简洁，前端自行匹配 operation 和 function 的关系。
+
+### D14: path 参数自动生成 input 组件
+
+**决策**：path 参数（如 `accountStatusSetting` 的 `{id}`）由编译器自动生成 input 组件，与 query/body 参数保持一致。前端从上下文（如行数据）取值。
+
+**理由**：path 参数和 query/body 参数本质都是"传给接口的参数"，统一为 input 保持模型一致性。
+
+### D15: 204 响应不特殊处理
+
+**决策**：204 响应（无 response body）编译后 `response: {}`，编译器自然从 OpenAPI 得到空 response。如果有 output 引用 204 接口的 response 字段，编译失败（断链）。
+
+**理由**：204 在 OpenAPI 中自然没有 response body，不需要特殊处理。
+
+### D16: 无 operationId 的操作编译报错
+
+**决策**：OpenAPI 中操作没有 `operationId` 时，编译器报错。
+
+**理由**：`operationId` 是 `openapi://` 引用的基础，缺失则无法引用。
+
+### D17: overrides 只能在 function 中声明
+
+**决策**：`function` 可通过 `properties.overrides` 覆盖 operation 默认值，`view`/`form` 的默认值由编译生成。
+
+**理由**：overrides 是功能级别的配置，只在 function 层声明，view/form 继承。
+
 ## 调用流程
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                  ComposeService.compile()                    │
+│                  ComposeEngine.compile()                     │
 │                                                              │
 │  1. ComposeRepository.loadAll() → List<JsonNode>            │
-│  2. ComposeCompiler.compile(List<JsonNode>) → List<Component>│
-│  3. new App(List<Component>) → App                          │
+│  2. compile(List<JsonNode>) → App                           │
 │                                                              │
 │  输出: App（包含编译后的 Component 树）                      │
 └─────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────┐
-│                    ComposeCompiler.compile()                 │
+│                    ComposeEngine.compile()                    │
 │                                                              │
 │  输入: List<JsonNode>（ComposeRepository.loadAll() 返回）    │
 │                                                              │
@@ -213,6 +238,11 @@ cn.procsl.ping.boot.ui
 │  │  └──────────────────────────────────────────────────┘  │  │
 │  │                                                        │  │
 │  │  结果: context.operations (Map<String, JsonNode>)      │  │
+│  │  │                                                        │  │
+│  │  检测:                                                │  │
+│  │  - operation id 全局唯一，重复则报错                  │  │
+│  │  - 必须有 operationId，否则报错                      │  │
+│  │  - 204 响应自然得到空 response {}                     │  │
 │  └────────────────────────────────────────────────────────┘  │
 │                                                              │
 │  ┌────────────────────────────────────────────────────────┐  │
@@ -220,29 +250,33 @@ cn.procsl.ping.boot.ui
 │  │                                                        │  │
 │  │  遍历所有 function/view/form 组件:                     │  │
 │  │  ┌──────────────────────────────────────────────────┐  │  │
-│  │  │ 1. 字段路径 → UUID                               │  │  │
-│  │  │ 2. 分页物化                                       │  │  │
+│  │  │ 1. 字段路径 → UUID（确定性哈希）                  │  │  │
+│  │  │ 2. 分页物化（page/scroll 模式）                  │  │  │
+│  │  │ 3. path 参数自动生成 input                        │  │  │
 │  │  └──────────────────────────────────────────────────┘  │  │
 │  │                                                        │  │
 │  │  结果: 编译后的 List<Component>（$ref 已替换为 UUID）  │  │
 │  └────────────────────────────────────────────────────────┘  │
 │                                                              │
-│  输出: List<Component>（编译后的组件树）                      │
+│  输出: App（包含编译后的 Component 树）                       │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ## 注意事项
 
-1. **开闭原则**：新增编译阶段只需实现 `CompilePhase` 接口，注册到 `ComposeCompiler`，不修改已有代码
+1. **开闭原则**：新增编译阶段只需实现 `CompilePhase` 接口，注册到 `ComposeEngine`，不修改已有代码
 2. **类型安全**：`Component` 采用组合类型，不同类型只是 `type` 字段不同，不引入继承层次
-3. **职责清晰**：Repository 只负责数据访问，Compiler 负责编译逻辑，Service 负责编排
+3. **职责清晰**：Repository 只负责数据访问，Engine 负责编排，Compiler 负责编译逻辑
 4. **异常精简**：只保留 2 个异常类，通过错误消息区分不同错误场景
-5. **命名规范**：统一使用 `Compiler` 后缀，避免 Resolver/Expander/Materializer 等混乱命名
+5. **命名规范**：统一使用 `Compiler`/`Engine` 后缀，避免 Resolver/Expander/Materializer 等混乱命名
+6. **UUID 策略**：确定性哈希，同一字段共享 UUID，前端不应依赖此特性
+7. **缓存策略**：启动时编译一次，运行期间不更新，直到重启
+8. **编译失败**：全有或全无，任何一个模块失败则整个应用启动失败
 
 ## 测试原则
 
 1. **单元测试**：每个 Compiler 阶段都有对应的单元测试
-2. **集成测试**：`ComposeCompiler` 的端到端测试，验证完整编译流程
+2. **集成测试**：`ComposeEngine` 的端到端测试，验证完整编译流程
 3. **异常测试**：验证各种错误场景（引用断链、循环引用、格式错误等）
 4. **边界测试**：验证空数组、空对象、缺失字段等边界情况
 
@@ -522,7 +556,7 @@ Step 4: openapi:// 字段路径 → UUID，写入被引用字段的 id 属性
       ↓ 提取 operationId = findUsers
       ↓ 在已展开的 operation 中定位 request.query.name
       ↓ 找到 UserQuery.name 字段
-      ↓ 生成 UUID: a1b2c3d4
+      ↓ 生成确定性哈希 UUID: a1b2c3d4
       ↓ 在 name 字段上写入 "id": "a1b2c3d4"
       ↓ 替换 $ref 值为 "a1b2c3d4"
 
@@ -530,7 +564,7 @@ Step 4: openapi:// 字段路径 → UUID，写入被引用字段的 id 属性
       ↓ 提取 operationId = findUsers
       ↓ 在已展开的 operation 中定位 response.content.items.account
       ↓ 找到 UserRecord.account 字段
-      ↓ 生成 UUID: f6g7h8i9
+      ↓ 生成确定性哈希 UUID: f6g7h8i9
       ↓ 在 account 字段上写入 "id": "f6g7h8i9"
 ```
 
@@ -660,25 +694,17 @@ state: { "type": "string", "enum": ["disable","enable"], "default": "enable" }
 
 ### path 参数处理
 
-path 参数（如 `accountStatusSetting` 的 `{id}`）由 SDK 根据配置在运行时处理。operation 中包含 path 参数定义，前端调用时从上下文（如当前行数据）取值：
+path 参数（如 `accountStatusSetting` 的 `{id}`）由编译器自动生成 input 组件，与 query/body 参数一致：
 
 ```json
 {
-  "type": "operation",
-  "id": "accountStatusSetting",
-  "properties": {
-    "method": "PATCH",
-    "path": "/v1/system/users/{id}/account",
-    "request": {
-      "path": {
-        "id": { "type": "integer" }
-      }
-    }
-  }
+  "type": "input",
+  "id": "f.id",
+  "properties": { "$ref": "openapi://accountStatusSetting/request/path/id" }
 }
 ```
 
-前端渲染时：path 参数不生成输入控件，调用时自动从行上下文（如 `$row.id`）取值。
+前端渲染时：path 参数生成隐藏 input 控件，调用时自动从行上下文（如 `$row.id`）取值。
 
 ### 204 响应处理
 
@@ -720,4 +746,5 @@ path 参数（如 `accountStatusSetting` 的 `{id}`）由 SDK 根据配置在运
 
 ## Open Questions
 
-- 无
+- view/form 引用单个还是多个 operation？（当前倾向支持多个，但具体设计待定）
+- platform 过滤具体实现方式（query param / header / 路径前缀）
