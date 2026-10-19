@@ -1,4 +1,94 @@
 {
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "sense-nova": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Sense Nova",
+      "options": {
+        "baseURL": "https://token.sensenova.cn/v1",
+        "apiKey": "$SENSENOVA_API_KEY"
+      },
+      "models": {
+        "deepseek-v4-flash": {
+          "name": "DeepSeek V4 Flash",
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          },
+          "limit": {
+            "context": 1048576,
+            "output": 65536
+          }
+        },
+        "glm-5.2": {
+          "name": "GLM-5.2",
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          },
+          "limit": {
+            "context": 1048576,
+            "output": 131072
+          }
+        },
+        "sensenova-6.8-flash-lite": {
+          "name": "SenseNova 6.8 Flash-Lite",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "limit": {
+            "context": 262144,
+            "output": 65536
+          }
+        },
+        "sensenova-u1.5-lite": {
+          "name": "SenseNova U1.5 Lite",
+          "modalities": {
+            "input": ["text"],
+            "output": ["image"]
+          },
+          "limit": {
+            "context": 262144,
+            "output": 65536
+          }
+        },
+        "kimi-k3": {
+          "name": "Kimi K3",
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          },
+          "limit": {
+            "context": 1048576,
+            "output": 65536
+          }
+        },
+        "deepseek-flash": {
+          "name": "DeepSeek Flash",
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          },
+          "limit": {
+            "context": 1048576,
+            "output": 65536
+          }
+        },
+        "deepseek-v4.1-flash": {
+          "name": "DeepSeek V4.1 Flash",
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          },
+          "limit": {
+            "context": 1048576,
+            "output": 65536
+          }
+        }
+      }
+    }
+  },
   "mcp": {
     "servers": {
       "chrome-devtools": {

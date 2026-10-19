@@ -69,6 +69,7 @@
 
 **OpenSpec 工作流约束**
 
+- **先拷问再进工作流**：有初步想法先 `/grill-me <初步计划>` 拷问到共识（直接说"grill 一下这个方案"会自动加载 `grilling`），再走 `/opsx:propose` 等产出物；需要沉淀文档时用 `/grill-with-docs`，拷问过程中同步产出 ADR 和 `GLOSSARY.md`
 - 需求理清楚后，**必须协商架构如何定义、组件如何组织**
 - spec 中的设计与任务必须包含：**示例、要求、测试**等沟通中的约束
 - 必须有**代码设计约束**（协商而来）
@@ -98,5 +99,6 @@
 ## OpenSpec
 
 - `openspec/`（schema `spec-driven`）+ `/opsx:*` 命令 + `.opencode/skills/openspec-*`，CLI `openspec` 已装
+- 拷问类 skill：`grill-me`、`grill-with-docs`（依赖 `grilling`、`domain-modeling`），来自 `mattpocock/skills`，装在 `.agents/skills/`，根目录 `skills-lock.json` 跟踪，更新用 `npx skills update`
 - 当前分支 `dev-new`
 - 活跃变更见 `openspec list`（活跃变更：`standalone-module-packaging`、`abstract-component-rendering`）

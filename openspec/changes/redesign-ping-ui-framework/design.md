@@ -117,8 +117,7 @@
 ```
 cn.procsl.ping.boot.ui
 ├── domain/
-│   ├── Component.java         # 组合类型（type + id + properties: Map<String, JsonNode> + children）
-│   └── App.java               # 应用根，包含编译后的 Component 树
+│   └─ Component.java         # 组合类型（type + id + properties: Map<String, JsonNode> + children）
 ├── compiler/
 │   ├── ComposeEngine.java     # 主编排器（合并原 ComposeCompiler + ComposeService），协调各编译阶段，返回 App
 │   ├── OperationCompiler.java # operation 契约构建（解析 + 展开 + 默认值）
