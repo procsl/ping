@@ -64,13 +64,11 @@
 - **WHEN** 多个 compose.json 声明了相同 id 的 operation（或 OpenAPI 中缺失 operationId）
 - **THEN** 编译阶段报错，启动失败，报错信息包含两处声明的来源（模块文件名）
 
-### Requirement: 组件结构约束
+### Requirement: function 结构约束
 
-`function` 的 `children` SHALL 非空——`function` 至少包含一个 `view` 或 `form` 子节点，否则编译报错、启动失败。动作类功能（如「重置密码」）SHALL 表达为 `function` 下挂 `form`，不单独引入动作类型。
+`function` 的 `children` SHALL 非空（至少一个 `view` 或 `form`），否则编译报错、启动失败。动作类功能（如「重置密码」）SHALL 表达为 `function` 下挂 `form`，不单独引入动作类型。
 
-`view` 与 `form` SHALL 各关联且仅关联一个 operation（`properties.operation`）：一个 view 读一个接口，一个 form 提交一个接口。一屏多接口 SHALL 用 `function` 下挂多个 view/form 表达。`view` 的子节点 SHALL 为 `input`/`output`（含编译器自动生成的分页/排序 input），`form` 的子节点 SHALL 为 `input`。
-
-> ⏸️ **遗留（待重新设计）**：`function` 自身是否携带 `properties.operation`（design D13 原文与示例互相矛盾）尚未定论，可能完全重新设计。当前实现以「只有 view/form 挂 operation、function 不携带」为准；这是唯一可增量演进的方向（将来加可选属性不破坏，反之则返工）。
+> ⏸️ **遗留（待重新设计）**：`function` 是否携带 `properties.operation` 待完全重新设计（design D13 遗留标记）；当前以「不携带」落地——这是唯一可增量演进的方向。
 
 #### Scenario: 空 function
 - **WHEN** function 不含任何 children
@@ -79,6 +77,14 @@
 #### Scenario: 动作功能表达为 form
 - **WHEN** 需要声明「重置密码」类动作功能
 - **THEN** 声明为 function 下挂 form（form 关联对应 operation）
+
+### Requirement: view/form 关联 operation
+
+`view` 与 `form` SHALL 各关联且仅关联一个 operation（`properties.operation`）：一个 view 读一个接口，一个 form 提交一个接口；一屏多接口用 `function` 下挂多个 view/form 表达。`view` 的子节点 SHALL 为 `input`/`output`（含编译器自动生成的分页/排序 input），`form` 的子节点 SHALL 为 `input`。
+
+#### Scenario: 单 operation 关联
+- **WHEN** view 关联 operation "findUsers"，其下 input/output 引用该 operation 的字段
+- **THEN** 编译成功，前端按引用渲染
 
 ### Requirement: $ref 引用与编译时解析
 
