@@ -1,5 +1,13 @@
 # Tasks
 
+> ⏸️ **状态：暂缓推进**（2026-10-19）。`function` 与 operation 的挂接关系待完全重新设计（见 design.md D13 遗留标记），**在重新设计完成前不要开始实现任何任务**。
+>
+> 本清单尚未对齐 design/spec 的最新共识，刷新时需一并修订：
+> - **删除**：3.2（platform 过滤，D8）、4.4.2（`registry.tsx`/`derive.ts`/`default-tree.ts` 已不存在）
+> - **改写**：2.3（非法属性改为忽略 + debug 日志，D6）、4.4.1（不能删整个 `sdk/`——它是 vite entry，须保留 `createPingUi` 占位 entry，D19）、4.5.x（随 DDD 包结构调整）
+> - **新增**：`META-INF/ping/openapi-<module>.json` 导出与加载（D7）、`openapi.export=true` 跳过编译（D18）、operation id 重复 / 空 function / `sortable_fields` 断链 / 数组路径缺 `items` 的校验、删除存量 `ui/user-center/compose.json`、重写 `ping-ui/doc/abstract-component-schema.md`
+> - **移除**：design 中已作废的回滚兜底（feature flag / 旧解析 fallback）相关项
+
 ## 1. DDD 架构重构
 
 ### 1.1 domain 层

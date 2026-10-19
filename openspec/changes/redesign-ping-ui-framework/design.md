@@ -16,10 +16,13 @@
 - **开闭原则**：新增编译阶段只需实现 `CompilePhase` 接口，不修改已有代码
 
 **Non-Goals:**
-- 不实现前端渲染器（各端自行实现）
+- 不实现前端渲染器（各端自行实现；本次前端只做减法，见 D19）
 - 不实现组件通信机制（前端内部事务）
 - 不支持运行时动态加载组件描述
 - 不声明 UI 展示细节（布局、样式、图标等）
+- 不做 platform 过滤（D8）
+- 不涉及任何权限/角色过滤（无权限体系，不做钩子）
+- 不做分模块 openapi 导出与散装豁免（后续提案）
 
 ## Decisions
 
@@ -33,7 +36,7 @@
 
 ### D2: operation 作为接口契约中心
 
-**决策**：`operation` 是接口契约的定义点，包含 `method`/`path`/`request`/`response`/`defaults`/`sortable_fields`。`input`/`output` 通过 `$ref`（`openapi://` 协议）引用 operation 的字段。operation id **全局唯一**，重复即编译报错。
+**决策**：`operation` 是接口契约的定义点，包含 `method`/`path`/`request`/`response`/`defaults`/`sortable_fields`。`input`/`output` 通过 `$ref`（`openapi://` 协议）引用 operation 的字段。operation id **全局唯一**，重复即编译报错，报错信息带两处声明来源（模块文件名）——冲突的是接口默认值与 sortable_fields，静默覆盖会让前端拿到不可预期的契约。
 
 **理由**：将接口描述集中管理，避免重复声明。前端可从 operation 生成可调用方法。编译时在被引用字段上插入 UUID 作为唯一标识。
 
@@ -57,15 +60,17 @@
 
 ### D4: 排序作为 input 处理
 
-**决策**：排序是一种特殊的 `input`，通过 `$ref`（`openapi://` 协议）引用 operation.request 中的排序字段。排序规则定义在 operation 的 `sortable_fields` 列表中。
+**决策**：排序是一种特殊的 `input`，由**编译器自动生成**（引用 operation 的排序参数，不带 value），开发者不手写。可排序字段定义在 operation 的 `sortable_fields` 列表中，且必须存在于 response（否则断链报错）；默认排序通过 `defaults` 给出。前端按 `sortable_fields` 决定列头排序入口，点击时自行拼 value（如 `account,asc`）。
 
-**理由**：排序本质上是"传给接口的参数"，和查询条件、分页没有本质区别。统一为 `input` 保持模型一致性。
+**理由**：排序本质上是"传给接口的参数"，和查询条件、分页没有本质区别，统一为 `input` 保持模型一致性。排序状态是 sort **单值**参数，手写多个 `sort.x` input 会互相冲突，故与 D9 分页一致采用编译器自动生成——"如何识别排序 input"的问题也随之消失。
 
-**备选方案**：在 output 上声明 `sortable: true` → 被拒绝，output 不应该关心行为，且需要后端支持。
+**备选方案**：在 output 上声明 `sortable: true` → 被拒绝，output 不应该关心行为，且需要后端支持；开发者手写排序 input → 被拒绝，单值参数多实例会冲突。
 
 ### D5: $ref 使用 openapi:// 协议引用 operation
 
 **决策**：`$ref` 使用自定义协议 `openapi://<operationId>` 引用 OpenAPI 操作（如 `openapi://findUsers`）。编译器按 `operationId` 在 OpenAPI 文档中查找对应 path + method。冲突时追加类型+方法名。**没有 operationId 的操作会导致编译报错**。
+
+字段路径 SHALL 逐段下钻；数组包装层使用**固定段名 `items`** 继续下钻，即 `openapi://findUsers/response/content/items/account` ≡ `response.content.items.properties.account`（`content` 是数组）。数组字段上缺 `items` 段（或多写）按断链报错。
 
 **理由**：
 - `openapi://` 协议简洁直观，避免 JSON Pointer 长路径（如 `#/paths/~1v1~1system~1users/get`）
@@ -79,30 +84,43 @@
 
 ### D6: 编译阶段全量校验，失败则启动失败
 
-**决策**：任何引用断链、空 schema、非法属性都导致启动失败。**全有或全无**——任何一个模块编译失败，整个应用启动失败。
+**决策**：编译校验按分级处理（明细见 spec「编译校验分级」）：
 
-**理由**：断链意味着声明有错误，运行时降级会隐藏问题。启动失败强制开发者修复。
+| 情况 | 处理 |
+|---|---|
+| `$ref` 断链（含数组路径缺 `items`）、被引用的空 schema `{}` | 报错，启动失败 |
+| operation/function id 重复、view/form 未关联 operation、缺 operationId、`sortable_fields` 断链 | 报错，启动失败 |
+| 未知组件类型、未知/多余属性（width、align…）、未被引用的空 schema | 忽略 + debug 日志 |
+
+**全有或全无**——任何一个模块编译失败，整个应用启动失败。**报错信息必须包含具体引用路径与声明来源**，便于快速定位。
+
+**理由**：断链意味着声明有错误，运行时降级会隐藏问题；但"非法属性"是**黑名单**问题，永远列不全，且未知属性留着能兼容版本升级（属性放行不渲染即可），与"未知类型忽略"同一待遇。被引用的空 schema 则不同——引用到了却内容为空，前端无法推断控件，报错能逼后端补全（见示例中 `UserAccountRecord: {}` 的真实案例）。
 
 **备选方案**：运行时降级 + WARN → 被拒绝，与"启动永不失败"的旧不变量冲突，但新设计认为声明错误应该尽早暴露。
 
 ### D7: 后端聚合器扫描 classpath 收集 compose.json
 
-**决策**：启动时扫描 classpath 下所有 `META-INF/ping/ui/compose.json`，每个文件内容为 operation/function 数组（不需要 `type: "app"` 包装），合并编译为最终 app JSON，缓存为只读快照。**启动时编译一次，运行期间不更新，直到重启**。function 按 id 字母序返回，但前端不可依赖此特性。
+**决策**：启动时扫描 classpath 下所有 `META-INF/ping/ui/compose.json`（**文件名固定为 `compose.json`，源文件直接放该目录，不经构建期聚合**），每个文件内容为 operation/function 数组（不需要 `type: "app"` 包装），合并编译为最终 app JSON，组装到内存（只读快照）。**启动时编译一次，运行期间不更新，直到重启**。function 按 id 字母序返回，但前端不可依赖此特性。
 
-**理由**：各业务模块独立提供 compose.json，后端聚合器统一编译并合并为 app.children。与现有"统一落 META-INF/ping/"的约定一致。顺序不应由后端决定，后续如需排序会增加新提案。
+编译输入为打包期导出的 OpenAPI 文档：**`META-INF/ping/openapi-<module>.json`**（如 `openapi-ping-distribute.json`、`openapi-ping-system.json`），运行时扫描全部文件合并进 operation 索引。本次只有 distribute 导出（内容是全量 API）。
 
-**备选方案**：构建期聚合 → 被拒绝，当前构建期聚合链路已移除，且启动期聚合更灵活。
+- **存在 compose.json 却不存在任何 openapi 文件 → 报错、启动失败**（散装运行的豁免归后续提案，本次不做）
+- **多文件合并规则**：本次读到几个文件就合并进索引，operationId 重复即报错，不做内容比对。**约束（给分模块导出提案）**：分模块导出上线前必须先解决全量与部分文件的互斥规则（如 distribute 不再生成全量文件），否则 operation id 重复会锁死聚合启动。
 
-### D8: platform 过滤（暂缓）
+**理由**：各业务模块独立提供 compose.json，后端聚合器统一编译并合并为 app.children。与现有"统一落 META-INF/ping/"的约定一致，且与 AGENTS"构建期产物统一落 META-INF/ping/、运行时只读该固定路径"对齐（`openapi.json` 从 classpath 根 `ping-api-doc/` 迁入 `META-INF/ping/`，同时改名加模块前缀）。顺序不应由后端决定，后续如需排序会增加新提案。
 
-**决策**：暂不实现。后续需要时再提新提案。
+**备选方案**：构建期聚合 → 被拒绝，当前构建期聚合链路已移除，且启动期聚合更灵活；运行时用 springdoc 现生成输入 → 被拒绝，本次明确"只认打包期导出文件"，来源可插拔留待后续；无 openapi 时静默跳过编译 → 被拒绝，有 compose.json 无输入是声明错误，应尽早暴露。
+
+### D8: platform 过滤（不做）
+
+**决策**：本次彻底不做，后续需要时再提新提案。spec 中的「平台过滤」需求与 tasks 中的对应任务已移除——没有第二个平台在用，留着就是空承诺。
 
 ### D9: 分页自动检测 + 物化为 pagination 容器 + input 组件
 
 **决策**：编译阶段检测 operation 的 request 是否含 `offset` + `size`、response 是否含 `content` + `total`。检测到后：
 1. 生成 `type: "pagination"` 容器组件，children 为该分页接口的 output 子节点，`mode` 属性区分 `page`（按页分页）或 `scroll`（滑动分页），默认 `page`
-2. 自动生成 `type: "input"` 组件（`offset` 和 `size`），插入到 view 的 children 中，与 query、sort 并列
-3. **response 匹配但 request 无分页参数时**，pagination mode 设为 `scroll`
+2. **request + response 均匹配时**（mode=page）：自动生成 `type: "input"` 组件（`offset` 和 `size`），插入到 view 的 children 中，与 query、sort 并列
+3. **仅 response 匹配、request 无分页参数时**（mode=scroll）：**不生成** offset/size input，pagination 容器属性中也不带 offset/size/content 引用——request 里根本没有这两个字段，生成即 `$ref` 断链，scroll 模式将永远无法编译成功；容器只保留 `mode` 并包裹 output children，翻页行为由前端滚动触发
 
 **理由**：分页是后台系统的固定模式（offset/size 请求 + content/total 响应），应该由编译器自动物化。pagination 作为容器包裹 output 子节点，前端既知道数据来自分页接口，又能针对性渲染分页器。`mode` 让前端选择按页分页器还是滑动加载。分页参数自动生成为 input，前端无需额外推断。
 
@@ -179,11 +197,13 @@ cn.procsl.ping.boot.ui
 - 保持 4 个异常 → 被拒绝，用户明确说"太多了"
 - 精简到 1 个 → 被拒绝，文件级错误与编译错误需要区分
 
-### D13: operation 和 function 保持平级，前端自行匹配
+### D13: operation 挂接点在 view/form，function 不携带 operation
 
-**决策**：编译后的 JSON 中，operation 和 function 是平级关系（都在 app.children 下）。前端根据 `function.properties.operation` 查找对应 operation。
+**决策**：编译后的 JSON 中，operation 和 function 是平级关系（都在 app.children 下）；但 operation 的**挂接点只有 view/form**（`properties.operation`，一个 view 读一个接口、一个 form 提交一个接口），`function` **不携带** operation 属性。动作类功能（如「重置密码」）表达为 `function` 下挂 `form`，不引入动作类型。`function` 的 `children` 非空——至少一个 view/form，否则编译报错；类型系统中没有占位类型，未实现的功能不声明（不声明 = 不存在）。
 
-**理由**：保持 JSON 结构简洁，前端自行匹配 operation 和 function 的关系。
+**理由**：两处挂接必然产生"两个来源不一致听谁的"的问题；function 是纯导航入口，没有自己的接口；单 view 单 form 单接口的规则已拍板，function 再带 operation 就是纯冗余。
+
+> ⏸️ **遗留（待完全重新设计）**：`function` 与 operation 的挂接关系可能被完全重新设计。当前以「不携带」落地——这是唯一**可增量演进**的方向（将来加可选属性不破坏；现在带了、将来要删才是真返工）。重新设计完成后更新本条与 spec 中的遗留标记。
 
 ### D14: path 参数自动生成 input 组件
 
@@ -209,7 +229,27 @@ cn.procsl.ping.boot.ui
 
 **理由**：overrides 是功能级别的配置，只在 function 层声明，view/form 继承。
 
+### D18: 打包导出模式跳过 UI 编译（解鸡生蛋）
+
+**决策**：`ping-distribute` 打包期那次真实启动只负责导出 openapi 文档；`openapi.export=true` 时 **ping-ui 跳过组件编译与端点注册**（条件装配）。其余任何启动场景都完整编译校验。
+
+**理由**：首次构建时 `target/classes/META-INF/ping/` 下还没有 openapi 文件，而 classpath 里已有业务模块的 compose.json——若导出进程也跑编译，按 D7 规则会直接启动失败，**永远造不出第一个 openapi 文件**（自锁）。这不是给声明错误开口子：导出进程的世界里本来就没有编译输入可校验。
+
+### D19: 本次前端只做减法
+
+**决策**：本次**不做前端渲染器**（维持 Non-Goal）。前端改动仅限：移除 SDK 机制文件（`registry.ts`、`message-bus.ts`、`sdk-error.ts`、`handlers/`），**保留 `sdk/index.ts` 作为最小占位 entry**（导出签名 `createPingUi({namespace})` 与 `init()/destroy` 行为不变，函数体降级为占位），薄壳 `META-INF/ping/entry/index.html` 一行不动，`npm run build` 必须通过。
+
+**理由**：`sdk/` 是 vite 构建 entry，整目录删除会让 `npm run build` 必失败（与旧任务 4.4 自带的验证矛盾）；保留同签名占位使契约零变化，后续渲染器重建在同 entry 内填实现。旧任务点名要删的 `registry.tsx`、`derive.ts`、`default-tree.ts` 在仓库中已不存在，属空任务。
+
+### D20: 端点鉴权不作特殊处理
+
+**决策**：`GET /v1/ui/components` 跟随现有全局登录拦截器（未登录 401），不加 `@PermitAll` 等豁免，spec 不写鉴权 Scenario，权限策略后续另行考虑（本次不涉及任何权限，不做钩子）。
+
+**理由**：组件树暴露全部接口的 method/path/字段结构，等于接口清单，不应给未登录者；静态资源本就放行，前端 401 场景留给后续壳工程处理。
+
 ## 调用流程
+
+> 输入②：`META-INF/ping/openapi-<module>.json`（打包期导出的 OpenAPI 文档，运行时扫描合并）；`openapi.export=true` 时整体跳过（D18）。
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -269,8 +309,10 @@ cn.procsl.ping.boot.ui
 4. **异常精简**：只保留 2 个异常类，通过错误消息区分不同错误场景
 5. **命名规范**：统一使用 `Compiler`/`Engine` 后缀，避免 Resolver/Expander/Materializer 等混乱命名
 6. **UUID 策略**：确定性哈希，同一字段共享 UUID，前端不应依赖此特性
-7. **缓存策略**：启动时编译一次，运行期间不更新，直到重启
-8. **编译失败**：全有或全无，任何一个模块失败则整个应用启动失败
+7. **缓存策略**：启动时编译一次，组装到内存，运行期间不更新，直到重启
+8. **编译失败**：全有或全无，任何一个模块失败则整个应用启动失败；分级见 D6（结构性错误报错、未知类型/属性忽略）
+9. **编译时机**：在 Spring 上下文启动阶段完成（Bean 初始化），失败即上下文启动失败、进程非 0 退出——这是"启动失败"的语义载体，不拖到首个请求
+10. **导出模式豁免**：`openapi.export=true` 时跳过编译（D18），除该模式外没有任何豁免路径
 
 ## 测试原则
 
@@ -448,8 +490,7 @@ cn.procsl.ping.boot.ui
           { "type": "input", "id": "f.state", "properties": { "$ref": "openapi://findUsers/request/query/state" } },
           { "type": "output", "id": "c.account", "properties": { "$ref": "openapi://findUsers/response/content/items/account" } },
           { "type": "output", "id": "c.name", "properties": { "$ref": "openapi://findUsers/response/content/items/name" } },
-          { "type": "output", "id": "c.gender", "properties": { "$ref": "openapi://findUsers/response/content/items/gender" } },
-          { "type": "input", "id": "sort.account", "properties": { "$ref": "openapi://findUsers/request/sort", "value": "account,asc" } }
+          { "type": "output", "id": "c.gender", "properties": { "$ref": "openapi://findUsers/response/content/items/gender" } }
         ]
       },
       {
@@ -524,6 +565,7 @@ request 有 offset + size，response 有 content + total
 自动生成 input 组件:
 { "type": "input", "id": "page.offset", "properties": { "$ref": "openapi://findUsers/request/offset" } }
 { "type": "input", "id": "page.size", "properties": { "$ref": "openapi://findUsers/request/size" } }
+{ "type": "input", "id": "sort.user-list", "properties": { "$ref": "openapi://findUsers/request/sort" } }   ← 排序 input 同样自动生成，不带 value（D4）
 
 生成的 pagination 容器:
 {
@@ -635,12 +677,12 @@ state: { "type": "string", "enum": ["disable","enable"], "default": "enable" }
         "path": "/v1/system/users/{id}/account",
         "request": {
           "path": {
-            "id": { "type": "integer" }
+            "id": { "type": "integer", "id": "j0k1l2m3" }
           },
           "body": {
             "type": "object",
             "properties": {
-              "state": { "type": "string", "enum": ["disable","enable"] }
+              "state": { "type": "string", "enum": ["disable","enable"], "id": "h9i0j1k2" }
             }
           }
         },
@@ -657,7 +699,7 @@ state: { "type": "string", "enum": ["disable","enable"], "default": "enable" }
           "children": [
             { "type": "input", "id": "f.name", "properties": { "$ref": "a1b2c3d4" } },
             { "type": "input", "id": "f.state", "properties": { "$ref": "b2c3d4e5" } },
-            { "type": "input", "id": "sort.account", "properties": { "$ref": "c3d4e5f6", "value": "account,asc" } },
+            { "type": "input", "id": "sort.user-list", "properties": { "$ref": "c3d4e5f6" } },
             { "type": "input", "id": "page.offset", "properties": { "$ref": "d4e5f6a1" } },
             { "type": "input", "id": "page.size", "properties": { "$ref": "e5f6g7b2" } },
             {
@@ -682,7 +724,8 @@ state: { "type": "string", "enum": ["disable","enable"], "default": "enable" }
           "type": "form",
           "id": "edit-user",
           "children": [
-            { "type": "input", "id": "f.state", "properties": { "$ref": "openapi://accountStatusSetting/request/body/state" } }
+            { "type": "input", "id": "f.id", "properties": { "$ref": "j0k1l2m3" } },
+            { "type": "input", "id": "f.state", "properties": { "$ref": "h9i0j1k2" } }
           ]
         }
       ]
@@ -724,26 +767,30 @@ path 参数（如 `accountStatusSetting` 的 `{id}`）由编译器自动生成 i
 
 ## Risks / Trade-offs
 
-- **[风险]** compose.json 格式破坏性变更，所有业务模块需迁移 → 提供迁移指南和自动化脚本
+- **[风险]** compose.json 格式破坏性变更，但**不做迁移**（无迁移指南/脚本/fallback）——存量文件直接删除，业务侧按新规范自行声明
 - **[风险]** `$ref` 引用语法从自定义路径改为 `openapi://` 协议
-- **[权衡]** 编译时校验导致启动失败，可能影响开发体验 → 报错信息包含具体引用路径，便于快速定位
+- **[权衡]** 编译时校验导致启动失败，可能影响开发体验 → 报错信息包含具体引用路径与声明来源，便于快速定位；未知类型/属性走忽略（D6）
 - **[权衡]** 不支持运行时动态加载组件描述 → 当前无此需求，如有需要可后续扩展
 - **[风险]** OpenAPI 中 `$ref` 嵌套可能导致编译时循环引用 → 编译阶段检测循环引用并报错
-- **[风险]** UserAccountRecord 为空 schema `{}`，output 引用它时前端无法推断控件类型 → 编译阶段检测空 schema 并报错，要求后端补全
+- **[风险]** UserAccountRecord 为空 schema `{}`，output 引用它时前端无法推断控件类型 → 被引用的空 schema 报错并要求后端补全（未被引用的忽略）
 - **[风险]** DDD 重构可能影响现有测试 → 保留现有测试，逐步迁移到新架构
+- **[风险]** 未来第一个新 compose.json 落地时，ping-system 的 4 个 `@SpringBootTest` 会因缺 openapi 文件启动失败 → 与散装启动问题合并，归后续提案
+- **[风险]** function 挂接关系若被完全重新设计，可能触及 function/view/form 结构 → 已按可增量方向（function 不携带 operation）落地，降低返工面
 
 ## Migration Plan
 
 1. 将所有 `$ref` 引用统一到 `openapi://` 协议风格
 2. 重写 `ping-ui` SDK 核心为编译/组装器，引入 DDD 架构
 3. 实现后端 `GET /v1/ui/components` 聚合接口
-4. 迁移所有业务模块 compose.json 到新格式
-5. 前端渲染器重写为静态 JSON 驱动
-6. 移除旧 SDK 代码（注册表、生命周期、消息总线）
+4. **删除**存量旧格式文件 `ping-system/src/main/resources/ui/user-center/compose.json`（死文件：路径不在扫描范围、模型是旧 dataset，不做迁移，业务侧以后按新规范自行声明）
+5. 前端只做减法：移除 SDK 机制、保留 `createPingUi` 占位 entry（D19）
+6. 移除旧 compiler/exception 代码
 
-回滚策略：保留旧 compose.json 解析逻辑作为 fallback，通过 feature flag 切换。
+**不做回滚兜底**：不保留旧 compose.json 解析逻辑、不设 feature flag——旧格式本就无法被现行代码加载成功，回滚对象不存在。
 
 ## Open Questions
 
-- view/form 引用单个还是多个 operation？（当前倾向支持多个，但具体设计待定）
-- platform 过滤具体实现方式（query param / header / 路径前缀）
+- ⏸️ **function 与 operation 的挂接关系**：可能完全重新设计（见 D13 遗留标记）；当前按「只有 view/form 挂 operation、function 不携带」落地
+- ⏸️ **分模块 openapi 导出的互斥规则**：全量文件（distribute）与部分文件（模块）并存时 operation id 重复会锁死聚合启动，分模块导出提案必须先解决（见 D7）
+- ⏸️ **散装启动问题**：业务模块独立运行时有 compose.json、无 openapi 文件 → 启动失败，豁免方案归后续提案
+- ⏸️ **测试影响**：未来第一个新 compose.json 落地时，ping-system 的 4 个 `@SpringBootTest` 会因缺 openapi 文件启动失败（与散装问题同案，一并归后续提案；本次因旧 compose.json 被删除，测试不受影响）

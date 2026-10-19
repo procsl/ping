@@ -57,7 +57,7 @@
 - **THEN** 返回 app 根节点，children 包含 operation 和 function
 
 #### Scenario: 空组件树
-- **WHEN** 无 compose.json 或全部编译失败
+- **WHEN** classpath 中没有任何 compose.json
 - **THEN** 返回 200 + 空 app 树
 
 ### Requirement: 框架无关渲染
@@ -70,15 +70,29 @@
 
 ### Requirement: 编译时校验
 
-系统 SHALL 在启动阶段编译所有 compose.json，校验所有引用完整性。任何断链、空 schema 或非法属性 SHALL 导致启动失败。
+系统 SHALL 在应用启动阶段扫描 classpath，将组件树编译并组装到内存（运行期间不重编译，直到重启）。编译输入 SHALL 为打包期导出的 OpenAPI 文档（`META-INF/ping/openapi-<module>.json`，如 `openapi-ping-distribute.json`）；存在 compose.json 却无任何该类文件时（如业务模块独立运行）SHALL 报错、启动失败。
+
+> ⏸️ **遗留（后续提案）**：散装运行的豁免方式、分模块导出时全量/部分文件并存的互斥规则，均延后到「分模块 openapi 导出」提案一并解决，本次不做豁免。
 
 #### Scenario: 编译成功
 - **WHEN** 所有 compose.json 编译通过
 - **THEN** 应用正常启动
 
-#### Scenario: 编译失败
-- **WHEN** 任何引用断链或 schema 为空
-- **THEN** 启动失败，报错信息包含具体引用路径
+#### Scenario: 结构性错误
+- **WHEN** 存在引用断链、被引用的空 schema、id 重复或未关联 operation
+- **THEN** 启动失败，报错信息包含具体引用路径与声明来源
+
+#### Scenario: 缺少 OpenAPI 输入
+- **WHEN** 存在 compose.json 但 classpath 中无任何 openapi-<module>.json
+- **THEN** 启动失败
+
+### Requirement: 打包导出模式跳过编译
+
+以 `openapi.export=true` 启动的进程（打包期负责生成 openapi 文档）SHALL 跳过组件编译与端点注册，否则首次构建时输入文档尚未生成会自锁。除此模式外 SHALL 无任何豁免路径。
+
+#### Scenario: 导出进程不编译
+- **WHEN** 以 `openapi.export=true` 启动应用
+- **THEN** 跳过组件编译与端点注册，导出进程正常完成
 
 ### Requirement: operation 可调用
 
@@ -88,14 +102,10 @@
 - **WHEN** 前端需要获取用户列表
 - **THEN** 找到 id="findUsers" 的 operation，使用其 method/path/request 发起 GET /v1/system/users
 
-### Requirement: 平台过滤
+### Requirement: 端点鉴权不作特殊处理
 
-系统 SHALL 支持在组装时按平台过滤组件。前端请求时携带平台标识，后端返回该平台支持的组件子集。
+`GET /v1/ui/components` SHALL 跟随现有全局登录拦截器，SHALL NOT 通过 `@PermitAll` 等方式豁免——组件树暴露全部接口的 method/path/字段结构，属登录后资源。权限策略本身不在本次范围内。
 
-#### Scenario: Web 平台
-- **WHEN** 前端请求 /v1/ui/components?platform=web
-- **THEN** 只返回 web 平台支持的组件
-
-#### Scenario: 桌面平台
-- **WHEN** 前端请求 /v1/ui/components?platform=desktop
-- **THEN** 只返回 desktop 平台支持的组件
+#### Scenario: 未登录请求
+- **WHEN** 未登录客户端请求 /v1/ui/components
+- **THEN** 返回 401（跟随现有拦截器，无任何豁免配置）
