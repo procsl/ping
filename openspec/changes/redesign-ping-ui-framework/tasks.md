@@ -1,95 +1,74 @@
 # Tasks
 
-> ⏸️ **状态：暂缓推进**（2026-10-19）。`function` 与 operation 的挂接关系待完全重新设计（见 design.md D13 遗留标记），**在重新设计完成前不要开始实现任何任务**。
->
-> 本清单尚未对齐 design/spec 的最新共识，刷新时需一并修订：
-> - **删除**：3.2（platform 过滤，D8）、4.4.2（`registry.tsx`/`derive.ts`/`default-tree.ts` 已不存在）
-> - **改写**：2.3（非法属性改为忽略 + debug 日志，D6）、4.4.1（不能删整个 `sdk/`——它是 vite entry，须保留 `createPingUi` 占位 entry，D19）、4.5.x（随 DDD 包结构调整）
-> - **新增**：`META-INF/ping/openapi-<module>.json` 导出与加载（D7）、`openapi.export=true` 跳过编译（D18）、operation id 重复 / 空 function / `sortable_fields` 断链 / 数组路径缺 `items` 的校验、删除存量 `ui/user-center/compose.json`、重写 `ping-ui/doc/abstract-component-schema.md`
-> - **移除**：design 中已作废的回滚兜底（feature flag / 旧解析 fallback）相关项
+> 状态：架构已按新模型定稿（`app > pages > function` + openapi 内联，见 design.md）。任务清单已重排。实现由 `/opsx-apply` 启动；使用意图（裁剪/默认/排序/分页）不在本次，仅留 `Transformer` 扩展点。
 
-## 1. DDD 架构重构
+## 1. DDD 架构
 
 ### 1.1 domain 层
 
-- [ ] 1.1.1 创建 `Component` 组合类型（type + id + properties + children），验证：单测覆盖 type/id/properties/children 的读写
-- [ ] 1.1.2 创建 `App` 应用根（包含编译后的 Component 树），验证：单测覆盖 children 读写
+- [ ] 1.1.1 创建统一节点组合类型（`type` + `id` + `properties` + `children`），验证：单测覆盖 type/id/properties/children 读写
+- [ ] 1.1.2 按 `type` 分派（app/page/function 各自约束），验证：单测覆盖按 type 分派
 
 ### 1.2 exception 层
 
-- [ ] 1.2.1 精简异常到 2 个（`ComposeException` + `ComposeParseException`），合并 `RefNotFoundException` 和 `CircularReferenceException`，验证：单测覆盖各种错误场景的异常消息
+- [ ] 1.2.1 精简异常到 2 个（`ComposeException` + `ComposeParseException`），验证：单测覆盖各错误场景的异常消息
 
 ### 1.3 repository 层
 
-- [ ] 1.3.1 将 `ComposeRepository` 移到 `repository` 包，保持返回 `List<JsonNode>`，验证：单测覆盖 classpath 扫描、JSON 解析、多文件合并
+- [ ] 1.3.1 实现 `ComposeRepository` 扫描 `META-INF/ping/ui/compose.json`，验证：单测覆盖 classpath 扫描、JSON 解析、多文件合并
+- [ ] 1.3.2 实现 `OpenApiRepository` 扫描 `META-INF/ping/openapi-<module>.json`，验证：单测覆盖多文件扫描合并
 
 ### 1.4 compiler 层
 
-- [ ] 1.4.1 创建 `CompilePhase` 接口，验证：单测覆盖接口定义
-- [ ] 1.4.2 创建 `CompileContext` 编译上下文，验证：单测覆盖 operations 读写
-- [ ] 1.4.3 创建 `OperationCompiler`（整合 OperationRefResolver + SchemaRefExpander + DefaultResolver），验证：单测覆盖 operation 解析、$ref 展开、默认值合并
-- [ ] 1.4.4 创建 `ComponentCompiler`（整合 RefResolver + PaginationMaterializer），验证：单测覆盖 UUID 解析、分页物化
-- [ ] 1.4.5 创建 `ComposeCompiler` 主编排器，验证：单测覆盖完整编译流程
-
-### 1.5 service 层
-
-- [ ] 1.5.1 创建 `ComposeService` 领域服务，验证：单测覆盖完整调用流程
-
-### 1.6 组件初始化/组装
-
-- [ ] 1.6.1 实现组件直接 new 创建（不依赖 Spring），验证：单测覆盖 new 创建 + 编译 + 释放流程
-- [ ] 1.6.2 实现 `ComposeService.compile()` 无状态，每次调用创建新实例，验证：多次调用互不影响
+- [ ] 1.4.1 创建 `Transformer` 接口（开闭原则扩展点），验证：单测覆盖接口定义
+- [ ] 1.4.2 创建 `CompileContext` 编译上下文（operations 索引），验证：单测覆盖读写
+- [ ] 1.4.3 实现 `OpenApiInliner` 阶段（按 operationId 定位 operation、展开 `$ref`、内联 method/path/parameters/requestBody/responses 到 `function.properties`，接受冗余、无 `$ref` 残留），验证：单测覆盖内联、`$ref` 展开、无残留
+- [ ] 1.4.4 实现 `ComposeCompiler` 主编排（协调各 Transformer，返回 `App`），验证：单测覆盖完整编译流程
 
 ## 2. 编译校验
 
-- [ ] 2.1 实现引用完整性校验：所有 $ref 必须能解析到具体字段，验证：单测覆盖断链报错
-- [ ] 2.2 实现空 schema 检测：被引用字段的 schema 为空对象 `{}` 时报错，验证：单测覆盖空 schema 报错
-- [ ] 2.3 实现非法 UI 属性检测：input/output 上出现 width/align/icon/order 等属性时报错，验证：单测覆盖非法属性报错
-- [ ] 2.4 实现编译结果缓存：编译后的 JSON 缓存为只读快照，验证：单测覆盖缓存一致性
-- [ ] 2.5 实现 operation id 全局唯一性校验：多个 compose.json 中不允许重复 operation id，验证：单测覆盖重复检测
-- [ ] 2.6 实现 function id 全局唯一性校验：多个 compose.json 中不允许重复 function id，验证：单测覆盖重复检测
-- [ ] 2.7 实现 view/form 必须关联 operation 校验，验证：单测覆盖未关联报错
-- [ ] 2.8 实现 operation 的 api 字段必须标注校验，验证：单测覆盖未标注报错
+- [ ] 2.1 `page.id` 全局唯一校验，验证：单测覆盖重复报错
+- [ ] 2.2 `function.id` 在 page 内唯一校验，验证：单测覆盖重复报错
+- [ ] 2.3 `operationId` 断链校验（openapi 中找不到），验证：单测覆盖断链报错含引用路径
+- [ ] 2.4 openapi 内 `operationId` 冲突校验，验证：单测覆盖冲突报错
+- [ ] 2.5 未知属性/未知类型忽略 + debug 日志，验证：单测覆盖不报错
+- [ ] 2.6 `function.id` 路由规则（`page.id/function.id`），验证：单测覆盖路由生成
 
 ## 3. 后端聚合接口
 
-- [ ] 3.1 实现 `GET /v1/ui/components` 端点，验证：curl 返回 200 + 合法 JSON
-- [ ] 3.2 实现 platform 过滤，验证：单测覆盖不同平台返回不同子集
-- [ ] 3.3 注册到 `UIAutoConfiguration`，验证：启动应用后 curl 可访问
+- [ ] 3.1 实现 `GET /v1/ui/components` 端点，返回编译产物，验证：curl 返回 200 + 合法 JSON
+- [ ] 3.2 注册到 `UIAutoConfiguration`，验证：启动应用后 curl 可访问
+- [ ] 3.3 `openapi.export=true` 时跳过编译与端点注册，验证：单测覆盖导出模式不编译
+- [ ] 3.4 存在 compose.json 而无 openapi 文件 → 启动失败，验证：单测覆盖缺输入报错
 
 ## 4. 旧代码清理
 
-### 4.1 移除旧 compiler 组件（已整合到 OperationCompiler/ComponentCompiler）
+### 4.1 移除旧编译器（$ref/UUID/pagination/排序/默认值那套）
 
-- [ ] 4.1.1 移除 `OperationRefResolver.java`，验证：代码中无残留引用
-- [ ] 4.1.2 移除 `SchemaRefExpander.java`，验证：代码中无残留引用
-- [ ] 4.1.3 移除 `DefaultResolver.java`，验证：代码中无残留引用
-- [ ] 4.1.4 移除 `RefResolver.java`，验证：代码中无残留引用
-- [ ] 4.1.5 移除 `PaginationMaterializer.java`，验证：代码中无残留引用
+- [ ] 4.1.1 移除 `OperationRefResolver`、`SchemaRefExpander`、`RefResolver`、`PaginationMaterializer`、`DefaultResolver`，验证：代码无残留引用
+- [ ] 4.1.2 移除旧 `Component`/`Compose` 等聚合类型，验证：代码无残留引用
 
-### 4.2 移除旧异常类（已合并到 ComposeException）
+### 4.2 移除旧异常与旧测试
 
-- [ ] 4.2.1 移除 `RefNotFoundException.java`，验证：代码中无残留引用
-- [ ] 4.2.2 移除 `CircularReferenceException.java`，验证：代码中无残留引用
-- [ ] 4.2.3 移除 `ComposeCompileException.java`（重命名为 `ComposeException`），验证：代码中无残留引用
+- [ ] 4.2.1 移除 `RefNotFoundException`、`CircularReferenceException`、`ComposeCompileException`，验证：代码无残留引用
+- [ ] 4.2.2 移除旧 component 包测试，验证：`./mvnw -Ph2 test` 通过
 
-### 4.3 移除旧 Compose 聚合根（已删除）
+### 4.3 移除旧前端 SDK
 
-- [ ] 4.3.1 移除 `Compose.java`，验证：代码中无残留引用
+- [ ] 4.3.1 移除 SDK 机制（registry、message-bus、sdk-error、handlers），保留 `createPingUi` 占位 entry，验证：`npm run build` 通过
 
-### 4.4 移除旧前端 SDK 代码
+### 4.4 移除存量旧格式文件
 
-- [ ] 4.4.1 移除 `ping-ui/src/main/js/sdk/` 目录（registry、message-bus、error-handler 等），验证：`npm run build` 通过
-- [ ] 4.4.2 移除前端旧渲染器代码（registry.tsx、derive.ts、default-tree.ts 等），验证：`npm run build` 通过
-
-### 4.5 移除旧测试代码
-
-- [ ] 4.5.1 移除 `ComponentTest.java`（性能测试，与 UI 组件无关），验证：`./mvnw -Ph2 test` 通过
-- [ ] 4.5.2 移除旧 component 包下的测试（ComposeRepositoryTest、DefaultResolverTest、OperationRefResolverTest、PaginationMaterializerTest、RefResolverTest、SchemaRefExpanderTest），验证：`./mvnw -Ph2 test` 通过
+- [ ] 4.4.1 删除 `ping-system/src/main/resources/ui/user-center/compose.json`，验证：代码无残留引用
 
 ## 5. 验证
 
-- [ ] 5.1 端到端验证：启动应用 → 请求 `/v1/ui/components` → 返回合法 JSON，验证完整链路畅通
-- [ ] 5.2 验证编译失败场景：故意写入断链 $ref，验证启动失败且报错信息包含具体引用路径
-- [ ] 5.3 验证分页场景：编译后 JSON 中包含 pagination 组件和 offset/size input
-- [ ] 5.4 验证 DDD 架构：`ComposeService.compile()` 返回 `App`，包含编译后的 `List<Component>`
+- [ ] 5.1 端到端：启动应用 → 请求 `/v1/ui/components` → 返回自包含 function JSON，验证完整链路
+- [ ] 5.2 编译失败：故意写断链 `operationId`，验证启动失败且报错含具体引用路径
+- [ ] 5.3 operation 内联：验证产物 function.properties 无 `$ref` 残留，method/path/parameters/responses 完整
+- [ ] 5.4 DDD 架构：`ComposeCompiler` 返回 `App`，含 `pages`/`functions`
+
+## 6. 后端 query 参数纠正
+
+- [ ] 6.1 给 query POJO 参数（如 `UserQuery`）加 `@ParameterObject` 或自定义组合注解，验证：openapi 中 UserQuery 展开为 name/account/state/gender 等独立 query 参数
+- [ ] 6.2 验证后端实际绑定与 openapi 描述一致（平铺参数），验证：curl `?name=x&state=enable` 可正确查询

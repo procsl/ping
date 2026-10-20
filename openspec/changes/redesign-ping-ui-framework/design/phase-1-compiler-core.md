@@ -2,36 +2,32 @@
 
 ## 任务范围概述
 
-重构 `cn.procsl.ping.boot.ui.component` 包为 DDD 架构，引入 `Component` 组合类型、`App` 应用根、`ComposeService` 领域服务、`ComposeCompiler` 编译器、`ComposeRepository` 仓储。
+把 `cn.procsl.ping.boot.ui.component` 旧包重构为 DDD 架构：统一节点组合类型、`ComposeCompiler` 主编排、`Transformer` 阶段接口、`OpenApiInliner`（openapi 内联阶段）、`ComposeRepository`/`OpenApiRepository` 仓储。对应 tasks 1.x / 2.x。
 
 ## 包结构
 
 ```
 cn.procsl.ping.boot.ui
 ├── domain/
-│   ├── Component.java         # 组合类型（type + id + properties + children）
-│   └── App.java               # 应用根，包含编译后的 Component 树
+│   └── Component.java         # 统一节点（type + id + properties + children）
 ├── compiler/
-│   ├── ComposeCompiler.java   # 编译器（List<JsonNode> → List<Component>）
-│   ├── OperationCompiler.java # operation 契约构建
-│   ├── ComponentCompiler.java # 组件树物化
-│   ├── CompilePhase.java      # 编译阶段接口
-│   ├── CompileContext.java    # 编译上下文
-│   └── Schemas.java           # 常量
-├── service/
-│   └── ComposeService.java    # 领域服务
+│   ├── ComposeCompiler.java     # 主编排，协调各 Transformer，返回 type:app 根
+│   ├── Transformer.java      # 编译阶段接口（开闭原则）
+│   ├── CompileContext.java    # 编译上下文（openapi operations 索引）
+│   └── OpenApiInliner.java    # openapi 内联阶段（本次唯一核心阶段）
 ├── repository/
-│   └── ComposeRepository.java  # 返回 List<JsonNode>
+│   ├── ComposeRepository.java  # 扫 META-INF/ping/ui/compose.json，返回 List<JsonNode>
+│   └── OpenApiRepository.java  # 扫 META-INF/ping/openapi-<module>.json
 └── exception/
-    ├── ComposeException.java
-    └── ComposeParseException.java
+    ├── ComposeException.java   # 基类，编译错误
+    └── ComposeParseException.java  # 文件解析错误
 ```
 
 ## 逐任务实现细节
 
 ### 1.1 domain 层
 
-#### 1.1.1 创建 Component 组合类型
+#### 1.1.1 统一节点组合类型
 
 ```java
 package cn.procsl.ping.boot.ui.domain;
@@ -40,71 +36,43 @@ import tools.jackson.databind.JsonNode;
 import java.util.List;
 
 /**
- * 抽象 UI 组件（组合类型）。
- * 不同类型只是 type 字段不同，不引入继承层次。
+ * 统一节点（组合类型）。app/page/function 只是 type 值不同，不引入继承层次。
+ * 不可变（final 字段）：改字段 = 重建节点，纯函数式变换返回新树。
  */
 public class Component {
-    private final String type;
+    private final String type;          // "app" | "page" | "function"
     private final String id;
-    private final JsonNode properties;
+    private final JsonNode properties;  // function: openapi 描述内联
     private final List<Component> children;
-    
+
     // constructor, getters
 }
 ```
 
-验证：单测覆盖 type/id/properties/children 的读写
+验证：单测覆盖 type/id/properties/children 读写
 
-#### 1.1.2 创建 App 应用根
+#### 1.1.2 按 type 分派
 
-```java
-package cn.procsl.ping.boot.ui.domain;
+校验与编译按 `type` 分派（app/page/function 各自约束），不为每类建子类。
 
-import java.util.List;
-
-/**
- * 应用根，包含编译后的 Component 树。
- */
-public class App {
-    private final List<Component> children;
-    
-    public App(List<Component> children) {
-        this.children = List.copyOf(children);
-    }
-    
-    public List<Component> getChildren() {
-        return children;
-    }
-}
-```
-
-验证：单测覆盖 children 读写
+验证：单测覆盖按 type 分派
 
 ### 1.2 exception 层
 
-#### 1.2.1 精简异常到 2 个
+保留 `ComposeException`（基类，编译错误）+ `ComposeParseException`（文件解析错误）。移除旧的 `RefNotFoundException`、`CircularReferenceException`、`ComposeCompileException`。
 
-保留：
-- `ComposeException`（基类）
-- `ComposeParseException`（文件级解析失败）
-
-移除：
-- `RefNotFoundException` → 合并到 `ComposeException`
-- `CircularReferenceException` → 合并到 `ComposeException`
-
-验证：单测覆盖各种错误场景的异常消息
+验证：单测覆盖各错误场景异常消息
 
 ### 1.3 repository 层
 
-#### 1.3.1 重命名 infra → repository
-
-将 `ComposeRepository` 移到 `repository` 包，保持返回 `List<JsonNode>`。
+- `ComposeRepository` 扫 `META-INF/ping/ui/compose.json`，返回 `List<JsonNode>`（节点数组）
+- `OpenApiRepository` 扫 `META-INF/ping/openapi-<module>.json`，多文件合并
 
 验证：单测覆盖 classpath 扫描、JSON 解析、多文件合并
 
 ### 1.4 compiler 层
 
-#### 1.4.1 创建 CompilePhase 接口
+#### 1.4.1 Transformer 接口
 
 ```java
 package cn.procsl.ping.boot.ui.compiler;
@@ -113,17 +81,15 @@ import cn.procsl.ping.boot.ui.domain.Component;
 import java.util.List;
 
 /**
- * 编译阶段接口。
- * 新增编译阶段只需实现此接口，注册到 ComposeCompiler。
+ * 变换接口（扩展点）。新增编译阶段（如未来使用意图）只需实现此接口，注册到 ComposeCompiler。
+ * 输入整棵树 → 输出变换后的树，纯函数式 List → List，支持过滤/增删/改字段。
  */
-public interface CompilePhase {
-    void execute(List<Component> components, CompileContext context);
+public interface Transformer {
+    List<Component> process(List<Component> nodes, CompileContext context);
 }
 ```
 
-验证：单测覆盖接口定义
-
-#### 1.4.2 创建 CompileContext
+#### 1.4.2 CompileContext
 
 ```java
 package cn.procsl.ping.boot.ui.compiler;
@@ -132,192 +98,235 @@ import tools.jackson.databind.JsonNode;
 import java.util.Map;
 
 /**
- * 编译上下文，共享编译过程中的数据。
+ * 编译上下文：openapi operations 索引（operationId -> operation 描述）。
  */
 public class CompileContext {
     private final Map<String, JsonNode> operations;
-    
-    // constructor, getters, setters
+    // constructor, getters
 }
 ```
 
-验证：单测覆盖 operations 读写
+#### 1.4.3 OpenApiInliner（openapi 内联阶段）
 
-#### 1.4.3 创建 OperationCompiler
-
-整合 `OperationRefResolver` + `SchemaRefExpander` + `DefaultResolver`。
-
-**解析流程：**
+本次唯一核心阶段。流程：
 
 ```
-输入: List<Component>（所有组件）
-输出: CompileContext.operations（Map<String, JsonNode>）
+输入: List<Component>（source nodes）+ CompileContext.operations（openapi 索引）
 
-遍历所有 type="operation" 的组件:
+遍历所有 type="function" 节点:
   │
-  ├─ Step 1: 解析 openapi:// 引用
-  │  │  从 component.properties.api.$ref 提取 operationId
-  │  │  在 OpenAPI 文档中按 operationId 查找 path + method
-  │  │  解析 parameters → request.path / request.query / request.<name>
-  │  │  解析 requestBody → request.body（仅 application/json）
-  │  │  解析 responses → response（200/201 取 schema，204 为空对象）
-  │  │
-  │  └─ 输出: operation 契约（method/path/request/response）
+  ├─ Step 1: 按 properties.operationId 定位 openapi operation
+  │     找不到 -> 抛 ComposeException（断链）
   │
-  ├─ Step 2: 展开 OpenAPI $ref
-  │  │  递归展开 request/response schema 树中的所有 $ref
-  │  │  检测循环引用，命中即抛 ComposeException
-  │  │
-  │  └─ 输出: 完全展开的 operation 契约
+  ├─ Step 2: 内联 method/path/parameters/requestBody/responses 到 properties
+  │     responses 只保留 2xx（200/201/204），非 2xx 丢弃
   │
-  └─ Step 3: 合并默认值
-     │  将 operation.properties.defaults 合并到 request 对应字段的 default 属性
-     │
-     └─ 输出: 合并默认值后的 operation 契约
+  └─ Step 3: 递归展开所有 $ref（#/components/schemas/...），内联 schema
+        接受冗余，无 $ref 残留
+        循环引用 -> 抛 ComposeException
 
-最终结果: context.operations.put(operationId, operationContract)
+输出: function.properties = 自包含 openapi operation 描述
 ```
 
-验证：单测覆盖 operation 解析、$ref 展开、默认值合并
-
-#### 1.4.4 创建 ComponentCompiler
-
-整合 `RefResolver` + `PaginationMaterializer`。
-
-**解析流程：**
-
-```
-输入: List<Component>（所有组件）+ CompileContext.operations
-输出: 编译后的 List<Component>（$ref 已替换为 UUID）
-
-遍历所有 type="function"/"view"/"form" 的组件:
-  │
-  ├─ Step 1: 字段路径 → UUID
-  │  │  遍历组件的 children（input/output）
-  │  │  从 child.properties.$ref 提取 openapi:// 路径
-  │  │  在 context.operations 中定位 operation 的字段节点
-  │  │  生成 UUID 写入字段 id 属性
-  │  │  替换 $ref 值为 UUID
-  │  │
-  │  └─ 输出: $ref 已替换为 UUID 的组件
-  │
-  └─ Step 2: 分页物化
-     │  检测 operation 是否分页（request 有 offset+size，response 有 content+total）
-     │  命中后:
-     │    1. 生成 type="input" 组件（page.offset / page.size），插入 view children
-     │    2. 生成 type="pagination" 容器，children 为 output 子节点，插入 view children 末尾
-     │
-     └─ 输出: 包含 pagination 容器的组件树
-```
-
-验证：单测覆盖 UUID 解析、分页物化
-
-#### 1.4.5 创建 ComposeCompiler
+#### 1.4.4 ComposeCompiler（主编排）
 
 ```java
 package cn.procsl.ping.boot.ui.compiler;
 
 import cn.procsl.ping.boot.ui.domain.Component;
-import tools.jackson.databind.JsonNode;
 import java.util.List;
 
 /**
- * 主编排器，协调各编译阶段。
+ * 主编排器：链式执行各 Transformer（纯变换 List→List），返回 type:app 根节点。
  */
 public class ComposeCompiler {
-    private final List<CompilePhase> phases;
-    
-    public ComposeCompiler(List<CompilePhase> phases) {
-        this.phases = List.copyOf(phases);
+    private final List<Transformer> transformers;
+
+    public ComposeCompiler(List<Transformer> transformers) {
+        this.transformers = List.copyOf(transformers);
     }
-    
-    public List<Component> compile(List<JsonNode> rawComponents) {
-        // 1. 将 JsonNode 转换为 Component
-        // 2. 执行各编译阶段
-        // 3. 返回编译后的 List<Component>
+
+    public Component compile(List<Component> sourceNodes, CompileContext context) {
+        List<Component> nodes = sourceNodes;
+        for (Transformer t : transformers) {
+            nodes = t.process(nodes, context);   // 链式：每步可过滤/增删/改字段
+        }
+        return assemble(nodes);                  // 固定方法：合并为 type:"app" 根
     }
+
+    // assemble：稳定合并逻辑，app 根结构是不变量，不做成扩展点
 }
 ```
 
-验证：单测覆盖完整编译流程
+## 示例
 
-### 1.5 service 层
+### compose.json 源（业务模块提供，节点数组）
 
-#### 1.5.1 创建 ComposeService
+```json
+[
+  {
+    "type": "page", "id": "user",
+    "children": [
+      { "type": "function", "id": "list",
+        "properties": { "operationId": "findUsers" } },
+      { "type": "function", "id": "edit",
+        "properties": { "operationId": "accountStatusSetting" } }
+    ]
+  }
+]
+```
 
-```java
-package cn.procsl.ping.boot.ui.service;
+### openapi 输入片段（findUsers）
 
-import cn.procsl.ping.boot.ui.domain.App;
-import cn.procsl.ping.boot.ui.compiler.ComposeCompiler;
-import cn.procsl.ping.boot.ui.repository.ComposeRepository;
-
-/**
- * 领域服务，串联 Repository → Compiler → App。
- */
-public class ComposeService {
-    private final ComposeRepository repository;
-    private final ComposeCompiler compiler;
-    
-    public App compile() {
-        List<JsonNode> raw = repository.loadAll();
-        List<Component> compiled = compiler.compile(raw);
-        return new App(compiled);
+```json
+{
+  "paths": {
+    "/v1/system/users": {
+      "get": {
+        "operationId": "findUsers",
+        "parameters": [
+          { "name": "name", "in": "query", "schema": { "type": "string" } },
+          { "name": "state", "in": "query", "schema": { "type": "string", "enum": ["disable","enable"] } },
+          { "name": "offset", "in": "query", "schema": { "type": "integer" } },
+          { "name": "size", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/FormatPageUserRecord" } } } },
+          "400": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorVO" } } } }
+        }
+      }
     }
+  },
+  "components": {
+    "schemas": {
+      "FormatPageUserRecord": {
+        "type": "object",
+        "properties": {
+          "content": { "type": "array", "items": { "$ref": "#/components/schemas/UserRecord" } },
+          "total": { "type": "integer" }
+        }
+      },
+      "UserRecord": {
+        "type": "object",
+        "properties": { "id": { "type": "integer" }, "name": { "type": "string" } }
+      },
+      "ErrorVO": { "type": "object", "properties": { "message": { "type": "string" } } }
+    }
+  }
 }
 ```
 
-验证：单测覆盖完整调用流程
+### 编译产物（GET /v1/ui/components 返回，function 自包含）
+
+```json
+{
+  "type": "app", "id": "ping.app",
+  "children": [
+    {
+      "type": "page", "id": "user",
+      "children": [
+        {
+          "type": "function", "id": "list",
+          "properties": {
+            "operationId": "findUsers",
+            "method": "GET",
+            "path": "/v1/system/users",
+            "parameters": [
+              { "name": "name", "in": "query", "schema": { "type": "string" } },
+              { "name": "state", "in": "query", "schema": { "type": "string", "enum": ["disable","enable"] } },
+              { "name": "offset", "in": "query", "schema": { "type": "integer" } },
+              { "name": "size", "in": "query", "schema": { "type": "integer" } }
+            ],
+            "responses": {
+              "200": {
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "content": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": { "id": { "type": "integer" }, "name": { "type": "string" } }
+                          }
+                        },
+                        "total": { "type": "integer" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "function", "id": "edit",
+          "properties": {
+            "operationId": "accountStatusSetting",
+            "method": "PATCH",
+            "path": "/v1/system/users/{id}/account",
+            "parameters": [ { "name": "id", "in": "path", "schema": { "type": "integer" } } ],
+            "requestBody": { "content": { "application/json": { "schema": { "type": "object", "properties": { "state": { "type": "string" } } } } } },
+            "responses": { "204": {} }
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+**要点**：schema 全内联（`FormatPageUserRecord`/`UserRecord` 已展开，无 `$ref`）；`responses` 只保留 2xx（400 不在产物里）；query 参数已展开为 name/state/offset/size 各一个（`@ParameterObject` 保证 openapi 源准确）。
+
+## 编译校验
+
+| 情况 | 处理 |
+|---|---|
+| `page.id` 重复 | `ComposeException`，启动失败 |
+| `function.id` 在 page 内重复 | `ComposeException`，启动失败 |
+| `operationId` 在 openapi 中找不到 | `ComposeException`（断链），启动失败 |
+| openapi 内 operationId 冲突 | `ComposeException`，启动失败 |
+| 未知属性 / 未知类型 | 忽略 + debug 日志 |
 
 ## 组件初始化/组装流程
 
-### 创建方式
-
-组件不依赖 Spring，直接 new 创建，用完即释放：
+组件不依赖 Spring，直接 new 创建，无状态，用完即释放：
 
 ```java
-// 每次请求时创建，用完即释放
-public App compile() {
-    ComposeRepository repository = new ComposeRepository(objectMapper);
-    ComposeCompiler compiler = new ComposeCompiler(List.of(
-        new OperationCompiler(),
-        new ComponentCompiler()
-    ));
-    ComposeService service = new ComposeService(repository, compiler);
-    return service.compile();
-}
+ObjectMapper om = new ObjectMapper();
+ComposeRepository composeRepo = new ComposeRepository(om);
+OpenApiRepository openApiRepo = new OpenApiRepository(om);
+CompileContext ctx = new CompileContext(openApiRepo.loadOperations());
+ComposeCompiler engine = new ComposeCompiler(List.of(new OpenApiInliner()));
+Component app = engine.compile(composeRepo.loadAll(), ctx);
 ```
 
-### 依赖链
+依赖链：
 
 ```
 ObjectMapper
-    ↓
-new ComposeRepository(objectMapper)
-    ↓
-new ComposeCompiler(List.of(new OperationCompiler(), new ComponentCompiler()))
-    ↓
-new ComposeService(repository, compiler)
-    ↓
-service.compile() → App
+  ↓
+ComposeRepository / OpenApiRepository
+  ↓
+CompileContext（openapi operations 索引）
+  ↓
+ComposeCompiler(List.of(new OpenApiInliner()))
+  ↓
+engine.compile(...) → type:"app" 根
 ```
 
-### 生命周期
-
-- 组件生命周期由调用方控制
-- 每次编译创建新实例，用完即释放
-- 无需一直持有，无内存泄漏风险
+生命周期：无状态，每次编译新建实例，用完即释放，无内存泄漏风险。
 
 ## 边界与降级契约
 
-1. **空输入**：`ComposeRepository.loadAll()` 返回空列表时，`ComposeCompiler.compile()` 返回空列表，`ComposeService.compile()` 返回空 App
-2. **编译失败**：任何编译错误都抛出 `ComposeException`，不降级
-3. **引用断链**：`$ref` 指向不存在的 operation 或字段时，抛出 `ComposeException`，包含完整路径
+1. **空输入**：`ComposeRepository.loadAll()` 返回空列表 → `compile()` 返回空 `type:"app"`（children 空），端点返回 200 空树
+2. **编译失败**：任何结构性错误抛 `ComposeException`，启动失败，不降级
+3. **断链**：`operationId` 找不到、`$ref` 循环引用，抛 `ComposeException` 含完整路径
 
 ## 验证方式
 
-1. **单元测试**：每个类都有对应的单元测试
-2. **集成测试**：`ComposeService.compile()` 的端到端测试
-3. **异常测试**：验证各种错误场景
-4. **边界测试**：验证空输入、空对象等边界情况
-5. **初始化测试**：验证 Spring Bean 正确注册和组装
+1. 单元测试：Component、CompileContext、OpenApiInliner、ComposeCompiler 各自单测
+2. 集成测试：`ComposeCompiler.compile()` 端到端（compose.json + openapi → app）
+3. 异常测试：断链、id 重复、operationId 冲突
+4. 边界测试：空输入、无 $ref 残留、responses 只含 2xx

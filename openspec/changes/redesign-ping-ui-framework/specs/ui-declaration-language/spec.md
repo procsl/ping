@@ -2,204 +2,113 @@
 
 ## Purpose
 
-定义抽象 UI 声明语言的组件类型系统、引用语法与编译规则，使 JSON 只声明功能组件及其与 operation 的输入/输出映射。
+定义抽象 UI 声明语言的组件结构、operationId 引用与 openapi 内联规则，使 compose.json 只声明功能树与接口引用，字段细节全部来自 openapi。
 
 ## ADDED Requirements
 
-### Requirement: 组件类型系统
+### Requirement: 功能树结构
 
-系统 SHALL 支持以下 8 种组件类型，每种类型有明确的职责边界：
+系统 SHALL 用统一节点构成功能树，每个节点 `{ type, id, properties, children }`，`type` 字段标识节点类型（app/page/function）：
 
-| 类型 | 职责 | 是否渲染 |
-|---|---|---|
-| `app` | 根节点（ping-ui 提供） | 否 |
-| `operation` | 接口契约（method/path/request/response） | 否 |
-| `function` | 功能入口（children 非空） | 是 |
-| `view` | 数据视图（读） | 是 |
-| `form` | 表单（写） | 是 |
-| `input` | 输入控件，`$ref` → operation.request 字段 | 是 |
-| `output` | 展示控件，`$ref` → operation.response 字段 | 是 |
-| `pagination` | 分页容器（编译器自动生成，见「分页物化」） | 是 |
-
-系统 SHALL NOT 在此类型系统之外渲染未注册类型（未知类型处理见「编译校验分级」）。无占位类型——未实现的功能不声明（不声明 = 不存在）。
-
-#### Scenario: 合法组件树
-- **WHEN** compose.json 包含上述 8 种类型的组件树
-- **THEN** 编译成功，前端按类型渲染
-
-### Requirement: operation 结构定义
-
-`operation` 组件 SHALL 包含以下结构：
-
-```json
-{
-  "type": "operation",
-  "id": "<唯一标识>",
-  "properties": {
-    "method": "<HTTP 方法>",
-    "path": "<URL 路径>",
-    "request": {
-      "path": { ... },
-      "query": { ... },
-      "body": { ... }
-    },
-    "response": { ... },
-    "defaults": { ... },
-    "sortable_fields": [...]
-  }
-}
+```
+{ type: "app",      id, properties, children: [page...] }
+  { type: "page",   id, properties, children: [function...] }
+    { type: "function", id, properties }
 ```
 
-`request` 中的 `path`/`query`/`body` SHALL 按 OpenAPI 参数位置分类。`response` 为空对象 `{}` 时表示 204 成功响应（无返回字段）。
+- `type: "app"` 根节点，`properties` SHALL 可扩展（如 `version`/`source`）
+- `type: "page"` 功能页面容器，`id` SHALL 全局唯一
+- `type: "function"` 接口功能，`id`（page 内唯一）+ `properties`（openapi 接口描述）
 
-#### Scenario: 完整 operation
-- **WHEN** operation 包含 method/path/request/response
-- **THEN** 编译成功，前端可调用
+compose.json 源为节点数组（`type` 标识），其中 `type: "function"` SHALL 仅声明 `{ type, id, properties: { operationId } }`，字段细节 SHALL NOT 在源中声明。
 
-#### Scenario: 204 响应
-- **WHEN** operation 的 response 为空对象
-- **THEN** 编译成功，表示成功但无可解析字段
+#### Scenario: 合法功能树
+- **WHEN** compose.json 包含 app > pages > function 三级结构
+- **THEN** 编译成功，前端据产物生成菜单与 page
 
-#### Scenario: operation id 重复
-- **WHEN** 多个 compose.json 声明了相同 id 的 operation（或 OpenAPI 中缺失 operationId）
-- **THEN** 编译阶段报错，启动失败，报错信息包含两处声明的来源（模块文件名）
+#### Scenario: page 无 name
+- **WHEN** page 只声明 id、未声明 name
+- **THEN** 合法，page 标识即 id
 
-### Requirement: function 结构约束
+### Requirement: function 路由规则
 
-`function` 的 `children` SHALL 非空（至少一个 `view` 或 `form`），否则编译报错、启动失败。动作类功能（如「重置密码」）SHALL 表达为 `function` 下挂 `form`，不单独引入动作类型。
+function 的全局标识 / 前端路由 SHALL 为 `page.id + "/" + function.id`。`function.id` SHALL 仅需在 page 内唯一（开发者写短名），全局唯一性由 page 前缀保证。
 
-> ⏸️ **遗留（待重新设计）**：`function` 是否携带 `properties.operation` 待完全重新设计（design D13 遗留标记）；当前以「不携带」落地——这是唯一可增量演进的方向。
+#### Scenario: 路由生成
+- **WHEN** page.id = "user"，function.id = "list"
+- **THEN** 前端路由为 "user/list"
 
-#### Scenario: 空 function
-- **WHEN** function 不含任何 children
-- **THEN** 编译阶段报错，启动失败
+### Requirement: 扁平菜单
 
-#### Scenario: 动作功能表达为 form
-- **WHEN** 需要声明「重置密码」类动作功能
-- **THEN** 声明为 function 下挂 form（form 关联对应 operation）
+前端菜单 SHALL 为扁平结构：各 function 以路由标识（`page.id/function.id`）平铺为一级菜单项，SHALL NOT 按 page 分级。`page.id` SHALL 仅作路由前缀，不作分组标签。菜单显示名由前端自定，compose 不声明显示名。
 
-### Requirement: view/form 关联 operation
+#### Scenario: 菜单生成
+- **WHEN** 功能树含多个 page 的多个 function
+- **THEN** 前端菜单平铺所有 function（以路由标识），无分组层级，显示名前端自定
 
-`view` 与 `form` SHALL 各关联且仅关联一个 operation（`properties.operation`）：一个 view 读一个接口，一个 form 提交一个接口；一屏多接口用 `function` 下挂多个 view/form 表达。`view` 的子节点 SHALL 为 `input`/`output`（含编译器自动生成的分页/排序 input），`form` 的子节点 SHALL 为 `input`。
+### Requirement: operationId 引用
 
-#### Scenario: 单 operation 关联
-- **WHEN** view 关联 operation "findUsers"，其下 input/output 引用该 operation 的字段
-- **THEN** 编译成功，前端按引用渲染
+`function` SHALL 通过 `operationId` 引用 openapi 中的 operation。同一 `operationId` SHALL 可被多个 page 的多个 function 引用（openapi operation 是唯一源，function 是其使用实例）。
 
-### Requirement: $ref 引用与编译时解析
+#### Scenario: 同一 operationId 多引用
+- **WHEN** page "user" 和 page "dashboard" 的 function 都引用 "findUsers"
+- **THEN** 两个 function 各自内联一份完整描述，编译成功
 
-`input` 和 `output` 组件 SHALL 通过 `properties.$ref` 引用 operation 的字段。编译阶段 SHALL 将 `$ref` 解析为 UUID，并插入到被引用字段的 `id` 属性上。
+### Requirement: openapi 内联
 
-`$ref` 语法为 `openapi://` 协议：
-- operation 级别：`openapi://<operationId>`（如 `openapi://findUsers`）
-- 字段级别：`openapi://<operationId>/<request|response>/<path>`（如 `openapi://findUsers/request/query/name`）
+编译阶段 SHALL 按 `operationId` 定位 openapi operation，将 `method`/`path`/`parameters`/`requestBody`/`responses` 内联进 `function.properties`，展开所有 `$ref`。内联 SHALL 接受冗余，使 function 完全自包含、无 `$ref` 残留。
 
-字段路径 SHALL 逐段下钻；数组包装层 SHALL 使用固定段名 `items` 继续下钻到元素定义，即 `response/content/items/<field>` 等价于 `response.content.items.properties.<field>`。数组字段上缺 `items` 段（或多写了 `items` 段）SHALL 视为断链。
+`function.properties` SHALL 保留 openapi operation 的结构形态，字段角色由 openapi 的天然锚点决定：`parameters[].in=path/query` → 输入、`requestBody` → 表单、`responses` → 展示。
 
-#### Scenario: $ref 解析为 UUID
-- **WHEN** input 的 $ref 为 `openapi://findUsers/request/query/name`
-- **THEN** 编译阶段生成 UUID，替换 $ref 值，并在 UserQuery.name 字段上写入 id 属性
+#### Scenario: operation 内联
+- **WHEN** function 引用 operationId "findUsers"
+- **THEN** 编译产物的 function.properties 包含 findUsers 的 method/path/parameters/responses，schema 全内联
 
-#### Scenario: 数组元素字段引用
-- **WHEN** output 的 $ref 为 `openapi://findUsers/response/content/items/account`
-- **THEN** 编译阶段解析到 `FormatPageUserRecord.content.items`（即 `UserRecord`）的 `account` 字段并物化
+#### Scenario: 无 $ref 残留
+- **WHEN** 编译完成
+- **THEN** function.properties 中不存在任何 `$ref`，前端可单函数渲染与调用
 
-#### Scenario: 数组路径缺少 items 段
-- **WHEN** output 的 $ref 为 `openapi://findUsers/response/content/account`（content 是数组）
-- **THEN** 编译阶段按断链报错，启动失败
+### Requirement: 响应只保留 2xx
 
-#### Scenario: $ref 断链
-- **WHEN** $ref 指向不存在的 operation 或字段
-- **THEN** 编译阶段报错，启动失败
+`function.properties.responses` SHALL 只序列化 2xx 状态码（200/201/204）的 schema，非 2xx（4xx/5xx）SHALL NOT 序列化。错误响应的处理归轻量 client（据 HTTP 状态码自判），不在本次产物范围。
 
-### Requirement: 编译校验分级
+#### Scenario: 只保留 2xx
+- **WHEN** operation 有 200/400/500 状态码
+- **THEN** function.properties.responses 只含 200 的 schema，400/500 不序列化
 
-编译阶段 SHALL 按下表分级处理，避免把不可枚举的情况变成启动阻塞：
+### Requirement: 编译校验
+
+编译阶段 SHALL 校验以下结构性错误，任一 SHALL 导致启动失败：
 
 | 情况 | 处理 |
 |---|---|
-| `$ref` 断链（operation 或字段不存在、数组路径缺 `items`） | 报错，启动失败 |
-| 空 schema `{}` 且**被** input/output 引用 | 报错，启动失败（前端无法推断控件） |
-| 空 schema `{}` 未被引用 | 忽略 |
-| operation / function id 重复 | 报错，启动失败（带两处声明来源） |
-| view/form 未关联 operation、operation 缺 operationId | 报错，启动失败 |
-| `sortable_fields` 中的字段不存在于 response | 报错，启动失败 |
-| 未知组件类型 | 忽略 + debug 日志 |
-| 未知/多余属性（width、align 等） | 忽略 + debug 日志（版本升级兼容） |
+| `page.id` 重复 | 报错，启动失败 |
+| `function.id` 在 page 内重复 | 报错，启动失败 |
+| `operationId` 在 openapi 中找不到 | 报错，启动失败 |
+| openapi 内 operationId 冲突 | 报错，启动失败 |
+| 未知属性（未来使用意图扩展字段） | 忽略 + debug 日志 |
+| 未知类型（page/function 之外） | 忽略 + debug 日志 |
 
-#### Scenario: 被引用的空 schema
-- **WHEN** output 引用的字段 schema 为空对象 `{}`
-- **THEN** 编译阶段报错，启动失败，报错信息包含引用路径
+全有或全无——任一 compose.json 编译失败，整个应用启动失败。报错信息 SHALL 含具体引用路径与声明来源。
 
-#### Scenario: 未知类型被忽略
-- **WHEN** compose.json 包含类型系统之外的类型（如旧格式的 `dataset`、`placeholder`）
-- **THEN** 编译阶段忽略该节点并打印 debug 日志，不报错、不影响启动
-
-#### Scenario: 未知属性被忽略
-- **WHEN** output 的 properties 中出现 `width` 或 `align`
-- **THEN** 编译阶段忽略该属性并打印 debug 日志，不报错
-
-### Requirement: 默认值优先级
-
-系统 SHALL 支持三级默认值，优先级为：**实际调用值 > 覆盖默认值 > operation 默认值**。
-
-`operation.properties.defaults` 声明接口级默认值；`function` SHALL 可通过 `overrides` 覆盖（依据 design D17，`view`/`form` 不允许声明 `overrides`，其默认值由编译生成）。
-
-#### Scenario: 默认值生效
-- **WHEN** operation 声明 defaults.request.query.state = "enable"
-- **THEN** 前端渲染时默认选中 "enable"
-
-#### Scenario: 覆盖默认值
-- **WHEN** function 声明 overrides.request.query.state = "disable"
-- **THEN** 前端渲染时默认选中 "disable"（覆盖 operation 默认值）
-
-### Requirement: 排序作为 input
-
-排序 SHALL 视为一种 `input`，由**编译器自动生成**（引用 operation 的排序参数，不带 value），开发者 SHALL NOT 手写排序 input。可排序字段 SHALL 在 operation 的 `sortable_fields` 列表中声明；`sortable_fields` 中的字段 SHALL 存在于 response，否则断链报错。默认排序如需指定，SHALL 通过 `defaults` 给出。前端按 `sortable_fields` 决定列头排序入口，点击时自行拼接 value。
-
-#### Scenario: 可排序字段
-- **WHEN** operation 声明 sortable_fields = ["account", "create_time"]
-- **THEN** 编译器自动生成排序 input；前端在对应 output 列上提供排序入口
-
-#### Scenario: sortable_fields 引用不存在的字段
-- **WHEN** operation 的 sortable_fields 中包含 response 里不存在的字段
-- **THEN** 编译阶段按断链报错，启动失败
-
-### Requirement: 分页物化
-
-编译阶段 SHALL 检测 operation 的 request 是否含 `offset` + `size`、response 是否含 `content` + `total`，并自动生成 `pagination` 容器：
-
-- 检测到分页（request + response 均匹配）：生成 `type: "pagination"` 容器包裹 output 子节点（`mode: "page"`），并自动生成 `offset`/`size` 的 input（与 query、sort 并列）
-- 仅 response 匹配（request 无 offset/size）：生成 `mode: "scroll"` 的 pagination 容器，**SHALL NOT 生成** offset/size input，容器属性中也不带 offset/size/content 引用（无字段可引用，生成即断链）
-
-#### Scenario: 按页分页
-- **WHEN** operation 的 request 含 offset+size、response 含 content+total
-- **THEN** 编译生成 mode=page 的 pagination 容器和 offset/size input
-
-#### Scenario: 滑动分页
-- **WHEN** operation 的 response 含 content+total 但 request 无 offset/size
-- **THEN** 编译生成 mode=scroll 的 pagination 容器，且不生成 offset/size input
-
-### Requirement: 声明极致克制
-
-compose.json SHALL NOT 携带任何 UI 展示属性（width、align、icon、order、format、enum 等）。这些属性由前端渲染器自动推断或硬编码。
-
-#### Scenario: 无 UI 属性
-- **WHEN** output 只包含 $ref 属性
-- **THEN** 编译成功，前端根据 schema 类型自动选择展示方式
-
-#### Scenario: 非法 UI 属性
-- **WHEN** output 包含 width 或 align 属性
-- **THEN** 编译阶段忽略该属性并打印 debug 日志，不报错、不影响启动（详见「编译校验分级」）
-
-### Requirement: $ref 匹配规则
-
-`$ref` SHALL 使用 `openapi://` 协议引用操作（如 `openapi://findUsers`）。编译器内部按 `operationId` 索引（非 summary）。若 operationId 冲突，SHALL 追加类型+方法名作为唯一标识。
-
-#### Scenario: 正常匹配
-- **WHEN** $ref 为 `openapi://findUsers`
-- **THEN** 匹配到 GET /v1/system/users 的 operationId "findUsers"
+#### Scenario: operationId 断链
+- **WHEN** function 引用的 operationId 在 openapi 中不存在
+- **THEN** 启动失败，报错含该 operationId 与声明来源
 
 #### Scenario: operationId 冲突
-- **WHEN** 两个方法有相同 operationId
-- **THEN** 追加类型+方法名（如 "UserController.findUsers"）
+- **WHEN** openapi 内两个 operation 有相同 operationId
+- **THEN** 启动失败，不兜底
+
+#### Scenario: 未知属性忽略
+- **WHEN** function.properties 出现未知字段（未来使用意图扩展）
+- **THEN** 忽略并打印 debug 日志，不报错
+
+### Requirement: 使用意图扩展点
+
+`function.properties` SHALL 作为未来使用意图（字段裁剪、默认值、可排序、分页模式）的扩展载体。系统 SHALL 通过可扩展的编译阶段（`Transformer`）添加这些字段，不修改已有编译器代码。本次 SHALL NOT 声明使用意图。
+
+分页/排序识别本期 SHALL 归前端据固定 schema 字段推断（request `offset`/`size`/`sort`、response `content`/`total`），编译器 SHALL NOT 物化分页容器或排序 input。字段裁剪本期不做，v1 显示 operation 全部 response 字段。
+
+#### Scenario: 编译阶段扩展
+- **WHEN** 未来新增使用意图编译阶段
+- **THEN** 该阶段往 function.properties 添加字段，不改动 openapi 内联阶段

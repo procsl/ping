@@ -2,42 +2,39 @@
 
 ## Why
 
-当前抽象 UI 框架（`add-ping-ui-web-sdk` 产物）过度依赖 JSON 驱动：18 种组件类型中大量与前端导航壳耦合（layout、nav_group、menu、breadcrumb、tabs 等），SDK 注册表 + 消息总线 + 生命周期机制过重，且后端聚合链路已断裂（`GET /v1/ui/components` 不存在）。需要重新设计一个更克制、更专注的声明式 UI 框架：**JSON 只声明功能组件及其与接口的输入/输出映射，渲染细节交给前端**。
+上一版抽象 UI 框架（`add-ping-ui-web-sdk` 产物）过度依赖自定义组件类型系统 + `$ref`/UUID 字段引用：18 种组件类型中大量与前端导航壳耦合，SDK 注册表 + 消息总线 + 生命周期机制过重，后端聚合链路已断裂（`GET /v1/ui/components` 不存在）。
 
-同时，`cn.procsl.ping.boot.ui.component` 包下的组件设计混乱、职责不明确、不符合领域驱动设计（DDD）。编译流程涉及多个阶段（operation 解析、$ref 展开、UUID 物化、默认值合并、分页物化），但代码组织是扁平的，缺少编排层，命名混乱（Resolver/Expander/Materializer 三种后缀），没有类型安全的领域对象。
+本变更早期草案虽精简了类型，但仍自造字段路径 DSL（`openapi://<operationId>/<request|response>/<path>` + `items` 段语义），表达力低于 JSON Schema——遇到嵌套对象、oneOf、discriminator 等 OpenAPI 已支持的形态就要扩语法；且字段级声明量大、新增接口成本高。
+
+需要重新设计为「功能树 + openapi 内联」模型：**compose.json 只声明功能树与接口引用，字段细节全部来自 openapi 内联，表达力天花板 = OpenAPI 全集**。
 
 ## What Changes
 
-- **BREAKING**：移除 12 种前端耦合组件类型（application、layout、nav_group、menu、breadcrumb、tabs、user_info_panel、main_container、row_action、form_action、empty、column 作为独立类型）
-- **BREAKING**：移除 SDK 注册表、生命周期、消息总线、错误处理器等重机制
-- **新增**：`operation` 组件类型——接口契约定义（含 method/path/request/response），编译时解析 `$ref` 引用（`openapi://<operationId>`）替换为 OpenAPI schema
-- **新增**：`input` / `output` 组件类型——通过 `$ref` 引用 operation 的 request/response 字段（`openapi://<operationId>/<request|response>/<path>`），编译时解析为 UUID
-- **新增**：`function` 组件类型——功能入口（唯一标识 + children），不含导航 UI 概念
-- **新增**：`view` / `form` 组件类型——数据视图（读）/ 表单（写），包含 input/output 子节点
-- **新增**：编译校验分级——结构性错误（引用断链、被引用的空 schema、id 重复、view/form 未关联 operation）失败则启动失败；未知类型/未知属性忽略 + debug 日志（版本升级兼容）
-- **新增**：OpenAPI 文档打包期导出、统一落 `META-INF/ping/openapi-<module>.json`，运行时扫描合并作为编译输入；存在 compose.json 而无任何 openapi 文档 → 启动失败（散装豁免归后续提案）；`openapi.export=true` 导出进程跳过 UI 编译
-- **新增**：`$ref` 使用 `openapi://<operationId>` 协议匹配 OpenAPI operation（非 summary），冲突时追加类型+方法名
-- **修改**：`compose.json` 只声明功能组件，不携带任何 UI 展示属性（width、align、icon、order 等）
-- **恢复**：后端 `GET /v1/ui/components` 聚合接口，返回编译后的完整 JSON
-- **新增**：DDD 代码架构——引入 `Component` 组合类型、`App` 应用根、`ComposeService` 领域服务、`ComposeCompiler` 编译器、`ComposeRepository` 仓储
-- **重构**：compiler 包整合为 `OperationCompiler` + `ComponentCompiler`，符合开闭原则
-- **精简**：exception 包从 4 个异常类精简到 2 个
+- **BREAKING**：组件结构从五层（function/view/form/input/output + 平级 operation）改为统一节点树 `type: app > page > function`，节点用 `type` 字段标识，domain 用单一组合类型承载
+- **BREAKING**：移除 `$ref`/UUID 字段引用机制、`openapi://` 字段路径 DSL、pagination 容器、分页物化、排序 input、默认值/overrides——字段细节全来自 openapi
+- **BREAKING**：compose.json 源中开发者只声明 `page`/`function` 标识 + `operationId` 引用，零字段声明
+- **新增**：`function` = openapi operation 的自包含镜像（method/path/parameters/requestBody/responses 内联，schema 全展开，接受冗余），前端据单个 function 即可渲染 + 调用
+- **新增**：`function.id` 路由规则 = `page.id + "/" + function.id`，菜单以路由标识平铺
+- **新增**：编译器 `Transformer` 开闭原则，使用意图（裁剪/默认/可排序/分页模式）未来往 `function.properties` 扩展，本次不做
+- **新增**：编译校验（id 重复、operationId 断链/冲突 → 启动失败；未知属性/类型忽略 + debug）
+- **恢复**：后端 `GET /v1/ui/components` 聚合接口，返回编译产物
+- **保留**：OpenAPI 文档打包期导出到 `META-INF/ping/openapi-<module>.json`，运行时扫描合并；`openapi.export=true` 导出进程跳过编译；存在 compose.json 而无 openapi 文件 → 启动失败
+- **DDD**：统一节点组合类型（type + id + properties + children，`type` 分派）、`ComposeCompiler` 编排、`ComposeRepository`/`OpenApiRepository` 仓储、exception 精简到 2 个
 
 ## Capabilities
 
 ### New Capabilities
 
-- `ui-declaration-language`: 抽象 UI 声明语言规范——定义组件类型系统（app/operation/function/view/form/input/output/pagination，无占位类型）、`$ref` 引用语法（`openapi://` 协议 + 数组 `items` 段）、编译阶段解析规则与校验分级、operation 结构约定（method/path/request/response/defaults/sortable_fields）、`$ref` 匹配规则
+- `ui-declaration-language`: 抽象 UI 声明语言规范——功能树结构（app/page/function）、`function.id` 路由规则、operationId 引用与 openapi 内联、使用意图扩展点、编译校验
 
 ### Modified Capabilities
 
-- `ui-component-sdk`: 现有 SDK spec 需要重写——从"运行时注册表 + 消息总线 + 生命周期"模型改为"编译时声明 + 静态 JSON 驱动"模型。移除处理器注册、生命周期、消息通知等需求，新增 operation 契约定义、input/output 引用、编译校验等需求。
+- `ui-component-sdk`: 从「运行时注册表 + 消息总线 + 生命周期」模型改为「静态自包含功能树驱动」模型。移除处理器注册、生命周期、消息通知；新增 function 自包含可调用、编译校验、编译输入、打包导出跳过等需求。
 
 ## Impact
 
-- `ping-ui` 模块：SDK 机制移除，重写为编译/组装器，DDD 架构重构；端点注册在 `UIAutoConfiguration`
-- `ping-distribute`：打包期导出 OpenAPI 到 `META-INF/ping/openapi-<module>.json`；恢复 `GET /v1/ui/components` 端点（跟随登录拦截）
-- 前端：**只做减法**——移除 SDK 机制，保留 `createPingUi` 占位 entry 与薄壳不变，渲染器重建不在本次范围
-- `compose.json` 格式：破坏性变更；**不做迁移**，存量旧文件删除，业务模块按新规范自行声明
-- `$ref` 引用语法：统一使用 `openapi://` 协议风格（如 `openapi://findUsers`、`openapi://findUsers/request/query/name`）
+- `ping-ui` 模块：SDK 机制移除，重写为「openapi 内联」编译器 + `Transformer` 骨架，DDD 架构重构；端点注册在 `UIAutoConfiguration`
+- `ping-distribute`：打包期导出 OpenAPI 到 `META-INF/ping/openapi-<module>.json`；恢复 `GET /v1/ui/components`（跟随登录拦截）
+- 前端：**只做减法**——移除 SDK 机制，保留 `createPingUi` 占位 entry 与薄壳；渲染器与轻量 client（据 function.properties 拼 fetch）不在本次范围
+- `compose.json` 格式：彻底变更；**不做迁移**，存量旧文件删除，业务模块按新规范声明
 - 已知限制（归后续提案）：业务模块独立运行（有 compose.json、无 openapi 文档）会启动失败；分模块导出 openapi 前须解决全量/部分文件互斥规则
