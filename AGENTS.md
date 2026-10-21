@@ -1,5 +1,5 @@
 # AGENTS.md
-## 全程使用中文
+## 全程使用中文交路,文档注释优先使用中文(代码,关键词,专业词汇除外)
 
 ## 命令
 
@@ -38,8 +38,8 @@
 
 **构建期产物**
 
-- 统一落 `META-INF/ping/`，运行时只读该固定路径，**禁 `classpath*:` 通配扫描**
-- OpenAPI 打包期按模块生成，运行时不读；处理器选项由根 pom 统一注入，模块 pom 不逐个声明
+- 统一落 `META-INF/ping/`，运行时只读该固定路径（精确文件名或模块前缀，禁 `**` 目录级通配扫描）
+- OpenAPI 打包期按模块生成 `META-INF/ping/openapi-<module>.json`，**运行时作为 UI 组件编译输入读取**（`ping-ui` 的 `OpenApiRepository` 扫描 `openapi-*.json`，`openapi.export=true` 导出进程跳过组件编译）；处理器选项由根 pom 统一注入，模块 pom 不逐个声明
 
 **GraalVM**
 

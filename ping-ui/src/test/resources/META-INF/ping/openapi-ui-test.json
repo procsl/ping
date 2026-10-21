@@ -1,0 +1,84 @@
+{
+  "openapi": "3.0.3",
+  "info": { "title": "ping-ui-test", "version": "1.0.0" },
+  "paths": {
+    "/v1/system/users": {
+      "get": {
+        "operationId": "findUsers",
+        "parameters": [
+          { "name": "name", "in": "query", "schema": { "type": "string" } },
+          { "name": "state", "in": "query", "schema": { "type": "string", "enum": ["disable", "enable"] } },
+          { "name": "offset", "in": "query", "schema": { "type": "integer" } },
+          { "name": "size", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/FormatPageUserRecord" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorVO" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/system/users/{id}/account": {
+      "patch": {
+        "operationId": "accountStatusSetting",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": { "state": { "type": "string", "enum": ["disable", "enable"] } }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "No Content" }
+        }
+      }
+    },
+    "/v1/system/ping-no-id": {
+      "get": {
+        "summary": "no operationId, should be skipped",
+        "responses": { "200": { "description": "OK" } }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "FormatPageUserRecord": {
+        "type": "object",
+        "properties": {
+          "content": { "type": "array", "items": { "$ref": "#/components/schemas/UserRecord" } },
+          "total": { "type": "integer" }
+        }
+      },
+      "UserRecord": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" }
+        }
+      },
+      "ErrorVO": {
+        "type": "object",
+        "properties": { "message": { "type": "string" } }
+      }
+    }
+  }
+}

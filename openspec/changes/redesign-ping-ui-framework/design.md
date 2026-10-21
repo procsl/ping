@@ -118,7 +118,7 @@
 cn.procsl.ping.boot.ui
 ├── domain/       # 统一节点组合类型（type + id + properties + children）
 ├── compiler/     # ComposeCompiler（主编排）+ Transformer（阶段接口）
-│                  + CompileContext（上下文）+ OpenApiInliner（openapi 内联阶段）
+│                  + CompileContext（上下文）+ OperationTransformer（openapi 内联阶段）
 ├── repository/   # ComposeRepository（扫 compose.json）+ OpenApiRepository（扫 openapi-*.json）
 └── exception/    # ComposeException（基类，编译错误）+ ComposeParseException（文件解析错误）
 ```

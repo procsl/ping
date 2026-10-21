@@ -1,0 +1,11 @@
+[
+  {
+    "type": "page", "id": "user",
+    "children": [
+      { "type": "function", "id": "list",
+        "properties": { "operationId": "findUsers" } },
+      { "type": "function", "id": "edit",
+        "properties": { "operationId": "accountStatusSetting" } }
+    ]
+  }
+]

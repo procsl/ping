@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Indexed;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +26,7 @@ public class UserQueryController {
     @MarkPageable
     @Operation(summary = "获取用户列表")
     @GetMapping("/v1/system/users")
-    public FormatPage<UserRecord> findUsers(Pageable pageable, UserQuery query) {
+    public FormatPage<UserRecord> findUsers(Pageable pageable, @ParameterObject UserQuery query) {
 //        return this.searchRepository.search(query, UserRecord.class, pageable);
         return null;
     }

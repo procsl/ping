@@ -8,13 +8,16 @@
 
 ### 3.1 GET /v1/ui/components 端点
 
-调用 `ComposeCompiler.compile()` 的结果（内存只读快照），序列化为 JSON 返回。启动时编译一次，运行期不重编译直到重启。
+controller 无状态（DDD 原则）：不持有产物快照，请求时直接经 `UiComponentTreeFactory` 现场编译返回 JSON；
+构造时调用一次 factory 仅作启动验证——输入缺失/断链等结构性错误在启动阶段即失败（design D8）。
 
 验证：curl 返回 200 + 合法 JSON
 
 ### 3.2 注册到 UIAutoConfiguration
 
-`UIAutoConfiguration` 注册 controller + 编译产物 bean，`AutoConfiguration.imports` 已登记。
+`UIAutoConfiguration` 只做装配：注册 controller bean，`AutoConfiguration.imports` 已登记。
+编译流程（扫描 → 输入完整性校验 → Transformer 链）内聚于 `compiler/UiComponentTreeFactory`（无 Spring 依赖）；
+编译产物是 controller 的私有只读状态，**不进容器**（避免 `Component` 通用 domain 类型成为全局注入点）。
 
 验证：启动应用后 curl 可访问
 

@@ -29,6 +29,12 @@
             <artifactId>ping-ui</artifactId>
         </dependency>
 
+        <!-- query POJO 参数平铺描述（@ParameterObject）：openapi 导出时展开为独立 query 参数 -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-common</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

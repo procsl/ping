@@ -12,10 +12,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * 组件聚合链路下线验证：
- * 构建期聚合 + 启动期装配的 {@code GET /v1/ui/components} 已随 {@code 4fb05681} 移除
- * （恢复不在 add-ping-ui-web-sdk 变更范围内），旧 {@code GET /v1/system/menus} 亦已下线。
- * 两个接口当前均应返回 404。
+ * 组件聚合端点状态验证：{@code GET /v1/ui/components} 已由 {@code redesign-ping-ui-framework}
+ * 变更恢复（新架构：功能树 + openapi 内联，{@code UIAutoConfiguration} 启动期编译一次并注册端点），
+ * 应返回 200；旧 {@code GET /v1/system/menus} 已下线，仍返回 404。
  *
  * <p>{@code authenticates-prefix} 采用与 {@code ping-distribute/application.properties} 一致的值：
  * 认证策略不在本变更范围内，这里只保证被测接口在与生产一致的前缀配置下可达。
@@ -34,9 +33,9 @@ class UiComponentAssemblyTest {
     }
 
     @Test
-    void componentsEndpointIsRemoved() throws Exception {
+    void componentsEndpointIsRestored() throws Exception {
         mockMvc().perform(get("/v1/ui/components"))
-            .andExpect(status().isNotFound());
+            .andExpect(status().isOk());
     }
 
     @Test

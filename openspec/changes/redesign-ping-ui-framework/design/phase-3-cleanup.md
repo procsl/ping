@@ -8,7 +8,7 @@
 
 ### 4.1 移除旧编译器
 
-移除 `OperationRefResolver`、`SchemaRefExpander`、`RefResolver`、`PaginationMaterializer`、`DefaultResolver`，及旧 `Component`/`Compose` 聚合类型（已被统一节点 + OpenApiInliner 替代）。
+移除 `OperationRefResolver`、`SchemaRefExpander`、`RefResolver`、`PaginationMaterializer`、`DefaultResolver`，及旧 `Component`/`Compose` 聚合类型（已被统一节点 + OperationTransformer 替代）。
 
 验证：代码无残留引用
 
