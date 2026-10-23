@@ -62,6 +62,8 @@ public class SystemAutoConfiguration implements WebMvcConfigurer {
         log.warn("Open API JSON exporter, 导出后进程将关闭");
         return (event) -> {
             String outputDir = context.getEnvironment().getProperty("openapi.output.dir");
+            String outputName = context.getEnvironment()
+                .getProperty("openapi.output.name", "openapi.json");
             Integer port = context.getEnvironment().getProperty("local.server.port", Integer.class);
 
             try {
@@ -77,9 +79,9 @@ public class SystemAutoConfiguration implements WebMvcConfigurer {
                 }
 
                 // 3. 使用 Spring 的 FileCopyUtils 一句话搞定写文件
-                File targetFile = new File(outputDir, "openapi.json");
-                if(targetFile.getParentFile().mkdirs()){
-                    log.warn("临时文件创建失败");
+                File targetFile = new File(outputDir, outputName);
+                if (!targetFile.getParentFile().exists() && !targetFile.getParentFile().mkdirs()) {
+                    log.warn("OpenAPI 输出目录创建失败: {}", targetFile.getParentFile());
                 }
                 FileCopyUtils.copy(json.getBytes(StandardCharsets.UTF_8), targetFile);
                 log.info("[OpenAPI] 成功导出至: {}", targetFile.getAbsolutePath());

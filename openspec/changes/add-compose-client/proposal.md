@@ -7,9 +7,9 @@
 ## What Changes
 
 - 新增 **`ComposeClient`**（`ping-ui/src/main/js/client/`，纯 TS、零 React 依赖）：
-  - `await ComposeClient.create()` 静态工厂：内部经 `treeSource`（默认 `fetch /v1/ui/components`）取树、按 `operationId` 建索引；`treeSource` 可注入（测试/离线喂树，唯一碰网络的地方）
+  - `await ComposeClient.create()` 静态工厂：内部经 `treeSource`（默认 `fetch /v1/ui/components`）取树、按 `operationId` 建索引；`treeSource` 与 HTTP 层（`fetch`）可注入（测试/离线喂树与 mock 网络——仅有的两个注入边界）
   - 参数绑定：`fetch(id, { params })` 的 params 按内联 `parameters[].in` 自动分拣——`path` 替换、`query` 平铺序列化、`body` JSON 序列化
-  - 可插拔洋葱模型 Handler 管道（`client.register(handler)`，`ctx` 携带 operation 与请求描述，可改写请求/响应、可短路）；**core 零自带 Handler**，加密/解密/转换/鉴权/剪枝/校验/缓存全部由注册实现；副作用事件机制（emit/订阅）推后至渲染器提案
+  - 可插拔洋葱模型 Handler 管道（Koa 式：`client.addHandler(handler)`，`(ctx, next)` 函数即 Handler，可改写请求/响应、可短路，数据经 return 冒泡、错误走 throw）；**核心零业务 Handler**，加密/解密/转换/鉴权/剪枝/校验/缓存全部由注册实现；副作用事件机制（emit/订阅）推后至渲染器提案
   - 错误契约：非 2xx / 网络失败 / 解析失败一律 **reject `ApiError`**（`status` / `operationId` / `message` / `fieldErrors`——对齐后端 `MessageVO` / `ParameterErrorVO` 形态）
   - 零魔法：401 不特殊处理（归鉴权 Handler）；snake_case 不自动转换（转换是注册的 Handler）
 - `sdk/index.ts` 导出衔接（vite entry 与产物 `renderer.js` 形态不变，client 与其同 bundle）
@@ -29,7 +29,7 @@
 
 ## Impact
 
-- `ping-ui/src/main/js/client/`（新增 core：Client/Handler 接口/管道执行器/ApiError/绑定逻辑）
+- `ping-ui/src/main/js/client/`（新增：compose 洋葱执行器、五个架子环 source/indexer/locate/bind/http、ComposeClient 门面、Context 协议、ApiError）
 - `ping-ui/src/main/js/sdk/index.ts`（导出衔接）
 - `ping-ui/package.json`（vitest devDependency + `test` script）
 - `ping-ui/pom.xml`（exec-maven-plugin 增加 test 阶段 `npm test` 执行）

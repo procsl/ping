@@ -109,13 +109,6 @@
                             </goals>
                         </execution>
                     </executions>
-                    <configuration>
-                        <apiDocsUrl>http://localhost:10000/v3/api-docs</apiDocsUrl>
-                        <outputFileName>openapi.json</outputFileName>
-                        <outputDir>${project.build.directory}/spring-doc</outputDir>
-                        <failOnError>true</failOnError>
-                        <skip>false</skip>
-                    </configuration>
                     <dependencies>
                         <dependency>
                             <groupId>org.springdoc</groupId>
@@ -165,7 +158,8 @@
 
                             <arguments>
                                 <argument>--openapi.export=true</argument>
-                                <argument>--openapi.output.dir=${project.build.outputDirectory}/ping-api-doc/</argument>
+                                <argument>--openapi.output.dir=${project.build.outputDirectory}/META-INF/ping/</argument>
+                                <argument>--openapi.output.name=openapi-app.json</argument>
                                 <argument>--spring.profiles.active=h2,openapi,openapi-export</argument>
                                 <argument>--server.port=0</argument>
                                 <argument>--logging.level.root=INFO</argument>

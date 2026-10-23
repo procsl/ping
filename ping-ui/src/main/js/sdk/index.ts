@@ -1,11 +1,32 @@
 /**
- * Ping UI 渲染器占位 entry（redesign-ping-ui-framework 4.3.1）。
+ * Ping UI SDK entry（vite 打包入口，产物 renderer.js）。
  *
- * 旧 SDK 机制（registry / message-bus / sdk-error / handlers）已随本变更移除；
- * 新渲染器与轻量 client 不在本次范围。保留 `createPingUi` 占位以维持
- * vite 打包入口（vite.config entry）与薄壳页 `META-INF/ping/entry/index.html`
- * 的调用形态：`createPingUi(options).init()` / `.destroy()`。
+ * 当前导出两部分：
+ * 1. 轻量 client（add-compose-client）：消费 compose 编译产物的 API 客户端——
+ *    ComposeClient 门面 + Koa 式洋葱管道（Handler/compose）+ Context 协议 + ApiError
+ * 2. createPingUi 占位：渲染器重建在后续提案（redesign-ping-ui-framework 4.3.1 约定）
  */
+
+// ---- 轻量 client（业务组件/渲染器的唯一 import 口）----
+export { ComposeClient } from "../client/client"
+export { compose, type Handler, type Next } from "../client/pipeline"
+export { ApiError, type ApiErrorInit } from "../client/error"
+export {
+  requireOperation,
+  requireRequest,
+  type ApiRequest,
+  type ComponentNode,
+  type ComposeClientOptions,
+  type Context,
+  type FetchInit,
+  type OperationDescriptor,
+  type OperationIndex,
+  type ParameterDescriptor,
+  type ResponseMeta,
+  type TreeSource,
+} from "../client/types"
+
+// ---- 渲染器占位（后续提案重建）----
 
 export interface PingUiOptions {
   namespace?: string
