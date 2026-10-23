@@ -1,5 +1,7 @@
 /**
- * 集成语义验证（tasks 4.2）：真实编译产物 fixture 全链路（Node 环境）。
+ * fixture 契约验证（tasks 4.2）：真实编译产物 fixture 全链路。
+ *
+ * 纯 Node 单元测试（无网络、不起服务），仅文件名中的 fixtures 表明数据来源特殊。
  *
  * fixture 来自 GET /v1/ui/components 真实导出（ping-system 编译产物），
  * 后端结构演进时该 fixture 先红（fixture 纪律，design Test Requirements）。
