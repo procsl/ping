@@ -2,7 +2,7 @@
 
 ## Context
 
-动机与范围见 `proposal.md`。前置：`add-ping-ai-agent-core` 已冻结 `core` 的事件类型与 `ToolPolicy` 接口。此处只列影响方案的现状与约束：
+动机与范围见 `proposal.md`。前置：`add-ping-ai-agent-core` 已冻结 box 契约与 `ToolPolicy` 接口。此处只列影响方案的现状与约束：
 
 - 目标机器已确认**未安装 Neovim**，因此分发是本变更的一等子系统，而非环境假设。
 - 平台为 Linux x86_64（WSL），终端图形能力未知。
@@ -61,7 +61,7 @@ java(宿主)
   │            ├─ 继承 java 的 stdin/stdout/stderr → nvim 直接在真终端全屏渲染
   │            └─ --listen 开一条 msgpack-rpc（unix socket；Windows 用 named pipe，兜底 TCP loopback）
   ├─ java 全程不碰 stdio，日志落 ~/.lwl/logs/
-  └─ 双向 rpc：java→nvim 调 lua 组件层；nvim→java 发事件（submit/cancel/approve/leave）
+  └─ 双向 rpc：java→nvim 调 lua 组件层；nvim→java 发命令（submit/cancel/confirm/ack/pull）
 ```
 
 - `--clean` 正是「不读用户配置、不加载用户插件、但保留内置 runtime 与 Vim 默认按键」的语义，一次参数同时满足两项要求。
@@ -105,7 +105,7 @@ nvim_set_keymap(...)                 (Java 不知道 buffer/window 存在)
 2. `undolevels = -1`（官方 `vi_diff`："Set it to -1 for no undo at all"），流式写入不进 undo 树。
 3. 避免 legacy regex syntax 在超大 buffer 上的导航开销（`neovim#17862`，`--clean` 下同样复现）；长历史靠折叠收缩而非无界增长。
 4. 高频变更触发的自动命令代价高（官方对 `TextChangedT` 的告警），不挂重活。
-5. **markdown 渲染必须去抖**。`render-markdown.nvim` 的工作方式是监听 buffer 变更后重算可见区 extmark —— 在流式 buffer 上等价于「每个 chunk 触发一次 markdown 重解析」，正好撞上第 3、4 条。因此：流式期间冻结渲染，消息完成（`message.completed`）后一次性渲染；或只渲染已冻结的消息区间，当前流式消息不参与渲染。
+5. **markdown 渲染必须去抖**。`render-markdown.nvim` 的工作方式是监听 buffer 变更后重算可见区 extmark —— 在流式 buffer 上等价于「每个 chunk 触发一次 markdown 重解析」，正好撞上第 3、4 条。因此：流式期间冻结渲染，对象结束（`seq` 为非负以外）后一次性渲染；或只渲染已冻结的消息区间，当前流式消息不参与渲染。
 
 **第 5 条是拆分时新识别出的约束**：原 design 只写了「对话 buffer 用 render-markdown 呈现」，没有说明它与第 3、4 条的关系。不做去抖，长对话的表现是打字久了 CPU 打满，而不是启动失败 —— 属于最难排查的一类问题。
 

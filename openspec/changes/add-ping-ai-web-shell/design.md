@@ -2,7 +2,7 @@
 
 ## Context
 
-动机与范围见 `proposal.md`。前置：`add-ping-ai-agent-core` 已冻结事件类型与策略接口。此处只列影响方案的现状与约束：
+动机与范围见 `proposal.md`。前置：`add-ping-ai-agent-core` 已冻结 box 契约与策略接口。此处只列影响方案的现状与约束：
 
 - `ping-ai` 依赖 `ping-web`（拖入 `spring-boot-starter-web` 的 servlet 容器）与 `spring-boot-starter-websocket`，web 形态所需的运行时已具备。
 - 核心变更已实现终端形态以 `WebApplicationType.NONE` 启动；本变更只新增 `--web` 分支。
@@ -79,12 +79,12 @@
 | 作为依赖时提供 web 能力 | D15 |
 | HTTP 端点 | D10 + D15 |
 | WebSocket 双向消息 | D10 + D15 |
-| 与交互形态语义一致 | D10（共用事件类型） |
+| 与交互形态语义一致 | D10（共用 box 契约） |
 
 ## Risks / Trade-offs
 
 - **端点鉴权**：沿用宿主鉴权，本变更不做特殊处理 → 若将来作为独立服务暴露，需要单独设计。
-- **WS 背压**：慢客户端会堆积消息 → 与核心 EventStream 的背压策略保持一致，必要时丢弃中间增量而不是阻塞模型。
+- **WS 背压**：慢客户端会堆积消息 → 超过阈值即断开连接；客户端重连后 `pull(from_id)` 按对象重建，不丢内容。
 - **多用户并发**：当前按单用户本地工具设计 → 并发会话未定义，属于 Non-Goal。
 - **自动配置的误触发**：宿主是 web 应用但不想启用本模块 → 需要提供关闭开关（`@ConditionalOnProperty`）。
 
@@ -95,6 +95,6 @@
 ## Open Questions
 
 - HTTP 端点的具体路径与请求/响应结构（遵循仓库的 `/v1/...` 与 SNAKE_CASE 约定）。
-- WebSocket 消息字段（与核心变更的事件字段格式一起定）。
+- WebSocket 帧如何承载 box（与核心变更的 box 契约一起定）。
 - 是否提供关闭自动配置的开关。
 - 多用户并发与配额是否需要单独变更。

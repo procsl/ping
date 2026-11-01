@@ -38,17 +38,18 @@ ChatResponse response = /* 由 flux 收集出的完整响应 */;
 
 while (response.hasToolCalls()) {          // hasToolCalls() 在 ChatResponse 上，不在 ChatClientResponse 上
     // <- 此处即"每次迭代 observable and interruptible"
-    //    白名单外 -> 发 tool.confirm 事件挂起, 等适配器回话
+    //    白名单外 -> 发确认对象挂起, 等适配器回命令
     ToolExecutionResult res = mgr.executeToolCalls(prompt, response);  // 签名是 (Prompt, ChatResponse)
     ...
 }
 ```
 
 - 依据：官方文档明确 *"Each iteration is observable and interruptible"*，另有 `ToolCallObservingAdvisor` 可观测每个 tool-call chunk 并转发。**"挂起等确认"不需要自造对话循环**。
-- **本变更的确认策略用测试替身验证**：发 `tool.confirm` 事件后由替身回话，验证「确认前不执行」；真实的确认 UI 属于 `add-ping-ai-nvim-tui`。
+- **本变更的确认策略用测试替身验证**：发确认对象后由替身回命令，验证「确认前不执行」；真实的确认 UI 属于 `add-ping-ai-nvim-tui`。
 - 挂起等待的调度器与超时策略见 `../design.md` Open Questions，本变更只需固定语义（确认前不执行、拒绝后模型收到结构化拒绝结果）。
 
-## 3.14 可观测事件
+## 3.14 对象交付
 
-- `tool.requested`：含工具名与参数。
-- `tool.finished`：含结果状态。
+- 工具发起与结束共用同一个对象 `id`：`seq=0` 的内容带工具名与参数，结束段带状态与结果摘要。
+- 具体 `type` 取值由实现约定，不属于 box 契约。
+- 工具结果与界面展示分离：对象里放的是可渲染摘要，模型收到的是完整结构化结果。

@@ -66,22 +66,43 @@
                      |  ToolPolicy     白名单 | 确认 (按形态注入)         |
                      |  SessionStore   ChatMemoryRepository -> JSON      |
                      |  AgentRuntime   ChatClient 组装 + 工具循环         |
-                     |  EventStream    对外交付的唯一出口                 |
+                     |  ObjectTable    会话内对象表 (id -> type/content)  |
+                     |  BoxStream      对外交付的唯一出口                 |
                      +-----------------------+--------------------------+
                                              |
                                   +----------v-----------+
                                   | CliAdapter           |
-                                  | 非交互式              |
-                                  | 直接订阅 EventStream  |
+                                  | 按 id 渲染 box        |
                                   | 零网络监听            |
                                   +----------------------+
 
-  兄弟变更追加（不得改动 core 的事件类型与策略接口）：
-    add-ping-ai-nvim-tui  -> NvimAdapter  (msgpack-rpc + lua 组件层)
+  兄弟变更追加（不得改动 box 契约与对象 id 规则）：
+    add-ping-ai-nvim-tui  -> NvimAdapter  (msgpack-rpc + lua 渲染器)
     add-ping-ai-web-shell -> WebAdapter   (HTTP + WebSocket)
 ```
 
-**事件语义是三个变更之间的契约**。本变更负责冻结事件类型与载荷结构；后续变更只允许在适配器层做编码转换，不得为了适配某个外壳而修改事件类型。
+**Box 契约**（渲染数据的唯一形态）
+
+```
+Box = { type, id, seq, content }
+```
+
+| 字段 | 规则 |
+|---|---|
+| `type` | 开放字符串。协议不定义取值，消费端自行分派；同一对象内不变 |
+| `id` | 对象 id，会话内从 0 递增、不复用；渲染顺序 = id 升序，id 0 恒在顶端 |
+| `seq` | 对象内片段序号：`0` 开始、`>0` 追加；**其余（负数、缺失、非法）一律表示该对象结束** |
+| `content` | 字符串，不透明。结构化数据由后端序列化，消费端按 `type` 解释 |
+
+- **允许多个对象同时推送**：不同 `id` 的 box 可以交错到达，对象之间只靠 `id` 排序。
+- 对象有两种形态：流式对象（`seq` 0..n + 结束）与完整对象（`seq=0` 带完整内容 + 结束）。
+- `pull(from_id)` 按 id 升序重放，每个对象两条 box，与实时推送同一套格式。
+- 每个 box 收到后回 `ack(id)`；对象 id 或 `seq` 出现缺口即 `pull(from=缺口)`。
+- 断线：服务端清连接，客户端清未结束对象，重连后 `pull`。
+
+**为什么不定义事件类型**：`message.delta`、`tool.finished` 这类事件会把 provider 的流式细节升格为协议。box 只回答「这是第几个对象的第几段、内容是什么」，渲染语义完全交给消费端。这也是 D3「Java 只见组件」在三种外壳上的统一。
+
+**对象语义是三个变更之间的契约**。本变更冻结 box 结构与 id 规则；后续变更只允许在消费端实现各自的 `type` 分派，不得修改 box 结构。
 
 **备选**：把 core 写成一个必须经过 HTTP 的服务、CLI 降级为 HTTP 客户端。
 **否决理由**：非交互式不需要网络，强制绕一圈既慢又违背「纯命令行程序」的定位。
@@ -185,7 +206,7 @@ ping-ai/src/main/java/cn/procsl/ping/boot/ai/
   prompt/      system.md / first.md
   tool/        工具注册表、执行策略（白名单 / 确认）、三段式选择
   session/     角色目录下的会话 JSON 仓库
-  core/        运行时编排、事件流与事件类型
+  core/        运行时编排、对象表与 box 流
   adapter/
     cli/       非交互式适配器与长参数解析
   PingAiLauncher          <- D10 的入口形态
@@ -195,14 +216,15 @@ ping-ai/src/main/java/cn/procsl/ping/boot/ai/
     adapter/web/   (add-ping-ai-web-shell)
 ```
 
-包边界即分层边界：`adapter/*` 只依赖 `core` 与各自的事件编解码，互不依赖；`core` 不 import 任何 `adapter`。
+包边界即分层边界：`adapter/*` 只依赖 `core` 与各自的 box 编解码，互不依赖；`core` 不 import 任何 `adapter`。
 
 ## 覆盖对照：spec 需求 → 决策
 
 | spec 需求 | 由哪个决策落实 |
 |---|---|
 | 系统提示词取自角色目录 / `first.md` 语义 | D7（本变更只做非交互分支） |
-| 流式增量产出 / 调用失败事件 | D1（EventStream）+ D8 |
+| 流式产出 / 多对象并发 / 调用失败 | D1（BoxStream）+ D8 |
+| 用户消息回送 / 历史重放 / 丢包恢复 | D1（对象 id + pull/ack） |
 | 图片作为模型输入 | D12 |
 | 会话持久化于角色 / 窗口上限 | D9 |
 | 模型配置来源全局 / 异常降级 | D7（GlobalConfigLoader + ModelCatalog） |
@@ -228,7 +250,7 @@ ping-ai/src/main/java/cn/procsl/ping/boot/ai/
 
 以下均为可安全延后、且不改变 specs、方案与任务拆分的项：
 
-- 事件流的具体字段与分片格式（兜底形态为细事件流）。本变更只固定**事件类型**。
+- 消费端 `type` 词表（实现约定，不属于协议）：v1 预期为 `user` / `text` / `tool` / `confirm` / `error`。
 - 确认策略在 Reactor 流中的具体阻塞/超时实现。
 - `api_key` 是否支持环境变量引用。
 - `~/.lwl` 是否需要按项目隔离。

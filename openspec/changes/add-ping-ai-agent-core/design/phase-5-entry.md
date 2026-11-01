@@ -12,7 +12,7 @@ ping-ai/src/main/java/cn/procsl/ping/boot/ai/PingAiLauncher.java
 
 - 启动类手写在 `src/main`，`src/main` 中不得出现第二个 `main`。
 - 以 `SpringApplication` 构造器显式设置 `WebApplicationType.NONE` 后启动。
-- 启动顺序：配置根初始化 → `GlobalConfigLoader` → 角色解析 → 适配器选择 → 事件循环。
+- 启动顺序：配置根初始化 → `GlobalConfigLoader` → 角色解析 → 适配器选择 → box 循环。
 
 ## 启动形态
 

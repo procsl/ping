@@ -2,7 +2,7 @@
 
 对应 `tasks.md` 阶段 4（任务 4.1–4.8）。架构决策见 `../design.md` D1（CliAdapter）、D10（终端形态）、D13（`adapter/cli`）。
 
-> 注：本文档待细化，当前只固定参数集合、事件消费方式与退出码语义。
+> 注：本文档待细化，当前只固定参数集合、box 消费方式与退出码语义。
 
 ## 参数表
 
@@ -19,20 +19,21 @@
 - 只提供长参数（Spring Boot 原生风格），**不提供短参数**。
 - `--web` 不出现在本变更（属于 `add-ping-ai-web-shell`）。
 
-## 事件消费
+## box 消费
 
 ```
-EventStream --subscribe--> CliAdapter
-  session.started    -> 静默（--verbose 时写 stderr）
-  message.delta      -> stdout.write
-  tool.requested     -> 静默（--verbose 时写 stderr）
-  tool.finished      -> 静默（--verbose 时写 stderr）
-  tool.confirm       -> 非交互形态不应出现；出现即视为策略配置错误
-  error              -> stderr + 非零退出
-  message.completed  -> stdout 换行
-  session.ended      -> 退出 0
+BoxStream --subscribe--> CliAdapter
+
+按对象 id 归组，按 id 升序渲染：
+  user / text   -> stdout
+  tool          -> 静默（--verbose 时写 stderr 一行）
+  confirm       -> 非交互形态不应出现；出现即按拒绝处理并告警
+  error         -> stderr + 非零退出
+  未知 type     -> 忽略
 ```
 
+- CLI 只实现自己认识的 `type` 分派表，未知类型忽略 —— 不依赖核心新增的类型。
+- 对象结束（`seq` 为非负以外）时，`user` / `text` 对象补一个换行。
 - **stdout 只放回答内容，诊断信息一律走 stderr** —— 这是「可接入管道」的实现前提。
 - 退出码约定：`0` 成功；`2` 参数错误；`3` 角色不存在；`4` 配置不可读；`5` 模型调用失败。
 

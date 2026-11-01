@@ -2,7 +2,7 @@
 
 ## Why
 
-`add-ping-ai-agent-core` 冻结了事件语义与非交互交付面，但整个提案最核心的取舍仍未验证：**用 Neovim 当交互式渲染引擎，而不是自研 TUI**。这项取舍的失败模式 —— 流式卡顿、超长行、RPC 阻塞、二进制获取失败 —— 只在真实终端里暴露，因此单独成一个变更。
+`add-ping-ai-agent-core` 冻结了 box 契约与非交互交付面，但整个提案最核心的取舍仍未验证：**用 Neovim 当交互式渲染引擎，而不是自研 TUI**。这项取舍的失败模式 —— 流式卡顿、超长行、RPC 阻塞、二进制获取失败 —— 只在真实终端里暴露，因此单独成一个变更。
 
 拆开的直接好处：本变更开头有一个**可失败的探针阶段**。探针失败就终止，核心变更已经独立归档、独立可用，沉没成本可控。
 
@@ -25,7 +25,7 @@
 
 ### Modified Capabilities
 
-无。本变更只消费 `add-ping-ai-agent-core` 已冻结的事件类型与 `ai-agent-tool-execution` 的确认策略接口，不修改任何既有需求。
+无。本变更只消费 `add-ping-ai-agent-core` 已冻结的 box 契约与 `ai-agent-tool-execution` 的确认策略接口，不修改任何既有需求。
 
 ## Impact
 
@@ -33,4 +33,4 @@
 - **运行时目录**：`~/.lwl/bin/nvim`、`~/.lwl/nvim/`（lua 组件层 + 布局 + syntax）、`~/.lwl/logs/`。
 - **依赖**：新增 3 个 MIT lua 库；Java 侧可能需要一个 msgpack 编解码依赖（待定，见 Open Questions）。
 - **不受影响**：`ping-distribute`（当前不含 ping-ai）、非交互 CLI 的行为、既有 spec。
-- **前置**：`add-ping-ai-agent-core` 的事件类型与策略接口。两者可以并行开发，但本变更归档前核心变更必须已冻结语义。
+- **前置**：`add-ping-ai-agent-core` 的 box 契约与策略接口。两者可以并行开发，但本变更归档前核心变更必须已冻结语义。

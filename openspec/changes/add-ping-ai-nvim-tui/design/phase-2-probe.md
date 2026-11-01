@@ -9,7 +9,7 @@
 完整方案要在阶段 3、4 之后才能验证「这条管线是否成立」：
 
 ```
-模型 SSE → Flux → EventStream → NvimAdapter → msgpack-rpc → lua → buffer → 终端
+模型 SSE → Flux → BoxStream → NvimAdapter → msgpack-rpc → lua → buffer → 终端
 ```
 
 其中有三处无法靠推理排除的不确定性：

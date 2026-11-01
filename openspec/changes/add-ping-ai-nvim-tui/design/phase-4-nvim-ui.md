@@ -34,7 +34,7 @@
   plugins/            nui 等社区库落位处
 ```
 
-上行事件（submit / cancel / tool.approve）经 `vim.rpcnotify` 发往 Java，见 `phase-3-rpc.md`。
+上行命令（submit / cancel / confirm / ack / pull）经 `vim.rpcnotify` 发往 Java，见 `phase-3-rpc.md`。
 
 ## 渲染两条路径
 
