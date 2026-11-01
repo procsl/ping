@@ -31,9 +31,17 @@
             <artifactId>ping-web</artifactId>
         </dependency>
 
+        <!-- 显式构造模型客户端，不依赖 spring.ai.* 自动配置；starter 会把 autoconfigure/observation/retry 一并拖入 -->
         <dependency>
             <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-starter-model-openai</artifactId>
+            <artifactId>spring-ai-openai</artifactId>
+            <version>2.0.1</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-client-chat</artifactId>
             <version>2.0.1</version>
             <scope>compile</scope>
         </dependency>
@@ -74,6 +82,19 @@
         </dependency>
 
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${springboot.version}</version>
+                <configuration>
+                    <mainClass>cn.procsl.ping.boot.ai.PingAiLauncher</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <profiles>
 

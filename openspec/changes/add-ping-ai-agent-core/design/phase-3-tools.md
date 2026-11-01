@@ -65,46 +65,34 @@ interface Hook {
 - 两次都通过，才把结果送回模型。
 - 被拒绝、失败、超时的工具调用**都算「已处理」**，轮次计数照常递减。
 
-## 3.5 Spring AI 工具循环
+## 3.5 工具执行：Spring AI 内置循环
 
-关闭自动循环，手动驱动每次迭代。**以下代码以 2.0.1 的实际签名为准**（已用 `javap` 核对）：
+工具调用与结果回填由 Spring AI 内置循环完成，**不自造对话循环**；box 只是渲染推送，不参与循环控制。
 
 ```java
-ToolCallingManager mgr = ToolCallingManager.builder().build();
-ChatClient cc = builder
-    .defaultAdvisors(MessageChatMemoryAdvisor.builder(memory).build())
-    .build();
+List<ToolCallback> callbacks = tools.stream()
+    .map(tool -> new HookedToolCallback(
+        registry.find(tool.name()), tool.name(), hooks, hookContext, session, truncator))
+    .toList();
 
-ChatClient.ChatClientRequestSpec req = cc.prompt()
+ChatClient.ChatClientRequestSpec request = chatClient.prompt()
     .system(systemPrompt)
-    .tools(resolvedTools)                                            // ToolService 查询结果
-    .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, sessionId))   // 2.0 起必填
-    .advisors(AdvisorParams.toolCallingAdvisorAutoRegister(false));  // 关掉自动循环
-
-// 注意：stream().chatClientResponse() 返回 Flux<ChatClientResponse>，不是单个响应
-Flux<ChatClientResponse> flux = req.stream().chatClientResponse();
-ChatResponse response = /* 由 flux 收集出的完整响应 */;
-
-while (response.hasToolCalls()) {          // hasToolCalls() 在 ChatResponse 上
-    // 每个 tool call：hook(请求) → 通过则执行 → hook(完成) → 通过则回模型
-    ToolExecutionResult res = mgr.executeToolCalls(prompt, response);
-    ...
-}
+    .messages(promptMessages)
+    .toolCallbacks(callbacks);
 ```
 
-- 依据：官方文档明确 *"Each iteration is observable and interruptible"*。
-- **线程**：模型请求在虚拟线程上；工具执行**不绑定同一线程**，可能由其他线程完成，结果统一回调 `Session.onToolCompleted`。
-- **本变更的确认策略用测试替身验证**：发确认对象后由替身回命令，验证「确认前不执行」；真实确认 UI 属于 `add-ping-ai-nvim-tui`。
+- `HookedToolCallback` 包装真实的 `ToolCallback`：调用前 hook → 执行 → 调用后 hook → 截断 → 投递对象。
+- 工具结果截断后回给模型；对象里只放摘要。
+- **线程**：模型请求在虚拟线程上；工具由 Spring AI 在流式过程中调用，可能不在调用方线程，`Session` 的投递方法自带锁。
+- **确认**：hook 返回 `WAIT` 时，非交互形态按拒绝处理；交互形态由适配器挂起等待（`add-ping-ai-nvim-tui`）。
 
 ## 3.6 轮次完成
 
-```
-pending = 1 + 本轮发起的工具调用数
-成功 / 失败 / 被拒 / 超时 都算一次完成 → pending--
-pending == 0 且对象全部结束 → 轮次结束
-```
+内置循环意味着模型流结束前所有工具调用都已处理完，因此：
 
-模型停止输出不算结束：它可能带着 tool call 继续下一轮请求。
+- 轮次结束 = 模型流结束 + 所有对象结束。
+- 工具成功、失败、被拒、超时都算已处理。
+- 保留 `pending` 计数与 `onToolCompleted` 入口，供将来换成异步工具执行器时使用。
 
 ## 3.7 对象交付
 

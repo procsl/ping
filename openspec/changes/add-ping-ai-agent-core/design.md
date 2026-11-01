@@ -212,10 +212,13 @@ interface ToolService {
 - 没有注册进上下文的工具，模型看不见，也就调不到 —— 这就是「白名单」，不另设第二份配置。
 - 本变更提供代码内注册表的实现；将来接 MCP 或外部注册中心只换实现。
 
-**执行**：关闭自动工具循环，手动驱动每次迭代 —— 官方文档明确 *"Each iteration is observable and interruptible"*。已核实（`spring-ai-client-chat-2.0.1` / `spring-ai-model-2.0.1`）：
+**执行**：工具调用与结果回填由 Spring AI 内置循环完成，**不自造对话循环**；box 只是渲染推送，不参与循环控制。我们的扩展点在工具执行对象外侧：用一个包装后的 `ToolCallback` 做调用前/调用后校验、结果截断与对象投递。
 
-- `AdvisorParams.toolCallingAdvisorAutoRegister(false)` 存在，落到 `ChatClientAttributes.TOOL_CALLING_ADVISOR_AUTO_REGISTER`。
-- `ToolCallingManager.executeToolCalls(Prompt, ChatResponse)` 存在。
+已核实（`spring-ai-client-chat-2.0.1` / `spring-ai-model-2.0.1`）：
+
+- `ChatClientRequestSpec.toolCallbacks(List<ToolCallback>)` 存在。
+- `ToolCallback` 只有 `getToolDefinition()` 与 `call(String)` / `call(String, ToolContext)`，适合做包装。
+- `FunctionToolCallback.builder(name, function).description(...).inputType(...)` 可注册代码内工具。
 - `ChatMemoryRepository`、`MessageWindowChatMemory`、`ChatMessageMemoryAdvisor` 均存在。
 
 **注意**：`ChatClientResponse` 没有 `hasToolCalls()`（那是 `ChatResponse` 的方法），且 `stream().chatClientResponse()` 返回 `Flux<ChatClientResponse>`。实现时以编译器为准。
