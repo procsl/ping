@@ -98,7 +98,7 @@
 
 ## OpenSpec
 
-- `openspec/`（schema `spec-driven`）+ `/opsx:*` 命令 + `.opencode/skills/openspec-*`，CLI `openspec` 已装
+- `openspec/`（schema `spec-driven`）+ `/opsx:*` 命令 + `.opencode/skills/openspec-*`，CLI 为 npm 全局包 `openspec-cn`（命令名 `openspec`）
 - 拷问类 skill：`grill-me`、`grill-with-docs`（依赖 `grilling`、`domain-modeling`），来自 `mattpocock/skills`，装在 `.agents/skills/`，根目录 `skills-lock.json` 跟踪，更新用 `npx skills update`
 - 当前分支 `dev-new`
-- 活跃变更见 `openspec list`（活跃变更：`standalone-module-packaging`、`abstract-component-rendering`）
+- 活跃变更以 `openspec list` 输出为准，不在本文档罗列
