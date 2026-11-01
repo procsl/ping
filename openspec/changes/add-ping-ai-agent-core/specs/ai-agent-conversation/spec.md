@@ -54,6 +54,36 @@
 - **WHEN** 两个对象同时推送
 - **THEN** 无论片段到达顺序如何，消费端都按 `id` 升序排列
 
+### Requirement: 上游消息按类型定义字段
+客户端发往服务端的消息 SHALL 只固定 `type` 字段，其余字段按类型增减；服务端 SHALL 按 `type` 分派，未知类型 SHALL 忽略并记录日志。
+
+#### Scenario: 类型分派
+- **WHEN** 服务端收到一条上游消息
+- **THEN** 按 `type` 选择处理逻辑，不要求各类型共享字段
+
+#### Scenario: 未知类型
+- **WHEN** 收到无法识别的 `type`
+- **THEN** 忽略该消息并记录日志，不影响当前轮次
+
+### Requirement: 用户消息提交
+用户消息 SHALL 以 `type=user` 提交，字段包含 `text`、`images` 与可选的 `request_id`；提交内容的组合是否可用 SHALL 由后端按模型能力与上下文校验，协议 SHALL NOT 预先限制。
+
+#### Scenario: 文本提交
+- **WHEN** 客户端提交 `text`
+- **THEN** 后端校验通过后分配对象 `id` 并回送用户对象
+
+#### Scenario: 携带图片
+- **WHEN** 客户端提交 `images`
+- **THEN** 后端落盘并编码图片，随文本组装为模型输入
+
+#### Scenario: 后端校验不通过
+- **WHEN** 提交内容不满足模型能力或上下文约束
+- **THEN** 后端返回错误对象，不分配对象 `id`
+
+#### Scenario: 携带 request_id 重试
+- **WHEN** 同一 `request_id` 被重复提交
+- **THEN** 后端返回首次分配的对象，不产生重复对象
+
 ### Requirement: 用户消息由后端封装
 用户提交的消息 SHALL 由后端分配下一个对象 `id` 并作为完整对象回送；消费端 SHALL NOT 依赖本地回显来展示该消息。
 

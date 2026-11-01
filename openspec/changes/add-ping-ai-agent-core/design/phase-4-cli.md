@@ -18,6 +18,7 @@
 
 - 只提供长参数（Spring Boot 原生风格），**不提供短参数**。
 - `--web` 不出现在本变更（属于 `add-ping-ai-web-shell`）。
+- `--prompt` 与 `--image` 组装成一条 `type=user` 的上游消息提交；未提供 `--prompt` 时使用 `first.md` 的内容。
 
 ## box 消费
 

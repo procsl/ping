@@ -100,6 +100,24 @@ Box = { type, id, seq, content }
 - 每个 box 收到后回 `ack(id)`；对象 id 或 `seq` 出现缺口即 `pull(from=缺口)`。
 - 断线：服务端清连接，客户端清未结束对象，重连后 `pull`。
 
+**上游消息**（客户端 → 服务端）
+
+```
+{ type, ...该类型自己的字段 }
+```
+
+| type | 字段 |
+|---|---|
+| `user` | `text`?、`images`?、`request_id`? |
+| `confirm` | `request_id`、`decision` |
+| `cancel` | 无 |
+| `ack` | `id` |
+| `pull` | `from`?（默认 0） |
+
+- 只有 `type` 是公共字段，其余按类型增减 —— 与 box 的固定四字段形成有意的不对称：下游是统一分片流，上游是异构命令集。
+- `request_id` 可选：携带时服务端按它去重，重复提交返回同一对象。
+- 组合是否合法（例如只有图片没有文本）由后端按模型能力与上下文校验，协议不限制。
+
 **为什么不定义事件类型**：`message.delta`、`tool.finished` 这类事件会把 provider 的流式细节升格为协议。box 只回答「这是第几个对象的第几段、内容是什么」，渲染语义完全交给消费端。这也是 D3「Java 只见组件」在三种外壳上的统一。
 
 **对象语义是三个变更之间的契约**。本变更冻结 box 结构与 id 规则；后续变更只允许在消费端实现各自的 `type` 分派，不得修改 box 结构。
@@ -225,6 +243,7 @@ ping-ai/src/main/java/cn/procsl/ping/boot/ai/
 | 系统提示词取自角色目录 / `first.md` 语义 | D7（本变更只做非交互分支） |
 | 流式产出 / 多对象并发 / 调用失败 | D1（BoxStream）+ D8 |
 | 用户消息回送 / 历史重放 / 丢包恢复 | D1（对象 id + pull/ack） |
+| 上游消息按类型分派 / request_id 幂等 | D1（上游消息） |
 | 图片作为模型输入 | D12 |
 | 会话持久化于角色 / 窗口上限 | D9 |
 | 模型配置来源全局 / 异常降级 | D7（GlobalConfigLoader + ModelCatalog） |
