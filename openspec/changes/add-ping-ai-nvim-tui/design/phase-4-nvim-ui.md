@@ -1,6 +1,6 @@
-# 阶段 6 设计：Neovim 组件层
+# 阶段 4 设计：Neovim 组件层
 
-对应 `tasks.md` 阶段 6（任务 6.1–6.15）。本文档承载实现级细节。架构决策见 `../design.md` D3（组件库原语）、D4（渲染两条路径）、D5（流式写入纪律）、D6（代码高亮）。
+对应 `tasks.md` 阶段 4（任务 4.1–4.16）。本文档承载实现级细节。架构决策见 `../design.md` D3（组件库原语）、D4（渲染两条路径）、D5（流式写入纪律）、D6（代码高亮）。
 
 > 注：本文档由 design.md 迁移而来，尚未按细化节奏展开；后续细化时补充组件类型清单与属性。
 
@@ -34,7 +34,7 @@
   plugins/            nui 等社区库落位处
 ```
 
-上行事件（submit / cancel / tool.approve）经 `vim.rpcnotify` 发往 Java，见 `phase-5-nvim-dist.md`。
+上行事件（submit / cancel / tool.approve）经 `vim.rpcnotify` 发往 Java，见 `phase-3-rpc.md`。
 
 ## 渲染两条路径
 
@@ -52,6 +52,16 @@
 2. `undolevels = -1`（官方 `vi_diff`："Set it to -1 for no undo at all"），流式写入不进 undo 树。
 3. 避免 legacy regex syntax 在超大 buffer 上的导航开销（`neovim#17862`，`--clean` 下同样复现）；长历史靠折叠收缩而非无界增长。
 4. 高频变更触发的自动命令代价高（官方对 `TextChangedT` 的告警），不挂重活。
+5. **markdown 渲染必须去抖**（任务 4.16）。`render-markdown.nvim` 监听 buffer 变更后重算可见区 extmark —— 在流式 buffer 上等价于「每个 chunk 一次 markdown 重解析」，正好撞上第 3、4 条。
+
+```
+流式期间          消息完成后
+-----------       -------------
+纯文本写入    →   一次性 markdown 渲染
+（冻结渲染）        （extmark 只算一次）
+
+备选：只渲染已完成消息区间，当前流式消息始终走纯文本
+```
 
 按既定策略：**默认使用开源组件，出现性能问题再针对性开发**，不设前置探针。
 

@@ -18,7 +18,7 @@
 
 ## 3.10–3.13 Spring AI 工具循环
 
-关闭自动循环，手动驱动每次迭代：
+关闭自动循环，手动驱动每次迭代。**以下代码以 2.0.1 的实际签名为准**（已用 `javap` 核对）：
 
 ```java
 ToolCallingManager mgr = ToolCallingManager.builder().build();
@@ -26,23 +26,27 @@ ChatClient cc = builder
     .defaultAdvisors(MessageChatMemoryAdvisor.builder(memory).build())
     .build();
 
-ChatClientResponse r = cc.prompt()
-    .system(systemPrompt)                                  // 来自 system.md
-    .tools(resolvedTools)                                  // 三段式解析结果
-    .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, sessionId))  // 2.0 起必填
-    .advisors(AdvisorParams.toolCallingAdvisorAutoRegister(false)) // 关掉自动循环
-    .stream().chatClientResponse();
+ChatClient.ChatClientRequestSpec req = cc.prompt()
+    .system(systemPrompt)                                            // 来自 system.md
+    .tools(resolvedTools)                                            // 三段式解析结果
+    .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, sessionId))   // 2.0 起必填
+    .advisors(AdvisorParams.toolCallingAdvisorAutoRegister(false));  // 关掉自动循环
 
-while (r.hasToolCalls()) {
+// 注意：stream().chatClientResponse() 返回 Flux<ChatClientResponse>，不是单个响应
+Flux<ChatClientResponse> flux = req.stream().chatClientResponse();
+ChatResponse response = /* 由 flux 收集出的完整响应 */;
+
+while (response.hasToolCalls()) {          // hasToolCalls() 在 ChatResponse 上，不在 ChatClientResponse 上
     // <- 此处即"每次迭代 observable and interruptible"
     //    白名单外 -> 发 tool.confirm 事件挂起, 等适配器回话
-    ToolExecutionResult res = mgr.executeToolCalls(prompt, r);
+    ToolExecutionResult res = mgr.executeToolCalls(prompt, response);  // 签名是 (Prompt, ChatResponse)
     ...
 }
 ```
 
 - 依据：官方文档明确 *"Each iteration is observable and interruptible"*，另有 `ToolCallObservingAdvisor` 可观测每个 tool-call chunk 并转发。**"挂起等确认"不需要自造对话循环**。
-- 交互式确认：发 `tool.confirm` 事件挂起 → 等适配器回话 → 允许则执行、拒绝则不执行且模型收到拒绝结果。
+- **本变更的确认策略用测试替身验证**：发 `tool.confirm` 事件后由替身回话，验证「确认前不执行」；真实的确认 UI 属于 `add-ping-ai-nvim-tui`。
+- 挂起等待的调度器与超时策略见 `../design.md` Open Questions，本变更只需固定语义（确认前不执行、拒绝后模型收到结构化拒绝结果）。
 
 ## 3.14 可观测事件
 

@@ -4,7 +4,9 @@
 
 ## 1.1 依赖调整
 
-移除 `ping-ai/pom.xml` 的 `ping-jpa` 依赖、保留 `ping-web`。会话是 JSON 文件，不需要数据库。
+- `ping-jpa` 已移除（`bf71424d`），会话是 JSON 文件，不需要数据库。
+- 把 `spring-ai-starter-model-openai` 收窄为 `spring-ai-openai`：本变更显式构造模型客户端，不依赖 `spring.ai.*` 自动配置（见 `../design.md` D7）。starter 会把 autoconfigure、observation、retry 一并拖入。
+- 保留 `ping-web`，终端形态以 `WebApplicationType.NONE` 启动。
 
 ## 1.2 配置根初始化
 
@@ -12,7 +14,7 @@
 
 ```
 解析路径 (默认 ~/.lwl, 可被参数覆盖)
-   → 创建骨架 bin/ logs/ nvim/ roles/
+   → 创建骨架 logs/ images/ roles/
    → 不可写时降级 + 告警 (不抛异常)
 ```
 
