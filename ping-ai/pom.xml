@@ -7,7 +7,7 @@
         <groupId>cn.procsl</groupId>
         <artifactId>ping</artifactId>
         <version>1.0.2-SNAPSHOT</version>
-        <relativePath>../ping-parent</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <packaging>jar</packaging>
