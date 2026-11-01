@@ -1,8 +1,8 @@
 # 阶段 2 设计：对话核心
 
-对应 `tasks.md` 阶段 2（任务 2.1–2.25）。本文档承载实现级细节。架构决策见 `../design.md` D1（BoxStream）、D8（工具循环）、D9（会话持久化）、D12（图片输入）。
+对应 `tasks.md` 阶段 2。本文档承载实现级细节。架构决策见 `../design.md` D1（BoxSink / Session / Completion）、D8（工具与 hook）、D9（持久化与重建）、D12（图片输入）。
 
-## 2.1–2.2 Box 与对象
+## 2.1 Box 与对象
 
 ### Box
 
@@ -63,7 +63,7 @@ box(id=3, type=text, seq=-1, "")
 
 `id=1` 与 `id=2` 的片段交错到达，消费端按 id 归组，互不影响。
 
-## 2.24–2.25 上游消息
+## 2.2 上游消息
 
 ### 消息模型
 
@@ -78,11 +78,11 @@ box(id=3, type=text, seq=-1, "")
 
 | type | 字段 | 服务端行为 |
 |---|---|---|
-| `user` | `text`?、`images`?、`request_id`? | 校验 → 分配 id → 回送 user 对象 → 开始一轮 |
+| `user` | `text`?、`images`?、`request_id`? | 校验 → 分配 id → 回送 user 对象 → 起一轮 |
 | `confirm` | `request_id`、`decision` | 匹配挂起的确认 |
-| `cancel` | 无 | 中断当前轮次 |
+| `cancel` | 无 | 给未结束对象补结束 box，回到 idle |
 | `ack` | `id` | 记录投递进度 |
-| `pull` | `from`?（默认 0） | 从该 id 起重放 |
+| `pull` | `from`?（默认 0） | 等价于 `Session.history(from)` |
 
 ### 用户消息
 
@@ -90,111 +90,195 @@ box(id=3, type=text, seq=-1, "")
 { "type": "user", "text": "帮我看看这个文件", "images": ["a.png"] }
 ```
 
-- `text` 与 `images` 的取舍不设协议级限制：纯文本、纯图片、图文混合都可以提交，由后端按模型能力与上下文校验。
-- 校验不通过时回 `error` 对象，不分配 id。
-- `request_id` 可选；携带时服务端按它去重，重试返回同一个对象 id。
+- `text` 与 `images` 的组合不在协议层限制，由后端按模型能力与上下文校验；不通过回 `error` 对象且不分配 id。
+- `request_id` 可选；携带时按它去重，重试返回首次分配的对象。
 - 上游字段是原始输入，下游 `user` 对象的 `content` 是显示投影，两者不要求相同。
 
-### 提交与回送时序
+## 2.3 Session 对象
+
+Session 是**唯一编排者**：状态与行为都在对象内，不持有线程，也不假设调用方在哪个线程。
 
 ```
-客户端                       服务端
-  │ user(text,images,rid?)     │
-  │───────────────────────────►│
-  │                            │ 校验（含模型能力）
-  │                            │ request_id 去重
-  │                            │ 分配 id=N
-  │◄── box(user, N, 0, …) ─────┤
-  │◄── box(user, N, -1, "") ───┤
-  │                            │ 开始一轮
+Session
+  状态  sessionId / role / model / messages / objects / roundState
+  端口  BoxSink（适配器注入）/ ChatMemory / ToolService / hook 链
+  行为
+    submit(msg) -> Completion   校验 -> 去重 -> 分配 id -> 回送 user 对象 -> 起一轮
+    cancel()                    给未结束对象补结束 box -> roundState = idle
+    history(fromId) -> boxes    按 id 升序重放
+    ack(id)                     记录投递进度
+    onToolCompleted(...)        工具线程回调入口
+    awaitIdle(timeout)          等待整轮结束
+    close()                     收尾并落盘
 ```
 
-## 2.3–2.6 提示词加载
+- **并发**：内部一把锁（`ReentrantLock`）保护 `roundState`、对象表与消息表；所有入口方法都加锁，工具线程回调 `onToolCompleted` 走同一入口。
+- **生命周期**：`SessionManager` 按 `sessionId` 缓存实例；连接断开不销毁 Session，进程退出才销毁。
+- **重启**：Session 是新建对象，`roundState = idle`，对象表由 `ObjectProjector` 从消息表重建。
 
-- `system.md` → 系统提示词；缺失时降级继续，不中断会话。
-- `first.md` → 默认用户提示词；缺失时不影响启动。
+### 创建
 
-### first.md 在两个适配器的分叉
+由**独立工厂**创建，不挂在配置对象上：
 
-core 只提供内容，如何使用由适配器决定：
-
-```
-core: 读 roles/<name>/first.md, 交出内容
-              |
-              v
-非交互 CliAdapter：直接作为用户消息发出（无人可编辑）
-
-交互 NvimAdapter：预填输入框（可编辑可清空）
-                  —— 该分支属于 add-ping-ai-nvim-tui
+```java
+SessionFactory.create(roleConfig, globalConfig, toolService, hooks, boxSink, history?)
 ```
 
-### first.md 缺失
+- 不传 `history` → 新会话。
+- 传 `history`（既有会话文件）→ 恢复消息表并重建对象表。
 
-- 非交互式未提供提示词时，给出明确错误并以非零状态退出，**不静默发送空消息**（见 `ai-agent-conversation` 与 `ai-agent-cli` 的对应场景）。
+### 状态机
 
-## 2.7–2.8 模型组装
+```
+idle --submit(通过校验)--> running --全部工具处理完 + 对象全部结束--> idle
+running --cancel--> idle
+running --error--> idle（是否可继续由后端按错误类型判定）
+```
 
-- 角色声明模型时用该模型；未声明时回退全局默认。
-- 由于配置不耦合 Spring（见 `../design.md` D7），**不能依赖 `spring.ai.*` 自动配置**，需由 `AgentRuntime` 显式持有 `GlobalConfig` 并显式构造模型客户端。
+不变量：**`idle` 时对象表中不存在未结束对象**。
 
-## 2.9–2.13 会话持久化
+## 2.4 Completion
 
-### 会话 JSON 结构（`roles/<name>/sessions/<session-id>.json`）
+`submit` **立即返回**，不阻塞调用线程：
+
+```java
+interface Completion {
+    void subscribe(Consumer<Box> consumer);   // 持续投递直到本轮结束
+    boolean await(Duration timeout);          // 阻塞到结束
+    void cancel();                            // 等价 Session.cancel()
+}
+```
+
+- CLI：`completion.await(...)` + 同步渲染（或阻塞遍历）。
+- nvim/web：`subscribe(...)` 把 box 推给外壳。
+- 一轮结束、取消、失败都会让 `subscribe` 终止并让 `await` 返回。
+
+### 调用流程
+
+```
+CliAdapter / NvimAdapter / WebAdapter
+   │ submit(userMessage)
+   ▼
+Session（加锁：校验 → 去重 → 分配 id → 回送 user 对象 → roundState=running）
+   │ 交给执行器（虚拟线程）
+   ▼
+RoundRunner
+   │ hook(发送前) → 调模型（流式）
+   │ 每个增量 → hook(文本前后) → 对象表 → BoxSink
+   │ 有 tool call → hook(工具前) → ToolService 取执行对象 → 执行
+   │             → onToolCompleted → hook(工具后) → 下一轮请求
+   │ 全部工具处理完 + 对象结束 → roundState=idle → 唤醒 awaitIdle()
+   ▼
+BoxSink → 适配器 → 渲染
+```
+
+- `RoundRunner` 只调用 `Session` 的公开方法，不直接改对象表。
+- 工具可能在别的线程完成，`onToolCompleted` 负责把控制权交回。
+- `cancel` 由适配器直接调 `Session.cancel()`，不经过 `RoundRunner`。
+
+## 2.5 轮次完成判定
+
+一轮结束的条件是**该轮发起的全部工具调用都处理完毕**（成功、失败、被拒、超时都算处理完），且所有对象已结束。
+
+```
+round.pending = 1 + 工具调用数        // 1 = 本轮主流程
+每个动作结束 → pending-- 
+pending == 0 → roundState = idle
+```
+
+- 模型停止输出**不算**结束 —— 还可能带着 tool call 继续。
+- 计数器用并发安全结构，工具线程完成时也能递减。
+
+## 2.6 错误
+
+```json
+{ "code": "provider_timeout", "status": "retry" }
+```
+
+- `code` 覆盖具体场景，由后端保证「同类错误稳定、处理方式不同的错误不同码」。
+- `status` 表示处理方式（取值后续跟进），前端据此决定重试 / 停止 / 忽略。
+- `error` 作为**一条消息记录落盘**，不进入 LLM 上下文。
+- 处理后标记为已处理（隐藏，不删除）；重放时照常发送，客户端跳过渲染。
+- 忙时拒绝：
+
+```
+id=5  text  "…还在输出…"        ← 未结束
+
+客户端 ──submit("新问题")──►
+服务端 ── box(id=6, type=error, seq=0, "{\"code\":\"busy\",\"status\":\"retry\"}")
+       ── box(id=6, type=error, seq=-1, "")
+```
+
+上一轮未结束时**不取消、不排队**，直接回 `error`，不为该消息分配 user 对象。
+
+## 2.7 持久化
+
+### 会话文件（`roles/<name>/sessions/<session-id>.json`）
 
 ```json
 {
-  "session_id": "2026-10-15-a1b2",
+  "session_id": "20261101153045123ABCDEFGHIJ",
   "role": "dev",
   "model": "claude_x",
   "messages": [
     { "type": "system",    "text": "..." },
     { "type": "user",      "text": "..." },
-    { "type": "assistant", "text": "...", "tool_calls": [] },
-    { "type": "tool",      "tool_call_id": "...", "text": "..." }
+    { "type": "assistant", "text": "...", "tool_calls": [], "interrupted": false },
+    { "type": "tool",      "tool_call_id": "...", "text": "..." },
+    { "type": "error",     "code": "provider_timeout", "status": "retry", "handled": false }
   ]
 }
 ```
 
-四类消息：system / user / assistant / tool。
+- 只有 `messages` 落盘，**对象表不落盘**。
+- `error` 是消息记录的一种，但不参与模型请求。
+- 会话 id：`yyyyMMddHHmmssSSS` + 10 位大写随机字母（27 字符）；`--session` 传入值须匹配 `^[A-Za-z0-9]{1,64}$`。
+
+### 写入时机
+
+| 场景 | 时机 |
+|---|---|
+| user / tool / error | 产生即写 |
+| 流式 assistant | 累计 500 字符写一次；距上次写盘超 5s 也写一次 |
+| 一轮结束 | 再补一次 |
+
+- 「临时文件 + 原子替换」，不产生半个 JSON。
+- 未完成的 assistant 消息带 `interrupted: true`，正常结束时清除；重建时对象末尾追加 `[输出中断]`。
 
 ### Spring AI 接入
 
 ```java
 ChatMemory memory = MessageWindowChatMemory.builder()
     .chatMemoryRepository(new RoleFileRepository(roleDir))  // -> sessions/*.json
-    .maxMessages(configuredWindow)                          // 窗口上限
+    .maxMessages(configuredWindow)
     .build();
 ```
 
-- 实现 `ChatMemoryRepository` 接口写入角色目录，配 `MessageWindowChatMemory` 提供窗口上限，无需自造记忆层。
-- **Spring AI 2.0 起 `CONVERSATION_ID` 为必填**，缺失即抛错。
-- 会话按角色隔离：角色甲的会话对角色乙不可见。
-- **会话持久化与 box 流是两回事**：落盘的是原始消息，box 只是渲染投影，不写文件。
+- Spring AI 2.0 起 `CONVERSATION_ID` 必填。
+- 会话按角色隔离；历史窗口只影响送入模型的消息，不影响落盘。
 
-## 2.14–2.16 流式产出与错误
+## 2.8 对象表重建
 
-- 流式对话执行：组装提示词 → 流式调用 → 每个增量封装成同一对象的下一段 box。
-- 模型调用失败：产生一个 `error` 对象（完整对象），而不是静默结束。
-- 工具循环的手动驱动见 `phase-3-tools.md`；工具发起与结束各自封装为对象。
-- box 只用于渲染，不改变模型侧的消息结构。
+`ObjectProjector` 是唯一映射实现，实时与全量共用：
 
-### 忙时拒绝
+| 消息 | 对象数 | 说明 |
+|---|---|---|
+| `user` | 1 | 一条用户消息一个对象 |
+| `assistant`（纯文本） | 1 | 文本一个对象 |
+| `assistant`（带 tool_calls） | 1 + N | 文本一个对象，每个 tool call 各自一个对象 |
+| `tool` | 0 | 并入对应 tool call 对象的后续内容 |
+| `error` | 1 | 已处理的对象在重放时带 `handled` 标记 |
+| `system` | 0 | 不进渲染 |
 
-```
-id=5  text  "…还在输出…"        ← 未结束
-
-客户端 ──submit("新问题")──►
-
-服务端 ── box(id=6, type=error, seq=0, "{\"code\":\"busy\"}")
-       ── box(id=6, type=error, seq=-1, "")
+```java
+project(messages) -> List<Object>   // 全量重建（加载时）
+project(message)  -> List<Object>   // 增量（实时追加）
 ```
 
-- 上一轮未结束时，服务端**不取消、不排队**，直接回 `error` 对象。
-- 用户消息不被接受，不分配 user 对象；客户端保留输入等待重试。
-- `error` 对象占用 id 并进入对象表，保证 id 连续。
-- `error` 的 `content` 由后端决定（例如 JSON 字符串带 `code`），可表达忙、429、网络等各类错误。
+- 幂等：同一份消息表两次加载得到逐字段相同的对象表。
+- 等效：流式对象的最终内容 = 全量重建的 `content`。
 
-## 2.17–2.18 图片输入
+## 2.9 图片输入
 
 图片是**输入侧一等能力**，与终端能力无关（见 `../design.md` D12）：
 
@@ -206,26 +290,25 @@ id=5  text  "…还在输出…"        ← 未结束
    → 与文本一起组装为多模态用户消息（文本顺序不变）
 ```
 
-- 落盘目录复用配置根（`~/.lwl/images/`），不放在角色目录 —— 图片可跨会话复用。
-- 文件名以内容哈希命名，避免同名覆盖与重复复制。
-- 用户消息对象的 `content` 由后端序列化成字符串（含文本与图片引用），消费端按 `type` 解释。
-- 输出侧展示（无法显示时显示文件名）不在本变更范围。
+- 只做「存在且可读」校验；格式与大小交给 provider 判断，provider 拒绝映射为 `error` 对象。
+- 落盘目录复用配置根，图片可跨会话复用；文件名以内容哈希命名。
+- 输出侧展示不在本变更范围。
 
-## 2.19–2.23 重放、确认与断线
+## 2.10 重放、确认与断线
 
-### pull
+### history
 
 ```
-pull()          从头重放
-pull(from_id)   从指定对象 id 开始重放
+history()        从头重放
+history(fromId)  从指定对象 id 开始重放
 ```
 
-- 与实时推送同一套 box，唯一区别：每个对象只发两条 —— `seq=0` 带完整内容，`seq<0` 结束。
-- 客户端替换 `id >= from_id` 的对象，之前的保持不动。
+- 与实时推送同一套 box，每个对象只发两条：`seq=0` 带完整内容，`seq<0` 结束。
 - 重放使用对象原本的 id，不重新编号。
+- 上游 `pull` 命令只是它的入口，只有一份实现。
 
 ```
-pull(from=1)
+history(from=1)
   ◄── box(id=1, type=text, seq=0, "我先读一下这个文件。")
   ◄── box(id=1, type=text, seq=-1, "")
   ◄── box(id=2, type=tool, seq=0, "{...完整工具调用...}")
@@ -234,17 +317,19 @@ pull(from=1)
 
 ### ack 与丢包
 
-- 每收到一个完整 box，回 `ack(id)`；同一 id 重复 ack 无副作用。
-- 对象 id 出现缺口 → `pull(from=缺口)`。
-- 对象内 `seq` 出现缺口 → 丢弃该对象，`pull(from=该对象 id)`。
-- ack 只用于服务端观测投递进度，**不做断点续传**。
+- 每收到一个完整 box，回 `ack(id)`；重复 ack 无副作用。
+- 对象 id 出现缺口 → `history(from=缺口)`。
+- 对象内 `seq` 出现缺口 → 丢弃该对象，`history(from=该对象 id)`。
+- ack 只用于观测投递进度，不做断点续传。
 
 ### 断线
 
 ```
-断线 → 服务端清掉该连接；客户端清掉未结束对象
+断线 → 服务端清掉该连接；客户端清掉未结束对象与本地状态
 重连 → 客户端发 pull → 按 id 重建
 ```
+
+- 前端**不持久化任何状态**：进程重启后必然全量 `pull()`；同一进程内重连可用 `pull(from_id)`。
 
 ### 消费端状态机
 
@@ -280,9 +365,8 @@ void onBox(Box b) {
 
 - 维护对象表 `id -> {type, content}`，id 只增不复用。
 - 分配 id、递增 seq、结束时发非负以外的值。
-- `submit` 前检查是否有未结束对象：有则回 `error`，不分配 user 对象。
-- `pull(from)` 按 id 升序重放，每个对象两条 box。
-- 不知道 `type` 会被渲染成什么，也不保存 box 历史 —— 对象表本身就是渲染投影。
+- `submit` 前检查 `roundState`：`running` 即回 `error`，不分配 user 对象。
+- `history(from)` 按 id 升序重放，每个对象两条 box。
 
 ## 完整流程
 
@@ -303,7 +387,7 @@ void onBox(Box b) {
   服务端 → 从缺口起重放
 
 断线
-  服务端清连接；客户端清未结束对象
+  服务端清连接；客户端清未结束对象与本地状态
   重连 → 回到「连接建立」
 ```
 

@@ -10,8 +10,8 @@
 
 - **新增 `~/.lwl/` 配置根**：全局模型配置 `config.json`（provider 的 key/url、模型清单、默认模型、历史窗口），配置文件为 JSON。
 - **新增角色（role）容器**：`system.md` 系统提示词、`first.md` 默认用户提示词、`role.json`（模型引用 + 工具子集）、`sessions/` 会话记录。角色名限定 `[a-zA-Z0-9_-]{1,36}`，仅是本地组织用的名字，**不传给模型、不定义人格**。
-- **新增对话核心**：提示词组装、模型客户端显式构造、流式增量交付、会话 JSON 持久化与恢复、历史窗口上限。
-- **新增工具体系**：全局工具清单在代码中定义；三段式选择（会话指定 → 角色默认 → 全局清单）；白名单与确认两种策略（确认策略在本变更用测试替身验证挂起与恢复）。
+- **新增对话核心**：提示词组装、模型客户端显式构造、会话对象（状态与行为自持）、完成对象（持续产出 box）、会话 JSON 持久化与恢复、对象表幂等重建、历史窗口上限。
+- **新增工具体系**：工具服务统一管理已开发好的工具，初始化时按名称查询并绑定进模型上下文；三段式选择（会话指定 → 角色默认 → 工具服务清单）；hook 机制在调用前后校验（白名单、确认由 hook 实现，确认策略用测试替身验证挂起与恢复）。
 - **新增图片输入**：图片落盘后以 base64 组装为多模态消息。
 - **新增终端非交互式形态**：Spring Boot 长参数风格（`--xxxx`，不提供短参数），直接消费核心 box 流，零网络监听。
 - **新增终端入口与可执行打包**：手写 `PingAiLauncher` 并在 `ping-ai/pom.xml` 配置 `spring-boot-maven-plugin` repackage。**这与 AGENTS.md「业务模块 `src/main` 不得自带 main、`mainClass` 由 `ping-apt` 生成」的约定冲突**，本变更以最小代价先跑通，并在 `design.md` 记为已知债务。
@@ -21,9 +21,9 @@
 
 ### New Capabilities
 
-- `ai-agent-conversation`: 对话运行时 —— 提示词组装、模型调用、流式产出、图片输入，以及会话记录在角色目录下的持久化与恢复。
+- `ai-agent-conversation`: 对话运行时 —— 提示词组装、模型调用、会话对象与完成对象、box 流交付、对象表重建、图片输入，以及会话记录在角色目录下的持久化与恢复。
 - `ai-agent-role`: 角色容器 —— 配置目录结构、角色名校验、角色级的提示词与模型选择、会话归属。
-- `ai-agent-tool-execution`: 工具调用 —— 全局工具清单、角色与会话两级的工具选择、白名单与确认两种执行策略。
+- `ai-agent-tool-execution`: 工具调用 —— 工具服务的查询与绑定、角色与会话两级的工具选择、hook 机制与调用前后的双校验、确认策略。
 - `ai-agent-cli`: 非交互式交付面 —— 长参数调用、标准输出增量、退出状态、零网络监听、独立运行默认不启动 web。
 
 ### Modified Capabilities
@@ -32,7 +32,7 @@
 
 ## Impact
 
-- **代码**：`ping-ai` 模块从「只有 pom」到完整核心与非交互适配器；新增 `core/` `config/` `prompt/` `tool/` `session/` `adapter/cli/` 与 `PingAiLauncher`。
+- **代码**：`ping-ai` 模块从「只有 pom」到完整核心与非交互适配器；新增 `config/` `prompt/` `tool/` `hook/` `session/` `core/` `adapter/cli/` 与 `PingAiLauncher`。
 - **依赖**：`spring-ai-starter-model-openai` 收窄为 `spring-ai-openai` —— 本变更显式构造模型客户端，不依赖 `spring.ai.*` 自动配置（见 `design.md` D7）。
 - **构建**：`ping-ai/pom.xml` 增加 `spring-boot-maven-plugin`，使 `package` 产出可执行 jar；`ping.standalone` 属性目前无任何插件消费，本变更不引入该机制。
 - **运行时目录**：新增 `~/.lwl/` 约定 —— 全局配置、角色、会话、图片、日志。

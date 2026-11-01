@@ -2,7 +2,7 @@
 
 ## Context
 
-动机与范围见 `proposal.md`。前置：`add-ping-ai-agent-core` 已冻结 box 契约与策略接口。此处只列影响方案的现状与约束：
+动机与范围见 `proposal.md`。前置：`add-ping-ai-agent-core` 已冻结 box 契约与 hook 机制。此处只列影响方案的现状与约束：
 
 - `ping-ai` 依赖 `ping-web`（拖入 `spring-boot-starter-web` 的 servlet 容器）与 `spring-boot-starter-websocket`，web 形态所需的运行时已具备。
 - 核心变更已实现终端形态以 `WebApplicationType.NONE` 启动；本变更只新增 `--web` 分支。

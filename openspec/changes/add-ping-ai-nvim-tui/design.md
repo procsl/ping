@@ -2,7 +2,7 @@
 
 ## Context
 
-动机与范围见 `proposal.md`。前置：`add-ping-ai-agent-core` 已冻结 box 契约与 `ToolPolicy` 接口。此处只列影响方案的现状与约束：
+动机与范围见 `proposal.md`。前置：`add-ping-ai-agent-core` 已冻结 box 契约、`Session`/`Completion` 与 hook 机制。此处只列影响方案的现状与约束：
 
 - 目标机器已确认**未安装 Neovim**，因此分发是本变更的一等子系统，而非环境假设。
 - 平台为 Linux x86_64（WSL），终端图形能力未知。
@@ -165,7 +165,7 @@ agent 自行下载 `nvim` 到 `~/.lwl/bin/` 并以 `--clean --listen` 启动，�
 | 交互式渲染引擎（`--clean` 保留 Vim 键位） | D2 |
 | Neovim 自动获取 / 获取失败明确错误 | D11 |
 | 流式呈现不退化 | D4 + D5 |
-| 工具确认呈现 | D2（双向 rpc）+ 核心变更的 `ToolPolicy` |
+| 工具确认呈现 | D2（双向 rpc）+ 核心变更的 hook 机制 |
 | 图片无法显示时显示文件名 | D12 |
 | 退出收尾 | D2 |
 

@@ -12,7 +12,7 @@
 ## WebSocket 通道
 
 ```
-客户端 ──WS──► WebAdapter ──► BoxStream（与终端共用）
+客户端 ──WS──► WebAdapter ──► Session / BoxSink（与终端共用）
                   ▲
                   └── 上行命令走同一通道
 ```

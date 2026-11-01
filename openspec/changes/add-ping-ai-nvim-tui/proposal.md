@@ -13,7 +13,7 @@
 - **新增 lua 组件层**：基于 `nui.nvim`、`nui-components.nvim`、`render-markdown.nvim`（均 MIT），经 `runtimepath` 注入自有配置目录。
 - **新增流式渲染纪律**：攒批、按换行切块、单行长度上限、禁 undo、markdown 渲染去抖 —— 全部针对已知的编辑器性能事故。
 - **新增语法高亮**：syntax 脚本随包提供，零编译、零 treesitter parser 分发。
-- **新增交互式确认呈现**：白名单外的工具调用在界面请求确认，确认前不执行。
+- **新增交互式确认呈现**：hook 判定需要确认的工具调用在界面请求确认，确认前不执行。
 - **新增图片输出侧降级**：无法显示图片时显示文件名。
 - **不包含**：核心对话逻辑改动、web 形态、Windows 分支（见 Open Questions）。
 
@@ -25,7 +25,7 @@
 
 ### Modified Capabilities
 
-无。本变更只消费 `add-ping-ai-agent-core` 已冻结的 box 契约与 `ai-agent-tool-execution` 的确认策略接口，不修改任何既有需求。
+无。本变更只消费 `add-ping-ai-agent-core` 已冻结的 box 契约、`Session`/`Completion` 与 `ai-agent-tool-execution` 的 hook 机制，不修改任何既有需求。
 
 ## Impact
 
@@ -33,4 +33,4 @@
 - **运行时目录**：`~/.lwl/bin/nvim`、`~/.lwl/nvim/`（lua 组件层 + 布局 + syntax）、`~/.lwl/logs/`。
 - **依赖**：新增 3 个 MIT lua 库；Java 侧可能需要一个 msgpack 编解码依赖（待定，见 Open Questions）。
 - **不受影响**：`ping-distribute`（当前不含 ping-ai）、非交互 CLI 的行为、既有 spec。
-- **前置**：`add-ping-ai-agent-core` 的 box 契约与策略接口。两者可以并行开发，但本变更归档前核心变更必须已冻结语义。
+- **前置**：`add-ping-ai-agent-core` 的 box 契约与 hook 机制。两者可以并行开发，但本变更归档前核心变更必须已冻结语义。

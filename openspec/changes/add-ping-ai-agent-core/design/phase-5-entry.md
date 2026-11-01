@@ -1,8 +1,6 @@
 # 阶段 5 设计：入口与可执行打包
 
-对应 `tasks.md` 阶段 5（任务 5.1–5.5）。架构决策见 `../design.md` D10。
-
-> 注：本文档待细化，当前只固定入口位置、启动形态与打包债务。
+对应 `tasks.md` 阶段 0（任务 0.7）与阶段 5（任务 5.1–5.4）。架构决策见 `../design.md` D10。
 
 ## 入口
 
@@ -12,7 +10,8 @@ ping-ai/src/main/java/cn/procsl/ping/boot/ai/PingAiLauncher.java
 
 - 启动类手写在 `src/main`，`src/main` 中不得出现第二个 `main`。
 - 以 `SpringApplication` 构造器显式设置 `WebApplicationType.NONE` 后启动。
-- 启动顺序：配置根初始化 → `GlobalConfigLoader` → 角色解析 → 适配器选择 → box 循环。
+- 启动顺序：配置根初始化 → `GlobalConfigLoader` → 角色解析 → `ToolService` 查询工具 → `SessionFactory` 创建 Session（含历史重建）→ 适配器选择 → `submit` 并消费 `Completion`。
+- Session 由工厂创建，**不挂在配置对象上**；工厂只接收配置、工具服务、hook 链与输出端口。
 
 ## 启动形态
 
