@@ -14,13 +14,14 @@
 
 ## 模块
 
-- reactor：`ping-parent`（→ `ping-product` `ping-system` `ping-captcha` `ping-ai`）、`ping-common`、`ping-web`、`ping-jpa`、`ping-distribute`
+- reactor：`ping-parent`（→ `ping-product` `ping-system` `ping-captcha` `ping-ai` `ping-ui`）、`ping-common`、`ping-web`、`ping-jpa`、`ping-distribute`
 - 已停用（pom 中注释，不参与构建）：`ping-connect` `ping-im` `ping-editor` `ping-batch`
 - 独立工程（只能 `-f` 构建）：`ping-apt`、`ping-tool`
-- 唯一入口：`cn.procsl.ping.app.DistributeApplication`，端口 10000
+- 聚合应用唯一入口：`cn.procsl.ping.app.DistributeApplication`，端口 10000（`ping-ai` 另有自己的启动壳 `PingAiLauncher`，不进聚合）
 - 自动配置类登记到 `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`（`spring.factories` 是遗留，不读）
-- 依赖方向：`common` ← `web`/`jpa` ← `captcha`/`product`/`ai` ← `system` ← `distribute`（distribute 不含 `ping-ai`）—— 目标态见下方「架构要求」
-- 包名 `cn.procsl.ping.boot.<module>`（例外：`ping-ai` 是 `cn.procsl.ping.ai`）
+- 依赖方向（现状）：`common` ← `web`/`jpa` ← `ui`/`captcha`/`product`/`ai`；`system` 依赖 `captcha`/`ui`；`distribute` 依赖 `product`/`system`/`ui`（不含 `ping-ai`）。`ping-ai` 只依赖 `web`，无任何模块依赖它 —— 目标态见下方「架构要求」
+- 包名 `cn.procsl.ping.boot.<module>`（`ping-ai` 即 `cn.procsl.ping.boot.ai`，无例外）
+- `ping-ai` 当前仅为 Spring Boot 空壳（独立端口 10001），LLM/agent 能力待重新设计
 - 路径每个 mapping 写全 `/v1/...`；分页 `offset`/`limit` one-indexed；JSON SNAKE_CASE
 
 ## 架构要求
@@ -33,7 +34,7 @@
 **散/聚打包**
 
 - 散：业务模块独立出可执行 jar；聚：`ping-distribute` 大单体，兼作 GraalVM `-Pnative` 发布
-- `mainClass` 由 `ping-apt` 生成 `<Module>Launcher`，`repackage` 自动发现 → **业务模块 pom 不写 `<mainClass>`**；开关 `ping.standalone`（根 pom `false`、`ping-parent` `true`、`ping-distribute` `false`）
+- `mainClass` 由 `ping-apt` 生成 `<Module>Launcher`，`repackage` 自动发现 → **业务模块 pom 不写 `<mainClass>`**；开关 `ping.standalone`（根 pom `false`、`ping-parent` `true`、`ping-distribute` `false`）。现状例外：`ping-ai` 手写了 `<mainClass>` 和 `PingAiLauncher.main`（启动壳）
 - 业务模块 `src/main` 不得自带 `main`
 
 **构建期产物**
@@ -67,14 +68,6 @@
 - **无状态**：组件不依赖 Spring，直接 new 创建，用完即释放，无需一直持有
 - **命名规范**：命名清晰一致，避免混乱
 
-**OpenSpec 工作流约束**
-
-- **先拷问再进工作流**：有初步想法先 `/grill-me <初步计划>` 拷问到共识（直接说"grill 一下这个方案"会自动加载 `grilling`），再走 `/opsx:propose` 等产出物；需要沉淀文档时用 `/grill-with-docs`，拷问过程中同步产出 ADR 和 `GLOSSARY.md`
-- 需求理清楚后，**必须协商架构如何定义、组件如何组织**
-- spec 中的设计与任务必须包含：**示例、要求、测试**等沟通中的约束
-- 必须有**代码设计约束**（协商而来）
-- 规划阶段只创建规划制品，不实现代码
-
 ## 编译期生成
 
 - `ping-apt` 为 `@Entity` 生成 `<pkg>.repository.XxxRepository` 和 `Xxx_`（`target/generated-sources/annotations`）—— **别手写同名 Repository**
@@ -87,7 +80,7 @@
 
 - 数据源是内存 H2，无需外部服务
 - **大量测试源整体被注释**（`ping-jpa` 的 6 个 `*Test.java` 全注释，`Tests run: 0` 不是失败）
-- 有真实测试的只有 `ping-system`、`ping-product`
+- 有真实测试的：`ping-system`（7 个）、`ping-product`（2 个），另 `ping-tool` 有 1 个
 
 ## 注意
 
@@ -95,10 +88,4 @@
 - `.gitmodules`：路径不存在；vendored 源码实际在 `third/`
 - Liquibase 未启用（全仓库无依赖），schema 由 `ddl-auto=update` 管
 - `.opencode/` 被 gitignore（skills/commands 仅本地）
-
-## OpenSpec
-
-- `openspec/`（schema `spec-driven`）+ `/opsx:*` 命令 + `.opencode/skills/openspec-*`，CLI 为 npm 全局包 `openspec-cn`（命令名 `openspec`）
-- 拷问类 skill：`grill-me`、`grill-with-docs`（依赖 `grilling`、`domain-modeling`），来自 `mattpocock/skills`，装在 `.agents/skills/`，根目录 `skills-lock.json` 跟踪，更新用 `npx skills update`
-- 当前分支 `dev-new`
-- 活跃变更以 `openspec list` 输出为准，不在本文档罗列
+- 拷问类 skill `grill-me`、`grill-with-docs` 在 `.agents/skills/`，根目录 `skills-lock.json` 跟踪，更新用 `npx skills update`
