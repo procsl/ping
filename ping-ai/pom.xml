@@ -26,29 +26,10 @@
 
     <dependencies>
 
+        <!-- 空壳阶段只依赖基础 Web 能力，后续 AI 能力在业务层实现 -->
         <dependency>
             <groupId>cn.procsl</groupId>
             <artifactId>ping-web</artifactId>
-        </dependency>
-
-        <!-- 显式构造模型客户端，不依赖 spring.ai.* 自动配置；starter 会把 autoconfigure/observation/retry 一并拖入 -->
-        <dependency>
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-openai</artifactId>
-            <version>2.0.1</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-client-chat</artifactId>
-            <version>2.0.1</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
 
         <!-- ping-web 的 validation 为 provided，本模块独立打包与被依赖时都需要运行时可用 -->
@@ -73,12 +54,6 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-indexer</artifactId>
             <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>org.immutables</groupId>
-            <artifactId>value</artifactId>
-            <scope>provided</scope>
         </dependency>
 
     </dependencies>

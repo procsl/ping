@@ -1,31 +1,29 @@
 package cn.procsl.ping.boot.ai;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
- * 唯一入口：非 web 形态启动，执行一次命令后退出。
+ * 启动入口：以 servlet web 形态启动。
  *
- * <p>已知债务：手写 main 与 AGENTS.md「业务模块 src/main 不得自带 main」冲突，
- * 待 {@code ping-apt} 生成 {@code <Module>Launcher} 后替换（见 design.md D10）。</p>
+ * <p>独立运行端口见 {@code application.properties} 的 {@code server.port}；
+ * 当前仅为 Spring Boot 空壳，AI 能力待重新设计。</p>
  */
 public final class PingAiLauncher {
+
+    private static final Logger log = LoggerFactory.getLogger(PingAiLauncher.class);
 
     private PingAiLauncher() {
     }
 
     public static void main(String[] args) {
         SpringApplication application = new SpringApplication(PingAiApplication.class);
-        application.setWebApplicationType(WebApplicationType.NONE);
+        application.setWebApplicationType(WebApplicationType.SERVLET);
         ConfigurableApplicationContext context = application.run(args);
-        int code;
-        try {
-            code = context.getBean(CliRunner.class).run();
-        } catch (RuntimeException e) {
-            context.close();
-            throw e;
-        }
-        System.exit(SpringApplication.exit(context, () -> code));
+        String port = context.getEnvironment().getProperty("server.port", "8080");
+        log.info("Ping AI 已启动: http://localhost:{}", port);
     }
 }
